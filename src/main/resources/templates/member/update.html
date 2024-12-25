@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"> 
+	<head>
+		<title>update title</title>
+		<link href="/style.css" rel="stylesheet">
+	</head>	
+	<body>
+		<h1>update.html</h1>
+		<form action="memberUpdate" method="post">
+			<table border="1">
+				<tr>
+					<th>아이디</th>
+					<td><input type="text" name="id" th:value="${member.id}" readonly> </td>
+				</tr>	
+				<tr>
+					<th>비밀번호</th>
+					<td><input type="password" name="pass" placeholder="기존 비밀번호를 입력하세요"></td>
+				</tr>		
+				<tr>
+					<th>이름</th>
+					<td><input type="text" name="name" th:value="${member.name}"></td>
+				</tr>
+				<tr>
+					<th>가입날짜</th>
+					<td><input type="text" name="date" th:value="${member.date}" readonly></td>
+				</tr>
+				<tr>
+					<th colspan="2">
+						<input type="submit" value="정보수정">
+						<input type="button" th:onclick="location.href='/'" value="메인으로">
+					</th>
+				</tr>
+			</table>
+			
+		</form>
+		
+	</body>
+</html>

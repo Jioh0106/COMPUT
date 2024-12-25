@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"> 
+</html>
+<script th:inline="javascript">
+	
+	let msg = /*[[${msg}]]*/ '';
+	let isClose = /*[[${isClose}]]*/ '';
+	let targetURL = /*[[${targetURL}]]*/ '';
+
+		
+	alert(msg);
+		
+	if(isClose == "true") {
+			window.opener.location.reload();
+			window.close();
+	} 
+	
+	if(targetURL == "") {
+			history.back();
+		} else {
+			location.href = targetURL;		
+	}
+</script>
