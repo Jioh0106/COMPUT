@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>board/write title</title>
+	</head>
+	<body>
+		<h1>board/write.html</h1>
+		
+		<form th:action="@{/boardWrite}" method="post">
+			<table border="1">
+				<tr>
+					<td>글쓴이</td>
+					<td><input type="text" name="writer" th:value="${session.id}" readonly></td>
+				</tr>
+				<tr>
+					<td>제목</td>
+					<td><input type="text" name="title"></td>
+				</tr>
+				<tr>
+					<td>내용</td>
+					<td><textarea name="content" rows="10" cols="20"></textarea></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="글쓰기"></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

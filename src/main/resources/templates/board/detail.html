@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>board/detail title</title>
+	</head>
+	<body>
+		<h1>board/detail.html</h1>
+	
+		<button onclick="location.href='boardList'">목록으로</button>
+		<br><br>
+		<table border="1">
+			<tr>
+				<td>글번호</td>
+				<td><span th:text="${board.board_num}"></span></td>
+			</tr>
+			<tr>
+				<td>글쓴이</td>
+				<td><span th:text="${board.writer}"></span></td>
+			</tr>
+			<tr>
+				<td>제목</td>
+				<td><span th:text="${board.title}"></span></td>
+			</tr>
+			<tr>
+				<td>내용</td>
+				<td><span th:text="${board.content}"></span></td>
+			</tr>
+			<tr>
+				<td>조회수</td>
+				<td><span th:text="${board.readcount}"></span></td>
+			</tr>
+			<tr>
+				<td>작성일자</td>
+				<td><span th:text="${board.date}"></span></td>
+			</tr>
+			<tr>
+				<td>파일</td>
+<!--				<td><span th:text="${board.file}"></span></td>-->
+				<!-- 링크 출력-->
+<!--				<td>-->
+<!--			       <a th:href="@{/files/{fileName}(fileName=${board.file})}" th:text="${board.file}"></a>-->
+<!--			   </td>-->
+				<!-- 이미지 미리보기-->
+			   <td>
+		           <img th:src="@{/files/{fileName}(fileName=${board.file})}" alt="Uploaded Image" style="max-width:300px; max-height:300px;">
+		       </td>
+			</tr>
+		</table>
+		<br>
+		<div th:if="${session.id != null && session.id == board.writer}">
+<!--			<a  th:href="@{/boardUpdate(board_num=${board.board_num})}">글수정</a>-->
+<!--			<a  th:href="@{/boardDelete(board_num=${board.board_num})}">글삭제</a>-->
+			<button th:onclick="'boardUpdate(' + ${board.board_num} + ')'">글수정</button>
+			<button th:onclick="'boardDelete(' + ${board.board_num} + ')'">글삭제</button>
+		</div>
+	</body>
+</html>
+
+<script>
+	function boardDelete(board_num) {
+		if(confirm("해당 글을 삭제하시겠습니까?")) {
+			location.href="boardDelete?board_num="+board_num;
+		}
+		
+	}
+</script>
