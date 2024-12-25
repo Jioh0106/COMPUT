@@ -32,19 +32,7 @@
 			</tr>
 			<tr>
 				<td>작성일자</td>
-				<td><span th:text="${board.date}"></span></td>
-			</tr>
-			<tr>
-				<td>파일</td>
-<!--				<td><span th:text="${board.file}"></span></td>-->
-				<!-- 링크 출력-->
-<!--				<td>-->
-<!--			       <a th:href="@{/files/{fileName}(fileName=${board.file})}" th:text="${board.file}"></a>-->
-<!--			   </td>-->
-				<!-- 이미지 미리보기-->
-			   <td>
-		           <img th:src="@{/files/{fileName}(fileName=${board.file})}" alt="Uploaded Image" style="max-width:300px; max-height:300px;">
-		       </td>
+				<td><span th:text="${board.write_date}"></span></td>
 			</tr>
 		</table>
 		<br>

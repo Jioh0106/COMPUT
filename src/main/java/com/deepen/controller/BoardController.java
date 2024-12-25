@@ -44,7 +44,7 @@ public class BoardController {
 		if(id == null) {
 			return "/member/login";
 		}
-		return "/board/write";
+		return "board/write";
 		
 	}
 	
@@ -62,7 +62,7 @@ public class BoardController {
 		List<Board> boardList = boardService.findAll();
 		model.addAttribute("boardList", boardList);
 		
-		return "/board/board_list";
+		return "board/board_list";
 	}
 	
 	
@@ -75,7 +75,7 @@ public class BoardController {
 		model.addAttribute("board", board.get());
 		log.info(board.get().toString());
 		
-		return "/board/detail";
+		return "board/detail";
 	}
 	
 	// 글 수정하기 뷰로
@@ -86,7 +86,7 @@ public class BoardController {
 		model.addAttribute("board", board.get());
 		log.info(board.get().toString());
 		
-		return "/board/update";
+		return "board/update";
 	}
 	
 	// 글 수정 작업
