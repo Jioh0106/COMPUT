@@ -48,7 +48,7 @@ public class MemberController {
 		
 		service.save(member);
 		model.addAttribute("msg", "회원가입을 환영합니다!");
-		model.addAttribute("targetURL", "/");
+		model.addAttribute("targetURL", "test");
 		
 		return "result/result";
 		
@@ -70,7 +70,7 @@ public class MemberController {
 		if(bdmember != null) {
 			log.info(bdmember.toString());
 			session.setAttribute("id", member.getId());
-			return "redirect:/";
+			return "redirect:/test";
 			
 		}
 		log.info("bdmember == null");
@@ -84,7 +84,7 @@ public class MemberController {
 	public String Logout(HttpSession session) {
 		session.invalidate();
 		
-		return "redirect:/";
+		return "redirect:/test";
 	}
 	
 	@GetMapping("memberUpdate")
@@ -104,7 +104,7 @@ public class MemberController {
 		
 		if(bdmember != null) {
 			service.updateMember(member);
-			return "redirect:/";
+			return "redirect:/test";
 			
 		}
 		log.info("bdmember == null");
