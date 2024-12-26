@@ -31,8 +31,8 @@ public class BoardController {
 	
 	// application에 설정해 둔 파일 위치 가져오기
 	// uploadPath=D:/workspace_sts4/springboot/src/main/resources/static/upload
-	@Value("${uploadPath}")
-	String uploadPath;
+//	@Value("${uploadPath}")
+//	String uploadPath;
 	
 	
 	
