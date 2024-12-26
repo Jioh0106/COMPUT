@@ -48,4 +48,25 @@ if(typeof PerfectScrollbar == 'function') {
 }
 
 // Scroll into active sidebar
-document.querySelector('.sidebar-item.active').scrollIntoView(false)
+//document.querySelector('.sidebar-item.active').scrollIntoView(false)
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('mouseenter', function () {
+        // 마우스가 올려졌을 때만 active 클래스를 추가
+        this.classList.add('active');
+        this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });  // 부드럽게 스크롤
+    });
+
+    item.addEventListener('mouseleave', function () {
+        // 마우스가 떼어졌을 때 active 클래스를 제거
+        this.classList.remove('active');
+    });
+
+    // 클릭시 active 클래스 고정
+    item.addEventListener('click', function () {
+        document.querySelectorAll('.sidebar-item.active').forEach(activeItem => {
+            activeItem.classList.remove('active');
+        });
+        this.classList.add('active');
+    });
+});
