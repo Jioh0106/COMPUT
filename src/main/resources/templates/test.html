@@ -1,23 +1,75 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org"> 
-	<head>
-		<title>test title</title>
-		<link href="/style.css" rel="stylesheet">
-	</head>	
-	<body>
-		<h1>test.html</h1> 
-		<div th:if="${session.id != null}">
-			<span th:text="${session.id}"></span>님
-			<button th:onclick="location.href='/memberLogout'">로그아웃</button>
-			<button th:onclick="location.href='/memberUpdate'">회원정보</button><br>
-		</div>
-		<div>
-			<button th:onclick="location.href='/memberJoin'">회원가입</button>
-			<button th:onclick="location.href='/memberList'">회원목록</button>
-			<button th:onclick="location.href='/memberLogin'">로그인</button>
-			<button th:onclick="location.href='/boardList'">글목록</button>
-			<button th:onclick="location.href='/boardWrite'">글쓰기</button>
-		</div>
-				
-	</body>
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+</head>
+<body>
+		
+	<div id="app">
+		
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+		
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+			
+			<h3>test.html</h3>
+			
+			<div th:if="${session.id != null}">
+				<span th:text="${session.id}"></span>님
+				<button th:onclick="location.href='/memberLogout'">로그아웃</button>
+				<button th:onclick="location.href='/memberUpdate'">회원정보</button><br>
+			</div>
+			<div>
+				<button th:onclick="location.href='/memberJoin'">회원가입</button>
+				<button th:onclick="location.href='/memberList'">회원목록</button>
+				<button th:onclick="location.href='/memberLogin'">로그인</button>
+				<button th:onclick="location.href='/boardList'">글목록</button>
+				<button th:onclick="location.href='/boardWrite'">글쓰기</button>
+			</div>		
+	
+			
+			
+			
+		</div><!--main--> 
+
+	</div><!-- app -->
+		
+		
+	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/main.js"></script>
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script>
+
+		/* TOAST UI , 기타 자바스크립트 코드 작성 */ 
+		
+	</script>
+	
+</body>
+
 </html>
