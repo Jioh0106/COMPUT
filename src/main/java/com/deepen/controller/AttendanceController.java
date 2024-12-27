@@ -13,5 +13,11 @@ public class AttendanceController {
 		return "attendance/leave_absence";
 	}
 	
+	@GetMapping("/cmt-mng")
+	public String cmtMng() {
+		//http://localhost:8082/cmt
+		return "attendance/cmt_mng";
+	}
+	
 	
 }
