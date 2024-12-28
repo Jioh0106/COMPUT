@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>work-mng</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+</head>
+<body>
+		
+	<div id="app">
+		
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{sidebar :: sidebar}"></div>
+		
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+		        <a href="#" class="burger-btn d-block d-xl-none">
+		            <i class="bi bi-justify fs-3"></i>
+		        </a>
+		    </header>
+			
+			<h3>근무관리</h3>
+			
+			<div id="grid"></div>		
+				
+			
+		</div><!--main--> 
+
+	</div><!-- app -->
+		
+		
+	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/main.js"></script>
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script>
+		const gridData = [
+		      { name: 'John', artist: 'Artist A', type: 'Pop', release: '2023', genre: 'Pop' },
+		      { name: 'Jane', artist: 'Artist B', type: 'Rock', release: '2022', genre: 'Rock' },
+		      { name: 'Mike', artist: 'Artist C', type: 'Jazz', release: '2021', genre: 'Jazz' }
+		];
+
+		const grid = new tui.Grid({
+			el: document.getElementById('grid'),
+			data: gridData,
+			scrollX: false,
+			scrollY: false,
+			columns: [
+				{ header: 'Name', name: 'name', editor: 'text' },  // 텍스트 편집기
+				{ header: 'Artist', name: 'artist', editor: 'text' },
+				{ header: 'Type', name: 'type', editor: 'text' },
+				{ header: 'Release', name: 'release', editor: 'text' },
+				{ header: 'Genre', name: 'genre', editor: 'text' }
+			],
+			editing: true  // 편집 기능 활성화
+		});
+		
+	</script>
+	
+</body>
+
+</html>
