@@ -20,5 +20,11 @@ public class AttendanceController {
 		return "attendance/cmt_stts";
 	}
 	
+	//휴가 관리
+	@GetMapping("/vctn-mng")
+	public String vctnMng() {
+		//http://localhost:8082/vctn-mng
+		return "attendance/vctn_mng";
+	}
 	
 }
