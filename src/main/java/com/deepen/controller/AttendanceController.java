@@ -13,10 +13,11 @@ public class AttendanceController {
 		return "attendance/leave_absence";
 	}
 	
-	@GetMapping("/cmt-mng")
+	// 출퇴근 현황
+	@GetMapping("/cmt-stts")
 	public String cmtMng() {
-		//http://localhost:8082/cmt-mng
-		return "attendance/cmt_mng";
+		//http://localhost:8082/cmt-stts
+		return "attendance/cmt_stts";
 	}
 	
 	
