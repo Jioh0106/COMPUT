@@ -15,7 +15,7 @@ public class AttendanceController {
 	
 	@GetMapping("/cmt-mng")
 	public String cmtMng() {
-		//http://localhost:8082/cmt
+		//http://localhost:8082/cmt-mng
 		return "attendance/cmt_mng";
 	}
 	

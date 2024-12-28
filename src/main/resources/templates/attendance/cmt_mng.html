@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cmt</title>
+    <title>출퇴근 관리</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -19,6 +19,14 @@
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<style>
+	    .tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+	      background-color: #ffffff !important; 
+	    }
+	  </style>
+	  
 </head>
 
 <body>
@@ -138,7 +146,7 @@
            el: document.getElementById('grid'),
            columns: [
                { header: '사원번호', name: 'id' },
-               { header: '이름', name: 'city', editor: 'text' },
+               { header: '이름', name: 'city' },
 			   { header: '부서', name: 'dept' },
 			   { header: '일자', name: 'date' },
                { header: '출근시간', name: 'start' },
