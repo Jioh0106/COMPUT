@@ -6,13 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AttendanceController {
 	
-	@GetMapping("/leave-absence")
-	public String leaveAbsence() {
-		
-		
-		return "attendance/leave_absence";
-	}
-	
 	// 출퇴근 현황
 	@GetMapping("/cmt-stts")
 	public String cmtMng() {
@@ -26,5 +19,24 @@ public class AttendanceController {
 		//http://localhost:8082/vctn-mng
 		return "attendance/vctn_mng";
 	}
+	
+	// 휴직 관리
+	@GetMapping("/absence")
+	public String absence() {
+		//http://localhost:8082/absence
+		return "attendance/absence";
+	}
+	
+	// 근무 관리
+	@GetMapping("/work-mng")
+	public String workMng() {
+		//http://localhost:8082/absence
+		return "attendance/work_mng";
+	}
+	
+	
+	
+	
+	
 	
 }
