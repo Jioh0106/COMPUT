@@ -297,7 +297,7 @@
 
 					} else {
 						const dateDay = temp_date.getDay(); //요일 구하는 변수
-						if (day !== 0 && day !== 6) { // 0: 일요일, 6: 토요일
+						if (dateDay !== 0 && dateDay !== 6) { // 0: 일요일, 6: 토요일
 							//평일인 경우에만 count 증가
 							count++;
 						}
