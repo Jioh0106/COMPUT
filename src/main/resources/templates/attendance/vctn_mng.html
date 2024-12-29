@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>휴가 관리</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+		.display-flex {
+			display: flex;
+			
+		}
+		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+			margin-left:auto
+		}
+		.child-input1 {
+		    flex:1;
+		    width:30%;
+		    box-sizing: border-box;
+		}
+
+		.child-input2{
+		    flex:1;
+		    margin: 0px 5%;
+		    width:30%;
+		    box-sizing: border-box;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<div class="display-flex">
+			<h3>휴가 관리</h3>
+				<div class="buttons">
+			  <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" 
+			  		data-bs-target="#default">휴가 신청</button>
+					
+					<!-- 휴가 신청서 Modal 시작 -->
+					<div class="modal fade text-left" id="default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1"
+						aria-hidden="true">
+						<div class="modal-dialog modal-dialog-scrollable" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title" id="myModalLabel33">휴가 신청서</h4>
+									<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+										<i data-feather="x"></i>
+									</button>
+								</div>
+								<div class="modal-body">
+									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
+					
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사번: </label>
+											<div class="form-group">
+												<input type="text" value="11222" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>이름: </label>
+											<div class="form-group">
+												<input type="text" value="홍길동" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+					
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용 시작일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-start-date" onchange="calcDate()" >
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>사용 종료일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-end-date" onchange="calcDate()">
+											</div>
+										</div>
+									</div>
+					
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용일수: </label>
+											<div class="form-group">
+												<input type="text" id="use-days" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>잔여일수: </label>
+											<div class="form-group">
+												<input type="text" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+					
+									<label>휴가 구분</label>
+									<fieldset class="form-group">
+										<select class="form-select" id="basicSelect">
+											<option>연차</option>
+											<option>월차</option>
+											<option>병가</option>
+											<option>출산휴가</option>
+											<option>산재</option>
+											<option>일반</option>
+											<option>경조사</option>
+										</select>
+									</fieldset>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+										<i class="bx bx-x d-block d-sm-none"></i>
+										<span class="d-none d-sm-block">닫기</span>
+									</button>
+									<button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">
+										<i class="bx bx-check d-block d-sm-none"></i>
+										<span class="d-none d-sm-block">신청</span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 휴가 신청서 Modal 끝 -->
+			  </div> <!-- buttons -->
+			</div> <!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body">
+
+					<!-- 데이트 피커 시작 -->
+					<section class="section" style="margin-bottom: 2.2rem">
+						<div style="display: flex; align-items: center; gap: 1rem;">
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-1"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-2"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+
+							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="search" />
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- 데이트 피커 끝 -->
+
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<div id="grid"></div>
+						</div>
+					</section>
+					<!-- 그리드 끝 -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<!-- DatePicker 스크립트 -->
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script>
+		// 첫 번째 DatePicker 초기화
+		const container1 = document.getElementById('tui-date-picker-container-1');
+		const target1 = document.getElementById('tui-date-picker-target-1');
+		const instance1 = new tui.DatePicker(container1, {
+			date: new Date(),
+			input: {
+				element: target1,
+				format: 'yyyy-MM-dd'
+			}
+		});
+
+		// 두 번째 DatePicker 초기화
+		const container2 = document.getElementById('tui-date-picker-container-2');
+		const target2 = document.getElementById('tui-date-picker-target-2');
+		const instance2 = new tui.DatePicker(container2, {
+			date: new Date(),
+			input: {
+				element: target2,
+				format: 'yyyy-MM-dd'
+			}
+		});
+	</script>
+
+	<!-- Grid 스크립트 -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script>
+		var Grid = tui.Grid;
+
+		// 데이터 정의
+		const data = [
+			{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
+			{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
+			{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
+			{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
+			{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
+		];
+
+		// Grid 생성
+		const grid = new Grid({
+			el: document.getElementById('grid'),
+			columns: [
+				{header: '사원번호', name: 'id'},
+				{header: '이름', name: 'name'},
+				{header: '부서', name: 'dept'},
+				{header: '사용일', name: 'useDate'},
+				{header: '구분', name: 'se'},
+				{header: '차감일수', name: 'useDays'},
+				{header: '잔여일수', name: 'rmnngDays'}
+			],
+			data: data
+		});
+
+		// 데이터 갱신 (필요시)
+		// grid.resetData(data);
+	</script>
+	
+	<!-- Modal 내에 있는 일수 계산 스크립트 -->
+	<script>
+		function calcDate() {
+			// 사용 시작일과 종료일 가져오기
+			const startDateValue = document.getElementById('use-start-date').value; // yyyy-mm-dd 형식
+			const endDateValue = document.getElementById('use-end-date').value;
+
+			const startDate = new Date(startDateValue);
+			const endDate = new Date(endDateValue);
+
+
+			var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
+
+			if (startDateValue && endDateValue) {
+
+				while (true) {
+					const temp_date = startDate; //임시 날짜 변수에 시작일을 할당
+					if (temp_date.getTime() > endDate.getTime()) {
+						break;
+
+					} else {
+						const dateDay = temp_date.getDay(); //요일 구하는 변수
+						if (dateDay !== 0 && dateDay !== 6) { // 0: 일요일, 6: 토요일
+							//평일인 경우에만 count 증가
+							count++;
+						}
+						temp_date.setDate(startDate.getDate() + 1); //다음 날로 이동
+					}
+				}
+				document.getElementById('use-days').value = count;
+			}
+		}
+	</script>
+
+
+</body>
+
+</html>
