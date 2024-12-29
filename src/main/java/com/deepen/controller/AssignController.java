@@ -9,9 +9,18 @@ public class AssignController {
 	//인사발령등록 페이지
 	@GetMapping("/assign-insert")
 	public String assignInsert() {
-		//http://localhost:8082/assign_insert
+		//http://localhost:8082/assign-insert
 		
 		return "assign/assign_insert";
+	}
+	
+	
+	//인사발령현황 페이지
+	@GetMapping("/assign-stts")
+	public String assignStts() {
+		//http://localhost:8082/assign-stts
+		
+		return "assign/assign_stts";
 	}
 
 }
