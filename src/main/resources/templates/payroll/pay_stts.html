@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화면명</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	
+	 <style>
+/* 전체 테두리 */
+.tui-grid {
+    border: 1px solid #ccc; /* 표 외곽 테두리 */
+    border-collapse: collapse;
+}
+/* 세로 줄 */
+.tui-grid-cell {
+    border-right: 1px solid #ccc !important; 
+}
+/* 가로줄 */
+.tui-grid-cell {
+    border-bottom: 1px solid #ccc !important; /* 셀 아래쪽에 가로줄 */
+}
+/* 헤더 테두리 */
+.tui-grid-header-area {
+    border-bottom: 2px solid #ccc !important; /* 헤더 아래쪽 두꺼운 선 */
+}
+    </style>
+</head>
+<body>
+		
+	<div id="app">
+		
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+		
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+			
+			<h3>급여 지급 현황</h3>
+			
+			
+			<!-- 사원 급여표 -->
+			<hr>
+			<div style="margin-bottom: 10px; display: flex; align-items: center;">
+			<select class="form-select" id="basicSelect" style="width: 150px;">
+            	<option>전체</option>
+            	<option>인사팀</option>
+            	<option>마케팅팀</option>
+           	    <option>영업팀</option>
+           	    <option>개발팀</option>
+           	    <option>재무팀</option>
+           	    <option>CS팀</option>
+            </select>
+			<input type="text" class="form-control" id="basicInput" style="margin-left: 5px; width:200px;" placeholder="사원이름 검색">
+			<a href="#" class="btn btn-primary rounded-pill" style="margin-left: 5px;">Search</a>
+			</div>
+			<div id="grid" style="width:100%; height:100%;">
+			</div>
+			<a href="#" class="btn btn-secondary" style="margin-top: 5px;">선택삭제</a>
+			
+			<!--모달 연결 안댐ㅠㅠ        modal파일명    id값   -->
+<!--     	<div th:include="~{payroll/modal :: modal}"></div> -->
+   			
+   			<!-- 모달 임시 -->
+			<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="modalLabel">사원 정보</h5>
+			                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			            </div>
+			            <div class="modal-body">
+			               <table class="modal-table">
+				                <tr>
+				                    <th>사원번호</th>
+				                    <td id="modal-emp-num"></td>
+				                </tr>
+				                <tr>
+				                    <th>사원이름</th>
+				                    <td id="modal-emp-name"></td>
+				                </tr>
+			            	</table>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+   			
+		</div><!--main--> 
+
+
+	</div><!-- app -->
+		
+		
+	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/main.js"></script>
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+
+<script>
+
+  // 데이터값
+  const gridData = [
+	  
+      { date:"2024/12", emp_num: "001", emp_name: "변종석", allow_cd_1: "3,800,000", allow_cd_2: "200,000", allow_cd_3: "100,000", allow_amt: "4,100,000", deduc_cd_1: "200,000", deduc_cd_2: "50,000", deduc_cd_3: "150,000", deduc_cd_4: "150,000", deduc_cd_5: "50,000", deduc_cd_6: "50,000", deduc_amt: "650,000", all:"3,450,000" },
+      { date:"2024/12",emp_num: "002", emp_name: "정재원", allow_cd_1: "3,800,000", allow_cd_2: "200,000", allow_cd_3: "100,000", allow_amt: "4,100,000", deduc_cd_1: "200,000", deduc_cd_2: "50,000", deduc_cd_3: "150,000", deduc_cd_4: "150,000", deduc_cd_5: "50,000", deduc_cd_6: "50,000", deduc_amt: "650,000", all:"3,450,000" },
+      { date:"2024/11",emp_num: "003", emp_name: "장지현", allow_cd_1: "3,800,000", allow_cd_2: "200,000", allow_cd_3: "100,000", allow_amt: "4,100,000", deduc_cd_1: "200,000", deduc_cd_2: "50,000", deduc_cd_3: "150,000", deduc_cd_4: "150,000", deduc_cd_5: "50,000", deduc_cd_6: "50,000", deduc_amt: "650,000", all:"3,450,000"},
+      { date:"2024/11",emp_num: "004", emp_name: "신문섭", allow_cd_1: "3,800,000", allow_cd_2: "200,000", allow_cd_3: "100,000", allow_amt: "4,100,000", deduc_cd_1: "200,000", deduc_cd_2: "50,000", deduc_cd_3: "150,000", deduc_cd_4: "150,000", deduc_cd_5: "50,000", deduc_cd_6: "50,000", deduc_amt: "650,000", all:"3,450,000"},
+
+  ];
+  
+  //15.Custom Event Grid
+  const grid = new tui.Grid({
+      el: document.getElementById('grid'),
+      data: gridData,
+      rowHeaders: ['checkbox'],
+      scrollX: false,
+      scrollY: false,
+      columns: [
+    	  
+          { header: '귀속연월', name: 'date' },
+          { header: '사원번호', name: 'emp_num' },
+          { header: '사원이름', name: 'emp_name', className: 'grid-cell-hover' },
+          { header: '기본급', name: 'allow_cd_1' },
+          { header: '연차수당', name: 'allow_cd_2' },
+          { header: '성과급', name: 'allow_cd_3' },
+          { header: '총수당액', name: 'allow_amt' },
+          { header: '소득세', name: 'deduc_cd_1' },
+          { header: '주민세', name: 'deduc_cd_2' },
+          { header: '국민연금', name: 'deduc_cd_3' },
+          { header: '건강보험', name: 'deduc_cd_4' },
+          { header: '고용보험', name: 'deduc_cd_5' },
+          { header: '산재보험', name: 'deduc_cd_6' },
+          { header: '총공제액', name: 'deduc_amt' },
+          { header: '실지급액', name: 'all' }
+      ]
+  });
+  
+  grid.on('check', ev => {
+      console.log('check!', ev);
+    });
+
+    grid.on('uncheck', ev => {
+      console.log('uncheck!', ev);
+    });
+
+    grid.on('focusChange', ev => {
+      console.log('change focused cell!', ev);
+    });
+  
+  //사원이름 click 
+  grid.on('click', (ev) => {
+      if (ev.columnName === 'emp_name') {
+          const rowData = grid.getRow(ev.rowKey);
+
+          // 모달에 데이터 삽입
+          document.getElementById('modal-emp-num').innerText = rowData.emp_num;
+          document.getElementById('modal-emp-name').innerText = rowData.emp_name;
+
+          // 모달 표시
+          const modal = new bootstrap.Modal(document.getElementById('modal'));
+          modal.show();
+      }
+  });
+  
+  
+</script>
+	
+</body>
+
+</html>
