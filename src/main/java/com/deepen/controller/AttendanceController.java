@@ -21,16 +21,16 @@ public class AttendanceController {
 	}
 	
 	// 휴직 관리
-	@GetMapping("/absence")
+	@GetMapping("/loab-mng")
 	public String absence() {
-		//http://localhost:8082/absence
-		return "attendance/absence";
+		//http://localhost:8082/loab-mng
+		return "attendance/loab-mng";
 	}
 	
 	// 근무 관리
 	@GetMapping("/work-mng")
 	public String workMng() {
-		//http://localhost:8082/absence
+		//http://localhost:8082/work-mng
 		return "attendance/work_mng";
 	}
 	
