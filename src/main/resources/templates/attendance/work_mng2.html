@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>근무 관리</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
+	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+</head>
+<body>
+		
+	<div id="app">
+		
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+		        <a href="#" class="burger-btn d-block d-xl-none">
+		            <i class="bi bi-justify fs-3"></i>
+		        </a>
+		    </header>
+			
+			<h3>근무관리</h3>
+			
+			<div class="card">
+				<div class="card-body">
+					
+					<!-- 데이트 피커 시작 -->
+					<section class="section" style="margin-bottom: 2.2rem">
+					    <div style="display: flex; align-items: center; gap: 1rem;">
+					        <!-- 첫 번째 데이트 피커 -->
+					        <div>
+					            <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+					                <input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" />
+					                <span class="tui-ico-date"></span>
+					            </div>
+					            <div id="tui-date-picker-container-1" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+					        </div>
+
+					        <!-- 구분자 -->
+					        <span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+
+					        <!-- 두 번째 데이트 피커 -->
+					        <div>
+					            <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+					                <input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" />
+					                <span class="tui-ico-date"></span>
+					            </div>
+					            <div id="tui-date-picker-container-2" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+					        </div>
+							
+							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="search"/>
+								</div>
+							</div>
+					    </div>
+					</section>
+					<!-- 데이트 피커 끝 -->
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<div id="grid"></div>
+								<input type="submit" class="btn btn-success float-end" value="저장">
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝 -->
+				</div>
+			</div>
+			
+			
+			
+			
+		</div><!--main--> 
+
+	</div><!-- app -->
+		
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>	
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <script>
+		
+		// 첫 번째 DatePicker 초기화
+		const container1 = document.getElementById('tui-date-picker-container-1');
+		const target1 = document.getElementById('tui-date-picker-target-1');
+		const instance1 = new tui.DatePicker(container1, {
+		    date: new Date(),
+		    input: {
+		        element: target1,
+		        format: 'yyyy-MM-dd'
+		    }
+		});
+	
+		// 두 번째 DatePicker 초기화
+		const container2 = document.getElementById('tui-date-picker-container-2');
+		const target2 = document.getElementById('tui-date-picker-target-2');
+		const instance2 = new tui.DatePicker(container2, {
+		    date: new Date(),
+		    input: {
+		        element: target2,
+		        format: 'yyyy-MM-dd'
+		    }
+		});
+		
+		// 그리드 
+		
+		const gridData = [
+		      { name: 'John', artist: 'Artist A', type: 'Pop', release: '2023', genre: 'Pop' },
+		      { name: 'Jane', artist: 'Artist B', type: 'Rock', release: '2022', genre: 'Rock' },
+		      { name: 'Mike', artist: 'Artist C', type: 'Jazz', release: '2021', genre: 'Jazz' }
+		];
+
+		const grid = new tui.Grid({
+			el: document.getElementById('grid'),
+			data: gridData,
+			columns: [
+				{ header: 'Name', name: 'name', editor: 'text' },  
+				{ header: 'Artist', name: 'artist', editor: 'text' },
+				{ header: 'Type', name: 'type', editor: 'text' },
+				{ header: 'Release', name: 'release', editor: 'text' },
+				{ header: 'Genre', name: 'genre', editor: 'text' }
+			],
+			editing: true  // 편집 기능 활성화
+		}); 
+		
+
+		
+	</script>
+	
+</body>
+
+</html>

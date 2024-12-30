@@ -1,17 +1,19 @@
-<div th:fragment="main">
-	<!-- main.html -->
-	<div id="main">
-		
-	    <header class="mb-3">
-	        <a href="#" class="burger-btn d-block d-xl-none">
-	            <i class="bi bi-justify fs-3"></i>
-	        </a>
-	    </header>
-		
-	    <div class="page-heading">
-	        <button type="button" class="btn btn-danger btn-lg">출근하기</button>
-	    </div>
-			
-	</div>
-	<!-- main.html 끝-->
-</div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:layout="layout :: layout">
+<head>
+    <title>Main Page</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- 기존 main.html의 콘텐츠 -->
+        <header class="mb-3">
+            <a href="#" class="burger-btn d-block d-xl-none">
+                <i class="bi bi-justify fs-3"></i>
+            </a>
+        </header>
+        <div class="page-heading">
+            <button type="button" class="btn btn-danger btn-lg">출근하기</button>
+        </div>
+    </div>
+</body>
+</html>
