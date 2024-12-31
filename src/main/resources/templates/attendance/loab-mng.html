@@ -66,7 +66,7 @@
 				<h3>휴직 관리</h3>
 				
 				<div class="buttons">
-			 	<button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#default">휴직 신청</button>
+			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#default">휴직 신청</button>
 				
 				<!-- 휴가 신청서 Modal 시작 -->
 				<div class="modal fade text-left" id="default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1"
@@ -191,7 +191,11 @@
 					<div class="row" id="basic-table">
 						<form>
 							<div id="grid"></div>
-							<input type="submit" class="btn btn-success float-end" value="저장">
+							<div class="float-end">
+								<input type="submit" class="btn btn-outline-secondary" value="추가">
+								<input type="submit" class="btn btn-outline-success" value="저장">
+								<input type="submit" class="btn btn-outline-danger" value="삭제">
+							</div>
 						</form>
 					</div>
 				</section>
