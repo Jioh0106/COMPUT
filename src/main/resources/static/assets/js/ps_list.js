@@ -1,3 +1,27 @@
+// toast ui datepiker
+// 첫 번째 DatePicker 초기화
+const container1 = document.getElementById('tui-date-picker-container-1');
+const target1 = document.getElementById('tui-date-picker-target-1');
+const instance1 = new tui.DatePicker(container1, {
+	date: new Date(),
+	input: {
+		element: target1,
+		format: 'yyyy-MM-dd'
+	}
+});
+
+// 두 번째 DatePicker 초기화
+const container2 = document.getElementById('tui-date-picker-container-2');
+const target2 = document.getElementById('tui-date-picker-target-2');
+const instance2 = new tui.DatePicker(container2, {
+	date: new Date(),
+	input: {
+		element: target2,
+		format: 'yyyy-MM-dd'
+	}
+});
+
+
 // toast ui 그리드
 const Grid = tui.Grid;
 
@@ -10,8 +34,7 @@ const exInfoList = new Grid({
 		filter: {
 		            type: 'date',
 		            options: {
-		              format: 'yyyy/MM/dd',
-					  language : 'ko'
+		              format: 'yyyy-MM-dd',
 					}
 				}
 	},
@@ -66,6 +89,7 @@ Grid.applyTheme('clean'); // 테마 적용
 
 // 모달에 데이터 표시 함수
 function showModal(data) {
+	
     const modalBody = document.querySelector('#psDatailModal .modal-body');
 
     // 기존 모달 내용 초기화
@@ -85,8 +109,8 @@ function showModal(data) {
 
 // 팝업 창 띄우기
 function popUp() {
-    const width = 720;
-    const height = 775;
+    const width = 730;
+    const height = 750;
 
     // 현재 창의 중앙 좌표 계산
     const left = (window.innerWidth - width) / 2 + window.screenLeft;

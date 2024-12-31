@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.itwillbs.mapper.MemberMapper">
+<mapper namespace="com.deepen.mapper.MemberMapper">
 
 	
 	<select id="getUserById" parameterType="String" resultType="com.deepen.domain.MemberDTO">
@@ -10,9 +10,6 @@
 		from members 
 		where id = #{id}
 	</select>
-	
-	
-	
 	
 	
 </mapper>

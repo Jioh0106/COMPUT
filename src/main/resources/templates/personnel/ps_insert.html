@@ -40,256 +40,309 @@
                         <div class="card-body">
 								
 								<div class="row">
-									<div class="col-md-6">
-		                                <div class="form-group">
-		                                    <label for="photo">사진</label>
-		                                    <input type="file" id="emp_photo" class="form-control" name="emp_photo">
-		                                </div>
-		                            </div>
+									<div class="col">
+										<div class="col-md-6">
+			                                <div class="form-group">
+			                                    <label for="photo">사진</label>
+			                                    <input type="file" id="emp_photo" class="form-control" name="emp_photo">
+			                                </div>
+			                            </div>
+									</div>
 								</div>
 									 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_role">사원 권한</label>
-                                            <select id="emp_role" class="form-control" name="emp_role">
-                                                <option>최고관리자</option>
-                                                <option>부서관리자</option>
-                                                <option>일반사원</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_name">이름</label>
-                                            <input type="text" id="emp_name" class="form-control" name="emp_name" placeholder="이름">
-                                        </div>
-                                    </div>
+                                	<div class="col">
+		                               	<div class="col-md-12">
+	                                       <div class="form-group">
+	                                           <label for="emp_role">사원 권한</label>
+	                                           <select id="emp_role" class="form-control" name="emp_role">
+	                                               <option>최고관리자</option>
+	                                               <option>부서관리자</option>
+	                                               <option>일반사원</option>
+	                                           </select>
+	                                       </div>
+	                                   </div>
+                                	</div>
+                                	
+                                	<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_name">이름</label>
+	                                            <input type="text" id="emp_name" class="form-control" name="emp_name" placeholder="이름">
+	                                        </div>
+	                                    </div>
+									</div>
+                                	
+                                </div>
+								
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_birth">생년월일(toast UI 추가예정)</label>
+	                                            <input type="text" id="emp_birth" class="form-control" name="emp_birth" placeholder="YYYY/MM/DD">
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_ssn">주민등록번호</label>
+	                                            <input type="text" id="emp_ssn" class="form-control" name="emp_ssn" placeholder="주민등록번호">
+	                                        </div>
+	                                    </div>
+									</div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_birth">생년월일(toast UI 추가예정)</label>
-                                            <input type="text" id="emp_birth" class="form-control" name="emp_birth" placeholder="YYYY/MM/DD">
-                                        </div>
-                                    </div>
+                                	<div class="col">
+										<div class="col-md-12">
+	                                       <div class="form-group">
+	                                           <label for="emp_gender">성별</label>
+	                                           <select id="emp_gender" class="form-control" name="emp_gender">
+	                                               <option>남</option>
+	                                               <option>여</option>
+	                                           </select>
+	                                       </div>
+                                   	 	</div>
+									</div>
+									
+									<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_marital_status">결혼여부</label>
+	                                            <select id="emp_marital_status" class="form-control" name="emp_marital_status">
+	                                                <option>미혼</option>
+	                                                <option>기혼</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_phone">전화번호</label>
+	                                            <input type="text" id="emp_phone" class="form-control" name="emp_phone" placeholder="전화번호">
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_email">이메일</label>
+	                                            <input type="email" id="emp_email" class="form-control" name="emp_email" placeholder="이메일">
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label for="emp_address">주소(daum api 추가 예정)</label>
+	                                            <input type="text" id="emp_address" class="form-control" name="emp_address" placeholder="주소" readonly>
+	                                            <button type="button" class="btn btn-primary" onclick="daumPostcode()">주소 검색</button>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_edu">학력</label>
+	                                            <select id="emp_edu" class="form-control" name="emp_edu">
+	                                                <option>고졸</option>
+	                                                <option>학사</option>
+	                                                <option>석사</option>
+	                                                <option>박사</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_cert">자격증</label>
+	                                            <select id="emp_cert" class="form-control" name="emp_cert">
+	                                                <option>없음</option>
+	                                                <option>국가</option>
+	                                                <option>민간</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_status">재직상태</label>
+	                                            <select id="emp_status" class="form-control" name="emp_status">
+	                                                <option>재직</option>
+	                                                <option>퇴직</option>
+	                                                <option>휴직</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_job_type">고용유형</label>
+	                                            <select id="emp_job_type" class="form-control" name="emp_job_type">
+	                                                <option>정규직</option>
+	                                                <option>계약직</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_dept">부서명</label>
+	                                            <select id="emp_dept" class="form-control" name="emp_dept">
+	                                                <option>인사</option>
+	                                                <option>마케팅</option>
+	                                                <option>영업</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_position">직급명</label>
+	                                            <select id="emp_position" class="form-control" name="emp_position">
+	                                                <option>이사</option>
+	                                                <option>부장</option>
+	                                                <option>사원</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="hire_date">입사일(toast UI 추가예정)</label>
+	                                            <input type="text" id="emp_hire_date" class="form-control" name="emp_hire_date" placeholder="입사일">
+	                                        </div>
+	                                    </div>
+									</div>
+		
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="years_of_service">근속년수(계산되어야함, 뺄 예정)</label>
+	                                            <input type="number" id="emp_tenure" class="form-control" name="emp_tenure" placeholder="근속년수">
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_perf_grade">성과등급</label>
+	                                            <select id="emp_perf_grade" class="form-control" name="emp_perf_grade">
+	                                                <option>A</option>
+	                                                <option>B</option>
+	                                                <option>C</option>
+	                                                <option>D</option>
+	                                                <option>F</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_qtr_eval">평가기간</label>
+	                                            <select id="emp_qtr_eval" class="form-control" name="emp_qtr_eval">
+	                                                <option>1분기</option>
+	                                                <option>2분기</option>
+	                                                <option>3분기</option>
+	                                                <option>4분기</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_exit_date">퇴사일(toast UI 추가예정)</label>
+	                                            <input type="text" id="emp_exit_date" class="form-control" name="emp_exit_date" placeholder="퇴사일">
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_exit_type">퇴사유형</label>
+	                                            <select id="emp_exit_type" class="form-control" name="emp_exit_type">
+	                                                <option>자진퇴사</option>
+	                                                <option>권고사직</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+										<div class="col-md-6">
+	                                       <div class="form-group">
+	                                           <label for="emp_salary">기본급여</label>
+	                                           <input type="number" id="emp_salary" class="form-control" name="emp_salary" placeholder="기본급여">
+	                                       </div>
+	                                   </div>
+									</div>
+                                </div>
+
+								
+                                <div class="row">
+                                	<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_bank">급여통장은행명</label>
+	                                            <input type="text" id="emp_bank" class="form-control" name="emp_bank" placeholder="급여통장은행명">
+	                                        </div>
+	                                    </div>
+									</div>
 									 
-									<div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_ssn">주민등록번호</label>
-                                            <input type="text" id="emp_ssn" class="form-control" name="emp_ssn" placeholder="주민등록번호">
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_gender">성별</label>
-                                            <select id="emp_gender" class="form-control" name="emp_gender">
-                                                <option>남</option>
-                                                <option>여</option>
-                                            </select>
-                                        </div>
-                                    </div>
-									 
-									<div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_marital_status">결혼여부</label>
-                                            <select id="emp_marital_status" class="form-control" name="emp_marital_status">
-                                                <option>미혼</option>
-                                                <option>기혼</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_phone">전화번호</label>
-                                            <input type="text" id="emp_phone" class="form-control" name="emp_phone" placeholder="전화번호">
-                                        </div>
-                                    </div>
-									 
-									<div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_email">이메일</label>
-                                            <input type="email" id="emp_email" class="form-control" name="emp_email" placeholder="이메일">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_address">주소(daum api 추가 예정)</label>
-                                            <input type="text" id="emp_address" class="form-control" name="emp_address" placeholder="주소" readonly>
-                                            <button type="button" class="btn btn-primary" onclick="daumPostcode()">주소 검색</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_edu">학력</label>
-                                            <select id="emp_edu" class="form-control" name="emp_edu">
-                                                <option>고졸</option>
-                                                <option>학사</option>
-                                                <option>석사</option>
-                                                <option>박사</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_cert">자격증</label>
-                                            <select id="emp_cert" class="form-control" name="emp_cert">
-                                                <option>없음</option>
-                                                <option>국가</option>
-                                                <option>민간</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_status">재직상태</label>
-                                            <select id="emp_status" class="form-control" name="emp_status">
-                                                <option>재직</option>
-                                                <option>퇴직</option>
-                                                <option>휴직</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_job_type">고용유형</label>
-                                            <select id="emp_job_type" class="form-control" name="emp_job_type">
-                                                <option>정규직</option>
-                                                <option>계약직</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_dept">부서명</label>
-                                            <select id="emp_dept" class="form-control" name="emp_dept">
-                                                <option>인사</option>
-                                                <option>마케팅</option>
-                                                <option>영업</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_position">직급명</label>
-                                            <select id="emp_position" class="form-control" name="emp_position">
-                                                <option>이사</option>
-                                                <option>부장</option>
-                                                <option>사원</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="hire_date">입사일(toast UI 추가예정)</label>
-                                            <input type="text" id="emp_hire_date" class="form-control" name="emp_hire_date" placeholder="입사일">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="years_of_service">근속년수(계산되어야함, 뺄 예정)</label>
-                                            <input type="number" id="emp_tenure" class="form-control" name="emp_tenure" placeholder="근속년수">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_perf_grade">성과등급</label>
-                                            <select id="emp_perf_grade" class="form-control" name="emp_perf_grade">
-                                                <option>A</option>
-                                                <option>B</option>
-                                                <option>C</option>
-                                                <option>D</option>
-                                                <option>F</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_qtr_eval">평가기간</label>
-                                            <select id="emp_qtr_eval" class="form-control" name="emp_qtr_eval">
-                                                <option>1분기</option>
-                                                <option>2분기</option>
-                                                <option>3분기</option>
-                                                <option>4분기</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_exit_date">퇴사일(toast UI 추가예정)</label>
-                                            <input type="text" id="emp_exit_date" class="form-control" name="emp_exit_date" placeholder="퇴사일">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_exit_type">퇴사유형</label>
-                                            <select id="emp_exit_type" class="form-control" name="emp_exit_type">
-                                                <option>자진퇴사</option>
-                                                <option>권고사직</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_salary">기본급여</label>
-                                            <input type="number" id="emp_salary" class="form-control" name="emp_salary" placeholder="기본급여">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-									<div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_bank">급여통장은행명</label>
-                                            <input type="text" id="emp_bank" class="form-control" name="emp_bank" placeholder="급여통장은행명">
-                                        </div>
-                                    </div>
-									 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="emp_account">급여통장계좌번호</label>
-                                            <input type="text" id="emp_account" class="form-control" name="emp_account" placeholder="급여통장계좌번호">
-                                        </div>
-                                    </div>
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_account">급여통장계좌번호</label>
+	                                            <input type="text" id="emp_account" class="form-control" name="emp_account" placeholder="급여통장계좌번호">
+	                                        </div>
+	                                    </div>
+									</div>
                                 </div>
                         </div>
                     </div>
