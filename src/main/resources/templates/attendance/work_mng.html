@@ -21,6 +21,31 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
 	
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+		.display-flex {
+			display: flex;
+			
+		}
+		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+			margin-left:auto
+		}
+		.child-input1 {
+		    flex:1;
+		    width:30%;
+		    box-sizing: border-box;
+		}
+
+		.child-input2{
+		    flex:1;
+		    margin: 0px 5%;
+		    width:30%;
+		    box-sizing: border-box;
+		}
+	</style>
 
 </head>
 <body>
@@ -87,16 +112,6 @@
 					</section>
 					<!-- 데이트 피커 끝 -->
 					
-					<!-- 그리드 시작 -->
-					<section class="section">
-						<div class="row" id="basic-table">
-							<form>
-								<div id="grid"></div>
-								<input type="submit" class="btn btn-success float-end" value="저장">
-							</form>
-						</div>
-					</section>
-					<!-- 그리드 끝 -->
 				</div>
 			</div>
 			
