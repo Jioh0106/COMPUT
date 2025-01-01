@@ -31,32 +31,22 @@ const exInfoList = new Grid({
     { 
 		header: '입사일자', 
 		name: 'emp_hire_date',
-		filter: {
-		            type: 'date',
-		            options: {
-		              format: 'yyyy-MM-dd',
-					}
-				}
 	},
     { 
 		header: '사원번호', 
 		name: 'emp_num',
-		filter : { type: 'text', showApplyBtn: true, showClearBtn: true }
 	},
     { 
 		header: '성명', 
 		name: 'emp_name',
-		filter : { type: 'text', showApplyBtn: true, showClearBtn: true }
 	},
     { 
 		header: '부서명', 
 		name: 'emp_dept',
-		filter : 'select'
 	},
     { 
 		header: '직급명', 
 		name: 'emp_position',
-		filter : 'select'
 	},
     { header: 'E-mail', name: 'emp_email'}
   ],

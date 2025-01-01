@@ -16,8 +16,7 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
     
     <!-- TOAST UI -->
-    <link rel="stylesheet" href="https://uicdn.toast.com/toast-ui.select-box/latest/toastui-select-box.css">
-    <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/tui-calendar.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
 </head>
 
 <body>
@@ -79,8 +78,12 @@
                                 	<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_birth">생년월일(toast UI 추가예정)</label>
-	                                            <input type="text" id="emp_birth" class="form-control" name="emp_birth" placeholder="YYYY/MM/DD">
+												<label for="emp_birth">생년월일</label>			                                            
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										            <input type="text" id="emp_birth" name="emp_birth" aria-label="Date-Time">
+										            <span class="tui-ico-date"></span>
+										        </div>
+										        <div id="emp-birth-wrapper" style="margin-top: -1px;"></div>
 	                                        </div>
 	                                    </div>
 									</div>
@@ -243,8 +246,12 @@
                                 	<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="hire_date">입사일(toast UI 추가예정)</label>
-	                                            <input type="text" id="emp_hire_date" class="form-control" name="emp_hire_date" placeholder="입사일">
+	                                            <label for="emp_hire_date">입사일</label>
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										            <input type="text" id="emp_hire_date" name="emp_hire_date" aria-label="Date-Time">
+										            <span class="tui-ico-date"></span>
+										        </div>
+										        <div id="emp-hire-date-wrapper" style="margin-top: -1px;"></div>
 	                                        </div>
 	                                    </div>
 									</div>
@@ -295,7 +302,11 @@
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <label for="emp_exit_date">퇴사일(toast UI 추가예정)</label>
-	                                            <input type="text" id="emp_exit_date" class="form-control" name="emp_exit_date" placeholder="퇴사일">
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										            <input type="text" id="emp_exit_date" name="emp_exit_date" aria-label="Date-Time">
+										            <span class="tui-ico-date"></span>
+										        </div>
+										        <div id="emp-exit-date-wrapper" style="margin-top: -1px;"></div>
 	                                        </div>
 	                                    </div>
 									</div>
@@ -351,8 +362,8 @@
 			
 				<div class="form-group">
 		           <div class="d-flex justify-content-center">
-		               <button type="submit" class="btn btn-primary mx-2 rounded-pill">등록</button>
-		               <button type="button" class="btn btn-danger mx-2 rounded-pill">취소</button>
+		               <button type="submit" class="btn btn-outline-primary mx-2">등록</button>
+		               <button type="button" class="btn btn-outline-danger mx-2">취소</button>
 		           </div>
 		        </div>
 				
@@ -363,8 +374,8 @@
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="https://uicdn.toast.com/calendar/latest/tui-calendar.js"></script>
-    <script src="https://uicdn.toast.com/toast-ui.select-box/latest/toastui-select-box.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="assets/js/ps_insert.js"></script>
     <script>
         // TOAST UI Calendar, SelectBox 관련 JavaScript 초기화 코드는 추가할 수 있습니다.
     </script>
