@@ -10,25 +10,35 @@ public class PersonnelController {
 	
 	@GetMapping("/ex")
 	public String exPage() {
-		return "/ex/component-dropdown";
+		return "/ex/component-button";
 	}
 	
-//	@GetMapping("/ex2")
-//	public String exPage2() {
-//		return "/attendance/vctn_mng";
-//	}
-	
-
+	//http://localhost:8082/ps-list
 	@GetMapping("/ps-list")
-	public String list() {
+	public String psList() {
 		
 		return "/personnel/ps_list";
 	}
 	
+	//http://localhost:8082/ps-insert
 	@GetMapping("/ps-insert")
-	public String insert() {
+	public String psInsert() {
 		
 		return "/personnel/ps_insert";
+	}
+	
+	//http://localhost:8082/ps-empDb
+	@GetMapping("/ps-empDb")
+	public String empDb() {
+		
+		return "/personnel/ps_empDb";
+	}
+	
+	//http://localhost:8082/ps-hrDb
+	@GetMapping("/ps-hrDb")
+	public String hrDb() {
+		
+		return "/personnel/ps_hrDb";
 	}
 	
 }

@@ -25,7 +25,7 @@ public class PersonnelRestController {
         
         // 테스트 데이터 생성
         Map<String, Object> row1 = new HashMap<>();
-        row1.put("emp_hire_date", LocalDate.parse("2015/03/01", formatter)); 
+        row1.put("emp_hire_date", Date.valueOf(LocalDate.parse("2015-03-01"))); // 문자열 변환
         row1.put("emp_num", "150301001004");
         row1.put("emp_name", "김부장");
         row1.put("emp_dept", "인사팀");
@@ -34,7 +34,7 @@ public class PersonnelRestController {
         data.add(row1);
 
         Map<String, Object> row2 = new HashMap<>();
-        row2.put("emp_hire_date", LocalDate.parse("2015/12/09", formatter));
+        row2.put("emp_hire_date", Date.valueOf(LocalDate.parse("2015-12-09"))); // 문자열 변환
         row2.put("emp_num", "151209002005");
         row2.put("emp_name", "김이사");
         row2.put("emp_dept", "재무팀");
@@ -42,8 +42,9 @@ public class PersonnelRestController {
         row2.put("emp_email", "test2@gmail.com");
         data.add(row2);
 
+        // 나머지 데이터도 동일한 방식으로 수정
         Map<String, Object> row3 = new HashMap<>();
-        row3.put("emp_hire_date", LocalDate.parse("2015/12/09", formatter));
+        row3.put("emp_hire_date", Date.valueOf(LocalDate.parse("2015-12-09")));
         row3.put("emp_num", "151209004004");
         row3.put("emp_name", "박부장");
         row3.put("emp_dept", "개발팀");
@@ -52,7 +53,7 @@ public class PersonnelRestController {
         data.add(row3);
 
         Map<String, Object> row4 = new HashMap<>();
-        row4.put("emp_hire_date", LocalDate.parse("2017/03/09", formatter));
+        row4.put("emp_hire_date", Date.valueOf(LocalDate.parse("2017-03-09")));
         row4.put("emp_num", "170309004003");
         row4.put("emp_name", "조차장");
         row4.put("emp_dept", "개발팀");
@@ -61,7 +62,7 @@ public class PersonnelRestController {
         data.add(row4);
 
         Map<String, Object> row5 = new HashMap<>();
-        row5.put("emp_hire_date", LocalDate.parse("2018/07/09", formatter));
+        row5.put("emp_hire_date", Date.valueOf(LocalDate.parse("2018-07-09")));
         row5.put("emp_num", "180709004005");
         row5.put("emp_name", "정팀장");
         row5.put("emp_dept", "개발팀");
@@ -70,7 +71,7 @@ public class PersonnelRestController {
         data.add(row5);
 
         Map<String, Object> row6 = new HashMap<>();
-        row6.put("emp_hire_date", LocalDate.parse("2021/03/02", formatter));
+        row6.put("emp_hire_date", Date.valueOf(LocalDate.parse("2021-03-02")));
         row6.put("emp_num", "210302004006");
         row6.put("emp_name", "손대리");
         row6.put("emp_dept", "개발팀");
@@ -79,7 +80,7 @@ public class PersonnelRestController {
         data.add(row6);
 
         Map<String, Object> row7 = new HashMap<>();
-        row7.put("emp_hire_date", LocalDate.parse("2024/12/09", formatter));
+        row7.put("emp_hire_date", Date.valueOf(LocalDate.parse("2024-12-09")));
         row7.put("emp_num", "241209004008");
         row7.put("emp_name", "이사원");
         row7.put("emp_dept", "개발팀");
@@ -88,7 +89,7 @@ public class PersonnelRestController {
         data.add(row7);
 
         Map<String, Object> row8 = new HashMap<>();
-        row8.put("emp_hire_date", LocalDate.parse("2024/12/09", formatter));
+        row8.put("emp_hire_date", Date.valueOf(LocalDate.parse("2024-12-09")));
         row8.put("emp_num", "241209004008");
         row8.put("emp_name", "박사원");
         row8.put("emp_dept", "개발팀");
@@ -99,4 +100,3 @@ public class PersonnelRestController {
         return data;
     }
 }
-
