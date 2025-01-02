@@ -42,7 +42,7 @@
 									<div class="col">
 										<div class="col-md-6">
 			                                <div class="form-group">
-			                                    <label for="photo">사진</label>
+			                                    <label for="emp_photo">사진</label>
 			                                    <input type="file" id="emp_photo" class="form-control" name="emp_photo">
 			                                </div>
 			                            </div>
@@ -51,21 +51,21 @@
 									 
                                 <div class="row">
                                 	<div class="col">
-		                               	<div class="col-md-2">
+		                               	<div class="col-md-5">
 	                                       <div class="form-group">
 	                                           <label for="emp_role">사원 권한</label>
 	                                           <select id="emp_role" class="form-control" name="emp_role">
-	                                               <option>최고관리자</option>
-	                                               <option>부서관리자</option>
-	                                               <option>일반사원</option>
+	                                               <option>추가 예정</option>
 	                                           </select>
 	                                       </div>
 	                                   </div>
                                 	</div>
+                                	
+                                	<div class="col"></div>
                                 </div>
-								
+                                
                                 <div class="row">
-                                	<div class="col">
+	                               	<div class="col">
 										<div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <label for="emp_name">이름</label>
@@ -74,15 +74,20 @@
 	                                    </div>
 									</div>
 									
-									<div class="col">
-										<div class="col-md-12">
-	                                        <div class="form-group">
-	                                            <label for="emp_ssn">주민등록번호</label>
-	                                            <input type="text" id="emp_ssn" class="form-control" name="emp_ssn" placeholder="주민등록번호">
-	                                        </div>
-	                                    </div>
-									</div>
-                                </div>
+                                	<div class="col">
+									   <div class="col-md-12">
+									       <div class="form-group">
+									           <label for="emp_ssn">주민등록번호</label>
+									           <div class="d-flex">
+									               <input type="text" id="first_emp_ssn" class="form-control" name="first_emp_ssn" placeholder="앞자리" style="width: 83%; margin-right: 5px;">
+									               <span><b>-</b></span>
+									               <input type="text" id="second_emp_ssn" class="form-control" name="second_emp_ssn" placeholder="뒷자리" style="width: 100%; margin-left: 5px;">
+									            </div>
+									        </div>
+									    </div>
+								  	</div>  
+								</div>
+                                
 
                                 <div class="row">
                                 	<div class="col">
@@ -117,7 +122,7 @@
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <label for="emp_phone">전화번호</label>
-	                                            <input type="text" id="emp_phone" class="form-control" name="emp_phone" placeholder="전화번호">
+	                                            <input type="text" id="emp_phone" class="form-control " name="emp_phone" placeholder="전화번호">
 	                                        </div>
 	                                    </div>
 									</div>
@@ -136,10 +141,10 @@
                                 	<div class="col">
 	                                    <div class="col-md-5">
 	                                    	<div class="form-group" >
-	                                            <div><label for="emp_address">주소</label></div>
+	                                            <div><label>주소</label></div>
 		                                        <div class ="d-flex align-items-center">
-		                                            <input type="text" class="form-control" id="sample6_postcode" placeholder="우편번호">
-													<input type="button" class="btn-primary" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+		                                            <input type="text" class="form-control" id="postCode" placeholder="우편번호">
+													<input type="button" class="btn-primary mx-2" onclick="daumAddressAPI()" value="주소 찾기"><br>
 		                                        </div>
 	                                    	</div>
 	                                    </div>
@@ -148,8 +153,8 @@
                                 
                                 <div class="row">
                                 	<div class="col-md-8">
-                                    	<div class="form-group">
-                                    		<input type="text" class="form-control" id="sample6_address" placeholder="주소"><br>
+                                    	<div class="form-group my-0">
+                                    		<input type="text" class="form-control" id="emp_address my-0" name="emp_address" placeholder="주소"><br>
                                     	</div>	
                                     </div>
                                 </div>
@@ -157,14 +162,16 @@
                                 <div class="row">
                                 	<div class="col-md-10">
                                     	<div class="form-group">
-											<input type="text" class="form-control" id="sample6_detailAddress" placeholder="상세주소">
+											<input type="text" class="form-control" id="emp_address_detail" name="emp_address_detail" placeholder="상세주소">
                                     	</div>	
                                     </div>
                                 </div>
 
+								<hr>	
+									
                                 <div class="row">
                                 	<div class="col">
-	                                    <div class="col-md-12">
+	                                    <div class="col-md-5">
 	                                        <div class="form-group">
 	                                            <label for="emp_edu">학력</label>
 	                                            <select id="emp_edu" class="form-control" name="emp_edu">
@@ -177,25 +184,16 @@
 	                                    </div>
 									</div>
 									
-									<div class="col">
-	                                    <div class="col-md-12">
-	                                        <div class="form-group">
-	                                            <label for="emp_cert">자격증</label>
-	                                            <select id="emp_cert" class="form-control" name="emp_cert">
-	                                                <option>없음</option>
-	                                                <option>국가</option>
-	                                                <option>민간</option>
-	                                            </select>
-	                                        </div>
-	                                    </div>
-									</div>
+									<div class="col"></div>
+									
+									
                                 </div>
 
                                 <div class="row">
                                 	<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_status">재직상태</label>
+	                                            <label for="emp_status">재직 상태</label>
 	                                            <select id="emp_status" class="form-control" name="emp_status">
 	                                                <option>재직</option>
 	                                                <option>퇴직</option>
@@ -208,7 +206,7 @@
 									<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_job_type">고용유형</label>
+	                                            <label for="emp_job_type">고용 유형</label>
 	                                            <select id="emp_job_type" class="form-control" name="emp_job_type">
 	                                                <option>정규직</option>
 	                                                <option>계약직</option>
@@ -251,7 +249,7 @@
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <div><label for="emp_hire_date">입사일</label></div> 
-												<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus form-control">
 										            <input type="text" id="emp_hire_date" name="emp_hire_date" aria-label="Date-Time">
 										            <span class="tui-ico-date"></span>
 										        </div>
@@ -259,42 +257,17 @@
 	                                        </div>
 	                                    </div>
 									</div>
-		
-									<div class="col">
-	                                    <div class="col-md-12">
-	                                        <div class="form-group">
-	                                            <label for="years_of_service">근속년수(계산되어야함, 뺄 예정)</label>
-	                                            <input type="number" id="emp_tenure" class="form-control" name="emp_tenure" placeholder="근속년수">
-	                                        </div>
-	                                    </div>
-									</div>
-                                </div>
-
-                                <div class="row">
-                                	<div class="col">
-	                                    <div class="col-md-12">
-	                                        <div class="form-group">
-	                                            <label for="emp_perf_grade">성과등급</label>
-	                                            <select id="emp_perf_grade" class="form-control" name="emp_perf_grade">
-	                                                <option>A</option>
-	                                                <option>B</option>
-	                                                <option>C</option>
-	                                                <option>D</option>
-	                                                <option>F</option>
-	                                            </select>
-	                                        </div>
-	                                    </div>
-									</div>
 									
 									<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_qtr_eval">평가기간</label>
-	                                            <select id="emp_qtr_eval" class="form-control" name="emp_qtr_eval">
-	                                                <option>1분기</option>
-	                                                <option>2분기</option>
-	                                                <option>3분기</option>
-	                                                <option>4분기</option>
+	                                            <label for="emp_perf_grade">성과 등급</label>
+	                                            <select id="emp_perf_grade" class="form-control" name="emp_perf_grade" >
+	                                                <option>A</option>
+	                                                <option>B</option>
+	                                                <option selected>C</option>
+	                                                <option>D</option>
+	                                                <option>F</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -306,7 +279,7 @@
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <div><label for="emp_exit_date">퇴사일</label></div>
-												<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus form-control">
 										            <input type="text" id="emp_exit_date" name="emp_exit_date" aria-label="Date-Time">
 										            <span class="tui-ico-date"></span>
 										        </div>
@@ -318,10 +291,9 @@
 									<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_exit_type">퇴사유형</label>
+	                                            <label for="emp_exit_type">퇴사 유형</label>
 	                                            <select id="emp_exit_type" class="form-control" name="emp_exit_type">
-	                                                <option>자진퇴사</option>
-	                                                <option>권고사직</option>
+	                                                <option>퇴사유형을 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -330,13 +302,14 @@
 
                                 <div class="row">
                                 	<div class="col">
-										<div class="col-md-6">
+										<div class="col-md-12">
 	                                       <div class="form-group">
-	                                           <label for="emp_salary">기본급여</label>
+	                                           <label for="emp_salary">기본 급여</label>
 	                                           <input type="number" id="emp_salary" class="form-control" name="emp_salary" placeholder="기본급여">
 	                                       </div>
 	                                   </div>
 									</div>
+									<div class="col"></div>
                                 </div>
 
 								
@@ -344,8 +317,8 @@
                                 	<div class="col">
 										<div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_bank">급여통장은행명</label>
-	                                            <input type="text" id="emp_bank" class="form-control" name="emp_bank" placeholder="급여통장은행명">
+	                                            <label for="emp_bank">계좌 은행</label>
+	                                            <input type="text" id="emp_bank" class="form-control" name="emp_bank" placeholder="급여 통장 은행명">
 	                                        </div>
 	                                    </div>
 									</div>
@@ -353,8 +326,8 @@
 									<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_account">급여통장계좌번호</label>
-	                                            <input type="text" id="emp_account" class="form-control" name="emp_account" placeholder="급여통장계좌번호">
+	                                            <label for="emp_account">계좌 번호</label>
+	                                            <input type="text" id="emp_account" class="form-control" name="emp_account" placeholder="-제외 입력">
 	                                        </div>
 	                                    </div>
 									</div>
