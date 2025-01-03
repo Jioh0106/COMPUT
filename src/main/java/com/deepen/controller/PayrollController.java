@@ -26,11 +26,4 @@ public class PayrollController {
 		//http://localhost:8082/pay-list
 		return "payroll/pay_list";
 	}
-	
-	
-	
-	
-	
-	
-	
 }

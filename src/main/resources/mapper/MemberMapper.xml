@@ -5,7 +5,7 @@
 <mapper namespace="com.deepen.mapper.MemberMapper">
 
 	
-	<select id="getUserById" parameterType="String" resultType="com.deepen.domain.MemberDTO">
+	<select id="getUserById"  resultType="com.deepen.domain.MemberDTO">
 		select *
 		from members 
 		where id = #{id}
