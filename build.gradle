@@ -30,14 +30,23 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
-	
-//	runtimeOnly 'com.mysql:mysql-connector-j'
-	
+		
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// https://mvnrepository.com/artifact/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	
+	
+	// mybatis-spring-boot
+	// https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+	
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.3'
 	
 	// Spring Boot Starter Security 
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
