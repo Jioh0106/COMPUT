@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.PersonnelMapper">
+
+	
+	<select id="selectCommonDetailCodeList" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('ATHR','WRST','DEPT','PSTN','OCPT','RANK','RTRM')
+		AND common_detail_status ='Y'
+	</select>
+	
+	
+</mapper>
+
+
+

@@ -17,6 +17,7 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
     <!-- TOAST UI CDN -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
 
     <style>
         .display-flex {
@@ -80,12 +81,15 @@
                 <h3>인사 카드 등록</h3>
                 <div class="buttons">
                     <!--신규 등록 버튼-->
-                    <button type="button" class="btn btn-primary rounded-pill" onclick="popUp()">
+                    <button type="button" class="btn btn-primary" onclick="popUp()">
                         신규 등록
                     </button>
                 </div>
             </div>
-
+			
+			
+			
+			
             <!--사원 조회 내용-->
             <div class="col-md-12 col-12">
                 <div class="card">
@@ -94,9 +98,50 @@
                     </div>-->
                     <div class="card-content">
                         <div class="card-body">
+                        
+                        	<!-- 데이트 피커 시작 -->
+							<section class="section" style="margin-bottom: 2.2rem">
+								<div style="display: flex; align-items: center; gap: 1rem;">
+									<!-- 첫 번째 데이트 피커 -->
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" />
+											<span class="tui-ico-date"></span>
+										</div>
+										<div id="tui-date-picker-container-1"
+											style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+									</div>
+					
+									<!-- 구분자 -->
+									<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+					
+									<!-- 두 번째 데이트 피커 -->
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" />
+											<span class="tui-ico-date"></span>
+										</div>
+										<div id="tui-date-picker-container-2"
+											style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+									</div>
+					
+									<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="search" />
+										</div>
+									</div>
+								</div>
+							</section>
+							<!-- 데이트 피커 끝 -->
 							
-                            <!--회원 정보 리스트-->
-                            <div id="grid"></div>
+                            <!--회원 정보 리스트 시작-->
+							<section class="section">
+								<div class="row" id="basic-table">
+                            		<div id="grid"></div>
+								</div>
+							</section>
+                            <!--회원 정보 리스트 끝-->
 
                         </div>
                     </div>
@@ -112,6 +157,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <!-- TOAST UI CDN -->
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
     <script src="assets/js/ps_list.js"></script>
     <script>
 		console.log();
