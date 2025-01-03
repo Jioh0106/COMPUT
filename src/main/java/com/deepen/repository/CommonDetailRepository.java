@@ -20,7 +20,7 @@ import com.deepen.entity.CommonDetail;
 //                findByIdOrPass(id,pass) => where id = ? or pass = ?
 //                findByNumBetween() => where num between ? and ?
 
-public interface CommonDetailRepository extends JpaRepository<CommonDetail, Integer> {
+public interface CommonDetailRepository extends JpaRepository<CommonDetail, String> {
 
 	
 	

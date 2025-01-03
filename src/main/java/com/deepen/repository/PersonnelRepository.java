@@ -20,7 +20,7 @@ import com.deepen.entity.Employees;
 //                findByIdOrPass(id,pass) => where id = ? or pass = ?
 //                findByNumBetween() => where num between ? and ?
 
-public interface PersonnelRepository extends JpaRepository<Employees, Integer> {
+public interface PersonnelRepository extends JpaRepository<Employees, String> {
 
 	
 	
