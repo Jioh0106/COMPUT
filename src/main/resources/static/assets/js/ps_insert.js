@@ -1,14 +1,53 @@
-/*const SelectBox = tui.SelectBox;
-const container1 = document.getElementById('selectBox');
+// ajax fetch API
+async function fetchCommonDetails() {
+	try{
+	  	const response = await fetch("http://localhost:8082/api/commonDetail");
+		if(!response.ok){
+			throw new Error("Network response was not ok");
+		}
+		const cdCodeData = await response.json();
+		console.log(cdCodeData);
+		
+		// ATHR(권한),WRST(재직상태),DEPT(부서),PSTN(직급),OCPT(직종),RANK(평가등급),RTRM(퇴사유형)
+		const athrSelect = document.getElementById('emp_role');
+		const wrstSelect = document.getElementById('emp_status');
+		const deptSelect = document.getElementById('emp_dept');
+		const pstnSelect = document.getElementById('emp_position');
+		const ocptSelect = document.getElementById('emp_job_type');
+		const rankSelect = document.getElementById('emp_perf_grade');
+		const rtrmSelect = document.getElementById('emp_exit_type');
+		
+		cdCodeData.forEach(item => {
+			const option = document.createElement('option');
+			option.value = item.common_detail_code;
+			option.textContent = item.common_detail_name;
+			
+			if(item.common_detail_code.startsWith('ATHR')){
+				athrSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('WRST')){
+				wrstSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('DEPT')){
+				deptSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('PSTN')){
+				pstnSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('OCPT')){
+				ocptSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('RANK')){
+				rankSelect.appendChild(option);
+			}else if(item.common_detail_code.startsWith('RTRM')){
+				rtrmSelect.appendChild(option);
+			}
+		});
+		
+	}catch(error){
+		console.error();
+	}
+}
 
-const selectBox = new SelectBox(container, {
-  data: [
-    {
-      label: 'Fruits',
-      data: [ { label: 'Apple', value: 'apple', selected: true }, { label: 'Banana', value: 'banana' } ]
-    }
-  ]
-});*/
+// 페이지가 완전히 로드된 후 함수 실행
+window.onload = function () {
+       fetchCommonDetails();
+   };
 
 // 다음 주소 api
 function daumAddressAPI() {

@@ -14,11 +14,7 @@ import lombok.Data;
 public class CommonDetail {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "common_detail_no")
-	private int common_detail_no;
-	
-	@Column(name="common_detail_code", length = 50, nullable = false, unique = true)
+	@Column(name="common_detail_code", length = 10, nullable = false)
 	private String common_detail_code;
 	
 	@Column(name="common_detail_name", length = 50, nullable = false)

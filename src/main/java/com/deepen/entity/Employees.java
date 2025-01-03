@@ -18,16 +18,16 @@ import lombok.Data;
 public class Employees {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "emp_no")
+	@Column(name ="emp_id", length = 30)
+	private String emp_id;
+	
+	@Column(name = "emp_no", nullable = false, unique = true)
 	private int emp_no; // 구분용 pk
 	
 	// 사원정보
 	@Column(name ="emp_role", length = 10, nullable = false)
 	private String emp_role;
 	
-	@Column(name ="emp_id", length = 30, nullable = false, unique = true)
-	private String emp_id;
 	
 	@Column(name ="emp_pw", length = 30, nullable = false)
 	private String emp_pw;
@@ -38,13 +38,13 @@ public class Employees {
 	@Column(name ="emp_photo", length = 100)
 	private String emp_photo;
 	
-	@Column(name ="emp_ssn", length = 13, nullable = false, unique = true)
+	@Column(name ="emp_ssn", length = 20, nullable = false, unique = true)
 	private String emp_ssn;
 	
-	@Column(name ="emp_gender", length = 1, nullable = false)
+	@Column(name ="emp_gender", length = 10, nullable = false)
 	private String emp_gender;
 	
-	@Column(name ="emp_marital_status", length = 2, nullable = false)
+	@Column(name ="emp_marital_status", length = 10, nullable = false)
 	private String emp_marital_status;
 	
 	@Column(name ="emp_phone", length = 20, nullable = false)
@@ -64,7 +64,7 @@ public class Employees {
 	//
 	
 	// 인사정보
-	@Column(name ="emp_status", length = 5, nullable = false)
+	@Column(name ="emp_status", length = 10, nullable = false)
 	private String emp_status;
 	
 	@Column(name ="emp_job_type", length = 10, nullable = false)

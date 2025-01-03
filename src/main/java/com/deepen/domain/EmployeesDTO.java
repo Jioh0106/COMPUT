@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class EmployeesDTO {
 	
-	private int emp_no; // 구분용 pk
 	
 	// 사원정보
-	private String emp_role;
 	private String emp_id;
+	private int emp_no; // 아이디 생성용
+	private String emp_role;
 	private String emp_pw;
 	private String emp_name;
 	private String emp_photo;

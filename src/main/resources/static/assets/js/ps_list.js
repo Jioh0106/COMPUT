@@ -107,6 +107,6 @@ function popUp() {
     const top = (window.innerHeight - height) / 2 + window.screenTop; 
 
     // 팝업 창 열기
-    window.open('/ps-insert', 'popup', `width=${width}, height=${height}, left=${left}, top=${top}`);
+    window.open('/ps-reg', 'popup', `width=${width}, height=${height}, left=${left}, top=${top}`);
 }
 

@@ -5,8 +5,12 @@
 <mapper namespace="com.deepen.mapper.PersonnelMapper">
 
 	
-	<select id="getCodeNameByCode" resultType="com.deepen.domain.CommonDetailDTO" >
-		
+	<select id="selectCommonDetailCodeList" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('ATHR','WRST','DEPT','PSTN','OCPT','RANK','RTRM')
+		AND common_detail_status ='Y'
 	</select>
 	
 	

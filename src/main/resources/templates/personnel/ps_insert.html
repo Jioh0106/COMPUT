@@ -28,7 +28,7 @@
             <!-- 사원 등록 -->
 			
 			<!-- 사원 등록 form 시작 -->
-            <form action="/ps-insert" method="post" enctype="multipart/form-data">
+            <form action="/ps-reg" method="post" enctype="multipart/form-data">
 			<!--card 시작-->
             <div class="col-md-12 col-12">
                 <div class="card">
@@ -43,7 +43,7 @@
 										<div class="col-md-6">
 			                                <div class="form-group">
 			                                    <label for="emp_photo">사진</label>
-			                                    <input type="file" id="emp_photo" class="form-control" name="emp_photo">
+			                                    <!-- <input type="file" id="emp_photo" class="form-control" name="emp_photo"> -->
 			                                </div>
 			                            </div>
 									</div>
@@ -55,7 +55,7 @@
 	                                       <div class="form-group">
 	                                           <label for="emp_role">사원 권한</label>
 	                                           <select id="emp_role" class="form-control" name="emp_role">
-	                                               <option>추가 예정</option>
+	                                               <option>권한 선택</option>
 	                                           </select>
 	                                       </div>
 	                                   </div>
@@ -87,7 +87,6 @@
 									    </div>
 								  	</div>  
 								</div>
-                                
 
                                 <div class="row">
                                 	<div class="col">
@@ -95,8 +94,8 @@
 	                                       <div class="form-group">
 	                                           <label for="emp_gender">성별</label>
 	                                           <select id="emp_gender" class="form-control" name="emp_gender">
-	                                               <option>남</option>
-	                                               <option>여</option>
+	                                               <option value="남">남</option>
+	                                               <option value="여">여</option>
 	                                           </select>
 	                                       </div>
                                    	 	</div>
@@ -107,8 +106,8 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_marital_status">결혼여부</label>
 	                                            <select id="emp_marital_status" class="form-control" name="emp_marital_status">
-	                                                <option>미혼</option>
-	                                                <option>기혼</option>
+	                                                <option value="미혼">미혼</option>
+	                                                <option value="기혼">기혼</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -122,7 +121,7 @@
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
 	                                            <label for="emp_phone">전화번호</label>
-	                                            <input type="text" id="emp_phone" class="form-control " name="emp_phone" placeholder="전화번호">
+	                                            <input type="text" id="emp_phone" class="form-control " name="emp_phone" placeholder="-생략">
 	                                        </div>
 	                                    </div>
 									</div>
@@ -154,7 +153,7 @@
                                 <div class="row">
                                 	<div class="col-md-8">
                                     	<div class="form-group my-0">
-                                    		<input type="text" class="form-control" id="emp_address my-0" name="emp_address" placeholder="주소"><br>
+                                    		<input type="text" class="form-control my-0" id="emp_address" name="emp_address" placeholder="주소"><br>
                                     	</div>	
                                     </div>
                                 </div>
@@ -175,10 +174,11 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_edu">학력</label>
 	                                            <select id="emp_edu" class="form-control" name="emp_edu">
-	                                                <option>고졸</option>
-	                                                <option>학사</option>
-	                                                <option>석사</option>
-	                                                <option>박사</option>
+	                                                <option>학력을 선택해주세요</option>
+	                                                <option value="고졸">고졸</option>
+	                                                <option value="학사">학사</option>
+	                                                <option value="석사">석사</option>
+	                                                <option value="박사">박사</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -195,9 +195,7 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_status">재직 상태</label>
 	                                            <select id="emp_status" class="form-control" name="emp_status">
-	                                                <option>재직</option>
-	                                                <option>퇴직</option>
-	                                                <option>휴직</option>
+	                                                <option>재직 상태를 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -208,8 +206,7 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_job_type">고용 유형</label>
 	                                            <select id="emp_job_type" class="form-control" name="emp_job_type">
-	                                                <option>정규직</option>
-	                                                <option>계약직</option>
+	                                                <option>고용 유형을 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -220,11 +217,9 @@
                                 	<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_dept">부서명</label>
+	                                            <label for="emp_dept">부서</label>
 	                                            <select id="emp_dept" class="form-control" name="emp_dept">
-	                                                <option>인사</option>
-	                                                <option>마케팅</option>
-	                                                <option>영업</option>
+	                                                <option>부서를 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -233,11 +228,9 @@
 									<div class="col">
 	                                    <div class="col-md-12">
 	                                        <div class="form-group">
-	                                            <label for="emp_position">직급명</label>
+	                                            <label for="emp_position">직급</label>
 	                                            <select id="emp_position" class="form-control" name="emp_position">
-	                                                <option>이사</option>
-	                                                <option>부장</option>
-	                                                <option>사원</option>
+	                                                <option>직급을 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -263,11 +256,7 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_perf_grade">성과 등급</label>
 	                                            <select id="emp_perf_grade" class="form-control" name="emp_perf_grade" >
-	                                                <option>A</option>
-	                                                <option>B</option>
-	                                                <option selected>C</option>
-	                                                <option>D</option>
-	                                                <option>F</option>
+	                                                <option>성과등급을 선택해주세요</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -340,7 +329,7 @@
 				<div class="form-group">
 		           <div class="d-flex justify-content-center">
 		               <button type="submit" class="btn btn-outline-primary mx-2">등록</button>
-		               <button type="button" class="btn btn-outline-danger mx-2">취소</button>
+		               <button type="button" class="btn btn-outline-danger mx-2" onclick="windowClose()">취소</button>
 		           </div>
 		        </div>
 				
@@ -355,7 +344,9 @@
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script src="assets/js/ps_insert.js"></script>
     <script>
-        // TOAST UI Calendar, SelectBox 관련 JavaScript 초기화 코드는 추가할 수 있습니다.
+        function windowClose(){
+        	window.close();
+        }
     </script>
     
 </body>

@@ -12,10 +12,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.domain.CommonDetailDTO;
+import com.deepen.service.PersonnelService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
+@Log
 public class PersonnelRestController {
-
+	
+	
+	private final PersonnelService psService;
+	
+	@GetMapping("/commonDetail")
+	public List<CommonDetailDTO> fetchCommonDetailCodeList() {
+		
+		List<CommonDetailDTO> cdDetailList = psService.fetchCommonDetailCodeList();
+		log.info(cdDetailList.toString());
+		
+		return cdDetailList;
+	}
+	
+	
     @GetMapping("/test1")
     public List<Map<String, Object>> getData() {
         List<Map<String, Object>> data = new ArrayList<>();
