@@ -1,10 +1,23 @@
 package com.deepen.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.deepen.service.AttendanceService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+
+@RequiredArgsConstructor
 @Controller
+@Log
 public class AttendanceController {
+	
+	private final AttendanceService attendanceService;
 	
 	// 출퇴근 현황
 	@GetMapping("/cmt-stts")
@@ -22,8 +35,13 @@ public class AttendanceController {
 	
 	// 휴직 관리
 	@GetMapping("/loab-mng")
-	public String absence() {
+	public String absence(Model model) {
 		//http://localhost:8082/loab-mng
+		
+		List<Map<String, Object>> absenceList = attendanceService.getAbsenceList();
+		log.info("absenceList : " + absenceList.toString());
+		
+		model.addAttribute("absenceList", absenceList);
 		return "attendance/loab-mng";
 	}
 	
