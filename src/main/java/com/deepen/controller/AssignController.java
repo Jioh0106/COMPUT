@@ -11,7 +11,7 @@ public class AssignController {
 	public String assignInsert() {
 		//http://localhost:8082/assign-insert
 		
-		return "assign/assign_insert";
+		return "personnel/assign_insert";
 	}
 	
 	
@@ -20,7 +20,7 @@ public class AssignController {
 	public String assignStts() {
 		//http://localhost:8082/assign-stts
 		
-		return "assign/assign_stts";
+		return "personnel/assign_stts";
 	}
 
 }
