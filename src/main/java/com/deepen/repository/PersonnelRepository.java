@@ -1,6 +1,7 @@
 package com.deepen.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.deepen.entity.Employees;
 
@@ -21,7 +22,7 @@ import com.deepen.entity.Employees;
 //                findByNumBetween() => where num between ? and ?
 
 public interface PersonnelRepository extends JpaRepository<Employees, String> {
-
 	
-	
+	@Query("SELECT MAX(e.emp_no) FROM Employees e")
+	Integer findMaxEmpNo();
 }
