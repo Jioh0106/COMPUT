@@ -1,7 +1,7 @@
-// ajax fetch API
+// ajax fetch API - 공통상세코드 조회
 async function fetchCommonDetails() {
 	try{
-	  	const response = await fetch("http://localhost:8082/api/commonDetail");
+	  	const response = await fetch("http://localhost:8082/restApi/commonDetail");
 		if(!response.ok){
 			throw new Error("Network response was not ok");
 		}
@@ -14,7 +14,7 @@ async function fetchCommonDetails() {
 		const deptSelect = document.getElementById('emp_dept');
 		const pstnSelect = document.getElementById('emp_position');
 		const ocptSelect = document.getElementById('emp_job_type');
-		const rankSelect = document.getElementById('emp_perf_grade');
+		const rankSelect = document.getElementById('emp_perf_rank');
 		const rtrmSelect = document.getElementById('emp_exit_type');
 		
 		cdCodeData.forEach(item => {
@@ -96,23 +96,21 @@ function daumAddressAPI() {
                document.getElementById("emp_address_detail").focus();
            }
        }).open();
-}   
-// 입사일
-const empHireDatePicker = new tui.DatePicker('#emp-hire-date-wrapper', {
-       date: new Date(),
-       input: {
-           element: '#emp_hire_date',
-           format: 'yyyy-MM-dd',
-       },
-	   language: 'ko',
-   });
-// 퇴사일
-const empExitDatePicker = new tui.DatePicker('#emp-exit-date-wrapper', {
-       date: new Date(),
-       input: {
-           element: '#emp_exit_date',
-           format: 'yyyy-MM-dd',
-       },
-	   language: 'ko',
-   });  
+}
+
+// toast ui datepiker
+function datePiker(containerSelector, inputSelector){
+	return new tui.DatePicker(containerSelector,{
+		date : new Date(),
+		input : {
+			element: inputSelector,
+			format: 'yyyy-MM-dd'
+		},
+		language : 'ko'
+	});
+}
+
+const empHireDatePiker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
+const empExitDatePiker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
+   
 
