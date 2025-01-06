@@ -56,7 +56,6 @@
                     <div class="row">
                         <div class="col-12 col-md-6 order-md-1 order-last">
                             <h3>급여 종류 관리</h3>
-                            <p class="text-subtitle text-muted">급여 항목을 관리할 수 있습니다.</p>
                         </div>
                     </div>
                 </div>
@@ -65,12 +64,12 @@
             <section class="section">
                 <div class="card">
                     <div class="card-body">
-                        <div style="margin-bottom: 10px;">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#salaryModal">
-                                급여 항목 입력
-                            </button>
-                        </div>
+                        <div style="margin-bottom: 10px; display: flex; align-items: center;"></div>
                         <div id="grid"></div>
+						<div class="float-end">
+							<input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
+							<input type="submit" class="btn btn-outline-danger" value="삭제">
+                    	</div>
                     </div>
                 </div>
             </section>
@@ -130,11 +129,11 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                                <i class="bi bi-x"></i> 닫기
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
+                                취소
                             </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> 저장
+                            <button type="submit" class="btn btn-outline-success">
+                                저장
                             </button>
                         </div>
                     </form>
@@ -169,15 +168,14 @@
             data: formulas,
             rowHeaders: ['checkbox'],
             columns: [
-                { header: '구분', name: 'formulaType', width: 100 },
-                { header: '항목명', name: 'formulaName', width: 150 },
-                { header: '계산식', name: 'formulaContent', width: 200 },
-                { header: '적용년도', name: 'applyYear', width: 100 },
-                { header: '우선순위', name: 'formulaPriority', width: 100 },
+                { header: '구분', name: 'formulaType'},
+                { header: '항목명', name: 'formulaName'},
+                { header: '계산식', name: 'formulaContent'},
+                { header: '적용년도', name: 'applyYear'},
+                { header: '우선순위', name: 'formulaPriority'},
                 { 
                     header: '수정일시', 
                     name: 'updatedAt',
-                    width: 150,
                     formatter: value => {
                         if (value.value) {
                             return new Date(value.value).toLocaleString();
