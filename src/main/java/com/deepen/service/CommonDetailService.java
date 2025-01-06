@@ -26,7 +26,4 @@ public class CommonDetailService {
         return repository.findAll();
     }
     
-    public Optional<CommonDetail> findByCode(String code) {
-        return repository.findByCode(code);
-    }
 }

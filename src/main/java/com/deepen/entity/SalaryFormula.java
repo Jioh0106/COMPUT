@@ -3,6 +3,7 @@ package com.deepen.entity;
 import java.time.LocalDateTime;
 
 import com.deepen.domain.SalaryFormulaDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,8 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -21,6 +20,7 @@ import lombok.Data;
 @Entity
 @Table(name = "SALARY_FORMULA")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SalaryFormula {
 	
 	@Id

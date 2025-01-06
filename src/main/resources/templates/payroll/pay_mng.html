@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>급여 종류 관리</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/bootstrap.css">
-    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
-    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
-    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/app.css">
-    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" type="image/x-icon">
     <!-- TOAST UI CDN -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
@@ -85,7 +86,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="salaryForm">
+                    <form id="salaryForm" th:action="@{/payroll/pay-mng}" method="post">
                         <div class="form-group">
                             <label for="formulaType" class="form-label">구분<span class="text-danger">*</span></label>
                             <select class="form-control" id="formulaType" name="formulaType" required>
@@ -143,19 +144,19 @@
     </div>
 
     <!-- Scripts -->
-    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 
     <script th:inline="javascript">
         // 서버에서 전달받은 데이터
-        const formulas = [[${formulas}]] || [];
+        const formulas = /*[[${formulas}]]*/ [];
         
         // 적용년도 옵션 설정
         const yearSelect = document.getElementById('applyYear');
         const currentYear = new Date().getFullYear();
-        for(let i = currentYear-2; i <= currentYear+2; i++) {
+        for(let i = currentYear; i <= currentYear+2; i++) {
             const option = document.createElement('option');
             option.value = i;
             option.textContent = i + '년';
@@ -187,39 +188,53 @@
             ]
         });
 
-        // 폼 제출 처리
-        document.getElementById('salaryForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    // 폼 제출 처리
+	 document.getElementById('salaryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            formulaType: document.getElementById('formulaType').value,
+            formulaName: document.getElementById('formulaName').value,
+            formulaContent: document.getElementById('formulaContent').value,
+            applyYear: parseInt(document.getElementById('applyYear').value),
+            formulaPriority: parseInt(document.getElementById('formulaPriority').value)
+        };
+
+        try {
+            const response = await fetch('/pay-mng', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
             
-            const formData = {
-                formulaType: document.getElementById('formulaType').value,
-                formulaName: document.getElementById('formulaName').value,
-                formulaContent: document.getElementById('formulaContent').value,
-                applyYear: parseInt(document.getElementById('applyYear').value),
-                formulaPriority: parseInt(document.getElementById('formulaPriority').value)
-            };
+            const result = await response.json();
 
-            try {
-                const response = await fetch('/payroll/pay-mng', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    alert('저장되었습니다.');
-                    window.location.reload();
-                } else {
-                    const errorData = await response.json();
-                    alert(errorData.message || '저장 중 오류가 발생했습니다.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('저장 중 오류가 발생했습니다.');
+            if (response.ok) {
+                alert(result.message || '저장되었습니다.');
+                location.reload(); // 페이지 새로고침하여 최신 데이터 표시
+            } else {
+                alert(result.message || '저장 중 오류가 발생했습니다');
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('저장 중 오류가 발생했습니다.');
+        }
+    });
+    
+	// 그리드 데이터 다시 불러오는 함수 추가
+	 function loadGridData() {
+	     fetch('/payroll/pay-mng')
+	         .then(response => response.json())
+	         .then(data => {
+	             grid.resetData(data);
+	         })
+	         .catch(error => {
+	             console.error('데이터 로딩 중 오류:', error);
+	         });
+	}
     </script>
 </body>
 </html>
