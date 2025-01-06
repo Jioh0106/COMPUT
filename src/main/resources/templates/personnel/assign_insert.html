@@ -55,10 +55,7 @@
 			<div class="card">
 				<div class="card-header">
 <!--					<h4 class="card-title">인사발령등록 작성</h4>-->
-					 <div class="col-12 d-flex justify-content-end">
-					<button type="button" class="btn btn-secondary" data-bs-toggle="modal"
-					 data-bs-target="#large">직원검색</button>
-				 	</div>
+					
 				</div>
 				<div class="card-content">
 					<div class="card-body">
@@ -69,16 +66,33 @@
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="first-name-column">담당자 사번</label>
-									<input type="text" id="first-name-column" class="form-control" 
-									readonly name="fname-column">
+									<input type="text" name="emp_id" id="emp_id" class="form-control" 
+									readonly>
 								</div>
 							</div>
 							
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="first-name-column">담당자 성명</label>
-									<input type="text" id="first-name-column" class="form-control" 
-									readonly name="fname-column">
+									<input type="text" id="emp_name" name="emp_name" class="form-control" 
+									readonly>
+								</div>
+							</div>
+							
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="first-name-column">발령자 사번</label>
+									<input type="text" id="assign_emp_id" class="form-control"
+										 name="assign_emp_id">
+								</div>
+							</div>
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="last-name-column">발령자 성명</label>
+									<input type="text" id="assign_emp_name" class="form-control"
+										 name="assign_emp_name">
 								</div>
 							</div>
 							
@@ -87,59 +101,50 @@
 								<div class="form-group">
 									<label>발령일자</label>
 									<div class="form-group">
-										<input type="date" class="form-control" id="assign_date" onchange="calcDate()">
+										<input type="date" class="form-control" id="assign_date" onchange="calcDate()"
+										name="assign_date">
 									</div>
 								</div>
 							</div>
 							
-							<div class="col-md-6 col-12">
-								<div class="form-group">
-									<label for="first-name-column">발령자 사번</label>
-									<input type="text" id="first-name-column" class="form-control"
-										 name="fname-column">
-								</div>
-							</div>
-							<div class="col-md-6 col-12">
-								<div class="form-group">
-									<label for="last-name-column">발령자 성명</label>
-									<input type="text" id="last-name-column" class="form-control"
-										 name="lname-column">
-								</div>
-							</div>
+							
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="city-column">발령구분</label>
-									<input type="text" id="city-column" class="form-control"
-										name="city-column">
+										<select id="assign_type" class="form-control" name="assign_type">
+											<option>구분 선택</option>
+										</select>
 								</div>
 							</div>
 							
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="company-column">이전직급</label>
-									<input type="text" id="company-column" class="form-control"
-										name="company-column">
+									<input type="text" id="prev_pos" class="form-control"
+										name="prev_pos">
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="email-id-column">발령직급</label>
-									<input type="email" id="email-id-column" class="form-control"
-										name="email-id-column">
+										<select id="new_pos" class="form-control" name="new_pos">
+											<option>직급 선택</option>
+										</select>
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="company-column">이전부서</label>
-									<input type="text" id="company-column" class="form-control"
-										name="company-column">
+									<input type="text" id="prev_dept" class="form-control"
+										name="prev_dept">
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="email-id-column">발령부서</label>
-									<input type="email" id="email-id-column" class="form-control"
-										name="email-id-column">
+										<select id="new_dept" class="form-control" name="new_dept">
+											<option>부서 선택</option>
+										</select>
 								</div>
 							</div>
 							<div class="col-12 d-flex justify-content-end">
@@ -199,7 +204,7 @@
                            <i class="bx bx-x d-block d-sm-none"></i>
                            <span class="d-none d-sm-block">취소</span>
                        </button>
-                       <button type="button" class="btn btn-primary ml-1"
+                       <button type="button" class="btn btn-primary ml-1" id="largeBtn"
                            data-bs-dismiss="modal">
                            <i class="bx bx-check d-block d-sm-none"></i>
                            <span class="d-none d-sm-block">선택</span>
@@ -266,30 +271,60 @@
 	<script src="assets/js/main.js"></script>
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="js/assign_insert.js"></script>
 	<script>
-
-
+	
+		// 발령자사번 클릭 시 직원검색 모달창
+		   document.getElementById('assign_emp_id').addEventListener('click', function () {
+		       // 모달 창을 보여줌
+		       var myModal = new bootstrap.Modal(document.getElementById('large'), {
+		           backdrop: 'static'  // 모달 바깥 클릭해도 닫히지 않게 설정 (필요 시)
+		       });
+		       myModal.show();
+		   });
+		
+		//토스트 ui 모달창 그리드 시작
 		document.addEventListener('DOMContentLoaded', function () {
 		      var Grid = tui.Grid;
 
-		      // 첫번째 모달창(직원검색버튼 모달창)
-		      const data1 = [
-		          {
-		              emp_num: '12-123', emp_name: '홍망고', emp_dept: '인사팀', emp_position: '팀장'
-		          }
-		      ];
-
-		      // 첫번째 모달창 Grid 생성
+		      // 직원검색 모달창 Grid 생성
 		      const grid1 = new Grid({
 		          el: document.getElementById('grid1'),
 		          columns: [
-		              { header: '사원번호', name: 'emp_num' },
+		              { header: '사원번호', name: 'emp_id' },
 		              { header: '성명', name: 'emp_name' },
 		              { header: '부서명', name: 'emp_dept' },
 		              { header: '직급', name: 'emp_position' }
 		          ],
-		          data: data1
+		          data: [] //초기데이터는 비워져있음
 		      });
+			  
+			  document.getElementById('nameSearch').addEventListener('input', function () {
+			        const keyword = this.value.trim(); // 입력된 키워드
+					
+					console.log("입력된 키워드:", keyword); // 디버그용 로그 출력
+					console.log("요청 URL:", `/api/empSearch?keyword=${encodeURIComponent(keyword)}`);
+					
+			        if (keyword.length > 0) {
+			            fetch(`/api/empSearch?keyword=${encodeURIComponent(keyword)}`)
+			                .then(response => {
+			                    if (!response.ok) {
+			                        throw new Error('검색 요청 중 오류가 발생했습니다.');
+			                    }
+			                    return response.json();
+			                })
+			                .then(data => {
+			                    grid1.resetData(data); // 검색 결과로 그리드 데이터 설정
+								grid1.refreshLayout(); // 레이아웃 새로고침
+			                })
+			                .catch(error => {
+			                    console.error('검색 중 오류가 발생했습니다.', error);
+			                    alert('검색 중 오류가 발생했습니다.');
+			                });
+			        } else {
+			            grid1.resetData([]); // 키워드가 없을 경우 그리드를 비움
+			        }
+			    });
 
 		      // 첫번째 모달이 열릴 때 Grid 리렌더링
 		      const largeModal = document.getElementById('large');
@@ -297,40 +332,77 @@
 		          grid1.refreshLayout();
 		      });
 
-		     
-			  //-------------------------------------------------------------
 			  
-			  
-			  // 두번쨰 모달창(등록버튼 승인권자 선택 모달창)
-			  	      const data2 = [
-			  	          {
-			  	              emp_num: '12-123', emp_name: '홍망고', emp_dept: '인사팀', emp_position: '팀장'
-			  	          }
-			  	      ];
 
-			  	      // 두번째 모달창 Grid 생성
+			  //직원검색에서 특정 그리드 선택
+			  let selectedRow = null;
+
+			  		grid1.on('click', (ev) => {
+			  		selectedRow = grid1.getRow(ev.rowKey); // 선택된 행의 데이터 가져오기
+			  		console.log(JSON.stringify(selectedRow));
+			  	});	  
+			  		
+			  	document.querySelector('#largeBtn').addEventListener('click',() => {
+			  		
+			  		if(selectedRow){
+			  			document.getElementById('assign_emp_id').value = selectedRow.emp_id;
+			  			document.getElementById('assign_emp_name').value = selectedRow.emp_name;
+			  			document.getElementById('prev_pos').value = selectedRow.emp_position;
+			  			document.getElementById('prev_dept').value = selectedRow.emp_dept;
+			  			
+			  			// 모달창 닫기
+			  			$('#large').modal('hide'); // Bootstrap Modal 닫기
+						
+			  		}else{
+			  			alert("직원을 선택해 주세요.");
+			  		}
+			  		
+			  	});
+			  
+			  
+			  
+		     
+			  //-------------------------------------------------------------승인권자 선택 모달창 시작
+			  
+			 
+
+			  	      // 승인권자 선택 모달창 Grid 생성
 			  	      const grid2 = new Grid({
 			  	          el: document.getElementById('grid2'),
 			  	          columns: [
-			  	              { header: '사원번호', name: 'emp_num' },
+			  	              { header: '사원번호', name: 'emp_id' },
 			  	              { header: '성명', name: 'emp_name' },
 			  	              { header: '부서명', name: 'emp_dept' },
 			  	              { header: '직급', name: 'emp_position' }
 			  	          ],
-			  	          data: data2
+			  	          data: []
 			  	      });
 
 			  	      // 두번째 모달이 열릴 때 Grid 리렌더링
 			  	      const defaultModal = document.getElementById('defaultSize');
 			  	      defaultModal.addEventListener('shown.bs.modal', function () {
-			  	          grid2.refreshLayout();
+			  	          
+						//ajax로 데이터 가져오기
+						fetch('/api/middleRole')
+						.then(response => response.json()) //json형태로 파싱
+						.then(data => {
+							grid2.resetData(data) // grid2에 새로운 데이터 바인딩
+							grid2.refreshLayout();
+						})
+						
+						.catch(error => {
+						     console.error('Error fetching middle role data:', error);
+						   })
+						
 			  	      });
-			  
-			  
-			  
-			  
-			  
-		  });
+		
+		 
+			 });//토스트 ui 모달창 그리드 끝
+		  
+		  
+									
+		  
+		  
 	</script>
 	
 </body>

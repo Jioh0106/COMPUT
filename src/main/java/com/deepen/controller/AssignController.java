@@ -12,6 +12,7 @@ public class AssignController {
 		//http://localhost:8082/assign-insert
 		
 		return "personnel/assign_insert";
+		
 	}
 	
 	
