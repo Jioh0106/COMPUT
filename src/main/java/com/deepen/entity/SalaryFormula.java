@@ -1,9 +1,7 @@
 package com.deepen.entity;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import com.deepen.domain.PayrollDTO;
 import com.deepen.domain.SalaryFormulaDTO;
 
 import jakarta.persistence.Column;
@@ -14,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -27,39 +27,44 @@ public class SalaryFormula {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "formula_seq")
 	@SequenceGenerator(name = "formula_seq", sequenceName = "FORMULA_SEQ", allocationSize = 1)
 	@Column(name = "formula_id")
-    private int formula_id;
+    private Long formulaId;
 
-	@Column(name = "formula_name")
-    private String formula_name;
+	@Column(name = "formula_name", nullable = false, length = 100)
+    private String formulaName;
 	
-	@Column(name = "formula_type")
-    private String formula_type;
+	@Column(name = "formula_type", nullable = false, length = 20)
+    private String formulaType;
 
-	@Column(name = "formula_content")
-    private String formula_content;
+	@Column(name = "formula_content", nullable = false, length = 1000)
+    private String formulaContent;
 	
-	@Column(name = "apply_year")
-    private int apply_year;
+	@Column(name = "apply_year", nullable = false)
+    private int applyYear;
 	
-	@Column(name = "formula_priority")
-    private int formula_priority;
+	@Column(name = "formula_priority", nullable = false)
+    private int formulaPriority;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
     
+    // FK 연결 : commonDetail
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "common_detail_no")
-    private CommonDetail commonDetail;
+    @JoinColumn(name = "formula_code", referencedColumnName = "common_detail_code", nullable = false)
+    private CommonDetail commonDetail; // FK 참조
     
     public static SalaryFormula setSalaryFormulaEntity(SalaryFormulaDTO salaryformulaDTO) {
     	SalaryFormula salaryFormula = new SalaryFormula();
-    	salaryFormula.setFormula_id(salaryformulaDTO.getFormula_id());
-    	salaryFormula.setFormula_name(salaryformulaDTO.getFormula_name());
-    	salaryFormula.setFormula_type(salaryformulaDTO.getFormula_type());
-    	salaryFormula.setFormula_content(salaryformulaDTO.getFormula_content());
-    	salaryFormula.setApply_year(salaryformulaDTO.getApply_year());
-    	salaryFormula.setFormula_priority(salaryformulaDTO.getFormula_priority());
-    	salaryFormula.setUpdated_at(salaryformulaDTO.getUpdated_at());
+    	salaryFormula.setFormulaId(salaryformulaDTO.getFormulaId());
+    	salaryFormula.setFormulaName(salaryformulaDTO.getFormulaName());
+    	salaryFormula.setFormulaType(salaryformulaDTO.getFormulaType());
+    	salaryFormula.setFormulaContent(salaryformulaDTO.getFormulaContent());
+    	salaryFormula.setApplyYear(salaryformulaDTO.getApplyYear());
+    	salaryFormula.setFormulaPriority(salaryformulaDTO.getFormulaPriority());
+    	// CommonDetail 설정
+        CommonDetail commonDetail = new CommonDetail();
+        commonDetail.setCommon_detail_code(salaryformulaDTO.getFormulaCode());
+        salaryFormula.setCommonDetail(commonDetail);
+    	salaryFormula.setUpdatedAt(LocalDateTime.now());
 		return salaryFormula;
     }
 	

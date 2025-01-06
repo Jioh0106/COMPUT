@@ -19,378 +19,207 @@
     
     <style>
         .tui-grid-cell {
-				background-color: #ffffff !important;
+            background-color: #ffffff !important;
         }
-
-        
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+        .modal-dialog {
+            max-width: 800px;
         }
-
-        .close:hover {
-            color: black;
-        }
-
-        .tab {
-            overflow: hidden;
-            border: 1px solid #ccc;
-            background-color: #f1f1f1;
-            margin-bottom: 20px;
-        }
-
-        .tab button {
-            background-color: inherit;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-        }
-
-        .tab button:hover {
-            background-color: #ddd;
-        }
-
-        .tab button.active {
-            background-color: #435ebe;
-            color: white;
-        }
-
-        .tabcontent {
-            display: none;
-            padding: 6px 12px;
-        }
-
-        .btn-wrapper {
-            margin-top: 10px;
-            text-align: right;
-        }
-
-        .btn-submit {
-            background-color: #435ebe;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
         .grid-wrapper {
             margin-top: 20px;
-            height: 300px;
+            height: 400px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
         }
     </style>
 </head>
+
 <body>
     <div id="app">
-        <!-- 사이드 메뉴바-->
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
         
-        <!-- 메인 content -->
         <div id="main">
-        
-            <!-- 반응형 사이드 메뉴 버튼-->
             <header class="mb-3">
                 <a href="#" class="burger-btn d-block d-xl-none">
                     <i class="bi bi-justify fs-3"></i>
                 </a>
             </header>
             
-            <h3>급여 종류 관리</h3>
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>급여 종류 관리</h3>
+                            <p class="text-subtitle text-muted">급여 항목을 관리할 수 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-	            <div class="card">
-					<div class="card-body">
-	            
-			            <!-- 급여 항목 입력 -->
-			            <div style="margin-bottom: 10px; display: flex; align-items: center;">
-			                <a href="#" class="btn btn-primary">급여 항목 입력</a>
-			            </div>
-			            
-			            <!-- 메인 그리드 시작 -->
-			            <section class="section">
-							<div class="row" id="basic-table">
-								<div id="grid"></div>
-							</div>
-						</section>
-			            <!-- 메인 그리드 끝 -->
-			            
-		            </div> <!-- card-body -->
-	            </div> <!-- card -->
-			            
-			            <div id="grid1" style="width:100%; height:100%;"></div>
-			            <a href="#" class="btn btn-secondary" style="margin-top: 5px;">선택삭제</a>
-			            
-        </div> <!-- main -->
-    </div> <!-- app -->
+            <section class="section">
+                <div class="card">
+                    <div class="card-body">
+                        <div style="margin-bottom: 10px;">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#salaryModal">
+                                급여 항목 입력
+                            </button>
+                        </div>
+                        <div id="grid"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
 
     <!-- 모달 창 -->
-	<div class="modal fade" id="salaryModal" tabindex="-1" role="dialog" aria-labelledby="salaryModalLabel" aria-hidden="true">
-	        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <h4 class="modal-title" id="salaryModalLabel">급여 항목 입력</h4>
-	                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-	                        <i class="bi bi-x"></i>
-	                    </button>
-	                </div>
-	                
-	                <div class="modal-body">
-	                    <!-- 탭 네비게이션 -->
-	                    <ul class="nav nav-tabs" id="salaryTab" role="tablist">
-	                        <li class="nav-item" role="presentation">
-	                            <button class="nav-link active" id="allowance-tab" data-bs-toggle="tab" data-bs-target="#allowance" 
-	                                    type="button" role="tab" aria-controls="allowance" aria-selected="true">수당</button>
-	                        </li>
-	                        <li class="nav-item" role="presentation">
-	                            <button class="nav-link" id="deduction-tab" data-bs-toggle="tab" data-bs-target="#deduction" 
-	                                    type="button" role="tab" aria-controls="deduction" aria-selected="false">공제</button>
-	                        </li>
-	                    </ul>
-	                    
-	                    <!-- 탭 컨텐츠 -->
-	                    <div class="tab-content" id="salaryTabContent">
-	                        <!-- 수당 탭 -->
-	                        <div class="tab-pane fade show active" id="allowance" role="tabpanel" aria-labelledby="allowance-tab">
-	                            <div id="allowanceGrid" class="grid-wrapper"></div>
-	                            <div class="d-flex justify-content-end mt-3">
-	                                <button onclick="addAllowanceRow()" class="btn btn-secondary me-2">항목 추가</button>
-	                                <button onclick="saveAllowance()" class="btn btn-primary">저장</button>
-	                            </div>
-	                        </div>
-	                        
-	                        <!-- 공제 탭 -->
-	                        <div class="tab-pane fade" id="deduction" role="tabpanel" aria-labelledby="deduction-tab">
-	                            <div id="deductionGrid" class="grid-wrapper"></div>
-	                            <div class="d-flex justify-content-end mt-3">
-	                                <button onclick="addDeductionRow()" class="btn btn-secondary me-2">항목 추가</button>
-	                                <button onclick="saveDeduction()" class="btn btn-primary">저장</button>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </div>
-	                
-	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-	                        <span class="d-none d-sm-block">닫기</span>
-	                    </button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
+    <div class="modal fade" id="salaryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">급여 항목 입력</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="salaryForm">
+                        <div class="form-group">
+                            <label for="formulaType" class="form-label">구분<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaType" name="formulaType" required>
+                                <option value="">선택하세요</option>
+                                <option value="수당">수당</option>
+                                <option value="공제">공제</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formulaName" class="form-label">항목명<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="formulaName" name="formulaName" 
+                                   maxlength="100" required placeholder="항목명을 입력하세요">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="formulaContent" name="formulaContent" 
+                                    rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
+                            <div class="help-text">예시: 기본급 * 0.1</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
+                            <select class="form-control" id="applyYear" name="applyYear" required>
+                                <option value="">선택하세요</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaPriority" name="formulaPriority" required>
+                                <option value="">선택하세요</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x"></i> 닫기
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> 저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
-    <!-- TOAST UI CDN -->
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 
-    <script>
-        // 메인 그리드 데이터
-        const gridData = [
-            { emp_num: "공제", emp_name: "소득세", allow_cd_1: "급여액에 따른 세율", allow_cd_2: "원", allow_cd_3: ""},
-            { emp_num: "공제", emp_name: "지방세", allow_cd_1: "소득세 x 0.1", allow_cd_2: "원", allow_cd_3: ""},
-            { emp_num: "공제", emp_name: "국민보험", allow_cd_1: "과세급여 x 0.45", allow_cd_2: "원", allow_cd_3: ""},
-            { emp_num: "공제", emp_name: "건강보험", allow_cd_1: "과세급여 x 0.3545", allow_cd_2: "원", allow_cd_3: "2024년 기준"},
-            { emp_num: "공제", emp_name: "고용보험", allow_cd_1: "과세급여 x 0.09", allow_cd_2: "원", allow_cd_3: ""},
-        ];
-
-        // 메인 그리드 생성
+    <script th:inline="javascript">
+        // 서버에서 전달받은 데이터
+        const formulas = [[${formulas}]] || [];
+        
+        // 적용년도 옵션 설정
+        const yearSelect = document.getElementById('applyYear');
+        const currentYear = new Date().getFullYear();
+        for(let i = currentYear-2; i <= currentYear+2; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i + '년';
+            yearSelect.appendChild(option);
+        }
+        
+        // 그리드 초기화
         const grid = new tui.Grid({
             el: document.getElementById('grid'),
-            data: gridData,
+            data: formulas,
             rowHeaders: ['checkbox'],
-            scrollX: false,
-            scrollY: false,
             columns: [
-                { header: '구분', name: 'emp_num' },
-                { header: '항목명', name: 'emp_name', className: 'grid-cell-hover' },
-                { header: '계산식', name: 'allow_cd_1' },
-                { header: '단위', name: 'allow_cd_2' },
-                { header: '설명', name: 'allow_cd_3' }
-            ]
-        });
-
-        // 수당 그리드 데이터
-        const allowanceData = [
-            { id: 1, category: '기본급', amount: 3800000 },
-            { id: 2, category: '연차수당', amount: 200000 },
-            { id: 3, category: '성과급', amount: 100000 }
-        ];
-
-        // 공제 그리드 데이터
-        const deductionData = [
-            { id: 1, category: '소득세', amount: 200000 },
-            { id: 2, category: '주민세', amount: 50000 },
-            { id: 3, category: '국민연금', amount: 150000 },
-            { id: 4, category: '건강보험', amount: 150000 },
-            { id: 5, category: '고용보험', amount: 50000 },
-            { id: 6, category: '산재보험', amount: 50000 }
-        ];
-
-        // 수당 그리드
-        const allowanceGrid = new tui.Grid({
-            el: document.getElementById('allowanceGrid'),
-            data: allowanceData,
-			scrollX: false,
-	        scrollY: true,
-	        bodyHeight: 250,
-            columns: [
-                {
-                    header: '항목',
-                    name: 'category',
-                    editor: 'text'
-                },
-                {
-                    header: '금액',
-                    name: 'amount',
-                    editor: 'text',
-                    formatter: (value) => {
-                        return value.value.toLocaleString() + '원';
+                { header: '구분', name: 'formulaType', width: 100 },
+                { header: '항목명', name: 'formulaName', width: 150 },
+                { header: '계산식', name: 'formulaContent', width: 200 },
+                { header: '적용년도', name: 'applyYear', width: 100 },
+                { header: '우선순위', name: 'formulaPriority', width: 100 },
+                { 
+                    header: '수정일시', 
+                    name: 'updatedAt',
+                    width: 150,
+                    formatter: value => {
+                        if (value.value) {
+                            return new Date(value.value).toLocaleString();
+                        }
+                        return '';
                     }
                 }
             ]
         });
 
-        // 공제 그리드
-        const deductionGrid = new tui.Grid({
-            el: document.getElementById('deductionGrid'),
-            data: deductionData,
-			scrollX: false,
-	        scrollY: true,
-	        bodyHeight: 250,
-            columns: [
-                {
-                    header: '항목',
-                    name: 'category',
-                    editor: 'text'
-                },
-                {
-                    header: '금액',
-                    name: 'amount',
-                    editor: 'text',
-                    formatter: (value) => {
-                        return value.value.toLocaleString() + '원';
-                    }
+        // 폼 제출 처리
+        document.getElementById('salaryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                formulaType: document.getElementById('formulaType').value,
+                formulaName: document.getElementById('formulaName').value,
+                formulaContent: document.getElementById('formulaContent').value,
+                applyYear: parseInt(document.getElementById('applyYear').value),
+                formulaPriority: parseInt(document.getElementById('formulaPriority').value)
+            };
+
+            try {
+                const response = await fetch('/payroll/pay-mng', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('저장되었습니다.');
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || '저장 중 오류가 발생했습니다.');
                 }
-            ]
-        });
-		
-		// 모달 객체 생성
-		        const salaryModal = new bootstrap.Modal(document.getElementById('salaryModal'));
-		        
-		        // 모달 열기 이벤트
-		        document.querySelector('.btn.btn-primary').addEventListener('click', function() {
-		            salaryModal.show();
-		            setTimeout(() => {
-		                allowanceGrid.refreshLayout();
-		                deductionGrid.refreshLayout();
-		            }, 100);
-		        });
-
-		        // 탭 전환 시 그리드 리프레시
-		        document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(button => {
-		            button.addEventListener('shown.bs.tab', function (event) {
-		                if (event.target.id === 'allowance-tab') {
-		                    allowanceGrid.refreshLayout();
-		                } else {
-		                    deductionGrid.refreshLayout();
-		                }
-		            });
-		        });
-
-        // 모달 관련 이벤트
-        document.querySelector('.btn.btn-primary').addEventListener('click', function() {
-            document.getElementById('salaryModal').style.display = "block";
-            allowanceGrid.refreshLayout();
-            deductionGrid.refreshLayout();
-        });
-
-        document.querySelector('.close').addEventListener('click', function() {
-            document.getElementById('salaryModal').style.display = "none";
-        });
-
-        window.addEventListener('click', function(event) {
-            if (event.target == document.getElementById('salaryModal')) {
-                document.getElementById('salaryModal').style.display = "none";
+            } catch (error) {
+                console.error('Error:', error);
+                alert('저장 중 오류가 발생했습니다.');
             }
         });
-
-        // 탭 전환 함수
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-            
-            if (tabName === 'allowance') {
-                allowanceGrid.refreshLayout();
-            } else {
-                deductionGrid.refreshLayout();
-            }
-        }
-
-        // 수당 행 추가
-        function addAllowanceRow() {
-            allowanceGrid.appendRow({
-                id: allowanceGrid.getData().length + 1,
-                category: '',
-                amount: 0
-            });
-        }
-
-        // 공제 행 추가
-        function addDeductionRow() {
-            deductionGrid.appendRow({
-                id: deductionGrid.getData().length + 1,
-                category: '',
-                amount: 0
-            });
-        }
-
-        // 수당 저장
-        function saveAllowance() {
-            const data = allowanceGrid.getData();
-            console.log('수당 데이터 저장:', data);
-            // 여기에 저장 로직 추가
-        }
-
-        // 공제 저장
-        function saveDeduction() {
-		            const data = deductionGrid.getData();
-		            console.log('공제 데이터 저장:', data);
-		            // 여기에 저장 로직 추가
-		        }
-
-		        // 메인 그리드 이벤트
-		        grid.on('check', ev => {
-		            console.log('check!', ev);
-		        });
-
-		        grid.on('uncheck', ev => {
-		            console.log('uncheck!', ev);
-		        });
-
-		        grid.on('focusChange', ev => {
-		            console.log('change focused cell!', ev);
-		        });
-		    </script>
-		</body>
-		</html>
+    </script>
+</body>
+</html>
