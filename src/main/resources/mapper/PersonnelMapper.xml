@@ -51,26 +51,26 @@
 	        TO_CHAR(e.emp_reg_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_reg_date
 	    FROM EMPLOYEES e
 	    LEFT JOIN COMMON_DETAIL cdr
-	        ON SUBSTR(cdr.common_detail_code, 1, 4) = 'ATHR'
-	        AND cdr.common_detail_code = e.emp_role
-	    LEFT JOIN COMMON_DETAIL cds
-	        ON SUBSTR(cds.common_detail_code, 1, 4) = 'WRST'
-	        AND cds.common_detail_code = e.emp_status
-	    LEFT JOIN COMMON_DETAIL cdjt 
-	        ON SUBSTR(cdjt.common_detail_code, 1, 4) = 'OCPT'
-	        AND cdjt.common_detail_code = e.emp_job_type
-	    LEFT JOIN COMMON_DETAIL cdd 
-	        ON SUBSTR(cdd.common_detail_code, 1, 4) = 'DEPT'
-	        AND cdd.common_detail_code = e.emp_dept
-	    LEFT JOIN COMMON_DETAIL cdp
-	        ON SUBSTR(cdp.common_detail_code, 1, 4) = 'PSTN'
-	        AND cdp.common_detail_code = e.emp_position
-	    LEFT JOIN COMMON_DETAIL cdrk
-	        ON SUBSTR(cdrk.common_detail_code, 1, 4) = 'RANK'
-	        AND cdrk.common_detail_code = e.emp_perf_rank
-	    LEFT JOIN COMMON_DETAIL cdet
-	        ON SUBSTR(cdet.common_detail_code, 1, 4) = 'RTRM'
-	        AND cdet.common_detail_code = e.emp_exit_type
+		    ON cdr.common_detail_code LIKE 'ATHR%'
+		    AND cdr.common_detail_code = e.emp_role
+		LEFT JOIN COMMON_DETAIL cds
+		    ON cds.common_detail_code LIKE 'WRST%'
+		    AND cds.common_detail_code = e.emp_status
+		LEFT JOIN COMMON_DETAIL cdjt 
+		    ON cdjt.common_detail_code LIKE 'OCPT%'
+		    AND cdjt.common_detail_code = e.emp_job_type
+		LEFT JOIN COMMON_DETAIL cdd 
+		    ON cdd.common_detail_code LIKE 'DEPT%'
+		    AND cdd.common_detail_code = e.emp_dept
+		LEFT JOIN COMMON_DETAIL cdp
+		    ON cdp.common_detail_code LIKE 'PSTN%'
+		    AND cdp.common_detail_code = e.emp_position
+		LEFT JOIN COMMON_DETAIL cdrk
+		    ON cdrk.common_detail_code LIKE 'RANK%'
+		    AND cdrk.common_detail_code = e.emp_perf_rank
+		LEFT JOIN COMMON_DETAIL cdet
+		    ON cdet.common_detail_code LIKE 'RTRM%'
+		    AND cdet.common_detail_code = e.emp_exit_type
 	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
 			WHERE e.emp_hire_date BETWEEN #{startDate} AND #{endDate}
 	    </if>    

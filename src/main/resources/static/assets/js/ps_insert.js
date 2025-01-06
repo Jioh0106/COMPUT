@@ -3,7 +3,7 @@ async function fetchCommonDetails() {
 	try{
 	  	const response = await fetch("http://localhost:8082/restApi/commonDetail");
 		if(!response.ok){
-			throw new Error("Network response was not ok");
+			throw new Error("네트워크 응답 실패");
 		}
 		const cdCodeData = await response.json();
 		console.log(cdCodeData);
@@ -40,7 +40,7 @@ async function fetchCommonDetails() {
 		});
 		
 	}catch(error){
-		console.error();
+		console.error("공통코드 조회 중 오류:", error);
 	}
 }
 

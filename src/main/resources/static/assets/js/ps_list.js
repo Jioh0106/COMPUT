@@ -62,7 +62,7 @@ async function fetchEmpList() {
 	       	const response = await fetch(`http://localhost:8082/restApi/empList?${params}`);
 			
 	       	if (!response.ok) {
-	           	throw new Error("Network response was not ok");
+	           	throw new Error("네트워크 응답 실패");
 	       	}
 	       	const empList = await response.json();
 	       	console.log(empList);
@@ -71,7 +71,7 @@ async function fetchEmpList() {
 	       	empListGrid.resetData(empList);
 			
 	   	} catch (error) {
-	       	console.error("Error fetching employee list:", error);
+	       	console.error("사원조회 중 오류:", error);
 	   	}
 	}
 
@@ -80,7 +80,7 @@ async function fetchCommonDetails() {
 	try{
 	  	const response = await fetch("http://localhost:8082/restApi/commonDetail");
 		if(!response.ok){
-			throw new Error("Network response was not ok");
+			throw new Error("네트워크 응답 실패");
 		}
 		const cdCodeData = await response.json();
 		console.log(cdCodeData);
@@ -119,7 +119,7 @@ async function fetchCommonDetails() {
 		});
 		
 	}catch(error){
-		console.error();
+		console.error("공통코드 조회 중 오류:", error);
 	}
 }
 
@@ -150,8 +150,6 @@ window.onload = function () {
 	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
 		
 	}
-
-
 
 // 그리드에서 로우 클릭 이벤트 추가
 empListGrid.on('click', function (ev) {
@@ -186,7 +184,6 @@ function showModal(empDetailInfo) {
 	       <p><b>E-mail:</b> ${data.emp_email}</p>
 	   `;
    	*/
-	
 	
 	console.log(empDetailInfo);
 	
@@ -269,6 +266,35 @@ function showModal(empDetailInfo) {
     const modal = new bootstrap.Modal(document.getElementById('empDatailModal'));
     modal.show();
 }
+
+const deleteBtn = document.getElementById('deleteBtn');
+
+
+
+deleteBtn.addEventListener('click',function(){
+		const checkedRowsIds = empListGrid.getCheckedRows();
+		// console.log(checkedRowsIds);
+		
+		//row => row.EMP_ID
+		const rowIds = checkedRowsIds.map(row => row.EMP_ID);
+		
+		
+		
+		console.log(rowIds);
+		
+		
+		
+		
+	});
+
+function getCheckedRowIds(){
+	
+	
+}
+
+
+
+//-------------------------------------------------------------------------------------------------------------------------------//
 
 // 다음 주소 api
 function daumAddressAPI() {
