@@ -151,41 +151,35 @@
 		<div class="card">
 			<div class="card-body">
 
-				<!-- 데이트 피커 시작 -->
-				<section class="section" style="margin-bottom: 2.2rem">
-					<div style="display: flex; align-items: center; gap: 1rem;">
-						<!-- 첫 번째 데이트 피커 -->
-						<div>
-							<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-								<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" />
-								<span class="tui-ico-date"></span>
-							</div>
-							<div id="tui-date-picker-container-1"
-								style="margin-top: -1px; z-index: 1000; position: relative;"></div>
-						</div>
+<!-- 				데이트 피커 시작 -->
+<!-- 				<section class="section" style="margin-bottom: 2.2rem"> -->
+<!-- 					<div style="display: flex; align-items: center; gap: 1rem;"> -->
+<!-- 						첫 번째 데이트 피커 -->
+<!-- 						<div> -->
+<!-- 							<div class="tui-datepicker-input tui-datetime-input tui-has-focus"> -->
+<!-- 								<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" /> -->
+<!-- 								<span class="tui-ico-date"></span> -->
+<!-- 							</div> -->
+<!-- 							<div id="tui-date-picker-container-1" -->
+<!-- 								style="margin-top: -1px; z-index: 1000; position: relative;"></div> -->
+<!-- 						</div> -->
 
-						<!-- 구분자 -->
-						<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+<!-- 						구분자 -->
+<!-- 						<span style="font-size: 1.2rem; line-height: 2rem;">~</span> -->
 
-						<!-- 두 번째 데이트 피커 -->
-						<div>
-							<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-								<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" />
-								<span class="tui-ico-date"></span>
-							</div>
-							<div id="tui-date-picker-container-2"
-								style="margin-top: -1px; z-index: 1000; position: relative;"></div>
-						</div>
+<!-- 						두 번째 데이트 피커 -->
+<!-- 						<div> -->
+<!-- 							<div class="tui-datepicker-input tui-datetime-input tui-has-focus"> -->
+<!-- 								<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" /> -->
+<!-- 								<span class="tui-ico-date"></span> -->
+<!-- 							</div> -->
+<!-- 							<div id="tui-date-picker-container-2" -->
+<!-- 								style="margin-top: -1px; z-index: 1000; position: relative;"></div> -->
+<!-- 						</div> -->
 
-						<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
-						<div>
-							<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-								<input type="text" id="search" />
-							</div>
-						</div>
-					</div>
-				</section>
-				<!-- 데이트 피커 끝 -->
+<!-- 					</div> -->
+<!-- 				</section> -->
+<!-- 				데이트 피커 끝 -->
 
 				<!-- 그리드 시작 -->
 				<section class="section">
@@ -193,17 +187,17 @@
 						<form>
 							<div id="grid"></div>
 							<div class="float-end">
-								<input type="submit" class="btn btn-outline-secondary" value="추가">
-								<input type="submit" class="btn btn-outline-success" value="저장">
-								<input type="submit" class="btn btn-outline-danger" value="삭제">
+								<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
+								<input type="button" class="btn btn-outline-success" value="저장">
+								<input type="button" class="btn btn-outline-danger" value="삭제">
 							</div>
 						</form>
 					</div>
 				</section>
-				<!-- 그리드 끝 -->
+				<!-- 그리드 끝  -->
 
-			</div> <!-- card-body -->
-		</div> <!-- card -->
+			</div><!-- card-body --> 
+		</div> <!-- card --> 
 	
 		</div><!--main--> 
 	</div><!-- app -->
@@ -216,35 +210,228 @@
 	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- TOAST UI CDN -->
-	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	
 	<script>
 		const gridData = [
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' }
+			{ 
+				no: '1', 
+				emp_id: '20210421001', 
+				emp_name: '홍길동', 
+				dept: '개발', 
+				type: '병가', 
+				start: '2022-12-02', 
+				end: '2022-12-31', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '2', 
+				emp_id: '20210421002', 
+				emp_name: '이순신', 
+				dept: '인사', 
+				type: '육아', 
+				start: '2023-01-01', 
+				end: '2023-03-01', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '3', 
+				emp_id: '20210421003', 
+				emp_name: '강감찬', 
+				dept: '영업', 
+				type: '병가', 
+				start: '2023-02-02', 
+				end: '2024-06-22', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '4', 
+				emp_id: '20210421004', 
+				emp_name: '유관순', 
+				dept: '마케팅', 
+				type: '육아', 
+				start: '2023-12-02',
+				end: '2024-03-03', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '5', 
+				emp_id: '20210421005', 
+				emp_name: '안중근', 
+				dept: '영업', 
+				type: '병가', 
+				start: '2023-12-02',
+				end: '2024-03-03', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '6', 
+				emp_id: '20210421006', 
+				emp_name: '윤동주', 
+				dept: '재무', 
+				type: '산재', 
+				start: '2023-12-02', 
+				end: '2024-03-03', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			},
+			{ 
+				no: '7', 
+				emp_id: '20210421007', 
+				emp_name: '안창호', 
+				dept: '고객관리', 
+				type: '병가', 
+				start: '2023-12-02', 
+				end: '2024-03-03', 
+				req_date: '2022-11-20', 
+				high_app: '김동희'
+			}
 		];
 
 		const grid = new tui.Grid({
 			el: document.getElementById('grid'),
 			data: gridData,
+			rowHeaders: ['checkbox'],
 			columns: [
-				{ header: '사원번호', name: 'id', editor: 'text' },  // 텍스트 편집기
-				{ header: '이름', name: 'name', editor: 'text' },
-				{ header: '부서', name: 'dept', editor: 'text' },
-				{ header: '구분', name: 'type', editor: 'text' },
-				{ header: '휴직시작일자', name: 'start', editor: 'text' },
-				{ header: '휴직종료일자', name: 'end', editor: 'text' }
+				{ 
+				  header: '번호', 
+					name: 'no', 
+				  filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+				  editor: 'text'
+				},  
+				{ 
+				  header: '사원번호', 
+					name: 'emp_id', 
+				  filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+				  editor: 'text'
+				},  
+				{ 
+				  header: '이름', 
+					name: 'emp_name', 
+				  filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+				  editor: 'text' 
+				},
+				{ 
+				  header: '부서', 
+					name: 'dept',
+					editor: {
+			            type: 'select',
+			            options: {
+			              listItems: [
+			            	  { text: '개발', value: '개발' },
+			                  { text: '인사', value: '인사' },
+			                  { text: '영업', value: '영업' },
+			                  { text: '마케팅', value: '마케팅' },
+			                  { text: '재무', value: '재무' },
+			                  { text: '고객관리', value: '고객관리' }
+			              ]
+			            }
+			        },
+			      filter: 'select'
+			    },
+				{ 
+			      header: '구분', 
+			        name: 'type', 
+			        editor: {
+			            type: 'select',
+			            options: {
+			              listItems: [
+			            	  { text: '육아', value: '육아' },
+			                  { text: '산재', value: '산재' },
+			                  { text: '병가', value: '병가' }
+			              ]
+			            }
+			        },
+			      filter: 'select'
+			      
+			    },
+				{ 
+					header: '휴직시작일자', 
+					name: 'start',
+					editor: {
+		                type: 'datePicker',
+		                options: {
+		                    format: 'yyyy-MM-dd'
+		                }
+		            },
+		            filter: {
+		                type: 'date',
+		                options: {
+		                    format: 'yyyy-MM-dd'
+		                }
+		            }
+		        },
+		        { 
+					header: '휴직종료일자', 
+					name: 'end',
+					editor: {
+		                type: 'datePicker',
+		                options: {
+		                    format: 'yyyy-MM-dd'
+		                }
+		            },
+		            filter: {
+		                type: 'date',
+		                options: {
+		                    format: 'yyyy-MM-dd'
+		                }
+		            }
+		        },
+		        { 
+					header: '신청일자', 
+					name: 'req_date',
+					editor: {
+						type: 'datePicker',
+						options: {
+						    format: 'yyyy-MM-dd'
+						}
+					},
+					filter: {
+						type: 'date',
+						options: {
+							format: 'yyyy-MM-dd'
+						}
+					}
+				},
+				{ 
+					header: '최종승인자', 
+					name: 'high_app', 
+					editor: 'text' 
+				},
 			],
 			editing: true  // 편집 기능 활성화
 		});
 		
+		// "추가" 버튼 클릭 이벤트
+		$('#appendRow').on('click', function (e) {
+			e.preventDefault(); // 기본 동작 방지
+			
+			// 기본값으로 새 행 데이터 생성
+			const newRow = {
+				no: grid.getRowCount() + 1,
+				emp_id: '',
+				emp_name: '',
+				dept: '', 
+				type: '', 
+				start: '', 
+				end: '',
+				req_date: '',
+				high_app: ''
+			};
+			
+			// 새 행을 TOAST UI Grid에 추가
+			grid.appendRow(newRow, {
+				focus: true // 추가된 행에 포커스
+			});
+		});
 	</script>
+	
 	<!-- Modal 내에 있는 일수 계산 스크립트 -->
 	<script>
 		function calcDate() {
