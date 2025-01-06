@@ -275,23 +275,36 @@ deleteBtn.addEventListener('click',function(){
 		const checkedRowsIds = empListGrid.getCheckedRows();
 		// console.log(checkedRowsIds);
 		
-		//row => row.EMP_ID
+		//function(row){
+		//	return row.EMP_ID
+		//}
 		const rowIds = checkedRowsIds.map(row => row.EMP_ID);
-		
-		
-		
 		console.log(rowIds);
+		async function deleteEmp(url ="http://localhost:8082/restApi/empDelete",data = rowIds){
+			try{
+				const response = await fetch('http://localhost:8082/restApi/empDeletetp',{
+					method : "POST",
+					headers:{
+						"Content-Type" : "application/json",
+					},
+					body: JSON.stringify(data)
+				});
+				
+				return response.json();
+							
+			}catch(error){
+				
+			}
+			
+			
+			
+			
+		}
 		
 		
 		
 		
 	});
-
-function getCheckedRowIds(){
-	
-	
-}
-
 
 
 //-------------------------------------------------------------------------------------------------------------------------------//

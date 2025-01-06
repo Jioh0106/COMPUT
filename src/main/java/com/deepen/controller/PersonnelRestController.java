@@ -13,6 +13,9 @@ import com.deepen.service.PersonnelService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RequiredArgsConstructor
@@ -44,6 +47,12 @@ public class PersonnelRestController {
 		List<Map<String, Object>> empList = psService.getEmpList(startDate,endDate,search);
 		
 		return empList;
+	}
+	
+	@PostMapping("/empDelete")
+	public void postMethodName() {
+		log.info("restController : Delete 준비");
+		
 	}
 	
 	
