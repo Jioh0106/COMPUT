@@ -14,7 +14,6 @@ public class AssignController {
 		return "personnel/assign_insert";
 	}
 	
-	
 	//인사발령현황 페이지
 	@GetMapping("/assign-stts")
 	public String assignStts() {
