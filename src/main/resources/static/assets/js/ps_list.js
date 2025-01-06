@@ -10,20 +10,26 @@ function datePiker(containerSelector, inputSelector){
 	});
 }
 
-const startDatePiker = datePiker('#tui-date-picker-container1','#startDate');
-const endDatePiker = datePiker('#tui-date-picker-container2','#endDate');
-const empHireDatePiker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
-const empExitDatePiker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
+const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
+const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+const empHireDatePicker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
+const empExitDatePicker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
+
 
 // toast ui 그리드
 const Grid = tui.Grid;
 Grid.applyTheme('clean'); // 그리드 테마
 
 const empListGrid = new Grid({
-  el: document.getElementById('grid'), 
+  el: document.getElementById('grid'),
+  data: [], // 초기 데이터
+  rowHeaders: ['checkbox'],
+  //scrollX: false,
+  //scrollY: false,
+  bodyHeight: 470,
   columns: [
     { 
-		header: '입사일자', 
+		header: '입사일', 
 		name: 'EMP_HIRE_DATE',
 	},
     { 
@@ -44,7 +50,9 @@ const empListGrid = new Grid({
 	},
     { header: 'E-mail', name: 'EMP_EMAIL'}
   ],
-  data: [] // 초기 데이터
+  columnOptions: {
+          resizable: true
+        }
 });
 
 // 사원리스트 조회
@@ -52,6 +60,7 @@ async function fetchEmpList() {
 	try	{	
 			const params = new URLSearchParams(empListFilters).toString();
 	       	const response = await fetch(`http://localhost:8082/restApi/empList?${params}`);
+			
 	       	if (!response.ok) {
 	           	throw new Error("Network response was not ok");
 	       	}
@@ -64,31 +73,6 @@ async function fetchEmpList() {
 	   	} catch (error) {
 	       	console.error("Error fetching employee list:", error);
 	   	}
-	}
-
-const empListFilters = {
-	startDate : '1900-01-01',
-	endDate : '2999-12-31',
-	search : '',
-}
-
-function updateEmpListFilters() {
-	    empListFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
-	    empListFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
-	    empListFilters.search = document.getElementById('search').value || '';
-	    
-	    fetchEmpList();
-	}
-
-// 페이지가 완전히 로드된 후 함수 실행
-window.onload = function () {
-		
-		document.getElementById('startDate').addEventListener('change', updateEmpListFilters);
-	   	document.getElementById('endDate').addEventListener('change', updateEmpListFilters);
-	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
-		
-		fetchEmpList();
-		fetchCommonDetails();
 	}
 
 // 필요한 공통 코드 상세 조회	
@@ -139,8 +123,45 @@ async function fetchCommonDetails() {
 	}
 }
 
+const empListFilters = {
+	startDate : '1900-01-01',
+	endDate : '2999-12-31',
+	search : '',
+}
+
+function updateEmpListFilters() {
+	    empListFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
+	    empListFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
+	    empListFilters.search = document.getElementById('search').value || '';
+	    
+	    fetchEmpList();
+	}
+
+// 페이지가 완전히 로드된 후 함수 실행
+window.onload = function () {
+		
+		fetchEmpList();
+		fetchCommonDetails();
+		
+		//document.getElementById('startDate').addEventListener('input', updateEmpListFilters);
+	   	//document.getElementById('endDate').addEventListener('input', updateEmpListFilters);
+		startDatePicker.on('change', updateEmpListFilters);
+		endDatePicker.on('change', updateEmpListFilters);
+	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
+		
+	}
+
+
+
 // 그리드에서 로우 클릭 이벤트 추가
 empListGrid.on('click', function (ev) {
+	
+	const target = ev.nativeEvent.target;
+	const columnName = ev.columnName;
+	
+	if(target.type === 'checkbox' || columnName === '_checked'){
+		return;
+	}
     const rowKey = ev.rowKey; // 클릭된 로우의 인덱스
    	const clickedRowData = empListGrid.getData()[rowKey];  // 해당 로우 데이터 가져오기
 	
@@ -154,7 +175,18 @@ empListGrid.on('click', function (ev) {
 // 모달에 데이터 표시 함수
 function showModal(empDetailInfo) {
 	
-    const modalBody = document.querySelector('#empDatailModal .modal-body');
+    //const modalBody = document.querySelector('#empDatailModal .modal-body');
+	/*
+	modalBody.innerHTML = `
+	       <p><b>입사일자:</b> ${data.emp_hire_date}</p>
+	       <p><b>사원번호:</b> ${data.emp_num}</p>
+	       <p><b>성명:</b> ${data.emp_name}</p>
+	       <p><b>부서명:</b> ${data.emp_dept}</p>
+	       <p><b>직급명:</b> ${data.emp_position}</p>
+	       <p><b>E-mail:</b> ${data.emp_email}</p>
+	   `;
+   	*/
+	
 	
 	console.log(empDetailInfo);
 	
@@ -203,12 +235,8 @@ function showModal(empDetailInfo) {
 	empPw.value = empDetailInfo.EMP_PW;
 	empNo.value = empDetailInfo.EMP_NO;
 	empRegDate.value = empDetailInfo.EMP_REG_DATE;
-	// 등록일 문자열을 변환
-	//const regDateString = empDetailInfo.EMP_REG_DATE; // '2023-01-06 12:00:00' 같은 문자열
-	//const regDateISO = new Date(regDateString).toISOString(); // '2023-01-06T12:00:00.000Z'
-	//document.getElementById("emp_reg_date").value = regDateISO;
-	
-	// empModDate.value = empDetailInfo.EMP_MOD_DATE;
+	//console.log(typeof(empRegDate.value));
+	//empModDate.value = empDetailInfo.EMP_MOD_DATE || null;
 	empRole.value = empDetailInfo.EMP_ROLE;
 	empName.value = empDetailInfo.EMP_NAME;
 	//empPhone.value = empDetailInfo.EMP_SSN;
@@ -236,17 +264,6 @@ function showModal(empDetailInfo) {
 	empSalary.value = empDetailInfo.EMP_SALARY;
 	empBank.value = empDetailInfo.EMP_BANK;
 	empAccount.value = empDetailInfo.EMP_ACCOUNT;
-	
-	/*
-	modalBody.innerHTML = `
-	       <p><b>입사일자:</b> ${data.emp_hire_date}</p>
-	       <p><b>사원번호:</b> ${data.emp_num}</p>
-	       <p><b>성명:</b> ${data.emp_name}</p>
-	       <p><b>부서명:</b> ${data.emp_dept}</p>
-	       <p><b>직급명:</b> ${data.emp_position}</p>
-	       <p><b>E-mail:</b> ${data.emp_email}</p>
-	   `;
-   	*/
 
     // 모달을 표시
     const modal = new bootstrap.Modal(document.getElementById('empDatailModal'));

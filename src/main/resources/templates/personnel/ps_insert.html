@@ -148,7 +148,7 @@
 	                                    	<div class="form-group" >
 	                                            <div><label>주소</label></div>
 		                                        <div class ="d-flex align-items-center">
-		                                            <input type="text" class="form-control" id="postCode" placeholder="우편번호">
+		                                            <input type="text" class="form-control" id="postCode" name="emp_postcode" placeholder="우편번호">
 													<input type="button" class="btn-primary mx-2" onclick="daumAddressAPI()" value="주소 찾기"><br>
 		                                        </div>
 	                                    	</div>
@@ -247,7 +247,7 @@
 										            <input type="text" id="emp_hire_date" name="emp_hire_date" aria-label="Date-Time">
 										            <span class="tui-ico-date"></span>
 										        </div>
-										        <div id="emp-hire-date-wrapper" style="margin-top: -1px;"></div>
+										        <div id="emp-hire-date-wrapper" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 	                                        </div>
 	                                    </div>
 									</div>
@@ -272,7 +272,7 @@
 										            <input type="text" id="emp_exit_date" name="emp_exit_date" aria-label="Date-Time">
 										            <span class="tui-ico-date"></span>
 										        </div>
-										        <div id="emp-exit-date-wrapper" style="margin-top: -1px;"></div>
+										        <div id="emp-exit-date-wrapper" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 	                                        </div>
 	                                    </div>
 									</div>

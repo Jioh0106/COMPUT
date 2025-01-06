@@ -48,8 +48,7 @@
 	        e.emp_salary,
 	        e.emp_bank,
 	        e.emp_account,
-	        TO_CHAR(e.emp_reg_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_reg_date,
-	        TO_CHAR(e.emp_mod_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_mod_date
+	        TO_CHAR(e.emp_reg_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_reg_date
 	    FROM EMPLOYEES e
 	    LEFT JOIN COMMON_DETAIL cdr
 	        ON SUBSTR(cdr.common_detail_code, 1, 4) = 'ATHR'
@@ -72,7 +71,7 @@
 	    LEFT JOIN COMMON_DETAIL cdet
 	        ON SUBSTR(cdet.common_detail_code, 1, 4) = 'RTRM'
 	        AND cdet.common_detail_code = e.emp_exit_type
-	    <if test="startDate != null and startDate !='' and endDate != null and endDate !=''">
+	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
 			WHERE e.emp_hire_date BETWEEN #{startDate} AND #{endDate}
 	    </if>    
  	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">

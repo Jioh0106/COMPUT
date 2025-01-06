@@ -45,8 +45,9 @@ public class EmployeesDTO {
 	private String emp_bank;
 	private String emp_account;
 	//
-	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Timestamp  emp_reg_date; //정보등록일
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Timestamp  emp_mod_date; //정보최종수정일
 	
 	//임시 필드

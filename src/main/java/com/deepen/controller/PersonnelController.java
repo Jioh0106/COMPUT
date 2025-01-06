@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.deepen.domain.EmployeesDTO;
-import com.deepen.entity.Employees;
 import com.deepen.service.PersonnelService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class PersonnelController {
 	//http://localhost:8082/ex
 	@GetMapping("/ex")
 	public String exPage() {
-		return "/ex/component-button";
+		return "/ex/component-card";
 	}
 	
 	//http://localhost:8082/ps-list
@@ -61,19 +60,11 @@ public class PersonnelController {
 	}
 	
 	@PostMapping("/ps-update")
-	public String psUpdate(@RequestParam("regDate") String regDateStr,EmployeesDTO dto) {
+	public String psUpdate(EmployeesDTO dto) {
 		
-		 try {
-		        // 문자열 -> Timestamp 변환
-		        Timestamp regDate = Timestamp.valueOf(regDateStr.replace("T", " ").substring(0, 19));
-		        dto.setEmp_reg_date(regDate);
-		    } catch (IllegalArgumentException e) {
-		        // 잘못된 날짜 포맷 처리
-		        return "redirect:/error-page";
-		    }
 		 log.info("C-update : "+dto.toString());
 		
-		//psService.updateEmpInfo(dto);
+		psService.updateEmpInfo(dto);
 		
 		return "redirect:/ps-list";
 	}

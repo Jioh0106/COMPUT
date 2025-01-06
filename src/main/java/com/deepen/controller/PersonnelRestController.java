@@ -39,7 +39,7 @@ public class PersonnelRestController {
 			@RequestParam(value = "endDate")String endDate,
 			@RequestParam(value = "search", defaultValue = "")String search) {
 		
-		log.info("C fitter: "+startDate+", "+endDate+", "+search);
+		//log.info("C fitter: "+startDate+", "+endDate+", "+search);
 		
 		List<Map<String, Object>> empList = psService.getEmpList(startDate,endDate,search);
 		

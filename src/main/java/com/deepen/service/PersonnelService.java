@@ -68,7 +68,6 @@ public class PersonnelService {
 		
 		empDTO.setEmp_ssn(ssn);
 		empDTO.setEmp_phone(phoneNum);
-		
 		empDTO.setEmp_mod_date(new Timestamp(System.currentTimeMillis()));
 		
 		Employees emp = Employees.setEmployees(empDTO);
