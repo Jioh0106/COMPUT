@@ -25,24 +25,28 @@
 			/* !important -> 우선순위 높아짐 */
 			background-color: #ffffff !important;
 		}
+
 		.display-flex {
 			display: flex;
-			
-		}
-		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			margin-left:auto
-		}
-		.child-input1 {
-		    flex:1;
-		    width:30%;
-		    box-sizing: border-box;
+
 		}
 
-		.child-input2{
-		    flex:1;
-		    margin: 0px 5%;
-		    width:30%;
-		    box-sizing: border-box;
+		.buttons {
+			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+			margin-left: auto
+		}
+
+		.child-input1 {
+			flex: 1;
+			width: 30%;
+			box-sizing: border-box;
+		}
+
+		.child-input2 {
+			flex: 1;
+			margin: 0px 5%;
+			width: 30%;
+			box-sizing: border-box;
 		}
 	</style>
 
@@ -66,14 +70,14 @@
 			</header>
 
 			<div class="display-flex">
-			<h3>휴가 관리</h3>
+				<h3>휴가 관리</h3>
 				<div class="buttons">
-			  <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" 
-			  		data-bs-target="#default">휴가 신청</button>
-					
+					<button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal"
+						data-bs-target="#default">휴가 신청</button>
+
 					<!-- 휴가 신청서 Modal 시작 -->
-					<div class="modal fade text-left" id="default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1"
-						aria-hidden="true">
+					<div class="modal fade text-left" id="default" tabindex="-1" role="dialog"
+						aria-labelledby="myModalLabel1" aria-hidden="true">
 						<div class="modal-dialog modal-dialog-scrollable" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
@@ -84,7 +88,7 @@
 								</div>
 								<div class="modal-body">
 									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
-					
+
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사번: </label>
@@ -99,22 +103,24 @@
 											</div>
 										</div>
 									</div>
-					
+
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사용 시작일: </label>
 											<div class="form-group">
-												<input type="date" class="form-control" id="use-start-date" onchange="calcDate()" >
+												<input type="date" class="form-control" id="use-start-date"
+													onchange="calcDate()">
 											</div>
 										</div>
 										<div class="child-input2">
 											<label>사용 종료일: </label>
 											<div class="form-group">
-												<input type="date" class="form-control" id="use-end-date" onchange="calcDate()">
+												<input type="date" class="form-control" id="use-end-date"
+													onchange="calcDate()">
 											</div>
 										</div>
 									</div>
-					
+
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사용일수: </label>
@@ -129,7 +135,7 @@
 											</div>
 										</div>
 									</div>
-					
+
 									<label>휴가 구분</label>
 									<fieldset class="form-group">
 										<select class="form-select" id="basicSelect">
@@ -157,7 +163,7 @@
 						</div>
 					</div>
 					<!-- 휴가 신청서 Modal 끝 -->
-			  </div> <!-- buttons -->
+				</div> <!-- buttons -->
 			</div> <!-- display-flex -->
 
 			<div class="card">
@@ -188,7 +194,9 @@
 								<div id="tui-date-picker-container-2"
 									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 							</div>
-
+							<!-- 데이트 피커 끝 -->
+							<!-- 사번/이름 검색 기능은 아래 링크 참고 -->
+<!--https://velog.io/@hyun/ajax%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EA%B2%80%EC%83%89%EA%B8%B0%EB%8A%A5-%EB%A7%8C%EB%93%A4%EA%B8%B0-->
 							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
 							<div>
 								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
@@ -197,15 +205,48 @@
 							</div>
 						</div>
 					</section>
-					<!-- 데이트 피커 끝 -->
 
-					<!-- 그리드 시작 -->
-					<section class="section">
-						<div class="row" id="basic-table">
-							<div id="grid"></div>
+
+					<!--전체/받은요청/보낸요청 탭 시작-->
+					<ul class="nav nav-tabs" id="tabHead" role="tablist">
+						<li class="nav-item" role="presentation">
+							<a class="nav-link active" id="useTab" data-bs-toggle="tab" href="#use" role="tab"
+								aria-controls="use" aria-selected="true">사용내역</a>
+						</li>
+						<li class="nav-item" role="presentation">
+							<a class="nav-link" id="holdTab" data-bs-toggle="tab" href="#hold" role="tab"
+								aria-controls="hold" aria-selected="false">보유현황</a>
+						</li>
+					</ul>
+					<div class="tab-content" id="tabContent">
+						<!-- 사용내역 탭 시작 -->
+						<div class="tab-pane fade show active" id="use" role="tabpanel" aria-labelledby="useTab">
+
+							<!-- 그리드 시작 -->
+							<section class="section">
+								<div class="row" id="basic-table">
+									<div id="useGrid"></div>
+								</div>
+							</section>
+							<!-- 그리드 끝 -->
+
 						</div>
-					</section>
-					<!-- 그리드 끝 -->
+						<!-- 사용내역 탭 끝 -->
+						<!-- 보유현황 탭 시작 -->
+						<div class="tab-pane fade" id="hold" role="tabpanel" aria-labelledby="holdTab">
+
+							<!-- 그리드 시작 -->
+							<section class="section">
+								<div class="row" id="basic-table">
+									<div id="holdGrid"></div>
+								</div>
+							</section>
+							<!-- 그리드 끝 -->
+
+						</div>
+						<!-- 보유현황 탭 끝 -->
+					</div>
+					<!--전체/받은요청/보낸요청 탭 끝-->
 
 				</div> <!-- card-body -->
 			</div> <!-- card -->
@@ -245,36 +286,75 @@
 	<!-- Grid 스크립트 -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	<script>
-		var Grid = tui.Grid;
+		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
+			var Grid = tui.Grid;
+			
+			const data = [
+				{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
+				{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
+				{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
+				{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
+				{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
+			];
 
-		// 데이터 정의
-		const data = [
-			{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
-			{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
-			{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
-			{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
-			{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
-		];
+			const grid = new Grid({
+				el: document.getElementById('useGrid'),
+				columns: [
+					{header: '사원번호', name: 'id'},
+					{header: '이름', name: 'name'},
+					{header: '부서', name: 'dept'},
+					{header: '사용일', name: 'useDate'},
+					{header: '구분', name: 'se'},
+					{header: '차감일수', name: 'useDays'},
+					{header: '잔여일수', name: 'rmnngDays'}
+				],
+				data: data
+			});
+		};
 
-		// Grid 생성
-		const grid = new Grid({
-			el: document.getElementById('grid'),
-			columns: [
-				{header: '사원번호', name: 'id'},
-				{header: '이름', name: 'name'},
-				{header: '부서', name: 'dept'},
-				{header: '사용일', name: 'useDate'},
-				{header: '구분', name: 'se'},
-				{header: '차감일수', name: 'useDays'},
-				{header: '잔여일수', name: 'rmnngDays'}
-			],
-			data: data
+		document.addEventListener('DOMContentLoaded', () => {
+			var Grid = tui.Grid;
+			var gridId = document.getElementById('useGrid');
+			// 데이터 정의
+			const data = [
+				{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
+				{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
+				{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
+				{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
+				{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
+			];
+
+			// 탭 전환 이벤트 처리
+			const tabList = document.querySelector('.nav'); //querySelector(clas명)으로 탭 리스트 선언
+
+			tabList.addEventListener('shown.bs.tab', function (e) {
+				//'shown.bs.tab' - 부트스트랩에 내장된 이벤트 타입이며 이 이벤트는 탭이 표시된 이후 탭 표시 시 발생합니다.
+				//event.target 과 event.relatedTarget 을 사용하여 각각 활성화된 탭과 이전 활성화된 탭을 타깃으로 합니다.
+				const tabId = e.target.id; // 현재 활성화된 탭의 ID
+
+				// 그리드 컨테이너 선택
+				gridId = tabId === "holdTab" ? document.getElementById('holdGrid') : document.getElementById('useGrid');
+
+				gridId.innerHTML = ""; //그리드 초기
+				const grid = new Grid({
+					el: gridId,
+					columns: [
+						{header: '사원번호', name: 'id'},
+						{header: '이름', name: 'name'},
+						{header: '부서', name: 'dept'},
+						{header: '사용일', name: 'useDate'},
+						{header: '구분', name: 'se'},
+						{header: '차감일수', name: 'useDays'},
+						{header: '잔여일수', name: 'rmnngDays'}
+					],
+					data: data
+				});
+
+			});
 		});
 
-		// 데이터 갱신 (필요시)
-		// grid.resetData(data);
 	</script>
-	
+
 	<!-- Modal 내에 있는 일수 계산 스크립트 -->
 	<script>
 		function calcDate() {
