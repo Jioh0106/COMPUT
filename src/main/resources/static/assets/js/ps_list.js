@@ -143,8 +143,6 @@ window.onload = function () {
 		fetchEmpList();
 		fetchCommonDetails();
 		
-		//document.getElementById('startDate').addEventListener('input', updateEmpListFilters);
-	   	//document.getElementById('endDate').addEventListener('input', updateEmpListFilters);
 		startDatePicker.on('change', updateEmpListFilters);
 		endDatePicker.on('change', updateEmpListFilters);
 	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
@@ -163,7 +161,7 @@ empListGrid.on('click', function (ev) {
     const rowKey = ev.rowKey; // 클릭된 로우의 인덱스
    	const clickedRowData = empListGrid.getData()[rowKey];  // 해당 로우 데이터 가져오기
 	
-	//console.log(clickedRowData);
+	console.log(clickedRowData);
 
     // 모달에 데이터 설정
     showModal(clickedRowData);
@@ -185,7 +183,7 @@ function showModal(empDetailInfo) {
 	   `;
    	*/
 	
-	console.log(empDetailInfo);
+	//console.log(empDetailInfo);
 	
 	// 수정시 hidden 넘길 데이터
 	const empId = document.getElementById('emp_id');
@@ -267,45 +265,42 @@ function showModal(empDetailInfo) {
     modal.show();
 }
 
+// 삭제
 const deleteBtn = document.getElementById('deleteBtn');
+function CheckedRowValues(gridObj,jsonKey){
+	const checkedRowsIds = gridObj.getCheckedRows();
+	//function(row){
+	//	return row.EMP_ID
+	//}
+	const rowValues = checkedRowsIds.map(row => row[jsonKey]);
+	
+	return rowValues;
+}
+deleteBtn.addEventListener("click",() => {
+	const checkedRowIds = CheckedRowValues(empListGrid,"EMP_ID");
+	empDelete("http://localhost:8082/restApi/empDelete",checkedRowIds)});
 
-
-
-deleteBtn.addEventListener('click',function(){
-		const checkedRowsIds = empListGrid.getCheckedRows();
-		// console.log(checkedRowsIds);
-		
-		//function(row){
-		//	return row.EMP_ID
-		//}
-		const rowIds = checkedRowsIds.map(row => row.EMP_ID);
-		console.log(rowIds);
-		async function deleteEmp(url ="http://localhost:8082/restApi/empDelete",data = rowIds){
-			try{
-				const response = await fetch('http://localhost:8082/restApi/empDeletetp',{
-					method : "POST",
-					headers:{
-						"Content-Type" : "application/json",
-					},
-					body: JSON.stringify(data)
-				});
-				
-				return response.json();
-							
-			}catch(error){
-				
-			}
-			
-			
-			
-			
+async function empDelete(url = "http://localhost:8082/restApi/empDelete",rowIds){
+	console.log(rowIds);
+	
+	try{
+		const response = await fetch("http://localhost:8082/restApi/empDelete",{
+			method: "POST",
+			headers:{
+				"Content-Type":"application/json",
+			},
+			body:JSON.stringify(rowIds)
+		})
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
 		}
+		const result = await response.text();
+		console.log("result : "+result);
 		
-		
-		
-		
-	});
-
+	}catch(error){
+		console.error("삭제 실패",error);
+	}
+}
 
 //-------------------------------------------------------------------------------------------------------------------------------//
 

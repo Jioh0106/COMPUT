@@ -50,9 +50,14 @@ public class PersonnelRestController {
 	}
 	
 	@PostMapping("/empDelete")
-	public void postMethodName() {
-		log.info("restController : Delete 준비");
-		
+	public String postMethodName(@RequestBody List<String> ids) {
+		log.info("restController : Delete 준비 - "+ids);
+			
+		if(ids.isEmpty()) {
+			return "서버 : 삭제 실패";
+		}else {
+			return "서버 : 삭제 성공";
+		}
 	}
 	
 	
