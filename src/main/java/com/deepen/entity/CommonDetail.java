@@ -27,6 +27,9 @@ public class CommonDetail {
 	
 	@Column(name="common_detail_status", length = 1)
 	private String common_detail_status = "Y";
+
+	@Column(name="common_detail_display", insertable = false, updatable = false)
+	private Integer common_detail_display;
 	
 	// DTO -> Entity 변환을 위한 정적 메서드
 	public static CommonDetail setCommonDetailEntity(CommonDetailDTO commonDetailDTO) {

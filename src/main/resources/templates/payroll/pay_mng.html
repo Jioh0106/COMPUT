@@ -68,7 +68,8 @@
                         <div id="grid"></div>
 						<div class="float-end">
 							<input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
-							<input type="submit" class="btn btn-outline-danger" value="삭제">
+							<input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
+							<input type="submit" class="btn btn-outline-danger" value="삭제" id="deleteBtn">
                     	</div>
                     </div>
                 </div>
@@ -129,11 +130,11 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
-                                취소
-                            </button>
                             <button type="submit" class="btn btn-outline-success">
                                 저장
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
+                                취소
                             </button>
                         </div>
                     </form>
@@ -168,14 +169,28 @@
             data: formulas,
             rowHeaders: ['checkbox'],
             columns: [
-                { header: '구분', name: 'formulaType'},
+                { 
+                	header: '구분',
+                	name: 'formulaType',
+                	sortable: true,
+                	sortingType: 'asc',
+                },
                 { header: '항목명', name: 'formulaName'},
                 { header: '계산식', name: 'formulaContent'},
-                { header: '적용년도', name: 'applyYear'},
-                { header: '우선순위', name: 'formulaPriority'},
+                { 
+                	header: '적용년도',
+                	name: 'applyYear',
+                	sortable: true
+                },
+                {
+                	header: '우선순위',
+                	name: 'formulaPriority',
+                	sortable: true
+                },
                 { 
                     header: '수정일시', 
                     name: 'updatedAt',
+                    sortable: true,
                     formatter: value => {
                         if (value.value) {
                             return new Date(value.value).toLocaleString();
@@ -185,21 +200,25 @@
                 }
             ]
         });
+        
 
     // 폼 제출 처리
 	 document.getElementById('salaryForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
+        	formulaId: this.dataset.id,
             formulaType: document.getElementById('formulaType').value,
             formulaName: document.getElementById('formulaName').value,
             formulaContent: document.getElementById('formulaContent').value,
             applyYear: parseInt(document.getElementById('applyYear').value),
             formulaPriority: parseInt(document.getElementById('formulaPriority').value)
         };
+        
+        const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
 
         try {
-            const response = await fetch('/pay-mng', {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,6 +239,75 @@
             console.error('Error:', error);
             alert('저장 중 오류가 발생했습니다.');
         }
+    });
+    
+	// 모달이 닫힐 때 폼 초기화
+	 document.getElementById('salaryModal').addEventListener('hidden.bs.modal', function () {
+	     document.getElementById('salaryForm').reset();
+	     delete document.getElementById('salaryForm').dataset.id;
+	     document.querySelector('.modal-title').textContent = '급여 항목 입력';
+	 });
+    
+    // 수정 버튼 클릭 이벤트
+    document.getElementById('editBtn').addEventListener('click', function(){
+    	const checkedRows = grid.getCheckedRows();
+    	if (checkedRows.length !== 1) {
+    		alert('수정할 항목을 하나만 선택해주세요.');
+    		return;
+    	}
+    	
+    	const selectedRow = checkedRows[0];
+    	
+    	// 모달 폼에 데이터 설정
+    	document.getElementById('formulaType').value = selectedRow.formulaType;
+    	document.getElementById('formulaName').value = selectedRow.formulaName;
+    	document.getElementById('formulaContent').value = selectedRow.formulaContent;
+    	document.getElementById('applyYear').value = selectedRow.applyYear;
+    	document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
+    	
+    	// 수정을 위한 ID 저장
+    	document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
+    	
+    	// 모달 타이틀 변경
+    	document.querySelector('.modal-title').textContent = '급여 항목 수정';
+    	
+    	// 모달 표시
+    	new bootstrap.Modal(document.getElementById('salaryModal')).show();
+    });
+    
+    // 삭제 버튼 클릭 이벤트
+    document.getElementById('deleteBtn').addEventListener('click', async function() {
+    	const checkedRows = grid.getCheckedRows();
+    	if(checkedRows.length == 0) {
+    		alert('삭제할 항목을 선택해주세요.')
+    		return;
+    	}
+    	
+    	if(!confirm('선택한 항목을 삭제하시겠습니까?')) {
+    		return;
+    	}
+    	
+    	try {
+    		const ids = checkedRows.map(row => row.formulaId);
+    		const response = await fetch('/pay-mng/delete', {
+    			method: 'POST',
+    			headers: {
+    				'Content-Type': 'application/json',
+    			},
+    			body: JSON.stringify(ids)
+    		});
+    		
+    		const result = await response.json();
+    		if (response.ok) {
+    			alert(result.message || '삭제되었습니다.');
+    			location.reload();
+    		} else {
+    			alert(result.message || '삭제 중 오류가 발생했습니다.')
+    		}
+    	} catch (error) {
+    		console.error('Error:', error);
+    		alert('삭제 중 오류가 발생했습니다.')
+    	}
     });
     
 	// 그리드 데이터 다시 불러오는 함수 추가

@@ -23,6 +23,7 @@ public class PayrollController {
 
     private final SalaryFormulaService salaryFormulaService;
 
+    // 급여 종류 관리 추가 GET
     @GetMapping("/pay-mng")
     public String payMng(Model model) {
         List<SalaryFormula> formulas = salaryFormulaService.findAll();
@@ -30,6 +31,7 @@ public class PayrollController {
         return "payroll/pay_mng";
     }
 
+    // 급여 종류 관리 추가 POST
     @PostMapping("/pay-mng")
     @ResponseBody
     public ResponseEntity<?> saveFormula(@RequestBody SalaryFormulaDTO salaryFormulaDTO) {
@@ -46,6 +48,38 @@ public class PayrollController {
                     "message", "저장 중 오류가 발생했습니다: " + e.getMessage(),
                     "status", "error"
                 ));
+        }
+    }
+    
+    // 급여 종류 관리 수정 GET
+    @PostMapping("/pay-mng/update")
+    @ResponseBody
+    public ResponseEntity<?> updateFormula(@RequestBody SalaryFormulaDTO salaryFormulaDTO) {
+    	 try {
+             salaryFormulaService.update(salaryFormulaDTO);
+             return ResponseEntity.ok()
+                     .body(Map.of("message", "수정되었습니다."));
+         } catch (Exception e) {
+             return ResponseEntity.badRequest()
+                     .body(Map.of("message", "수정 중 오류가 발생했습니다: " + e.getMessage()));
+         }
+    }
+    
+    // 급여 종류 관리 수정 POST
+    
+    // 급여 종류 관리 삭제 GET
+    
+    // 급여 종류 관리 삭제 POST
+    @PostMapping("/pay-mng/delete")
+    @ResponseBody
+    public ResponseEntity<?> deleteFormulas(@RequestBody List<Long> ids) {
+        try {
+            salaryFormulaService.deleteByIds(ids);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "삭제되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "삭제 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
     
