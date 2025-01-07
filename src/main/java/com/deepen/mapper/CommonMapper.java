@@ -6,18 +6,12 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import com.deepen.domain.CommonDetailDTO;
-import com.deepen.entity.CommonDetail;
-
-
 @Mapper
 @Repository
 public interface CommonMapper {
-	
 
 	List<Map<String, Object>> commonList();
-	
-	
-	
-	
+
+	List<Map<String, Object>> commonDtlList(String commonCd);
+
 }

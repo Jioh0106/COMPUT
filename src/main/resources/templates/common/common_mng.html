@@ -2,60 +2,67 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>공통코드관리</title>
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공통코드관리</title>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link
+	href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
 
-	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
 
-	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
-	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
-	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+<link rel="stylesheet"
+	th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+<link rel="stylesheet" th:href="@{/assets/css/app.css}">
+<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}"
+	th:type="@{/assets/image/x-icon}">
 
-	<!-- TOAST UI CDN -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+<!-- TOAST UI CDN -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
 
-	<!-- sweetAlert CDN -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+<!-- sweetAlert CDN -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
 
-	<style>
-		.buttons {
-			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			float: right;
-		}
+<style>
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	float: right;
+}
 
-		.table {
-			table-layout: fixed;
-			/* 열 너비를 고정 */
-			width: 100%;
-			/* 테이블을 부모 너비에 맞춤 */
-			word-wrap: break-word;
-			/* 내용이 길어지면 줄바꿈 */
-		}
+.table {
+	table-layout: fixed;
+	/* 열 너비를 고정 */
+	width: 100%;
+	/* 테이블을 부모 너비에 맞춤 */
+	word-wrap: break-word;
+	/* 내용이 길어지면 줄바꿈 */
+}
 
-		.full-width-input {
-			width: 100%;
-		}
+.full-width-input {
+	width: 100%;
+}
 
-		/* 테이블 스크롤 */
-		.table-responsive {
-			height: 500px;
-			overflow: auto;
-			-webkit-overflow-scrolling: touch;
-		}
+/* 테이블 스크롤 */
+.table-responsive {
+	height: 500px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
 
-		/* 체크박스가 있는 첫 번째 열의 너비 설정 */
-		th:first-child,
-		td:first-child {
-			width: 40px;
-			text-align: center;
-		}
-	</style>
+/* 체크박스가 있는 첫 번째 열의 너비 설정 */
+th:first-child, td:first-child {
+	width: 40px;
+	text-align: center;
+}
+</style>
 
 
 </head>
@@ -72,8 +79,8 @@
 
 			<!-- 반응형 사이드 메뉴 버튼-->
 			<header class="mb-3">
-				<a href="#" class="burger-btn d-block d-xl-none">
-					<i class="bi bi-justify fs-3"></i>
+				<a href="#" class="burger-btn d-block d-xl-none"> <i
+					class="bi bi-justify fs-3"></i>
 				</a>
 			</header>
 
@@ -95,27 +102,27 @@
 								</div>
 							</div>
 							<div class="card-body">
-								<div class="table-responsive"> <!-- 설정한 높이 이상이면 스크롤을 나타내기 위한 div -->
+								<div class="table-responsive">
+									<!-- 설정한 높이 이상이면 스크롤을 나타내기 위한 div -->
 									<table class="table table-bordered mb-0" id="parent">
 										<tr>
 											<th><input class="form-check-input" type="checkbox"
-													onclick='selectAll(this, "parent")'></th>
+												onclick='selectAll(this, "parent")'></th>
 											<th>구분코드</th>
 											<th>구분명</th>
 											<th>사용여부</th>
 										</tr>
-										<tr th:each="map : ${commonList}" onclick="goToSection('dept', this.id)"
+										<tr th:each="map : ${commonList}" onclick="rowVal(this)"
 											id="deptHead">
-											<td>
-												<input type="checkbox" name="parent" class="form-check-input"
-													value="1" />
-											</td>
+											<td><input type="checkbox" name="parent"
+												class="form-check-input" value="1" /></td>
 											<td contenteditable="true" th:text="${map.COMMON_CODE}"></td>
 											<td contenteditable="true" th:text="${map.COMMON_NAME}"></td>
 											<td contenteditable="true" th:text="${map.COMMON_STATUS}"></td>
 										</tr>
 									</table>
-								</div> <!-- 스크롤 -->
+								</div>
+								<!-- 스크롤 -->
 							</div>
 						</div>
 					</div>
@@ -137,18 +144,13 @@
 								<table class="table table-bordered mb-0" id="child">
 									<tr>
 										<th><input class="form-check-input" type="checkbox"
-												onclick='selectAll(this, "child")'></th>
+											onclick='selectAll(this, "child")'></th>
 										<th>구분코드</th>
 										<th>구분명</th>
 										<th>사용여부</th>
 									</tr>
-									<tr id="dept" style="display: none;">
-										<td>
-											<input type="checkbox" name="child" class="form-check-input" value="1" />
-										</td>
-										<td>DEPT01</td>
-										<td>인사부</td>
-										<td>Y</td>
+									<tr id="dept">
+										
 									</tr>
 								</table>
 							</div>
@@ -159,22 +161,27 @@
 
 
 
-		</div><!--main-->
+		</div>
+		<!--main-->
 
-	</div><!-- app -->
+	</div>
+	<!-- app -->
 
 	<!-- 제이쿼리 -->
 	<script th:src="@{/js/jquery-3.7.1.js}"></script>
-	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script
+		th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
 	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script
+		src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 
 	<!-- sweetAlert CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	<script>
 
 		// 공통코드 목록 클릭 시 해당하는 공통코드에 대한 상세공통코드목록 현시
@@ -198,7 +205,7 @@
 			const table = document.getElementById(tableId);
 
 			// 새 행(Row) 추가
-			const newRow = table.insertRow(0);
+			const newRow = table.insertRow(1); // 상단에 행 추가하기 위해 인덱스 고정
 
 			// 새 행(Row)에 Cell 추가
 			const newCell1 = newRow.insertCell(0);
@@ -265,6 +272,7 @@
 
 		};
 
+		// 전체 선택 처리
 		function selectAll(obj, objNm) {
 			console.info(obj);
 			const checkboxes = document.getElementsByName(objNm);
@@ -273,7 +281,75 @@
 				checkbox.checked = obj.checked;
 			})
 		};
+		
+		// 공통코드 행 선택 시 이벤트 처리
+		function rowVal(target) {
+			
+			const table = target.parentNode;
+			const trs = table.getElementsByTagName('tr');
+			
+			
+			for(i=0; i<trs.length; i++){ // 테이블 해더 부분 제외
+				
+				var row = trs[i];
+	
+				// 선택한 행 배경색 및 글자색 변경
+				if (trs[i] != target) { // param으로 가져온 target과 요소가 다른 경우 -> 선택 행 x
+					row.style.backgroundColor = 'transparent';
+					row.style.color = '#607080';
+					
+				} else { // 같은 경우 -> 선택 행 o
+					row.style.backgroundColor = '#435ebe';
+					row.style.color = '#fff';
+					
+					var celVal = row.cells[1].textContent; // 두 번째 셀의 텍스트 값 가져오기
+		            console.log('두 번째 셀의 값: ' + celVal);
+					
+		            var data = {
+		            		celVal : celVal
+	                };
+		            
+					$.ajax({
+						url : "/commonCd",
+						contentType: "application/json",
+						data : JSON.stringify(data),
+						type : 'POST',
+						success: function(response) {
+						    // 테이블에 데이터를 추가하기 전에 기존의 데이터를 초기화
+						    $('#child').find('tr:not(:first)').remove(); // 헤더 제외
 
+						    // 받은 데이터를 HTML에 동적으로 뿌리기
+						    response.forEach(function(item) {
+						        // 새로운 행 (tr)을 생성
+						        var newRow = $('<tr></tr>');
+
+						        // 각 데이터 항목을 <td>로 생성하여 추가
+						        var checkBoxCell = $('<td></td>').append(
+						            $('<input>').attr({
+						                type: 'checkbox',
+						                name: 'child',
+						                class: 'form-check-input',
+						                value: item.common_detail_code // 예시로 'common_detail_code'를 value로 사용
+						            })
+						        );
+
+						        var codeCell = $('<td></td>').text(item.COMMON_DETAIL_CODE); // 예시로 'common_detail_code' 사용
+						        var nameCell = $('<td></td>').text(item.COMMON_DETAIL_NAME); // 예시로 'common_detail_name' 사용
+						        var statusCell = $('<td></td>').text(item.COMMON_DETAIL_STATUS); // 예시로 'common_detail_status' 사용
+
+						        // 생성된 <td>들을 <tr>에 추가
+						        newRow.append(checkBoxCell, codeCell, nameCell, statusCell);
+
+						        // 생성된 <tr>를 테이블에 삽입
+						        $('#child').append(newRow);
+						    });
+						}
+					})
+				}
+				
+			};
+			
+		};
 
 
 	</script>
