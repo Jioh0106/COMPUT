@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>화면명</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<h3>요청내역</h3>
+
+			<div class="card">
+				<div class="card-body">
+					
+					<!--검색창-->
+				 	<div class="col-md-6 mb-1">
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+							<input type="text" class="form-control" id="nameSearch" placeholder="검색"
+								aria-label="Recipient's username" aria-describedby="button-addon2">
+							<button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+						</div>
+					</div>
+	
+
+                  <!--전체/받은요청/보낸요청 탭 시작-->
+                  <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab"
+                              aria-controls="home" aria-selected="true">전체</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
+                              aria-controls="profile" aria-selected="false">받은요청</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab"
+                              aria-controls="contact" aria-selected="false">보낸요청</a>
+                      </li>
+                  </ul>
+                  <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                         
+						<!-- 그리드 시작 -->
+						<section class="section">
+							<div class="row" id="basic-table">
+								<div id="grid"></div>
+							</div>
+						</section>
+						<!-- 그리드 끝 -->
+								
+                      </div>
+                      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                         
+						<!--각 탭마다 그리드 id 다르게 해줘야함-->
+						
+                      </div>
+                      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                          
+						<!--각 탭마다 그리드 id 다르게 해줘야함-->
+						
+						
+                      </div>
+                  </div>
+				  <!--전체/받은요청/보낸요청 탭 끝-->
+				  
+				  
+				  
+	<!--반려사유 가져오는 모달창 시작-->
+			<!--Default size Modal -->
+	    <div class="modal fade text-left" id="defaultSize" tabindex="-1"
+	        role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+	        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+	            role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="myModalLabel18">반려사유</h4>
+	                    <button type="button" class="close" data-bs-dismiss="modal"
+	                        aria-label="Close">
+	                        <i data-feather="x"></i>
+	                    </button>
+	                </div>
+	                <div class="modal-body">
+						
+						<h6 >승인권자 사번</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="emp_id" readonly
+														onchange="calcDate()">
+							<p id="rejectNameText"></p> <!--ajax사용해서 response에 담아오기-->
+						</div>
+						
+						<h6>승인권자 성명</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="emp_name" readonly
+															onchange="calcDate()">
+							<p id="rejectNameText"></p> <!--ajax사용해서 response에 담아오기-->
+						</div>
+						
+						<h6>반려사유</h6>
+						<div class="content">
+							<div class="form-group">
+								 <textarea class="form-control me-2" id="rejectReason" rows="4"></textarea>
+								<p id="rejectReasonText"></p> <!--ajax사용해서 response에 담아오기-->
+							</div>
+						
+						</div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-primary"
+	                        data-bs-dismiss="modal">
+	                        <i class="bx bx-check d-block d-sm-none"></i>
+	                        <span class="d-none d-sm-block">확인</span>
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+				  
+	<!--반려사유 가져오는 모달창 끝-->			  
+				  
+				  
+
+
+
+			
+		</div> <!-- card-body -->
+	 </div> <!-- card -->
+	</div><!--main-->
+
+</div><!-- app -->
+
+
+			<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+			<script src="assets/js/bootstrap.bundle.min.js"></script>
+			<script src="assets/js/main.js"></script>
+			<!-- TOAST UI CDN -->
+			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+			<script>
+				
+				
+				var Grid = tui.Grid;
+
+				// 데이터 정의
+				const data = [
+					{
+					request_no: '1', request_division: '발신', request_type: '발령', emp_num: '12-123', emp_name: '홍망고', 
+					emp_dept: '인사팀', request_date: '2024-12-20',request_deadline: '2024-12-26',
+						middle_approval: '22-123/홍팀장/인사팀', high_approval: '',
+						request_status: '1차대기중',request_rejection:''
+					}
+
+				];
+
+				// Grid 생성
+				const grid = new Grid({
+					el: document.getElementById('grid'),
+					columns: [
+						{header: '요청번호', name: 'request_no'},
+						{header: '요청구분', name: 'request_division'},
+						{header: '요청유형', name: 'request_type'},
+						{header: '사원번호', name: 'emp_num'},
+						{header: '성명', name: 'emp_name'},
+						{header: '부서명', name: 'emp_dept'},
+						{header: '요청일', name: 'request_date'},
+						{header: '요청마감일', name: 'request_deadline'},
+						{header: '중간승인권자', name: 'middle_approval'},
+						{header: '최종승인권자', name: 'high_approval'},
+						{header: '요청상태', name: 'request_status'},
+						{header: '반려사유', name: 'request_rejection'}
+					],
+					data: data
+				});
+
+				
+		// Grid의 row 클릭 이벤트 추가
+		    grid.on('click', (ev) => {
+		        // 클릭된 row 데이터 가져오기
+		        const rowData = ev.instance.getRow(ev.rowKey);
+				
+				// 팝업 창 열기
+				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
+				   const popup = window.open('/request-assign-detail', '_blank', popupOptions);
+
+				   // 팝업 창이 로드되었을 때 데이터 전달
+				   popup.onload = () => {
+				       popup.postMessage(rowData, '*'); // rowData 객체를 팝업에 전달
+				   };
+
+		      
+		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
+			
+			
+				
+			</script>
+
+</body>
+
+</html>

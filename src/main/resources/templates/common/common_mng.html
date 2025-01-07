@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>공통코드관리</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
+	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+	<!-- sweetAlert CDN -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+
+	<style>
+		.buttons {
+			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+			float: right;
+		}
+
+		.table {
+			table-layout: fixed;
+			/* 열 너비를 고정 */
+			width: 100%;
+			/* 테이블을 부모 너비에 맞춤 */
+			word-wrap: break-word;
+			/* 내용이 길어지면 줄바꿈 */
+		}
+
+		.full-width-input {
+			width: 100%;
+		}
+
+		/* 테이블 스크롤 */
+		.table-responsive {
+			height: 500px;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		/* 체크박스가 있는 첫 번째 열의 너비 설정 */
+		th:first-child,
+		td:first-child {
+			width: 40px;
+			text-align: center;
+		}
+	</style>
+
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<h3>공통코드관리</h3>
+
+			<section class="section">
+				<div class="row" id="basic-table">
+					<!-- 대분류 공통코드 -->
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-title">공통코드</h4>
+								<div class="buttons">
+									<button type="button" class="btn btn-outline-secondary"
+										onclick='addRow("parent")'>추가</button>
+									<button type="button" class="btn btn-outline-success">저장</button>
+									<button type="button" class="btn btn-outline-danger"
+										onclick='deleteRow("parent")'>삭제</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive"> <!-- 설정한 높이 이상이면 스크롤을 나타내기 위한 div -->
+									<table class="table table-bordered mb-0" id="parent">
+										<tr>
+											<th><input class="form-check-input" type="checkbox"
+													onclick='selectAll(this, "parent")'></th>
+											<th>구분코드</th>
+											<th>구분명</th>
+											<th>사용여부</th>
+										</tr>
+										<tr th:each="map : ${commonList}" onclick="goToSection('dept', this.id)"
+											id="deptHead">
+											<td>
+												<input type="checkbox" name="parent" class="form-check-input"
+													value="1" />
+											</td>
+											<td contenteditable="true" th:text="${map.COMMON_CODE}"></td>
+											<td contenteditable="true" th:text="${map.COMMON_NAME}"></td>
+											<td contenteditable="true" th:text="${map.COMMON_STATUS}"></td>
+										</tr>
+									</table>
+								</div> <!-- 스크롤 -->
+							</div>
+						</div>
+					</div>
+
+					<!-- 소분류 상세공통코드 -->
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-title">상세공통코드</h4>
+								<div class="buttons">
+									<button type="button" class="btn btn-outline-secondary"
+										onclick='addRow("child")'>추가</button>
+									<button type="button" class="btn btn-outline-success">저장</button>
+									<button type="button" class="btn btn-outline-danger"
+										onclick='deleteRow("child")'>삭제</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<table class="table table-bordered mb-0" id="child">
+									<tr>
+										<th><input class="form-check-input" type="checkbox"
+												onclick='selectAll(this, "child")'></th>
+										<th>구분코드</th>
+										<th>구분명</th>
+										<th>사용여부</th>
+									</tr>
+									<tr id="dept" style="display: none;">
+										<td>
+											<input type="checkbox" name="child" class="form-check-input" value="1" />
+										</td>
+										<td>DEPT01</td>
+										<td>인사부</td>
+										<td>Y</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+
+
+		</div><!--main-->
+
+	</div><!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+
+	<!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+
+		// 공통코드 목록 클릭 시 해당하는 공통코드에 대한 상세공통코드목록 현시
+		function goToSection(href, head) {
+			// href 값에서 ID 추출
+			const id = href;
+			const idHead = head;
+
+			if (id) {
+				document.getElementById(idHead).style.backgroundColor = '#435ebe';
+				document.getElementById(idHead).style.color = '#fff';
+				document.getElementById(id).style.display = '';
+			} else {
+				console.warn(`Element with ID "${id}" not found.`);
+			}
+		};
+
+		// 등록 버튼 클릭 시 행 추가
+		function addRow(tableId) {
+			// table element 찾기
+			const table = document.getElementById(tableId);
+
+			// 새 행(Row) 추가
+			const newRow = table.insertRow(0);
+
+			// 새 행(Row)에 Cell 추가
+			const newCell1 = newRow.insertCell(0);
+			const newCell2 = newRow.insertCell(1);
+			const newCell3 = newRow.insertCell(2);
+			const newCell4 = newRow.insertCell(3);
+
+			// Cell에 입력 필드 추가
+			const input1 = document.createElement('input');
+			input1.type = 'checkbox';
+			input1.className = 'form-check-input'; // CSS 클래스 추가
+			input1.name = tableId;
+
+			const input2 = document.createElement('input');
+			input2.type = 'text';
+			input2.className = 'full-width-input'; // CSS 클래스 추가
+			input2.placeholder = '코드 입력';
+
+			const input3 = document.createElement('input');
+			input3.type = 'text';
+			input3.className = 'full-width-input'; // CSS 클래스 추가
+			input3.placeholder = '이름 입력';
+
+			const input4 = document.createElement('input');
+			input4.type = 'text';
+			input4.className = 'full-width-input'; // CSS 클래스 추가
+			input4.placeholder = '여부 입력';
+
+			// 입력 필드를 Cell에 추가
+			newCell1.appendChild(input1);
+			newCell2.appendChild(input2);
+			newCell3.appendChild(input3);
+			newCell4.appendChild(input4);
+		};
+
+		// 삭제 버튼 클릭 시 선택된 행만 삭제
+		function deleteRow(tableId) {
+			// @Param : tableId로 테이블 찾기 
+			const table = document.getElementById(tableId);
+
+			// 선택된 체크박스 개수 확인
+			const checkbox = `input[name=${tableId}]:checked`; //체크된 체크박스
+			const selectedCheckbox = document.querySelectorAll(checkbox); //체크된 체크박스 전체
+			const cnt = selectedCheckbox.length; //selectedCheckbox의 개수
+
+			// 선택된 행이 없을 경우 경고창 표시
+			if (cnt === 0) {
+				Swal.fire({
+					title: "삭제할 행을 선택해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
+
+			// 선택된 행 삭제
+			for (let i = 1; i < table.rows.length; i++) { // 테이블 row 전체 반복
+				const checkbox = table.rows[i].cells[0].querySelector("input[type='checkbox']");
+				if (checkbox && checkbox.checked) {
+					table.deleteRow(i);
+					i--; // 삭제 후 인덱스 조정
+				}
+			}
+
+		};
+
+		function selectAll(obj, objNm) {
+			console.info(obj);
+			const checkboxes = document.getElementsByName(objNm);
+
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = obj.checked;
+			})
+		};
+
+
+
+	</script>
+
+</body>
+
+</html>

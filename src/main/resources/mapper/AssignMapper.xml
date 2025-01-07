@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.AssignMapper">
+	
+	
+	<!--발령등록페이지 공통코드 연결-->
+	<select id="selectAssignCommonDetail" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('APNT','DEPT','PSTN')
+		AND common_detail_status ='Y'
+	</select>
+
+	
+	<!--직원검색 (공통상세코드랑 조인해서 코드값 실제 이름보여주기)-->
+	<!--별칭을 employeeDTO필드명과 같아야 담을 수 있음-->
+	<select id="empSearch" resultType="com.deepen.domain.EmployeesDTO" parameterType="String">
+	    SELECT emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+	    pos_code.common_detail_name AS emp_position
+	    FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    WHERE emp_status LIKE 'WRST%'
+	    AND emp_name LIKE '%' || #{keyword, jdbcType=VARCHAR} || '%'
+	</select>
+	
+	<!--중간 승인권자 조회 모달창-->
+	<select id="middleRoleSearch" resultType="com.deepen.domain.EmployeesDTO">
+		select emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+		pos_code.common_detail_name AS emp_position
+		FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST%'
+	</select>
+	
+	
+	
+	
+	
+</mapper>
+
+    
+    

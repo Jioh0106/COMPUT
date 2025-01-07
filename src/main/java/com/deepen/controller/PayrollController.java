@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PayrollController {
 
+
     private final SalaryFormulaService salaryFormulaService;
 
     // 급여 종류 관리 추가 GET
@@ -94,4 +95,5 @@ public class PayrollController {
     public String payList() {
         return "payroll/pay_list";
     }
+
 }

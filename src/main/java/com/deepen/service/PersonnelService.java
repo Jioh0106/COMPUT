@@ -1,0 +1,103 @@
+package com.deepen.service;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.deepen.domain.CommonDetailDTO;
+import com.deepen.domain.EmployeesDTO;
+import com.deepen.entity.Employees;
+import com.deepen.mapper.PersonnelMapper;
+import com.deepen.repository.CommonDetailRepository;
+import com.deepen.repository.PersonnelRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+
+@Service
+@RequiredArgsConstructor
+@Log
+public class PersonnelService {
+	
+	private final PersonnelRepository psRepo;
+	private final CommonDetailRepository cdRepo;
+	private final PersonnelMapper psMapper;
+	
+	//JPA
+	public void regEmployees(EmployeesDTO empDTO) {
+		
+		int newEmpNo = generateNewEmpNo();
+		
+		//사원 아이디
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String id = format.format(empDTO.getEmp_hire_date())+newEmpNo; 
+		//사원 초기 비밀번호
+		String pw = empDTO.getMiddleEmpPhoneNo()+empDTO.getLastEmpPhoneNo();
+		//사원 주민등록번호
+		String ssn = empDTO.getFirst_emp_ssn()+"-"+empDTO.getSecond_emp_ssn();
+		//사원 전화번호
+		String phoneNum = empDTO.getFirstEmpPhoneNo()+"-"+empDTO.getMiddleEmpPhoneNo()+"-"+empDTO.getLastEmpPhoneNo();
+		
+		// 정보 설정
+		empDTO.setEmp_id(id);
+		empDTO.setEmp_pw(pw);
+		empDTO.setEmp_no(newEmpNo);
+		empDTO.setEmp_ssn(ssn);
+		empDTO.setEmp_phone(phoneNum);
+		empDTO.setEmp_reg_date(new Timestamp(System.currentTimeMillis()));
+		
+		Employees emp = Employees.setEmployees(empDTO);
+		psRepo.save(emp);
+	}
+	
+	private int generateNewEmpNo() {
+	    // 데이터베이스에서 현재 가장 큰 emp_no 가져오기
+	    Integer maxEmpNo = psRepo.findMaxEmpNo();
+	    return (maxEmpNo != null) ? maxEmpNo + 1 : 1; // null인 경우 1부터 시작
+	}
+	
+	public void updateEmpInfo(EmployeesDTO empDTO) {
+		//사원 주민등록번호
+		String ssn = empDTO.getFirst_emp_ssn()+"-"+empDTO.getSecond_emp_ssn();
+		//사원 전화번호
+		String phoneNum = empDTO.getFirstEmpPhoneNo()+"-"+empDTO.getMiddleEmpPhoneNo()+"-"+empDTO.getLastEmpPhoneNo();
+		
+		empDTO.setEmp_ssn(ssn);
+		empDTO.setEmp_phone(phoneNum);
+		empDTO.setEmp_mod_date(new Timestamp(System.currentTimeMillis()));
+		
+		Employees emp = Employees.setEmployees(empDTO);
+		log.info("Service 수정 할 데이터 : "+emp.toString());
+		psRepo.save(emp);
+	}
+	
+	
+	//Mybatis
+	// 등록페이지 필요 공통코드 조회
+	public List<CommonDetailDTO> fetchCommonDetailCodeList(){
+		
+		List<CommonDetailDTO> cdCodeList = psMapper.selectCommonDetailCodeList();
+		
+		return cdCodeList;
+	}
+	
+	public List<Map<String, Object>> getEmpList(String startDate, String endDate, String search){
+		
+		log.info("S fitter: "+startDate+", "+endDate+", "+search);
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("startDate", startDate);
+		params.put("endDate", endDate);
+		params.put("search", search);
+		
+		List<Map<String, Object>> empList = psMapper.selectEmpList(params);
+		
+		return empList;
+	}
+
+}
+

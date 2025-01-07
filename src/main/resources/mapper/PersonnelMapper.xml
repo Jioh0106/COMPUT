@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.PersonnelMapper">
+
+	
+	<select id="selectCommonDetailCodeList" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('ATHR','WRST','DEPT','PSTN','OCPT','RANK','RTRM')
+		AND common_detail_status ='Y'
+	</select>
+	
+	<select id="selectEmpList" parameterType="Map" resultType="java.util.Map">
+	    SELECT 
+	        e.emp_id, 
+	        e.emp_no, 
+	        e.emp_pw, 
+	        e.emp_role,
+	        cdr.common_detail_name AS emp_role_name,
+	        e.emp_name,
+	        e.emp_photo, 
+	        e.emp_ssn, 
+	        e.emp_gender,
+	        e.emp_marital_status,
+	        e.emp_phone,
+	        e.emp_postcode,
+	        e.emp_address,
+	        e.emp_address_detail,
+	        e.emp_email,
+	        e.emp_edu,
+	        e.emp_status,
+	        cds.common_detail_name AS emp_status_name,
+	        e.emp_job_type,
+	        cdjt.common_detail_name AS job_type_name,
+	        e.emp_dept,
+	        cdd.common_detail_name AS emp_dept_name,
+	        e.emp_position,
+	        cdp.common_detail_name AS emp_position_name,
+	        TO_CHAR(e.emp_hire_date, 'YYYY-MM-DD') AS emp_hire_date,
+	        e.emp_perf_rank,
+	        cdrk.common_detail_name AS emp_rank_name,
+	        TO_CHAR(e.emp_exit_date, 'YYYY-MM-DD') AS emp_exit_date,
+	        e.emp_exit_type,
+	        cdet.common_detail_name AS exit_type_name,
+	        e.emp_salary,
+	        e.emp_bank,
+	        e.emp_account,
+	        TO_CHAR(e.emp_reg_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_reg_date
+	    FROM EMPLOYEES e
+	    LEFT JOIN COMMON_DETAIL cdr
+	        ON SUBSTR(cdr.common_detail_code, 1, 4) = 'ATHR'
+	        AND cdr.common_detail_code = e.emp_role
+	    LEFT JOIN COMMON_DETAIL cds
+	        ON SUBSTR(cds.common_detail_code, 1, 4) = 'WRST'
+	        AND cds.common_detail_code = e.emp_status
+	    LEFT JOIN COMMON_DETAIL cdjt 
+	        ON SUBSTR(cdjt.common_detail_code, 1, 4) = 'OCPT'
+	        AND cdjt.common_detail_code = e.emp_job_type
+	    LEFT JOIN COMMON_DETAIL cdd 
+	        ON SUBSTR(cdd.common_detail_code, 1, 4) = 'DEPT'
+	        AND cdd.common_detail_code = e.emp_dept
+	    LEFT JOIN COMMON_DETAIL cdp
+	        ON SUBSTR(cdp.common_detail_code, 1, 4) = 'PSTN'
+	        AND cdp.common_detail_code = e.emp_position
+	    LEFT JOIN COMMON_DETAIL cdrk
+	        ON SUBSTR(cdrk.common_detail_code, 1, 4) = 'RANK'
+	        AND cdrk.common_detail_code = e.emp_perf_rank
+	    LEFT JOIN COMMON_DETAIL cdet
+	        ON SUBSTR(cdet.common_detail_code, 1, 4) = 'RTRM'
+	        AND cdet.common_detail_code = e.emp_exit_type
+	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
+			WHERE e.emp_hire_date BETWEEN #{startDate} AND #{endDate}
+	    </if>    
+ 	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">
+        	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
+    	</if>
+	    ORDER BY e.emp_no
+	</select>
+</mapper>
+
+
+

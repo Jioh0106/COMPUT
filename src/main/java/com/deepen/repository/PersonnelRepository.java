@@ -1,19 +1,11 @@
 package com.deepen.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import com.deepen.entity.CommonDetail;
+import com.deepen.entity.Employees;
 
-@Repository
-public interface CommonDetailRepository extends JpaRepository<CommonDetail, String> {
-    @Query("SELECT c FROM CommonDetail c WHERE c.common_detail_code LIKE :prefix% ORDER BY c.common_detail_code DESC")
-    List<CommonDetail> findByCommon_detail_codeStartingWith(@Param("prefix") String prefix);
-  
+
 //extends JpaRepository<T(Entity), ID(기본키 형)>
 //JpaRepository 지원하는 기본 메서드 제공
 //save(Entity) : 엔티티 저장 및 수정
@@ -29,4 +21,8 @@ public interface CommonDetailRepository extends JpaRepository<CommonDetail, Stri
 //                findByIdOrPass(id,pass) => where id = ? or pass = ?
 //                findByNumBetween() => where num between ? and ?
 
+public interface PersonnelRepository extends JpaRepository<Employees, String> {
+	
+	@Query("SELECT MAX(e.emp_no) FROM Employees e")
+	Integer findMaxEmpNo();
 }

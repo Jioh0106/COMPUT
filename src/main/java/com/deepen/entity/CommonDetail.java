@@ -39,6 +39,5 @@ public class CommonDetail {
         commonDetail.setCommon_detail_status(commonDetailDTO.getCommon_detail_status());
         return commonDetail;
     }
-	
 
 }
