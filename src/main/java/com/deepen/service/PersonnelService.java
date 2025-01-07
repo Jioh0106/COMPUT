@@ -75,6 +75,11 @@ public class PersonnelService {
 		psRepo.save(emp);
 	}
 	
+	public void deleteAllEmpById(List<String> ids) {
+		psRepo.deleteAllById(ids);
+		log.info("삭제한 데이터 Ids : "+ids);
+	}
+	
 	
 	//Mybatis
 	// 등록페이지 필요 공통코드 조회

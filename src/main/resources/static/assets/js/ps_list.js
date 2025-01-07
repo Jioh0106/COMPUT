@@ -1,20 +1,8 @@
-// toast ui datepiker
-function datePiker(containerSelector, inputSelector){
-	return new tui.DatePicker(containerSelector,{
-		date : new Date(),
-		input : {
-			element: inputSelector,
-			format: 'yyyy-MM-dd'
-		},
-		language : 'ko'
-	});
-}
-
+// datePikers
 const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
 const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
 const empHireDatePicker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
 const empExitDatePicker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
-
 
 // toast ui 그리드
 const Grid = tui.Grid;
@@ -55,6 +43,165 @@ const empListGrid = new Grid({
         }
 });
 
+const empListFilters = {
+	startDate : '1900-01-01',
+	endDate : '2999-12-31',
+	search : '',
+}
+
+function updateEmpListFilters() {
+	    empListFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
+	    empListFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
+	    empListFilters.search = document.getElementById('search').value || '';
+	    
+	    fetchEmpList();
+	}
+
+// 페이지가 완전히 로드된 후 함수 실행
+window.onload = function () {
+		
+		fetchEmpList();
+		fetchCommonDetails();
+		
+		startDatePicker.on('change', updateEmpListFilters);
+		endDatePicker.on('change', updateEmpListFilters);
+	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
+		
+	}
+
+// 그리드에서 로우 클릭 이벤트 추가
+empListGrid.on('click', function (ev) {
+	
+	const target = ev.nativeEvent.target;
+	//console.log(target);
+	const columnName = ev.columnName;
+	
+	if(target.type === 'checkbox' || columnName === '_checked'){
+		return;
+	}
+    const rowKey = ev.rowKey; // 클릭된 로우의 인덱스
+   	const clickedRowData = empListGrid.getData()[rowKey];  // 해당 로우 데이터 가져오기
+	
+	console.log(clickedRowData);
+
+    // 모달에 데이터 설정
+    showModal(clickedRowData);
+});
+
+// 조회된 정보 모달에 바인딩
+function showModal(empDetailInfo) {
+	
+    //const modalBody = document.querySelector('#empDatailModal .modal-body');
+	//modalBody.innerHTML = ``;
+	
+	// 수정시 hidden 넘길 데이터
+	const empId = document.getElementById('emp_id');
+	const empPw = document.getElementById('emp_pw');
+	const empNo = document.getElementById('emp_no');
+	const empRegDate = document.getElementById('emp_reg_date');
+	//const empModDate = document.getElementById('emp_mod_date');
+	
+	const empRole = document.getElementById('emp_role');
+	const empName = document.getElementById('emp_name');
+	const empFirstSsn = document.getElementById('first_emp_ssn'); //EMP_SSN
+	const empSecondSsn = document.getElementById('second_emp_ssn'); //EMP_SSN
+	const empGender = document.getElementById('emp_gender');
+	const empMaritalStatus = document.getElementById('emp_marital_status');
+	const empFirstPhone = document.getElementById('firstEmpPhoneNo'); //EMP_PHONE
+	const empMiddlePhone = document.getElementById('middleEmpPhoneNo'); //EMP_PHONE
+	const empLastPhone = document.getElementById('lastEmpPhoneNo'); //EMP_PHONE
+	const empEmail = document.getElementById('emp_email');
+	const postCode= document.getElementById('postCode');
+	const empAddress = document.getElementById('emp_address');
+	const empAddressDetail = document.getElementById('emp_address_detail');
+	const empEdu = document.getElementById('emp_edu');
+	const empStatus = document.getElementById('emp_status');
+	const empJobType = document.getElementById('emp_job_type');
+	const empDept = document.getElementById('emp_dept');
+	const empPosition = document.getElementById('emp_position');
+	const empHireDate = document.getElementById('emp_hire_date');
+	const empPerfRank = document.getElementById('emp_perf_rank');
+	const empExitDate = document.getElementById('emp_exit_date');
+	const empExitType = document.getElementById('emp_exit_type');
+	const empSalary = document.getElementById('emp_salary');
+	const empBank = document.getElementById('emp_bank');
+	const empAccount = document.getElementById('emp_account');
+	
+	// 주민등록번호 문자열 분리
+	let splitSsn = empDetailInfo.EMP_SSN.split('-');
+	
+	// 전화번호 문자열 분리
+	let splitPhoneNum = empDetailInfo.EMP_PHONE.split('-');
+	
+	empId.value = empDetailInfo.EMP_ID;
+	empPw.value = empDetailInfo.EMP_PW;
+	empNo.value = empDetailInfo.EMP_NO;
+	empRegDate.value = empDetailInfo.EMP_REG_DATE;
+	//console.log(typeof(empRegDate.value));
+	//empModDate.value = empDetailInfo.EMP_MOD_DATE || null;
+	empRole.value = empDetailInfo.EMP_ROLE;
+	empName.value = empDetailInfo.EMP_NAME;
+	//empPhone.value = empDetailInfo.EMP_SSN;
+	empFirstSsn.value = splitSsn[0];
+	empSecondSsn.value = splitSsn[1];
+	empGender.value = empDetailInfo.EMP_GENDER;
+	empMaritalStatus.value = empDetailInfo.EMP_MARITAL_STATUS;
+	//empPhone.value = empDetailInfo.EMP_PHONE;
+	empFirstPhone.value = splitPhoneNum[0];
+	empMiddlePhone.value = splitPhoneNum[1];
+	empLastPhone.value = splitPhoneNum[2];
+	empEmail.value = empDetailInfo.EMP_EMAIL;
+	postCode.value = empDetailInfo.EMP_POSTCODE;
+	empAddress.value = empDetailInfo.EMP_ADDRESS;
+	empAddressDetail.value = empDetailInfo.EMP_ADDRESS_DETAIL;
+	empEdu.value = empDetailInfo.EMP_EDU;
+	empStatus.value = empDetailInfo.EMP_STATUS;
+	empJobType.value = empDetailInfo.EMP_JOB_TYPE;
+	empDept.value = empDetailInfo.EMP_DEPT;
+	empPosition.value = empDetailInfo.EMP_POSITION;
+	empHireDate.value = empDetailInfo.EMP_HIRE_DATE;
+	empPerfRank.value = empDetailInfo.EMP_PERF_RANK;
+	empExitDate.value = empDetailInfo.EMP_EXIT_DATE;
+	empExitType.value = empDetailInfo.EMP_EXIT_TYPE;
+	empSalary.value = empDetailInfo.EMP_SALARY;
+	empBank.value = empDetailInfo.EMP_BANK;
+	empAccount.value = empDetailInfo.EMP_ACCOUNT;
+
+    // 모달을 표시
+    const modal = new bootstrap.Modal(document.getElementById('empDatailModal'));
+    modal.show();
+}
+
+// 삭제 버튼
+const deleteBtn = document.getElementById('deleteBtn');
+// 그리드에서 제하고싶은 key 배열로 만들어주기
+function CheckedRowValues(gridObj,jsonKey){
+	const checkedRowsIds = gridObj.getCheckedRows();
+	//function(row){
+	//	return row.EMP_ID
+	//}
+	const rowValues = checkedRowsIds.map(row => row[jsonKey]);
+	return rowValues;
+}
+deleteBtn.addEventListener("click",() => {
+	
+	const checkedRowIds = CheckedRowValues(empListGrid,"EMP_ID");
+	console.log(checkedRowIds);
+		if(checkedRowIds.length === 0){
+			alert("삭제할 정보를 선택해주세요");
+		}else{
+			if(confirm("삭제하시겠습니까?")){
+				empDelete("http://localhost:8082/restApi/empDelete",checkedRowIds);
+				alert("삭제 완료");
+			}else{
+				alert("삭제 취소");
+			}
+		}
+	}
+);
+
+//--------ajax--------------------------------------------------------------------------------------------------------------------//
+
 // 사원리스트 조회
 async function fetchEmpList() {
 	try	{	
@@ -73,7 +220,7 @@ async function fetchEmpList() {
 	   	} catch (error) {
 	       	console.error("사원조회 중 오류:", error);
 	   	}
-	}
+}
 
 // 필요한 공통 코드 상세 조회	
 async function fetchCommonDetails() {
@@ -123,168 +270,12 @@ async function fetchCommonDetails() {
 	}
 }
 
-const empListFilters = {
-	startDate : '1900-01-01',
-	endDate : '2999-12-31',
-	search : '',
-}
-
-function updateEmpListFilters() {
-	    empListFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
-	    empListFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
-	    empListFilters.search = document.getElementById('search').value || '';
-	    
-	    fetchEmpList();
-	}
-
-// 페이지가 완전히 로드된 후 함수 실행
-window.onload = function () {
-		
-		fetchEmpList();
-		fetchCommonDetails();
-		
-		startDatePicker.on('change', updateEmpListFilters);
-		endDatePicker.on('change', updateEmpListFilters);
-	   	document.getElementById('search').addEventListener('input', updateEmpListFilters);
-		
-	}
-
-// 그리드에서 로우 클릭 이벤트 추가
-empListGrid.on('click', function (ev) {
-	
-	const target = ev.nativeEvent.target;
-	const columnName = ev.columnName;
-	
-	if(target.type === 'checkbox' || columnName === '_checked'){
-		return;
-	}
-    const rowKey = ev.rowKey; // 클릭된 로우의 인덱스
-   	const clickedRowData = empListGrid.getData()[rowKey];  // 해당 로우 데이터 가져오기
-	
-	console.log(clickedRowData);
-
-    // 모달에 데이터 설정
-    showModal(clickedRowData);
-});
-
-
-// 모달에 데이터 표시 함수
-function showModal(empDetailInfo) {
-	
-    //const modalBody = document.querySelector('#empDatailModal .modal-body');
-	/*
-	modalBody.innerHTML = `
-	       <p><b>입사일자:</b> ${data.emp_hire_date}</p>
-	       <p><b>사원번호:</b> ${data.emp_num}</p>
-	       <p><b>성명:</b> ${data.emp_name}</p>
-	       <p><b>부서명:</b> ${data.emp_dept}</p>
-	       <p><b>직급명:</b> ${data.emp_position}</p>
-	       <p><b>E-mail:</b> ${data.emp_email}</p>
-	   `;
-   	*/
-	
-	//console.log(empDetailInfo);
-	
-	// 수정시 hidden 넘길 데이터
-	const empId = document.getElementById('emp_id');
-	const empPw = document.getElementById('emp_pw');
-	const empNo = document.getElementById('emp_no');
-	const empRegDate = document.getElementById('emp_reg_date');
-	//const empModDate = document.getElementById('emp_mod_date');
-	
-	
-	const empRole = document.getElementById('emp_role');
-	const empName = document.getElementById('emp_name');
-	const empFirstSsn = document.getElementById('first_emp_ssn'); //EMP_SSN
-	const empSecondSsn = document.getElementById('second_emp_ssn'); //EMP_SSN
-	const empGender = document.getElementById('emp_gender');
-	const empMaritalStatus = document.getElementById('emp_marital_status');
-	const empFirstPhone = document.getElementById('firstEmpPhoneNo'); //EMP_PHONE
-	const empMiddlePhone = document.getElementById('middleEmpPhoneNo'); //EMP_PHONE
-	const empLastPhone = document.getElementById('lastEmpPhoneNo'); //EMP_PHONE
-	const empEmail = document.getElementById('emp_email');
-	const postCode= document.getElementById('postCode');
-	const empAddress = document.getElementById('emp_address');
-	const empAddressDetail = document.getElementById('emp_address_detail');
-	const empEdu = document.getElementById('emp_edu');
-	const empStatus = document.getElementById('emp_status');
-	const empJobType = document.getElementById('emp_job_type');
-	const empDept = document.getElementById('emp_dept');
-	const empPosition = document.getElementById('emp_position');
-	const empHireDate = document.getElementById('emp_hire_date');
-	const empPerfRank = document.getElementById('emp_perf_rank');
-	const empExitDate = document.getElementById('emp_exit_date');
-	const empExitType = document.getElementById('emp_exit_type');
-	const empSalary = document.getElementById('emp_salary');
-	const empBank = document.getElementById('emp_bank');
-	const empAccount = document.getElementById('emp_account');
-	
-	// 주민등록번호 문자열 분리
-	let splitSsn = empDetailInfo.EMP_SSN.split('-');
-	
-	// 전화번호 문자열 분리
-	let splitPhoneNum = empDetailInfo.EMP_PHONE.split('-');
-	
-	
-	empId.value = empDetailInfo.EMP_ID;
-	empPw.value = empDetailInfo.EMP_PW;
-	empNo.value = empDetailInfo.EMP_NO;
-	empRegDate.value = empDetailInfo.EMP_REG_DATE;
-	//console.log(typeof(empRegDate.value));
-	//empModDate.value = empDetailInfo.EMP_MOD_DATE || null;
-	empRole.value = empDetailInfo.EMP_ROLE;
-	empName.value = empDetailInfo.EMP_NAME;
-	//empPhone.value = empDetailInfo.EMP_SSN;
-	empFirstSsn.value = splitSsn[0];
-	empSecondSsn.value = splitSsn[1];
-	empGender.value = empDetailInfo.EMP_GENDER;
-	empMaritalStatus.value = empDetailInfo.EMP_MARITAL_STATUS;
-	//empPhone.value = empDetailInfo.EMP_PHONE;
-	empFirstPhone.value = splitPhoneNum[0];
-	empMiddlePhone.value = splitPhoneNum[1];
-	empLastPhone.value = splitPhoneNum[2];
-	empEmail.value = empDetailInfo.EMP_EMAIL;
-	postCode.value = empDetailInfo.EMP_POSTCODE;
-	empAddress.value = empDetailInfo.EMP_ADDRESS;
-	empAddressDetail.value = empDetailInfo.EMP_ADDRESS_DETAIL;
-	empEdu.value = empDetailInfo.EMP_EDU;
-	empStatus.value = empDetailInfo.EMP_STATUS;
-	empJobType.value = empDetailInfo.EMP_JOB_TYPE;
-	empDept.value = empDetailInfo.EMP_DEPT;
-	empPosition.value = empDetailInfo.EMP_POSITION;
-	empHireDate.value = empDetailInfo.EMP_HIRE_DATE;
-	empPerfRank.value = empDetailInfo.EMP_PERF_RANK;
-	empExitDate.value = empDetailInfo.EMP_EXIT_DATE;
-	empExitType.value = empDetailInfo.EMP_EXIT_TYPE;
-	empSalary.value = empDetailInfo.EMP_SALARY;
-	empBank.value = empDetailInfo.EMP_BANK;
-	empAccount.value = empDetailInfo.EMP_ACCOUNT;
-
-    // 모달을 표시
-    const modal = new bootstrap.Modal(document.getElementById('empDatailModal'));
-    modal.show();
-}
-
-// 삭제
-const deleteBtn = document.getElementById('deleteBtn');
-function CheckedRowValues(gridObj,jsonKey){
-	const checkedRowsIds = gridObj.getCheckedRows();
-	//function(row){
-	//	return row.EMP_ID
-	//}
-	const rowValues = checkedRowsIds.map(row => row[jsonKey]);
-	
-	return rowValues;
-}
-deleteBtn.addEventListener("click",() => {
-	const checkedRowIds = CheckedRowValues(empListGrid,"EMP_ID");
-	empDelete("http://localhost:8082/restApi/empDelete",checkedRowIds)});
-
+// 선택 삭제
 async function empDelete(url = "http://localhost:8082/restApi/empDelete",rowIds){
 	console.log(rowIds);
 	
 	try{
-		const response = await fetch("http://localhost:8082/restApi/empDelete",{
+		const response = await fetch(url,{
 			method: "POST",
 			headers:{
 				"Content-Type":"application/json",
@@ -296,13 +287,27 @@ async function empDelete(url = "http://localhost:8082/restApi/empDelete",rowIds)
 		}
 		const result = await response.text();
 		console.log("result : "+result);
-		
+		setTimeout(()=>{
+			window.location.reload();
+		},1000);
 	}catch(error){
 		console.error("삭제 실패",error);
 	}
 }
 
-//-------------------------------------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------------------------------------------//
+
+// toast ui datepiker
+function datePiker(containerSelector, inputSelector){
+	return new tui.DatePicker(containerSelector,{
+		date : new Date(),
+		input : {
+			element: inputSelector,
+			format: 'yyyy-MM-dd'
+		},
+		language : 'ko'
+	});
+}
 
 // 다음 주소 api
 function daumAddressAPI() {
