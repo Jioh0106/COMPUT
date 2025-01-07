@@ -6,18 +6,12 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import com.deepen.domain.CommonDetailDTO;
-
-
 @Mapper
 @Repository
-public interface AttendanceMapper {
-	
-	List<Map<String, Object>> getAbsenceList();
+public interface CommonMapper {
 
-	List<CommonDetailDTO> getCommonList(String code);
-	
-	
-	
-	
+	List<Map<String, Object>> commonList();
+
+	List<Map<String, Object>> commonDtlList(String commonCd);
+
 }

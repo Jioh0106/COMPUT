@@ -10,6 +10,15 @@
 		FROM ABSENCE_VIEW 
 	</select>
 	
+	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
+		SELECT common_detail_code, common_detail_name
+		FROM common_detail
+		WHERE common_detail_status = 'Y'
+		<if test="code != null">
+			AND REGEXP_LIKE(common_detail_code, '^${code}')
+		</if>
+	</select>
+	
 	
 	
 	

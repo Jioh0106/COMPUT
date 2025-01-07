@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.CommonMapper">
+
+	
+	<select id="commonList" resultType="map">
+		SELECT common_code, common_name, common_status, common_display
+		FROM common
+		WHERE common_status = 'Y'
+	</select>
+	
+	<select id="commonDtlList" resultType="map" parameterType="string">
+		SELECT common_detail_code, common_detail_name, common_detail_status, common_detail_display
+		FROM common_detail
+		WHERE common_detail_status = 'Y'
+		AND REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+	</select>
+	
+	
+	
+	
+</mapper>
+
+
+
