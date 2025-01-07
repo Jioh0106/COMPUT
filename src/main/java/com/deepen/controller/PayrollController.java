@@ -52,7 +52,7 @@ public class PayrollController {
         }
     }
     
-    // 급여 종류 관리 수정 GET
+    // 급여 종류 관리 수정
     @PostMapping("/pay-mng/update")
     @ResponseBody
     public ResponseEntity<?> updateFormula(@RequestBody SalaryFormulaDTO salaryFormulaDTO) {
@@ -66,11 +66,8 @@ public class PayrollController {
          }
     }
     
-    // 급여 종류 관리 수정 POST
     
-    // 급여 종류 관리 삭제 GET
-    
-    // 급여 종류 관리 삭제 POST
+    // 급여 종류 관리 삭제
     @PostMapping("/pay-mng/delete")
     @ResponseBody
     public ResponseEntity<?> deleteFormulas(@RequestBody List<Long> ids) {
@@ -82,6 +79,12 @@ public class PayrollController {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", "삭제 중 오류가 발생했습니다: " + e.getMessage()));
         }
+    }
+    
+    @GetMapping("/pay-mng/formula-types")
+    @ResponseBody
+    public List<Map<String, String>> getFormulaTypes() {
+        return salaryFormulaService.getFormulaTypes();
     }
     
     // 급여 지급 이력

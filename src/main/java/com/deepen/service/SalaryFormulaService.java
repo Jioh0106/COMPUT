@@ -1,8 +1,10 @@
 package com.deepen.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -25,19 +27,9 @@ public class SalaryFormulaService {
     @Transactional
     public void save(SalaryFormulaDTO dto) {
         try {
-            // 1. 코드 생성
-            String newCode = generateCode(dto.getFormulaType());
+        	CommonDetail commonDetail = commonDetailRepository.findById(dto.getFormulaCode())
+                    .orElseThrow(() -> new RuntimeException("해당 구분 코드를 찾을 수 없습니다."));
             
-            // 2. CommonDetail 저장
-            CommonDetail commonDetail = new CommonDetail();
-            commonDetail.setCommon_detail_code(newCode);
-            commonDetail.setCommon_detail_name(dto.getFormulaName());
-            commonDetail.setCommon_detail_status("Y");
-            // common_detail_display는 기본값 1 사용
-            
-            CommonDetail savedCommonDetail = commonDetailRepository.save(commonDetail);
-            
-            // 3. SalaryFormula 저장
             SalaryFormula formula = new SalaryFormula();
             formula.setFormulaName(dto.getFormulaName());
             formula.setFormulaType(dto.getFormulaType());
@@ -45,7 +37,7 @@ public class SalaryFormulaService {
             formula.setApplyYear(dto.getApplyYear());
             formula.setFormulaPriority(dto.getFormulaPriority());
             formula.setUpdatedAt(LocalDateTime.now());
-            formula.setCommonDetail(savedCommonDetail);
+            formula.setCommonDetail(commonDetail);
             
             salaryFormulaRepository.save(formula);
             
@@ -58,11 +50,6 @@ public class SalaryFormulaService {
     public void update(SalaryFormulaDTO dto) {
         SalaryFormula formula = salaryFormulaRepository.findById(dto.getFormulaId())
             .orElseThrow(() -> new RuntimeException("해당 급여 공식을 찾을 수 없습니다."));
-        
-        // CommonDetail 업데이트
-        CommonDetail commonDetail = formula.getCommonDetail();
-        commonDetail.setCommon_detail_name(dto.getFormulaName());
-        commonDetailRepository.save(commonDetail);
         
         // SalaryFormula 업데이트
         formula.setFormulaName(dto.getFormulaName());
@@ -79,31 +66,39 @@ public class SalaryFormulaService {
     public void deleteByIds(List<Long> ids) {
         List<SalaryFormula> formulas = salaryFormulaRepository.findAllById(ids);
         
-        // CommonDetail도 함께 삭제
-        List<CommonDetail> commonDetails = formulas.stream()
-            .map(SalaryFormula::getCommonDetail)
-            .collect(Collectors.toList());
-        
         salaryFormulaRepository.deleteAllInBatch(formulas);
-        commonDetailRepository.deleteAllInBatch(commonDetails);
     }
     
-    private String generateCode(String type) {
-        String prefix = "수당".equals(type) ? "RWRD" : "DDCT";
-        List<CommonDetail> details = commonDetailRepository.findByCommon_detail_codeStartingWith(prefix);
+ // SalaryFormulaService.java
+    public List<Map<String, String>> getFormulaTypes() {
+        List<Map<String, String>> result = new ArrayList<>();
         
-        int nextNum = 1;
-        if (!details.isEmpty()) {
-            String lastCode = details.get(0).getCommon_detail_code();
-            try {
-                nextNum = Integer.parseInt(lastCode.substring(4)) + 1;
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                nextNum = 1;
-            }
+        // DDCT(공제) 데이터 조회
+        List<CommonDetail> deductions = commonDetailRepository
+            .findByCommon_detail_codeStartingWithOrderByCommon_detail_codeDesc("DDCT");
+        // RWRD(수당) 데이터 조회
+        List<CommonDetail> rewards = commonDetailRepository
+            .findByCommon_detail_codeStartingWithOrderByCommon_detail_codeDesc("RWRD");
+        
+        for (CommonDetail detail : deductions) {
+            Map<String, String> item = new HashMap<>();
+            item.put("code", detail.getCommon_detail_code());
+            item.put("name", detail.getCommon_detail_name());
+            item.put("type", "공제");
+            result.add(item);
         }
-        return String.format("%s%03d", prefix, nextNum);
+        
+        for (CommonDetail detail : rewards) {
+            Map<String, String> item = new HashMap<>();
+            item.put("code", detail.getCommon_detail_code());
+            item.put("name", detail.getCommon_detail_name());
+            item.put("type", "수당");
+            result.add(item);
+        }
+        
+        return result;
     }
-
+    
     public List<SalaryFormula> findAll() {
         return salaryFormulaRepository.findAll();
     }
