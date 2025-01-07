@@ -11,6 +11,12 @@
 		WHERE common_status = 'Y'
 	</select>
 	
+	<select id="commonDtlList" resultType="map" parameterType="string">
+		SELECT common_detail_code, common_detail_name, common_detail_status, common_detail_display
+		FROM common_detail
+		WHERE common_detail_status = 'Y'
+		AND REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+	</select>
 	
 	
 	
