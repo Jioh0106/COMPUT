@@ -19,7 +19,7 @@
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-	
+
 	<!-- sweetAlert CDN -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
 
@@ -40,6 +40,13 @@
 
 		.full-width-input {
 			width: 100%;
+		}
+
+		/* 테이블 스크롤 */
+		.table-responsive {
+			height: 500px;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
 		}
 
 		/* 체크박스가 있는 첫 번째 열의 너비 설정 */
@@ -88,26 +95,27 @@
 								</div>
 							</div>
 							<div class="card-body">
-								<table class="table table-bordered mb-0" id="parent">
-									<thead>
+								<div class="table-responsive"> <!-- 설정한 높이 이상이면 스크롤을 나타내기 위한 div -->
+									<table class="table table-bordered mb-0" id="parent">
 										<tr>
-											<th><input class="form-check-input" type="checkbox" onclick='selectAll(this, "parent")'></th>
+											<th><input class="form-check-input" type="checkbox"
+													onclick='selectAll(this, "parent")'></th>
 											<th>구분코드</th>
 											<th>구분명</th>
 											<th>사용여부</th>
 										</tr>
-									</thead>
-									<tbody>
-										<tr onclick="goToSection('dept', this.id)" id="deptHead">
+										<tr th:each="map : ${commonList}" onclick="goToSection('dept', this.id)"
+											id="deptHead">
 											<td>
-												<input type="checkbox" name="parent" class="form-check-input" value="1" />
+												<input type="checkbox" name="parent" class="form-check-input"
+													value="1" />
 											</td>
-											<td contenteditable="true">DEPT</td>
-											<td contenteditable="true">부서명</td>
-											<td contenteditable="true">Y</td>
+											<td contenteditable="true" th:text="${map.COMMON_CODE}"></td>
+											<td contenteditable="true" th:text="${map.COMMON_NAME}"></td>
+											<td contenteditable="true" th:text="${map.COMMON_STATUS}"></td>
 										</tr>
-									</tbody>
-								</table>
+									</table>
+								</div> <!-- 스크롤 -->
 							</div>
 						</div>
 					</div>
@@ -127,24 +135,21 @@
 							</div>
 							<div class="card-body">
 								<table class="table table-bordered mb-0" id="child">
-									<thead>
-										<tr>
-											<th><input class="form-check-input" type="checkbox" onclick='selectAll(this, "child")'></th>
-											<th>구분코드</th>
-											<th>구분명</th>
-											<th>사용여부</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr id="dept" style="display: none;">
-											<td>
-												<input type="checkbox" name="child" class="form-check-input" value="1" />
-											</td>
-											<td>DEPT01</td>
-											<td>인사부</td>
-											<td>Y</td>
-										</tr>
-									</tbody>
+									<tr>
+										<th><input class="form-check-input" type="checkbox"
+												onclick='selectAll(this, "child")'></th>
+										<th>구분코드</th>
+										<th>구분명</th>
+										<th>사용여부</th>
+									</tr>
+									<tr id="dept" style="display: none;">
+										<td>
+											<input type="checkbox" name="child" class="form-check-input" value="1" />
+										</td>
+										<td>DEPT01</td>
+										<td>인사부</td>
+										<td>Y</td>
+									</tr>
 								</table>
 							</div>
 						</div>
@@ -167,7 +172,7 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
-	
+
 	<!-- sweetAlert CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
@@ -193,7 +198,7 @@
 			const table = document.getElementById(tableId);
 
 			// 새 행(Row) 추가
-			const newRow = table.insertRow();
+			const newRow = table.insertRow(0);
 
 			// 새 행(Row)에 Cell 추가
 			const newCell1 = newRow.insertCell(0);
@@ -229,37 +234,44 @@
 			newCell4.appendChild(input4);
 		};
 
-
+		// 삭제 버튼 클릭 시 선택된 행만 삭제
 		function deleteRow(tableId) {
-			// table element 찾기
+			// @Param : tableId로 테이블 찾기 
 			const table = document.getElementById(tableId);
 
-			for(var i=1; i < table.rows.length; i++){ //테이블 row 전체 개수 반복문
-				var checkbox = table.rows[i].cells[0].querySelector("input[type='checkbox']").checked; //i행.0번째셀.체크박스요소.체크有
-				
-				console.info(checkbox);
-				if(checkbox){
-					table.deleteRow(i)
-					i--;
-				} else {
-					Swal.fire({
-					  title: "삭제할 행을 선택해 주세요",
-					  icon: "error",
-					  confirmButtonText: "확인"
-					});
+			// 선택된 체크박스 개수 확인
+			const checkbox = `input[name=${tableId}]:checked`; //체크된 체크박스
+			const selectedCheckbox = document.querySelectorAll(checkbox); //체크된 체크박스 전체
+			const cnt = selectedCheckbox.length; //selectedCheckbox의 개수
+
+			// 선택된 행이 없을 경우 경고창 표시
+			if (cnt === 0) {
+				Swal.fire({
+					title: "삭제할 행을 선택해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
+
+			// 선택된 행 삭제
+			for (let i = 1; i < table.rows.length; i++) { // 테이블 row 전체 반복
+				const checkbox = table.rows[i].cells[0].querySelector("input[type='checkbox']");
+				if (checkbox && checkbox.checked) {
+					table.deleteRow(i);
+					i--; // 삭제 후 인덱스 조정
 				}
-				
 			}
 
 		};
-		
-		function selectAll(obj, objNm)  {
+
+		function selectAll(obj, objNm) {
 			console.info(obj);
-		  const checkboxes = document.getElementsByName(objNm);
-		  
-		  checkboxes.forEach((checkbox) => {
-		    checkbox.checked = obj.checked;
-		  })
+			const checkboxes = document.getElementsByName(objNm);
+
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = obj.checked;
+			})
 		};
 
 
