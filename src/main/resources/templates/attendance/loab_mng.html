@@ -142,17 +142,12 @@
 									
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>1차 승인 요청 </label>
-											<div class="form-group">
-												<input type="text" id="request1" class="form-control" >
-											</div>
-										</div>
-										
-										<div class="child-input2">
-											<label>2차 승인 요청</label>
-											<div class="form-group">
-												<input type="text" id="request2" class="form-control" >
-											</div>
+											<label>승인 요청 선택 </label>
+											<fieldset class="form-group">
+												<select class="form-select" id="requestSelect" name="middle_approval">
+													<option value="" disabled selected>선택하세요</option>
+												</select>
+											</fieldset>
 										</div>
 									</div>
 								</form> <!-- 휴직 신청서 모달폼 끝 -->
@@ -193,24 +188,6 @@
 				</section>
 				<!-- 그리드 끝  -->
 				
-				<div class="modal fade" id="remarkModal" tabindex="-1" aria-labelledby="remarkModalLabel" aria-hidden="true">
-				    <div class="modal-dialog">
-				        <div class="modal-content">
-				            <div class="modal-header">
-				                <h5 class="modal-title" id="remarkModalLabel">비고</h5>
-				                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				            </div>
-				            <div class="modal-body" id="remarkModalBody">
-				                <!-- 비고 내용이 여기에 표시됩니다. -->
-				            </div>
-				            <div class="modal-footer">
-				                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-				            </div>
-				        </div>
-				    </div>
-				</div>
-
-
 			</div><!-- card-body --> 
 		</div> <!-- card --> 
 	
@@ -285,6 +262,34 @@
 		            }
 		        });
 		    });
+		});
+		
+		// 모달창 승인 대상자 리스트 불러오기
+		$('#requestSelect').on('click', function () {
+		    // 이미 데이터가 로드된 경우 추가 요청 방지
+		    if (this.options.length > 1) {
+		        return;
+		    }
+			
+			// *** 현재 권한자가 LOW면 MIDDLE, 현재 권한자가 MIDDLE 이면 HIGH 조건문 추가 필요****
+			const role = 'MIDDLE';
+
+			axios.get(`/api/absence/request/${role}`)
+	        .then(function (response) {
+	            const data = response.data;
+	            $('#requestSelect').empty().append('<option value="" disabled selected>선택하세요</option>');
+				
+	            data.forEach(item => {
+	                $('#requestSelect').append(
+	                    $('<option></option>').val(item.emp_id).text(item.emp_name + " / " + item.emp_dept + " / " + item.emp_position)
+	                );
+	            });
+	        })
+	        .catch(function (error) {
+	            console.error('Error:', error);
+	            alert('데이터를 가져오는 중 문제가 발생했습니다.');
+	        });
+			
 		});
 		
 		
