@@ -32,8 +32,8 @@
 //				.authorizeHttpRequests(authorizeHttpRequestCustomizer -> authorizeHttpRequestCustomizer
 //						.requestMatchers("/login/**","/css/**", "/js/**", "/images/**", "/webjars/**", "/mapTest/**", "/assets/**")
 //						.permitAll()
-//						.requestMatchers("/memberInfo/**", "/memberUpdate/**", "/memberDelete/**", 
-//											 "/boardWrite/**", "/boardUpdate/**", "/boardDelete/**")
+//						.requestMatchers("/", "/request-list/**", "/ps-list/**", "/ps-empDb/**", "/ps-hrDb/**", "/assign-stts/**", "/assign-insert/**", 
+//											 "/cmt-stts/**", "/vctn-mng/**", "/loab-mng/**", "/work-mng/**","/pay-stts/**", "/pay-list/**", "/pay-mng/**")
 //						.hasAnyRole("HIGH", "MIDDLE", "LOW")
 //						.requestMatchers("/common-mng/**")
 //						.hasRole("HIGH")

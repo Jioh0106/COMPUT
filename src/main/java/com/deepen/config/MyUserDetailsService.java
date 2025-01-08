@@ -18,16 +18,16 @@
 //	private final PersonnelRepository personnelRepository;
 //	
 //	@Override
-//	public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+//	public UserDetails loadUserByUsername(String emp_id) throws UsernameNotFoundException {
 //		
-//		Employees employees = personnelRepository.findById(id).orElseThrow(() 
+//		Employees employees = personnelRepository.findById(emp_id).orElseThrow(() 
 //				-> new UsernameNotFoundException("없는 회원")
 //				);
 //		
 //		return User.builder()
 //				.username(employees.getEmp_id())
 //				.password(employees.getEmp_pw())
-//				.roles(employees.getEmp_role())
+//				.roles("ROLE_" + employees.getEmp_role())
 //				.build()
 //				;
 //

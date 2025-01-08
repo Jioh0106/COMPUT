@@ -1,61 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/bootstrap.css">
-    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/app.css">
-    <link rel="stylesheet" href="assets/css/pages/auth.css">
-</head>
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>login</title>
+	    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	    <link rel="stylesheet" href="assets/css/bootstrap.css">
+	    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	    <link rel="stylesheet" href="assets/css/app.css">
+	    <link rel="stylesheet" href="assets/css/pages/auth.css">
+	</head>
+	
+	<body>
+	    <div id="auth">
+			<div class="row h-100">
+			    <div class="col-lg-5 col-12">
+			        <div id="auth-left">
+			            <div class="auth-logo">
+			                <a href="/"><img src="assets/images/logo/logo.png" alt="Logo"></a>
+			            </div>
+			            <h1 class="auth-title">Log in.</h1>
+	<!--		            <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>-->
+	
+			            <form action="loginPro" method="post">
+			                <div class="form-group position-relative has-icon-left mb-4">
+			                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id">
+			                    <div class="form-control-icon">
+			                        <i class="bi bi-person"></i>
+			                    </div>
+			                </div>
+			                <div class="form-group position-relative has-icon-left mb-4">
+			                    <input type="password" class="form-control form-control-xl" placeholder="비밀번호" name="emp_pw">
+			                    <div class="form-control-icon">
+			                        <i class="bi bi-shield-lock"></i>
+			                    </div>
+			                </div>
+			                <div class="form-check form-check-lg d-flex align-items-end">
+			                    <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault" name="KeepLogged">
+			                    <label class="form-check-label text-gray-600" for="flexCheckDefault">
+			                        아이디 기억하기
+			                    </label>
+			                </div>
+			                <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
+			            </form>
+						<button class="btn btn-outline-secondary btn-block mt-5 visitors-login" id="low-login">일반 사원으로 로그인하기</button>
+						<button class="btn btn-outline-secondary btn-block mt-2 visitors-login" id="middle-login">중간 관리자로 로그인하기</button>
+						<button class="btn btn-outline-secondary btn-block mt-2 visitors-login" id="high-login">높은 관리자로 로그인하기</button>
+			        </div>
+			    </div> 
+			    <div class="col-lg-7 d-none d-lg-block">
+			        <div id="auth-right">
+	
+			        </div>
+			    </div>
+			</div>
+	    </div>
+	</body>
+	
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>	
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	
+	<script>
+		$('#low-login').on('click', function() {
+			submitLoginForm('2024120903', '33333333');
+		});
+		
+		$('#middle-login').on('click', function() {
+			submitLoginForm('2024120902', '22222222');
+		});
+		
+		$('#high-login').on('click', function() {
+			submitLoginForm('2024120901', '11111111');
+		
+		});
+		
+		function submitLoginForm(empId, empPw) {
+		    const form = $('form[action="loginPro"]');
+		    form.find('input[name="emp_id"]').val(empId); // 사원번호 설정
+		    form.find('input[name="emp_pw"]').val(empPw); // 비밀번호 설정
 
-<body>
-    <div id="auth">
-		<div class="row h-100">
-		    <div class="col-lg-5 col-12">
-		        <div id="auth-left">
-		            <div class="auth-logo">
-		                <a href="/"><img src="assets/images/logo/logo.png" alt="Logo"></a>
-		            </div>
-		            <h1 class="auth-title">Log in.</h1>
-<!--		            <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>-->
-
-		            <form action="loginPro" method="post">
-		                <div class="form-group position-relative has-icon-left mb-4">
-		                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id">
-		                    <div class="form-control-icon">
-		                        <i class="bi bi-person"></i>
-		                    </div>
-		                </div>
-		                <div class="form-group position-relative has-icon-left mb-4">
-		                    <input type="password" class="form-control form-control-xl" placeholder="비밀번호" name="emp_pw">
-		                    <div class="form-control-icon">
-		                        <i class="bi bi-shield-lock"></i>
-		                    </div>
-		                </div>
-		                <div class="form-check form-check-lg d-flex align-items-end">
-		                    <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault" name="KeepLogged">
-		                    <label class="form-check-label text-gray-600" for="flexCheckDefault">
-		                        아이디 기억하기
-		                    </label>
-		                </div>
-		                <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
-		            </form>
-					<button class="btn btn-outline-secondary btn-block mt-5" id="low-login">일반 사원으로 로그인하기</button>
-					<button class="btn btn-outline-secondary btn-block mt-2" id="middle-login">중간 관리자로 로그인하기</button>
-					<button class="btn btn-outline-secondary btn-block mt-2" id="high-login">높은 관리자로 로그인하기</button>
-		        </div>
-		    </div>
-		    <div class="col-lg-7 d-none d-lg-block">
-		        <div id="auth-right">
-
-		        </div>
-		    </div>
-		</div>
-    </div>
-</body>
+		    form.submit();
+		}
+		
+	</script>
 
 </html>
