@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.service.AttendanceService;
@@ -45,9 +46,6 @@ public class AttendanceController {
 		//http://localhost:8082/loab-mng
 		
 		List<Map<String, Object>> absenceList = attendanceService.getAbsenceList();
-		List<CommonDetailDTO> loabCommon = attendanceService.getCommonList("LOAB");
-		List<CommonDetailDTO> deptCommon = attendanceService.getCommonList("DEPT");
-		List<CommonDetailDTO> pstnCommon = attendanceService.getCommonList("PSTN");
 		
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	    absenceList.forEach(item -> {
@@ -70,40 +68,25 @@ public class AttendanceController {
 	        	item.put("REQUEST_DATE", formattedDate);
 	        }
 	    });
-		    
-		List<Map<String, String>> loabCommonList = loabCommon.stream()
-			    .<Map<String, String>>map(dto -> Map.of(
-			        "text", dto.getCommon_detail_name(),
-			        "value", dto.getCommon_detail_name()
-			    ))
-			    .collect(Collectors.toList());
-		
-		List<Map<String, String>> deptCommonList = deptCommon.stream()
-				.<Map<String, String>>map(dto -> Map.of(
-						"text", dto.getCommon_detail_name(),
-						"value", dto.getCommon_detail_name()
-						))
-				.collect(Collectors.toList());
-		
-		List<Map<String, String>> pstnCommonList = pstnCommon.stream()
-				.<Map<String, String>>map(dto -> Map.of(
-						"text", dto.getCommon_detail_name(),
-						"value", dto.getCommon_detail_name()
-						))
-				.collect(Collectors.toList());
-		
-		
+	    
 		log.info("absenceList : " + absenceList.toString());
-		log.info("loabCommon : " + loabCommon.toString());
-		log.info("deptCommon : " + deptCommon.toString());
-		log.info("pstnCommon : " + pstnCommon.toString());
 		
 		model.addAttribute("absenceList", absenceList);
-		model.addAttribute("loabCommon", loabCommonList);
-		model.addAttribute("deptCommon", deptCommonList);
-		model.addAttribute("pstnCommon", pstnCommonList);
 		
 		return "attendance/loab_mng";
+	}
+	
+	
+	@PostMapping("/loab-insert")
+	public String laobInsert(String emp_id, String absence_start, String absence_end, String absence_type, String absence_remark ) {
+		
+		
+		attendanceService.insertLoab();
+		
+		
+		
+		
+		return "";
 	}
 	
 	// 근무 관리
