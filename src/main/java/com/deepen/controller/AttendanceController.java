@@ -3,6 +3,7 @@ package com.deepen.controller;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,13 +81,20 @@ public class AttendanceController {
 	@PostMapping("/loab-insert")
 	public String laobInsert(String emp_id, String absence_start, String absence_end, String absence_type, String absence_remark ) {
 		
+		Map<String, Object> map = new HashMap<>();
+		map.put("emp_id", map);
+		map.put("absence_start", absence_start);
+		map.put("absence_end", absence_end);
+		map.put("absence_type", absence_type);
+		map.put("absence_remark", absence_remark);
+		map.put("request_type", "휴직");
 		
-		attendanceService.insertLoab();
+		attendanceService.insertLoab(map);
 		
 		
 		
 		
-		return "";
+		return "result";
 	}
 	
 	// 근무 관리

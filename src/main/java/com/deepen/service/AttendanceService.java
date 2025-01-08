@@ -37,9 +37,9 @@ public class AttendanceService {
 
 	
 	// 휴직신청서 통한 휴직 insert
-	public void insertLoab() {
-		
-		
+	public void insertLoab(Map<String, Object> map) {
+		attendanceMapper.insertRequest(map.get(""));
+		attendanceMapper.insertLoab(map);
 		
 	}
 
