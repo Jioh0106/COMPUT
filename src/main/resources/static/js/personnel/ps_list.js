@@ -179,7 +179,7 @@ function showModal(empDetailInfo) {
 
 // 삭제 버튼
 const deleteBtn = document.getElementById('deleteBtn');
-// 그리드에서 제하고싶은 key 배열로 만들어주기
+// 그리드에서 삭제하고싶은 key 배열로 만들어주기
 function CheckedRowValues(gridObj,jsonKey){
 	const checkedRowsIds = gridObj.getCheckedRows();
 	//function(row){
@@ -276,7 +276,7 @@ async function fetchCommonDetails() {
 }
 
 // 선택 삭제
-async function empDelete(url = "http://localhost:8082/restApi/empDelete",rowIds){
+async function empDelete(url,rowIds){
 	console.log(rowIds);
 	
 	try{
@@ -315,6 +315,7 @@ function datePiker(containerSelector, inputSelector){
 }
 
 // 다음 주소 api
+document.querySelector("#daumAPI").addEventListener("click", daumAddressAPI);
 function daumAddressAPI() {
        new daum.Postcode({
            oncomplete: function(data) {

@@ -42,13 +42,6 @@ public class PersonnelController {
 	public String psInsert(EmployeesDTO empDTO) {
 		
 		log.info(empDTO.toString());
-//		if (empDTO.getEmp_hire_date() == null || empDTO.getEmp_hire_date().toString().isEmpty()) {
-//			empDTO.setEmp_hire_date(null);
-//	    }
-//		
-//		if (empDTO.getEmp_exit_date() == null || empDTO.getEmp_exit_date().toString().isEmpty()) {
-//			empDTO.setEmp_exit_date(null);
-//	    }
 		
 		psService.regEmployees(empDTO);
 		
@@ -66,13 +59,6 @@ public class PersonnelController {
 	public String psUpdate(EmployeesDTO empDTO) {
 		
 		log.info("C-update : "+empDTO.toString());
-//		if (empDTO.getEmp_hire_date() == null || empDTO.getEmp_hire_date().toString().isEmpty()) {
-//			empDTO.setEmp_hire_date(null);
-//	    }
-//		
-//		if (empDTO.getEmp_exit_date() == null || empDTO.getEmp_exit_date().toString().isEmpty()) {
-//			empDTO.setEmp_exit_date(null);
-//	    }
 		
 		psService.updateEmpInfo(empDTO);
 		
