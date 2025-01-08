@@ -20,7 +20,10 @@
 	</select>
 	
 	
-	
+	<insert id="insertLoab">
+		INSERT INTO ABSENCE(emp_id, absence_type, absence_start, absence_end, request_no, absence_remark)
+		VALUES()
+	</insert>
 	
 	
 </mapper>

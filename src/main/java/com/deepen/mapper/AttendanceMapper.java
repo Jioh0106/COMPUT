@@ -16,6 +16,8 @@ public interface AttendanceMapper {
 	List<Map<String, Object>> getAbsenceList();
 
 	List<CommonDetailDTO> getCommonList(String code);
+
+	void insertLoab(Map<String, Object> map);
 	
 	
 	
