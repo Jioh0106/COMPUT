@@ -10,8 +10,8 @@
 			common_code, common_name, common_content, common_status, common_display
 		FROM 
 			common
-		WHERE 
-			common_status = 'Y'
+		ORDER BY
+			common_display
 	</select>
 	
 	<select id="commonDtlList" resultType="map" parameterType="string">
@@ -20,22 +20,36 @@
 		FROM 
 			common_detail
 		WHERE 
-			common_detail_status = 'Y'
-		AND 
 			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+		ORDER BY
+			common_detail_display
 	</select>
 	
 	<insert id="insertCommonList" parameterType="com.deepen.domain.CommonDTO">
-		INSERT INTO 
-			common ( common_code
-				   , common_name
-				   , common_content
-				   , common_status
+		INSERT INTO common (
+			common_code
+		  , common_name
+		  , common_content
+		  , common_status
 		
-		) VALUES ( #{commonCode}
-				 , #{commonName}
-				 , #{commonContent}
-				 , #{commonStatus}
+		) VALUES ( 
+			#{commonCode}
+		  , #{commonName}
+		  , #{commonContent}
+		  , #{commonStatus}
+		)
+	</insert>
+	
+	<insert id="insertDetailList" parameterType="com.deepen.domain.CommonDTO">
+		INSERT INTO common_detail (
+			common_detail_code
+		  , common_detail_name
+		  , common_detail_status
+		
+		) VALUES ( 
+			#{commonCode}
+		  , #{commonName}
+		  , #{commonStatus}
 		)
 	</insert>
 	
