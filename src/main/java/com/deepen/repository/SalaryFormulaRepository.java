@@ -17,4 +17,6 @@ public interface SalaryFormulaRepository extends JpaRepository<SalaryFormula, Lo
     // 코드 생성을 위한 메서드
     @Query("SELECT s FROM SalaryFormula s WHERE s.commonDetail.common_detail_code LIKE :prefix% ORDER BY s.commonDetail.common_detail_code DESC")
     List<SalaryFormula> findByCodeStartingWith(@Param("prefix") String prefix);
+
+	boolean existsByFormulaName(String formulaName);
 }

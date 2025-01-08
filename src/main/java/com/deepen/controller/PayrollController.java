@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deepen.domain.SalaryFormulaDTO;
@@ -86,6 +87,21 @@ public class PayrollController {
     public List<Map<String, String>> getFormulaTypes() {
         return salaryFormulaService.getFormulaTypes();
     }
+    
+    @GetMapping("/pay-mng/check-duplicate")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkDuplicate(
+    		 @RequestParam("name") String name  // "name"으로 파라미터 이름 명시
+	) {
+	    try {
+	        boolean isDuplicate = salaryFormulaService.existsByFormulaName(name);
+	        return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest()
+	            .body(Map.of("isDuplicate", false));
+	    }
+	}
+
     
     // 급여 지급 이력
     @GetMapping("/pay-stts")

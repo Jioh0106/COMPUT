@@ -63,9 +63,21 @@
             
             <section class="section">
                 <div class="card">
+                	<div class="card-header">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <select class="form-control" id="typeFilter">
+                                    <option value="">전체 구분</option>
+                                    <option value="수당">수당</option>
+                                    <option value="공제">공제</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <div style="margin-bottom: 10px; display: flex; align-items: center;"></div>
+                        <!-- 그리드 -->
                         <div id="grid"></div>
+                        <!-- 버튼 그룹 -->
                         <div class="float-end">
                             <input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
                             <input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
@@ -88,20 +100,37 @@
                 <div class="modal-body">
                     <form id="salaryForm" th:action="@{/payroll/pay-mng}" method="post">
                         <div class="form-group">
-                            <label for="formulaCode" class="form-label">구분<span class="text-danger">*</span></label>
+                            <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
                             <select class="form-control" id="formulaCode" name="formulaCode" required>
                                 <option value="">선택하세요</option>
                             </select>
                         </div>
 
                         <input type="hidden" id="formulaType" name="formulaType">
+                        
+                        <input type="hidden" id="formulaName" name="formulaName">
 
                         <div class="form-group">
-                            <label for="formulaName" class="form-label">항목명<span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="formulaName" name="formulaName" 
-                                   maxlength="100" required placeholder="항목명을 입력하세요">
+                            <label for="displayType" class="form-label">구분<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="displayType"
+                            	   readonly
+                            	   disabled
+                            	   style="background-color: #e9ecef"
+                                   maxlength="100"
+                                   required placeholder="항목명을 선택하세요">
                         </div>
-
+                        
+                        <div class="form-group" id="salaryRangeGroup" style="display: none;">
+						    <label for="salaryRange" class="form-label">급여 구간<span class="text-danger">*</span></label>
+						    <select class="form-control" id="salaryRange" name="salaryRange">
+						        <option value="">구간을 선택하세요</option>
+						        <option value="1,200만원 이하">1,200만원 이하</option>
+						        <option value="4,600만원 이하">4,600만원 이하</option>
+						        <option value="8,800만원 초과">8,800만원 이하</option>
+						        <option value="1.5억원 초과">1.5억원 초과</option>
+						    </select>
+						</div>
+                        
                         <div class="form-group">
                             <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
                             <textarea class="form-control" id="formulaContent" name="formulaContent" 
@@ -221,36 +250,93 @@
                 console.error('구분 데이터 로딩 중 오류:', error);
             }
         }
-
-        // 구분 선택 시 타입 자동 설정
-        document.getElementById('formulaCode').addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
-            if (selected.value) {  // 선택된 값이 있을 경우
-                document.getElementById('formulaType').value = selected.dataset.type;
-                // 선택된 항목의 이름을 formulaName에 설정
-                const name = selected.textContent.split(' (')[0];  // "(타입)"을 제외한 이름만 추출
-                document.getElementById('formulaName').value = name;
-                document.getElementById('formulaName').readOnly = true;  // 이름 필드를 읽기 전용으로 설정
-            } else {  // "선택하세요" 옵션 선택 시
-                document.getElementById('formulaType').value = '';
-                document.getElementById('formulaName').value = '';
-                document.getElementById('formulaName').readOnly = false;  // 이름 필드 읽기 전용 해제
+        
+     // 중복 검사 함수
+        async function checkDuplicate(value) {
+            try {
+                const response = await fetch(`/pay-mng/check-duplicate?name=${value}`);  // name 파라미터로 변경
+                const result = await response.json();
+                return result.isDuplicate;
+            } catch (error) {
+                console.error('중복 검사 오류:', error);
+                return false;
             }
-        });
+        }
+        
+
+     	// 구분 선택 시 타입 자동 설정
+        document.getElementById('formulaCode').addEventListener('change', function() {
+		    const selected = this.options[this.selectedIndex];
+		    const salaryRangeGroup = document.getElementById('salaryRangeGroup');
+		    const salaryRange = document.getElementById('salaryRange');
+		    
+		    if (selected.value) {
+		        // 기본 설정
+		        document.getElementById('formulaName').value = selected.textContent.split(' (')[0];
+		        document.getElementById('formulaType').value = selected.dataset.type;
+		        const typeInParentheses = selected.textContent.match(/\((.*?)\)/)[1];
+		        document.getElementById('displayType').value = typeInParentheses;
+		
+		        // 소득세 선택 시 급여 구간 선택창 표시
+		        if (selected.value === 'DDCT002') {
+		            salaryRangeGroup.style.display = 'block';
+		            salaryRange.required = true;
+		        } else {
+		            salaryRangeGroup.style.display = 'none';
+		            salaryRange.required = false;
+		            salaryRange.value = '';
+		        }
+		    } else {
+		        document.getElementById('formulaName').value = '';
+		        document.getElementById('formulaType').value = '';
+		        document.getElementById('displayType').value = '';
+		        salaryRangeGroup.style.display = 'none';
+		        salaryRange.required = false;
+		        salaryRange.value = '';
+		    }
+		});
+
+		// 급여 구간 선택 시 항목명 업데이트
+		document.getElementById('salaryRange').addEventListener('change', function() {
+		    const formulaCode = document.getElementById('formulaCode');
+		    const selected = formulaCode.options[formulaCode.selectedIndex];
+		    
+		    if (selected.value && this.value) {
+		        const baseName = selected.textContent.split(' (')[0];
+		        document.getElementById('formulaName').value = `${baseName} - ${this.value}`;
+		    }
+		});
 
         // 폼 제출 처리
         document.getElementById('salaryForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+         	// 수정 모드가 아닐 때만 중복 검사 실행
+            if (!this.dataset.id) {
+            	
+            	// 항목명 중복 검사만 수행
+                const isNameDuplicate = await checkDuplicate(formulaName);
+                if (isNameDuplicate) {
+                    alert('이미 존재하는 급여 항목명입니다.');
+                    return;
+                }
+            }
+         	
+         	// 소득세 선택 시 급여 구간 필수 체크
+            if (formulaCode.value === 'DDCT001' && !salaryRange.value) {
+                alert('급여 구간을 선택해주세요.');
+                return;
+            }
+            
             const formData = {
-                formulaId: this.dataset.id,
-                formulaCode: document.getElementById('formulaCode').value,
-                formulaType: document.getElementById('formulaType').value,
-                formulaName: document.getElementById('formulaName').value,
-                formulaContent: document.getElementById('formulaContent').value,
-                applyYear: parseInt(document.getElementById('applyYear').value),
-                formulaPriority: parseInt(document.getElementById('formulaPriority').value)
-            };
+            	    formulaId: this.dataset.id,
+            	    formulaCode: document.getElementById('formulaCode').value,
+            	    formulaName: document.getElementById('formulaName').value,  // 소득세와 같은 이름
+            	    formulaType: document.getElementById('formulaType').value,  // 공제/수당
+            	    formulaContent: document.getElementById('formulaContent').value,
+            	    applyYear: parseInt(document.getElementById('applyYear').value),
+            	    formulaPriority: parseInt(document.getElementById('formulaPriority').value)
+           	};
             
             const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
 

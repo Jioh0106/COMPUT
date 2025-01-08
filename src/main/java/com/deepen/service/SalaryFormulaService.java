@@ -24,9 +24,26 @@ public class SalaryFormulaService {
     private final SalaryFormulaRepository salaryFormulaRepository;
     private final CommonDetailRepository commonDetailRepository;
     
+    // 코드 중복 검사
+    public boolean existsByFormulaName(String name) {
+    	return salaryFormulaRepository.existsByFormulaName(name);
+    }
+    
+    // 중복 검사 메서드
+    private void validateDuplicate(String formulaName) {
+    	// 코드 중복 검사
+    	if (salaryFormulaRepository.existsByFormulaName(formulaName)) {
+    		throw new RuntimeException("이미 존재하는 급여 코드입니다.");
+    	}
+    }
+    
+    
     @Transactional
     public void save(SalaryFormulaDTO dto) {
         try {
+        	
+        	validateDuplicate(dto.getFormulaName());
+        	
         	CommonDetail commonDetail = commonDetailRepository.findById(dto.getFormulaCode())
                     .orElseThrow(() -> new RuntimeException("해당 구분 코드를 찾을 수 없습니다."));
             
