@@ -1,8 +1,7 @@
 package com.deepen.domain;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -37,9 +36,13 @@ public class EmployeesDTO {
 	private String emp_job_type;
 	private String emp_dept;
 	private String emp_position;
-	private Date emp_hire_date;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate emp_hire_date;
 	private String emp_perf_rank;
-	private Date emp_exit_date;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate emp_exit_date;
 	private String emp_exit_type;
 	private int emp_salary;
 	private String emp_bank;

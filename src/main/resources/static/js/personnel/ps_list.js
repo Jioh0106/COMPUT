@@ -4,6 +4,9 @@ const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
 const empHireDatePicker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
 const empExitDatePicker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
 
+startDatePicker.setNull();
+endDatePicker.setNull();
+
 // toast ui 그리드
 const Grid = tui.Grid;
 Grid.applyTheme('clean'); // 그리드 테마
@@ -31,10 +34,12 @@ const empListGrid = new Grid({
     { 
 		header: '부서명', 
 		name: 'EMP_DEPT_NAME',
+		filter : 'select'
 	},
     { 
 		header: '직급명', 
 		name: 'EMP_POSITION_NAME',
+		filter : 'select'
 	},
     { header: 'E-mail', name: 'EMP_EMAIL'}
   ],
@@ -161,7 +166,7 @@ function showModal(empDetailInfo) {
 	empPosition.value = empDetailInfo.EMP_POSITION;
 	empHireDate.value = empDetailInfo.EMP_HIRE_DATE;
 	empPerfRank.value = empDetailInfo.EMP_PERF_RANK;
-	empExitDate.value = empDetailInfo.EMP_EXIT_DATE;
+	empExitDate.value = empDetailInfo.EMP_EXIT_DATE || "";
 	empExitType.value = empDetailInfo.EMP_EXIT_TYPE;
 	empSalary.value = empDetailInfo.EMP_SALARY;
 	empBank.value = empDetailInfo.EMP_BANK;
@@ -202,7 +207,7 @@ deleteBtn.addEventListener("click",() => {
 
 //--------ajax--------------------------------------------------------------------------------------------------------------------//
 
-// 사원리스트 조회
+// 사원리스트 필터 조회
 async function fetchEmpList() {
 	try	{	
 			const params = new URLSearchParams(empListFilters).toString();
@@ -289,7 +294,7 @@ async function empDelete(url = "http://localhost:8082/restApi/empDelete",rowIds)
 		console.log("result : "+result);
 		setTimeout(()=>{
 			window.location.reload();
-		},1000);
+		},500);
 	}catch(error){
 		console.error("삭제 실패",error);
 	}

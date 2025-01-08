@@ -122,7 +122,7 @@
 	                                            <label for="firstEmpPhoneNo">전화번호</label>
 	                                           <!--  <input type="text" id="emp_phone" class="form-control " name="emp_phone" placeholder="-생략"> -->
 	                                            <div class="d-flex">
-									               <input type="text" id="firstEmpPhoneNo" class="form-control" name="firstEmpPhoneNo" placeholder="010" style="width: 90%; margin-right: 5px;">
+									               <input type="text" id="firstEmpPhoneNo" class="form-control" name="firstEmpPhoneNo" value="010" style="width: 90%; margin-right: 5px;">
 									               <span><b>-</b></span>
 									               <input type="text" id="middleEmpPhoneNo" class="form-control" name="middleEmpPhoneNo" style="width: 100%; margin-left: 5px;">
 									               <span><b>-</b></span>
@@ -257,6 +257,7 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_perf_rank">성과 등급</label>
 	                                            <select id="emp_perf_rank" class="form-control" name="emp_perf_rank" >
+	                                            	<option value="">성과 등급 선택</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -282,7 +283,7 @@
 	                                        <div class="form-group">
 	                                            <label for="emp_exit_type">퇴사 유형</label>
 	                                            <select id="emp_exit_type" class="form-control" name="emp_exit_type">
-	                                                <option value=" ">퇴사유형을 선택해주세요</option>
+	                                                <option value="">퇴사 유형 선택</option>
 	                                            </select>
 	                                        </div>
 	                                    </div>
@@ -328,7 +329,7 @@
 			
 				<div class="form-group">
 		           <div class="d-flex justify-content-center">
-		               <button type="submit" class="btn btn-outline-primary mx-2">등록</button>
+		               <button type="submit" id="regBtn" class="btn btn-outline-primary mx-2">등록</button>
 		               <button type="button" class="btn btn-outline-danger mx-2" onclick="windowClose()">취소</button>
 		           </div>
 		        </div>
@@ -342,7 +343,7 @@
     <script src="assets/js/main.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-	<script src="assets/js/ps_insert.js"></script>
+	<script type="module" src="js/personnel/ps_insert.js"></script>
     <script>
         function windowClose(){
         	window.close();

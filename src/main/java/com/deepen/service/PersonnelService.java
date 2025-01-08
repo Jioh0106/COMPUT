@@ -1,7 +1,7 @@
 package com.deepen.service;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class PersonnelService {
 		int newEmpNo = generateNewEmpNo();
 		
 		//사원 아이디
-		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMMdd");
 		String id = format.format(empDTO.getEmp_hire_date())+newEmpNo; 
 		//사원 초기 비밀번호
 		String pw = empDTO.getMiddleEmpPhoneNo()+empDTO.getLastEmpPhoneNo();

@@ -51,7 +51,7 @@ public class PersonnelRestController {
 	
 	@PostMapping("/empDelete")
 	public String postMethodName(@RequestBody List<String> ids) {
-		log.info("restController : Delete 준비 - "+ids);
+		log.info("삭제할 ids - "+ids);
 		psService.deleteAllEmpById(ids);
 		return "서버 : 삭제 성공";
 	}
