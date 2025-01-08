@@ -1,11 +1,8 @@
 package com.deepen.controller;
 
-import java.sql.Timestamp;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.deepen.domain.EmployeesDTO;
 import com.deepen.service.PersonnelService;
@@ -45,9 +42,15 @@ public class PersonnelController {
 	public String psInsert(EmployeesDTO empDTO) {
 		
 		log.info(empDTO.toString());
+//		if (empDTO.getEmp_hire_date() == null || empDTO.getEmp_hire_date().toString().isEmpty()) {
+//			empDTO.setEmp_hire_date(null);
+//	    }
+//		
+//		if (empDTO.getEmp_exit_date() == null || empDTO.getEmp_exit_date().toString().isEmpty()) {
+//			empDTO.setEmp_exit_date(null);
+//	    }
 		
 		psService.regEmployees(empDTO);
-		
 		
 		return "redirect:/registClose";
 	}
@@ -60,11 +63,18 @@ public class PersonnelController {
 	}
 	
 	@PostMapping("/ps-update")
-	public String psUpdate(EmployeesDTO dto) {
+	public String psUpdate(EmployeesDTO empDTO) {
 		
-		 log.info("C-update : "+dto.toString());
+		log.info("C-update : "+empDTO.toString());
+//		if (empDTO.getEmp_hire_date() == null || empDTO.getEmp_hire_date().toString().isEmpty()) {
+//			empDTO.setEmp_hire_date(null);
+//	    }
+//		
+//		if (empDTO.getEmp_exit_date() == null || empDTO.getEmp_exit_date().toString().isEmpty()) {
+//			empDTO.setEmp_exit_date(null);
+//	    }
 		
-		psService.updateEmpInfo(dto);
+		psService.updateEmpInfo(empDTO);
 		
 		return "redirect:/ps-list";
 	}

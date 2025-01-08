@@ -3,7 +3,7 @@ async function fetchCommonDetails() {
 	try{
 	  	const response = await fetch("http://localhost:8082/restApi/commonDetail");
 		if(!response.ok){
-			throw new Error("Network response was not ok");
+			throw new Error("네트워크 응답 실패");
 		}
 		const cdCodeData = await response.json();
 		console.log(cdCodeData);
@@ -40,7 +40,7 @@ async function fetchCommonDetails() {
 		});
 		
 	}catch(error){
-		console.error();
+		console.error("공통코드 조회 중 오류:", error);
 	}
 }
 
@@ -112,5 +112,103 @@ function datePiker(containerSelector, inputSelector){
 
 const empHireDatePiker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
 const empExitDatePiker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');
-   
+empExitDatePiker.setNull();
 
+//------------- 유효성 검사 -----------------------------------------------------------------------------------------------
+
+import {allowKoAndEn,allowOnlyNumbers} from "./inputValidator.js";
+
+const regBtn = document.querySelector("#regBtn");
+const nameInput = document.getElementById("emp_name");
+const ssnInput1 = document.getElementById("first_emp_ssn");
+const ssnInput2 = document.getElementById("second_emp_ssn");
+const phoneInput1 = document.getElementById("firstEmpPhoneNo");
+const phoneInput2 = document.getElementById("middleEmpPhoneNo");
+const phoneInput3 = document.getElementById("lastEmpPhoneNo");
+const postCodeInput = document.getElementById("postCode");
+const addressInput = document.getElementById("emp_address");
+const salaryInput = document.getElementById("emp_salary");
+const bankInput = document.getElementById("emp_bank"); // 은행명
+const accountInput = document.getElementById("emp_account"); // 계좌번호
+
+function validateInputs() {
+  let isValid = true;
+  let errorMessage = "";
+
+  // 이름 유효성 검사 (한글, 영어만 허용, 공백 가능, null 불가능)
+  if (!nameInput.value || !allowKoAndEn(nameInput.value)) {
+    errorMessage += "이름은 한글과 영어만 입력 가능하며, 공백은 허용되나 값이 비어있을 수는 없습니다.\n";
+    isValid = false;
+  }
+
+  // 주민등록번호 앞자리, 뒷자리 유효성 검사 (숫자만 허용, 공백 불가능, null 불가능)
+  if (!allowOnlyNumbers(ssnInput1.value) || !ssnInput1.value) {
+    errorMessage += "주민등록번호 앞자리는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  if (!allowOnlyNumbers(ssnInput2.value) || !ssnInput2.value) {
+    errorMessage += "주민등록번호 뒷자리는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  // 전화번호 입력 유효성 검사 (숫자만 허용, 공백 불가능, null 불가능)
+  if (!allowOnlyNumbers(phoneInput1.value) || !phoneInput1.value) {
+    errorMessage += "전화번호 앞자리는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  if (!allowOnlyNumbers(phoneInput2.value) || !phoneInput2.value) {
+    errorMessage += "전화번호 중간자리는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  if (!allowOnlyNumbers(phoneInput3.value) || !phoneInput3.value) {
+    errorMessage += "전화번호 끝자리는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  // 우편번호 유효성 검사 (숫자만 허용, 공백 불가능, null 불가능)
+  if (!allowOnlyNumbers(postCodeInput.value) || !postCodeInput.value) {
+    errorMessage += "우편번호는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  // 주소 유효성 검사 (null 불가능)
+  if (!addressInput.value) {
+    errorMessage += "주소는 비워둘 수 없습니다.\n";
+    isValid = false;
+  }
+
+  // 급여 입력 유효성 검사 (숫자만 허용, 공백 불가능, null 불가능)
+  if (!allowOnlyNumbers(salaryInput.value) || !salaryInput.value) {
+    errorMessage += "급여는 숫자만 입력 가능하며, 공백이 없어야 합니다.\n";
+    isValid = false;
+  }
+
+  // 은행명 유효성 검사 (한글, 영어만 허용, 공백 가능, null 가능)
+  if (bankInput.value && !allowKoAndEn(bankInput.value)) {
+    errorMessage += "은행명은 한글과 영어만 입력 가능합니다.\n";
+    isValid = false;
+  }
+
+  // 계좌번호 유효성 검사 (숫자만 허용, 공백 가능, null 가능)
+  if (accountInput.value && !allowOnlyNumbers(accountInput.value)) {
+    errorMessage += "계좌번호는 숫자만 입력 가능합니다.\n";
+    isValid = false;
+  }
+
+  if (!isValid) {
+    alert(errorMessage);
+  }
+
+  return isValid;
+}
+
+// 등록 버튼 클릭 이벤트
+regBtn.addEventListener("click", (event) => {
+  if (!validateInputs()) {
+    event.preventDefault(); // 유효성 검사 실패 시 폼 전송 중단
+  }
+});
+ 
