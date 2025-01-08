@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.mapper.AttendanceMapper;
-import com.deepen.repository.CommonDetailRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -27,7 +26,7 @@ public class AttendanceService {
 		return attendanceMapper.getAbsenceList();
 	}
 
-	// 공통코드 항목 조호ㅢ
+	// 공통코드 항목 조회
 	public List<CommonDetailDTO> getCommonList(String code) {
 		List<CommonDetailDTO> list = attendanceMapper.getCommonList(code);
 		log.info("AttendanceService - getCommonList : " + list);
@@ -38,7 +37,7 @@ public class AttendanceService {
 	
 	// 휴직신청서 통한 휴직 insert
 	public void insertLoab(Map<String, Object> map) {
-		attendanceMapper.insertRequest(map.get(""));
+//		attendanceMapper.insertRequest(map.get(""));
 		attendanceMapper.insertLoab(map);
 		
 	}
