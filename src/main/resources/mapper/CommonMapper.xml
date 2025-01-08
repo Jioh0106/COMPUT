@@ -6,18 +6,54 @@
 
 	
 	<select id="commonList" resultType="map">
-		SELECT common_code, common_name, common_status, common_display
-		FROM common
-		WHERE common_status = 'Y'
+		SELECT 
+			common_code, common_name, common_content, common_status, common_display
+		FROM 
+			common
+		WHERE 
+			common_status = 'Y'
 	</select>
 	
 	<select id="commonDtlList" resultType="map" parameterType="string">
-		SELECT common_detail_code, common_detail_name, common_detail_status, common_detail_display
-		FROM common_detail
-		WHERE common_detail_status = 'Y'
-		AND REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+		SELECT 
+			common_detail_code, common_detail_name, common_detail_status, common_detail_display
+		FROM 
+			common_detail
+		WHERE 
+			common_detail_status = 'Y'
+		AND 
+			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
 	</select>
 	
+	<insert id="insertCommonList" parameterType="com.deepen.domain.CommonDTO">
+		INSERT INTO 
+			common ( common_code
+				   , common_name
+				   , common_content
+				   , common_status
+		
+		) VALUES ( #{commonCode}
+				 , #{commonName}
+				 , #{commonContent}
+				 , #{commonStatus}
+		)
+	</insert>
+	
+	<update id="updateCommonList" parameterType="com.deepen.domain.CommonDTO">
+			UPDATE common
+			SET common_code = #{commonCode}
+				, common_name = #{commonName}
+				, common_status = #{commonStatus}
+			WHERE common_code = #{commonCode}
+	</update>
+	
+	<update id="updateDetailList" parameterType="com.deepen.domain.CommonDTO">
+			UPDATE common_detail
+			SET common_detail_code = #{commonCode}
+				, common_detail_name = #{commonName}
+				, common_detail_status = #{commonStatus}
+			WHERE common_detail_code = #{commonCode}
+	</update>
 	
 	
 	

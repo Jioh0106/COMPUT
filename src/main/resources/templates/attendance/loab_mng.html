@@ -66,11 +66,11 @@
 				<h3>휴직 관리</h3>
 				
 				<div class="buttons">
-			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#default">휴직 신청</button>
+			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loab-request">휴직 신청</button>
 				
 				<!-- 휴직 신청서 Modal 시작 -->
-				<div class="modal fade text-left" id="default" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1"
-					aria-hidden="true">
+				<div class="modal fade text-left" id="loab-request" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+					
 					<div class="modal-dialog modal-dialog-scrollable" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
@@ -81,61 +81,89 @@
 							</div>
 							<div class="modal-body">
 								<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
-				
-								<div class="display-flex">
-									<div class="child-input1">
-										<label>사번: </label>
-										<div class="form-group">
-											<input type="text" value="11222" class="form-control" readonly>
+								<form th:action="@{/laob-insert}" method="post">
+								
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사번: </label>
+											<div class="form-group">
+												<input type="text" value="11222" name="emp_id" class="form-control" readonly >
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>이름: </label>
+											<div class="form-group">
+												<input type="text" value="홍길동" class="form-control" readonly>
+											</div>
 										</div>
 									</div>
-									<div class="child-input2">
-										<label>이름: </label>
-										<div class="form-group">
-											<input type="text" value="홍길동" class="form-control" readonly>
+					
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용 시작일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-start-date" onchange="calcDate()" name="absence_start">
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>사용 종료일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-end-date" onchange="calcDate()" name="absence_end">
+											</div>
 										</div>
 									</div>
-								</div>
-				
-								<div class="display-flex">
-									<div class="child-input1">
-										<label>사용 시작일: </label>
-										<div class="form-group">
-											<input type="date" class="form-control" id="use-start-date" onchange="calcDate()" >
+									
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용일수: </label>
+											<div class="form-group">
+												<input type="text" id="use-days" class="form-control" readonly>
+											</div>
+										</div>
+										
+										<div class="child-input2">
+											<label>휴직 구분</label>
+											<fieldset class="form-group">
+												<select class="form-select" id="loabSelect" name="absence_type">
+													<option value="" disabled selected>선택하세요</option>
+												</select>
+											</fieldset>
 										</div>
 									</div>
-									<div class="child-input2">
-										<label>사용 종료일: </label>
-										<div class="form-group">
-											<input type="date" class="form-control" id="use-end-date" onchange="calcDate()">
+									
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>비고사항 </label>
+											<div class="form-group">
+												<textarea id="remark"class="form-control" name="absence_remark"></textarea>
+											</div>
 										</div>
 									</div>
-								</div>
-				
-								<div class="display-flex">
-									<div class="child-input1">
-										<label>사용일수: </label>
-										<div class="form-group">
-											<input type="text" id="use-days" class="form-control" readonly>
+									
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>1차 승인 요청 </label>
+											<div class="form-group">
+												<input type="text" id="request1" class="form-control" >
+											</div>
+										</div>
+										
+										<div class="child-input2">
+											<label>2차 승인 요청</label>
+											<div class="form-group">
+												<input type="text" id="request2" class="form-control" >
+											</div>
 										</div>
 									</div>
-								</div>
-				
-								<label>휴직 구분</label>
-								<fieldset class="form-group">
-									<select class="form-select" id="basicSelect">
-										<option>육아</option>
-										<option>산재</option>
-										<option>병가</option>
-									</select>
-								</fieldset>
+								</form> <!-- 휴직 신청서 모달폼 끝 -->
+								
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
 									<i class="bx bx-x d-block d-sm-none"></i>
 									<span class="d-none d-sm-block">닫기</span>
 								</button>
-								<button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">
+								<button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal">
 									<i class="bx bx-check d-block d-sm-none"></i>
 									<span class="d-none d-sm-block">신청</span>
 								</button>
@@ -158,23 +186,57 @@
 							<div class="float-end">
 								<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
 								<input type="button" class="btn btn-outline-success" id="save"  value="저장">
-								<input type="button" class="btn btn-outline-danger" value="삭제">
+								<input type="button" class="btn btn-outline-danger" id="delete" value="삭제">
 							</div>
 						</form>
 					</div>
 				</section>
 				<!-- 그리드 끝  -->
-<!-- 				<p th:text="${pstnCommon}"></p> -->
 				
-<!-- 				<div th:each="c : ${pstnCommon}"> -->
-<!-- 				    <p th:text="${c.common_detail_name}"></p>  -->
-<!-- 				    <p th:text="${c.common_detail_code}"></p> -->
-<!-- 				</div> -->
+				<div class="modal fade" id="remarkModal" tabindex="-1" aria-labelledby="remarkModalLabel" aria-hidden="true">
+				    <div class="modal-dialog">
+				        <div class="modal-content">
+				            <div class="modal-header">
+				                <h5 class="modal-title" id="remarkModalLabel">비고</h5>
+				                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				            </div>
+				            <div class="modal-body" id="remarkModalBody">
+				                <!-- 비고 내용이 여기에 표시됩니다. -->
+				            </div>
+				            <div class="modal-footer">
+				                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+
+
 			</div><!-- card-body --> 
 		</div> <!-- card --> 
 	
 		</div><!--main--> 
 	</div><!-- app -->
+	
+	<!-- 모달 정의 -->
+	<div class="modal fade" id="empSerchModal" tabindex="-1" aria-labelledby="empSerchModalLabel" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="empSerchModalLabel">사원 조회</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body" id="empSerchModalBody">
+	                <!-- 동적 컨텐츠 -->
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	                <button type="button" class="btn btn-primary" id="modalConfirmButton">확인</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	
 		
 		
 	<!-- 제이쿼리 -->
@@ -182,6 +244,9 @@
 	
 	<!--Axios -->
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	
+	<!-- sweet arert -->
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	
 	<!--공통 -->
 	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
@@ -193,127 +258,280 @@
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	
 	<script th:inline="javascript">
+	
+		let grid;
 		
 		const gridData = /*[[${absenceList}]]*/'';
-		const deptCommon = /*[[${deptCommon}]]*/ [];
-		const loabCommon = /*[[${loabCommon}]]*/ [];
-		const pstnCommon = /*[[${pstnCommon}]]*/ [];
 		
-		const grid = new tui.Grid({
-			el: document.getElementById('grid'),
-			data: gridData,
-			rowHeaders: ['checkbox'],
-			columns: [
-				{
-					header: '번호', 
-					name: 'ABSENCE_NO', 
-					filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-					editor: 'text'
-				},
-				{ 
-					header: '사원번호', 
-					name: 'EMP_ID', 
-					filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-					editor: 'text'
-				},  
-				{ 
-					header: '사원명', 
-					name: 'EMP_NAME', 
-					filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-					editor: 'text'
-				},
-				{ 
-					header: '부서', 
-					name: 'EMP_DEPT',
-					editor: {
-						type: 'select',
-						options: {
-							listItems: deptCommon
-						}
-				    },
-					filter: 'select'
-				},
-				{ 
-					header: '직급', 
-					name: 'EMP_POSITION', 
-					editor: {
-						type: 'select',
-						options: {
-							listItems: pstnCommon
-						}
-				    },
-					filter: 'select'
-				},
-				{ 
-					header: '종류', 
-					name: 'COMMON_DETAIL_NAME',
-					editor: {
-						type: 'select',
-						options: {
-							listItems: loabCommon
-						}
-				    },
-					filter: 'select'
-				},
+		// 모달창 휴직 구분 공통코드 불러오기
+		$('#loabSelect').on('click', function () {
+		    // 이미 데이터가 로드된 경우 추가 요청 방지
+		    if (this.options.length > 1) {
+		        return;
+		    }
+
+		    const type = 'LOAB'; 
+
+		    getCommonList(type).then(function (data) {
+		        $('#loabSelect')
+		            .empty()
+		            .append('<option value="" disabled selected>선택하세요</option>');
+
+		        data.forEach(item => {
+		            if (item.common_detail_code && item.common_detail_name) {
+		                $('#loabSelect').append(
+		                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+		                );
+		            }
+		        });
+		    });
+		});
+		
+		
+		// type으로 공통 코드 가져오는 함수
+		function getCommonList(type) {
+		    return axios.get(`/api/common/list/${type}`)
+		        .then(function (response) {
+		            return response.data; // 데이터 반환
+		        })
+		        .catch(function (error) {
+		            console.error('Error fetching data:', error);
+		            alert('데이터를 가져오는 중 문제가 발생했습니다.');
+		            return []; // 에러 발생 시 빈 배열 반환
+		        });
+		}
+		
+		// 그리드 초기화
+		fetchData().then(function (data) {
+			
+		    grid = new tui.Grid({
+		    	el: document.getElementById('grid'),
+				data: gridData,
+				rowHeaders: ['checkbox'],
+				columns: [
+					{
+						header: '번호', 
+						name: 'ABSENCE_NO', 
+						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+						editor: 'text'
+					},
+					{ 
+						header: '사원번호', 
+						name: 'EMP_ID', 
+						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+						editor: 'text'
+					},  
+					{ 
+						header: '사원명', 
+						name: 'EMP_NAME', 
+						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+						editor: 'text'
+					},
+					{ 
+						header: '부서', 
+						name: 'EMP_DEPT',
+						editor: {
+							type: 'select',
+							options: {
+								listItems: data.deptCommon
+							}
+					    },
+						filter: 'select'
+					},
+					{ 
+						header: '직급', 
+						name: 'EMP_POSITION', 
+						editor: {
+							type: 'select',
+							options: {
+								listItems: data.pstnCommon
+							}
+					    },
+						filter: 'select'
+					},
+					{ 
+						header: '종류', 
+						name: 'COMMON_DETAIL_NAME',
+						editor: {
+							type: 'select',
+							options: {
+								listItems: data.loabCommon
+							}
+					    },
+						filter: 'select'
+					},
+					
+					{ 
+						header: '휴직 시작일', 
+						name: 'ABSENCE_START',
+						editor: {
+			                type: 'datePicker',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            },
+			            filter: {
+			                type: 'date',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            }
+			        },
+			        { 
+						header: '휴직 종료일', 
+						name: 'ABSENCE_END',
+						editor: {
+			                type: 'datePicker',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            },
+			            filter: {
+			                type: 'date',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            }
+			        },
+			        { 
+						header: '신청일', 
+						name: 'REQUEST_DATE',
+						editor: {
+			                type: 'datePicker',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            },
+			            filter: {
+			                type: 'date',
+			                options: {
+			                    format: 'yyyy-MM-dd'
+			                }
+			            }
+			        },
+			        { 
+						header: '최종 승인자', 
+						name: 'HIGH_APPROVAL', 
+						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+						editor: 'text'
+					},
+					{ 
+						header: '비고', 
+						name: 'ABSENCE_REMARK',
+						editor: 'text'
+					}
+				],
+				editing: true  // 편집 기능 활성화
 				
-				{ 
-					header: '휴직 시작일', 
-					name: 'ABSENCE_START',
-					editor: {
-		                type: 'datePicker',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            },
-		            filter: {
-		                type: 'date',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            }
-		        },
-		        { 
-					header: '휴직 종료일', 
-					name: 'ABSENCE_END',
-					editor: {
-		                type: 'datePicker',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            },
-		            filter: {
-		                type: 'date',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            }
-		        },
-		        { 
-					header: '신청일', 
-					name: 'REQUEST_DATE',
-					editor: {
-		                type: 'datePicker',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            },
-		            filter: {
-		                type: 'date',
-		                options: {
-		                    format: 'yyyy-MM-dd'
-		                }
-		            }
-		        },
-		        { 
-					header: '최종 승인자', 
-					name: 'HIGH_APPROVAL', 
-					filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-					editor: 'text'
-				},
-			],
-			editing: true  // 편집 기능 활성화
+			});
+		    
+		    
+		 // 사원번호/사원명 수정 시 모달창에서 사원 조회 후 등록
+		    grid.on('editingStart', function (ev) {
+		    	const { rowKey, columnName } = ev;
+
+		        // 사원번호 또는 사원명 수정 시 모달 띄우기
+		        if (columnName === 'EMP_ID' || columnName === 'EMP_NAME') {
+		            ev.stop(); // 기본 편집 동작 중단
+		            
+		        	// 해당 행의 데이터 가져오기
+		            const rowData = grid.getRow(rowKey);
+
+		            // 사원번호와 사원명을 함께 전달
+		            showEmpModal(rowKey, columnName, rowData.EMP_ID, rowData.EMP_NAME);
+		        }
+		        
+		    });
+		 
+		 
 			
 		});
+		
+		
+		// 사원 조회 모달창 표시 함수 
+		function showEmpModal(rowKey, columnName, empId, empName) {
+			
+		    const $modal = $('#empSerchModal');
+		    const $modalTitle = $('#empSerchModalLabel');
+		    const $modalBody = $('#empSerchModalBody');
+
+		    // 모달 내용 업데이트
+		    $modalBody.html(`
+		        <form>
+		            <div class="form-group">
+		               
+		                <div class="display-flex">
+						<div class="child-input1">
+							<label>사번: </label>
+							<div class="form-group">
+								<input type="text" value="${empId || ''}" name="emp_id" class="form-control emp-serch">
+							</div>
+						</div>
+						<div class="child-input2">
+							<label>이름: </label>
+							<div class="form-group">
+								<input type="text" value="${empName || ''}" class="form-control emp-serch" >
+							</div>
+						</div>
+					</div>
+		            </div>
+		        </form>
+		    `);
+
+		    // 모달 표시
+		    $modal.modal('show');
+
+			 // 확인 버튼 클릭 시 이벤트 처리
+		    $('#modalConfirmButton').off('click').on('click', function () {
+		        // 모달에서 입력된 값을 가져오기
+		        const newEmpId = $('input[name="emp_id"]').val();
+		        const newEmpName = $('input[name="emp_name"]').val();
+
+		        // 그리드 데이터 업데이트
+		        if (columnName === 'EMP_ID') {
+		            grid.setValue(rowKey, 'EMP_ID', newEmpId);
+		        } else if (columnName === 'EMP_NAME') {
+		            grid.setValue(rowKey, 'EMP_NAME', newEmpName);
+		        }
+		        
+		        // 모달 닫기
+		        $modal.modal('hide');
+		    });
+		}
+		
+				
+		
+		// 그리드 수정 시 공통코드 셀렉트값 가져오기
+		function fetchData() {
+		    
+		    return Promise.all([
+		    	 getCommonList('DEPT'),  // 부서 
+		         getCommonList('PSTN'),   // 직급
+		         getCommonList('LOAB') // 휴직 
+		        
+		        
+		    ])
+		    .then(function ([deptCommon, pstnCommon, loabCommon]) {
+		        return {
+		        	deptCommon: deptCommon.map(item => ({
+		                text: item.common_detail_name,
+		                value: item.common_detail_name
+		            })),
+		            pstnCommon: pstnCommon.map(item => ({
+		                text: item.common_detail_name,
+		                value: item.common_detail_name
+		            })),
+		            loabCommon: loabCommon.map(item => ({
+		                text: item.common_detail_name,
+		                value: item.common_detail_name
+		            }))
+		        };
+		    })
+		    .catch(function (error) {
+		        console.error('Error fetching data:', error);
+		        return { deptCommon: [], pstnCommon: [], loabCommon: [] };
+		    });
+		}
 		
 		
 		// "추가" 버튼 클릭 이벤트
@@ -341,6 +559,8 @@
 		});
 		
 		
+		
+		// "저장" 버튼 클릭 이벤트
 		$('#save').on('click', function () {
 			
 			const modifiedRows = grid.getModifiedRows();
@@ -363,6 +583,10 @@
 			.catch(error => console.error('Error:', error));
 		}
 		*/
+		
+		
+		
+		
 	</script>
 	
 	<!-- Modal 내에 있는 일수 계산 스크립트 -->
@@ -397,6 +621,9 @@
 				document.getElementById('use-days').value = count;
 			}
 		}
+		
+		
+		$
 	</script>
 
 

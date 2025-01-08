@@ -1,23 +1,27 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"> 
+	<!-- sweet arert -->
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	
+	<script th:inline="javascript">
+		
+		let msg = /*[[${msg}]]*/ '';
+		let isClose = /*[[${isClose}]]*/ '';
+		let targetURL = /*[[${targetURL}]]*/ '';
+	
+			
+		swal(msg);
+			
+		if(isClose == "true") {
+				window.opener.location.reload();
+				window.close();
+		} 
+		
+		if(targetURL == "") {
+				history.back();
+			} else {
+				location.href = targetURL;		
+		}
+	</script>
+	
 </html>
-<script th:inline="javascript">
-	
-	let msg = /*[[${msg}]]*/ '';
-	let isClose = /*[[${isClose}]]*/ '';
-	let targetURL = /*[[${targetURL}]]*/ '';
-
-		
-	alert(msg);
-		
-	if(isClose == "true") {
-			window.opener.location.reload();
-			window.close();
-	} 
-	
-	if(targetURL == "") {
-			history.back();
-		} else {
-			location.href = targetURL;		
-	}
-</script>
