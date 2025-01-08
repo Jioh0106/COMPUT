@@ -68,7 +68,7 @@ public class CommonController {
 	@PostMapping("/saveData")
 	@ResponseBody
 	public int saveData(@RequestBody List<CommonDTO> commonList) {
-
+		
 		int result = service.saveData(commonList);
 
 		return result;
