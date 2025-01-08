@@ -79,16 +79,20 @@ public class AttendanceController {
 	
 	
 	@PostMapping("/loab-insert")
-	public String laobInsert(String emp_id, String absence_start, String absence_end, String absence_type, String absence_remark ) {
+	public String laobInsert(String emp_id, String absence_start, String absence_end, String absence_type, String absence_remark, String request_approval, String request_role) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("emp_id", map);
+		Map<String, String> map = new HashMap<>();
+		map.put("emp_id", emp_id);
 		map.put("absence_start", absence_start);
 		map.put("absence_end", absence_end);
 		map.put("absence_type", absence_type);
 		map.put("absence_remark", absence_remark);
 		map.put("request_type", "휴직");
+		map.put("request_approval", request_approval);
+		map.put("request_role", request_role);
 		
+		
+		int request_no = attendanceService.insertRequest(map);
 		attendanceService.insertLoab(map);
 		
 		

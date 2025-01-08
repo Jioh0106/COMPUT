@@ -18,9 +18,12 @@ public interface AttendanceMapper {
 
 	List<CommonDetailDTO> getCommonList(String code);
 
-	void insertLoab(Map<String, Object> map);
 
 	List<EmployeesDTO> getEmpList(String emp_role);
+
+	int insertRequest(Map<String, String> map);
+	
+	void insertLoab(Map<String, String> map);
 	
 	
 	

@@ -36,13 +36,7 @@ public class AttendanceService {
 	}
 
 	
-	// 휴직신청서 통한 휴직 insert
-	public void insertLoab(Map<String, Object> map) {
-//		attendanceMapper.insertRequest(map.get(""));
 
-		attendanceMapper.insertLoab(map);
-		
-	}
 
 	public List<EmployeesDTO> getEmpList(String emp_role) {
 		List<EmployeesDTO> list = attendanceMapper.getEmpList(emp_role);
@@ -50,7 +44,20 @@ public class AttendanceService {
 		return list;
 	}
 
+	public int insertRequest(Map<String, String> map) {
+		// 요청 테이블에 먼저 추가 후 요청 번호 리턴 
+		attendanceMapper.insertRequest(map);
+		
+		
+		return 0;
+	}
 
+	// 휴직신청서 통한 휴직 insert
+	public void insertLoab(Map<String, String> map) {
+		// 요청 번호 받아서 추가 
+		attendanceMapper.insertLoab(map);
+		
+	}
 
 
 	
