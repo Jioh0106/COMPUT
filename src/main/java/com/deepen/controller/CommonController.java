@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.deepen.domain.CommonDTO;
 import com.deepen.service.CommonService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,12 @@ public class CommonController {
 
 	private final CommonService service;
 
-	// 공통코드 관리
+	/**
+	 * 공통코드 조회
+	 * 
+	 * @view model
+	 * @return String
+	 */
 	@GetMapping("/common-mng")
 	public String commonList(Model model) {
 		// http://localhost:8082/common-mng
@@ -33,6 +39,13 @@ public class CommonController {
 		return "common/common_mng";
 	}
 
+	/**
+	 * 상세공통코드 조회
+	 * 
+	 * @view model
+	 * @param map
+	 * @return List<Map<String, Object>>
+	 */
 	@PostMapping("/commonCd")
 	@ResponseBody
 	public List<Map<String, Object>> commonCd(Model model, @RequestBody Map<String, Object> map) {
@@ -44,6 +57,21 @@ public class CommonController {
 
 		return commonDtlList;
 
+	}
+
+	/**
+	 * 공통코드 및 상세공통코드 저장
+	 * 
+	 * @param commonList
+	 * @return
+	 */
+	@PostMapping("/saveData")
+	@ResponseBody
+	public int saveData(@RequestBody List<CommonDTO> commonList) {
+
+		int result = service.saveData(commonList);
+
+		return result;
 	}
 
 }
