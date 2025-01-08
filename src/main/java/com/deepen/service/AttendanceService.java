@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.CommonDetailDTO;
+import com.deepen.domain.EmployeesDTO;
 import com.deepen.mapper.AttendanceMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,12 @@ public class AttendanceService {
 
 		attendanceMapper.insertLoab(map);
 		
+	}
+
+	public List<EmployeesDTO> getEmpList(String emp_role) {
+		List<EmployeesDTO> list = attendanceMapper.getEmpList(emp_role);
+		log.info("AttendanceService - getEmpList : " + list);
+		return list;
 	}
 
 
