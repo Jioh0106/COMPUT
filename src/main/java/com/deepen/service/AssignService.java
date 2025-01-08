@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
+import com.deepen.domain.RequestDTO;
+import com.deepen.entity.Assignment;
+import com.deepen.entity.Request;
 import com.deepen.mapper.AssignMapper;
+import com.deepen.repository.AssignmentRepository;
 import com.deepen.repository.CommonDetailRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,10 +24,35 @@ public class AssignService {
 	
 	private final CommonDetailRepository cdRepo; //공통상세테이블 
 	private final AssignMapper asMapper; //발령매퍼 인터페이스
+	private final AssignmentRepository asRepository;
+	private final PersonnelService psService; 
 	
 	
 	//JPA
 	
+	public void saveAssigmentAndRequest(RequestDTO requestDto) {//requestDto는 html에 있는 requestData값들
+		
+		//Request 객체생성
+		Request request = new Request();
+		request.setRequest_no(requestDto.getRequest_no()); //요청번호
+		request.setEmp_id(requestDto.getEmp_id()); //요청자 사번(html에서 내가 직접 담음. login기능이 없으니깐)
+		//근데 요청자 부서랑 성명은 ??request.setEmp_id(requestDto.getEmp_id())얘가 사원번호니깐 얘를 매개변수로 넣고
+		//psService에서 매서드 만들어서? 부서랑 성명을 가져와야하나..?
+		request.setRequest_rejection(requestDto.getRequest_rejection()); //반려사유
+		request.setRequest_status("1차대기"); //요청상태
+		request.setRequest_type("발령"); //요청유형
+		// 요청일과 요청마감일은 @PrePersist에 의해 자동 설정됨(서비스단에서 처리 안해도된다!)
+		
+		//Assignment 객체생성
+		Assignment assignment = new Assignment();
+		
+		
+	}
+	
+	
+	
+	
+	//=============================================================================
 	
 	
 	//마이바티스
