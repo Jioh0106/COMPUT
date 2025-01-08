@@ -23,23 +23,23 @@
 		            <h1 class="auth-title">Log in.</h1>
 <!--		            <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>-->
 
-		            <form action="index.html">
+		            <form action="loginPro" method="post">
 		                <div class="form-group position-relative has-icon-left mb-4">
-		                    <input type="text" class="form-control form-control-xl" placeholder="Username">
+		                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id">
 		                    <div class="form-control-icon">
 		                        <i class="bi bi-person"></i>
 		                    </div>
 		                </div>
 		                <div class="form-group position-relative has-icon-left mb-4">
-		                    <input type="password" class="form-control form-control-xl" placeholder="Password">
+		                    <input type="password" class="form-control form-control-xl" placeholder="비밀번호" name="emp_pw">
 		                    <div class="form-control-icon">
 		                        <i class="bi bi-shield-lock"></i>
 		                    </div>
 		                </div>
 		                <div class="form-check form-check-lg d-flex align-items-end">
-		                    <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault">
+		                    <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault" name="KeepLogged">
 		                    <label class="form-check-label text-gray-600" for="flexCheckDefault">
-		                        Keep me logged in
+		                        아이디 기억하기
 		                    </label>
 		                </div>
 		                <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
