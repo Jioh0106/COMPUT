@@ -16,6 +16,8 @@
 //@EnableWebSecurity
 //public class SecurityConfig {
 //	
+//	private final MyUserDetailsService myUserDetailsService;
+//	
 //	@Bean
 //	public PasswordEncoder passwordEncoder() {
 //		return new BCryptPasswordEncoder();
@@ -50,7 +52,8 @@
 //				.logout(logoutCustomizer
 //						-> logoutCustomizer
 //						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//						.logoutSuccessUrl("/main"))
+//						.logoutSuccessUrl("/"))
+//				.userDetailsService(myUserDetailsService)
 //				.build();
 //	}
 //	
