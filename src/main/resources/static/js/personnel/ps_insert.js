@@ -104,7 +104,6 @@ function datePiker(containerSelector, inputSelector){
 		language : 'ko'
 	});
 }
-
 const empHireDatePiker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
 
 //------------- 유효성 검사 -----------------------------------------------------------------------------------------------
