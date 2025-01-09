@@ -30,12 +30,14 @@ public class SecurityConfig {
 		
 		
 		return security
-				.csrf(csrf -> csrf.disable())
+//				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorizeHttpRequestCustomizer -> authorizeHttpRequestCustomizer
-						.requestMatchers("/login/**","/css/**", "/js/**", "/images/**", "/webjars/**", "/mapTest/**", "/assets/**", "/ps-list/**", "/ps-reg/**")
+						.requestMatchers("/login/**","/css/**", "/js/**", "/images/**", "/webjars/**", "/mapTest/**", "/assets/**")
 						.permitAll()
 						.requestMatchers("/", "/request-list/**", "/ps-empDb/**", "/ps-hrDb/**", "/assign-stts/**", "/assign-insert/**", 
-											 "/cmt-stts/**", "/vctn-mng/**", "/loab-mng/**", "/work-mng/**","/pay-stts/**", "/pay-list/**", "/pay-mng/**")
+											"/ps-list/**", "/ps-reg/**", "/restApi/**", "/api/**", 
+											 "/cmt-stts/**",  "/loab-mng/**", "/vctn-mng/**",  "/work-mng/**",
+											 "/pay-stts/**", "/pay-list/**", "/pay-mng/**")
 						.hasAnyRole("ATHR001", "ATHR002", "ATHR003")
 						.requestMatchers("/common-mng/**")
 						.hasRole("ATHR001")
