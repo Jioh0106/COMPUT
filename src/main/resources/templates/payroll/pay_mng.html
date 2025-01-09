@@ -225,6 +225,8 @@
 const formulas = /*[[${formulas}]]*/ [];
 
 // 그리드 초기화
+console.log('Grid Data:', formulas); // 데이터 확인
+
 const grid = new tui.Grid({
     el: document.getElementById('grid'),
     data: formulas,
@@ -234,20 +236,37 @@ const grid = new tui.Grid({
             header: '구분',
             name: 'formulaType',
             sortable: true,
-            sortingType: 'asc',
-        },
-        { header: '항목명', name: 'formulaName'},
-        { header: '계산식', name: 'formulaContent'},
-        { 
-            header: '범위 시작',
-            name: 'rangeStart',
-            sortable: true
+            sortingType: 'asc'
         },
         { 
-            header: '범위 끝',
-            name: 'rangeEnd',
-            sortable: true
+            header: '항목명', 
+            name: 'formulaName'
         },
+		{
+		            header: '계산식',
+		            name: 'formulaContent_calc',  // 이름 변경
+		            formatter: function({row}) {  // row 데이터 전체를 받아옴
+		                const value = row.formulaContent;
+		                if (!value) return '';
+		                // 순수 숫자나 빈 문자열이면 공백 반환
+		                if (/^\d+$/.test(value)) return '';
+		                // 계산식이면 그대로 반환
+		                return value;
+		            }
+		        },
+		        {
+		            header: '금액',
+		            name: 'formulaContent_amount',  // 이름 변경
+		            formatter: function({row}) {  // row 데이터 전체를 받아옴
+		                const value = row.formulaContent;
+		                if (!value) return '';
+		                // 순수 숫자인 경우에만 금액으로 표시
+		                if (/^\d+$/.test(value)) {
+		                    return new Intl.NumberFormat('ko-KR').format(Number(value)) + '원';
+		                }
+		                return '';
+		            }
+		        },
         { 
             header: '적용년도',
             name: 'applyYear',
@@ -318,113 +337,69 @@ const RANGE_OPTIONS = {
 	    }
 	};
 
-//항목명 선택 시 상세 정보 표시
-document.getElementById('formulaCode').addEventListener('change', function() {
-    const selectedCode = this.value;
-    const detailSection = document.getElementById('detailSection');
-    const numberRangeSection = document.getElementById('numberRangeSection');
-    const gradeSection = document.getElementById('gradeSection');
-    
-    // 초기 설정
-    document.getElementById('formulaType').value = this.options[this.selectedIndex].dataset.type;
-    
-    if (selectedCode) {
-//         const baseName = this.options[this.selectedIndex].text;
-        
-//         // 상세 입력이 필요한 케이스 확인
-//         if (['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode)) {
-//             detailSection.style.display = 'block';
-            
-//             // 문자열 범위 사용 (기술수당, 성과금)
-//             if (['RWRD001', 'RWRD002'].includes(selectedCode)) {
-//                 numberRangeSection.style.display = 'none';
-//                 stringRangeSection.style.display = 'block';
-                
-//                 // 옵션 설정
-//                 const options = selectedCode === 'RWRD001' ? 
-//                     ['초급', '중급', '고급'] : ['A', 'B', 'C', 'D', 'E', 'F'];
-                
-//                 ['rangeStartText', 'rangeEndText'].forEach(id => {
-//                     const select = document.getElementById(id);
-//                     select.innerHTML = '<option value="">선택하세요</option>';
-//                     options.forEach(opt => {
-//                         const option = document.createElement('option');
-//                         option.value = opt;
-//                         option.textContent = opt;
-//                         select.appendChild(option);
-//                     });
-//                     select.required = true;
-//                 });
-//             }
-//             // 숫자 범위 사용 (소득세, 근속수당)
-//             else {
-//                 numberRangeSection.style.display = 'block';
-//                 stringRangeSection.style.display = 'none';
-//                 ['rangeStart', 'rangeEnd'].forEach(id => {
-//                     document.getElementById(id).required = true;
-//                 });
-//             }
-            
-//             // 상세명 placeholder 설정
-//             document.getElementById('detailName').placeholder = 
-//                 selectedCode === 'DDCT005' ? '예: 1200만원 이하' :
-//                 selectedCode === 'RWRD001' ? '예: 초급' :
-//                 selectedCode === 'RWRD002' ? '예: A등급' : '예: 3년미만';
-//             document.getElementById('detailName').required = true;
-            
-//         } else {
-//             // 상세 입력이 필요없는 경우
-//             detailSection.style.display = 'none';
-//             document.getElementById('formulaName').value = baseName;
-//             ['detailName', 'rangeStart', 'rangeEnd', 'rangeStartText', 'rangeEndText']
-//                 .forEach(id => {
-//                     const element = document.getElementById(id);
-//                     if (element) {
-//                         element.required = false;
-//                         element.value = '';
-//                     }
-//                 });
-//         }
-//     }
-    
-    	// 기술수당
-        if (selectedCode === 'RWRD001') {
-            detailSection.style.display = 'block';
-            numberRangeSection.style.display = 'none';
-            gradeSection.style.display = 'block';
-            
-            const gradeSelect = document.getElementById('grade');
-            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
-            ['초급', '중급', '고급'].forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelect.appendChild(option);
-            });
-        } 
-        // 성과수당
-        else if (selectedCode === 'RWRD002') {
-            detailSection.style.display = 'block';
-            numberRangeSection.style.display = 'none';
-            gradeSection.style.display = 'block';
-            
-            const gradeSelect = document.getElementById('grade');
-            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
-            ['A', 'B', 'C', 'D', 'F'].forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelect.appendChild(option);
-            });
-        }
-        // 소득세, 근속수당
-        else if (['DDCT005', 'RWRD003'].includes(selectedCode)) {
-            detailSection.style.display = 'block';
-            numberRangeSection.style.display = 'block';
-            gradeSection.style.display = 'none';
-        }
-    }
-});
+	// 항목명 선택 시 상세 정보 표시
+	document.getElementById('formulaCode').addEventListener('change', function() {
+	    const selectedCode = this.value;
+	    const detailSection = document.getElementById('detailSection');
+	    const numberRangeSection = document.getElementById('numberRangeSection');
+	    const gradeSection = document.getElementById('gradeSection');
+	    
+	    // 초기 설정
+	    document.getElementById('formulaType').value = this.options[this.selectedIndex].dataset.type;
+	    
+	    if (selectedCode) {
+	        const baseName = this.options[this.selectedIndex].text;
+	        document.getElementById('formulaName').value = baseName;  // 기본 이름 설정
+	        
+	        // 기술수당
+	        if (selectedCode === 'RWRD001') {
+	            detailSection.style.display = 'block';
+	            numberRangeSection.style.display = 'none';
+	            gradeSection.style.display = 'block';
+	            
+	            const gradeSelect = document.getElementById('grade');
+	            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
+	            ['초급', '중급', '고급'].forEach(grade => {
+	                const option = document.createElement('option');
+	                option.value = grade;
+	                option.textContent = grade;
+	                gradeSelect.appendChild(option);
+	            });
+	        } 
+	        // 성과수당
+	        else if (selectedCode === 'RWRD002') {
+	            detailSection.style.display = 'block';
+	            numberRangeSection.style.display = 'none';
+	            gradeSection.style.display = 'block';
+	            
+	            const gradeSelect = document.getElementById('grade');
+	            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
+	            ['A', 'B', 'C', 'D', 'F'].forEach(grade => {
+	                const option = document.createElement('option');
+	                option.value = grade;
+	                option.textContent = grade;
+	                gradeSelect.appendChild(option);
+	            });
+	        }
+	        // 소득세, 근속수당
+	        else if (['DDCT005', 'RWRD003'].includes(selectedCode)) {
+	            detailSection.style.display = 'block';
+	            numberRangeSection.style.display = 'block';
+	            gradeSection.style.display = 'none';
+	        }
+	        // 일반 항목 (명절수당, 휴가수당 등)
+	        else {
+	            detailSection.style.display = 'none';
+	            numberRangeSection.style.display = 'none';
+	            gradeSection.style.display = 'none';
+	            document.getElementById('detailName').required = false;
+	            document.getElementById('grade').required = false;
+	            ['rangeStart', 'rangeEnd'].forEach(id => {
+	                document.getElementById(id).required = false;
+	            });
+	        }
+	    }
+	});
 
 //등급 선택 시 range 값 자동 설정
 document.getElementById('grade').addEventListener('change', function() {
@@ -432,6 +407,11 @@ document.getElementById('grade').addEventListener('change', function() {
     if (selectedGrade) {
         document.getElementById('rangeStart').value = selectedGrade;
         document.getElementById('rangeEnd').value = selectedGrade;
+        
+        // formulaName 업데이트
+        const formulaCode = document.getElementById('formulaCode');
+        const baseName = formulaCode.options[formulaCode.selectedIndex].text;
+        document.getElementById('formulaName').value = `${baseName} - ${selectedGrade}`;
     }
 });
 
@@ -445,24 +425,57 @@ document.getElementById('detailName').addEventListener('input', function() {
 // 폼 제출 처리
 document.getElementById('salaryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    console.log('폼 제출 시작'); // 디버깅 로그 추가
     
     const selectedCode = document.getElementById('formulaCode').value;
-    const needsDetail = ['DDCT002', 'RWRD003', 'RWRD004', 'RWRD005'].includes(selectedCode);
+    console.log('selectedCode:', selectedCode); // 선택된 코드 확인
     
+    const needsDetail = ['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode);
+    console.log('needsDetail:', needsDetail); // 상세 정보 필요 여부 확인
+
     const formData = {
         formulaId: this.dataset.id,
         formulaCode: selectedCode,
-        formulaName: document.getElementById('formulaName').value,
         formulaType: document.getElementById('formulaType').value,
         formulaContent: document.getElementById('formulaContent').value,
         applyYear: parseInt(document.getElementById('applyYear').value),
-        formulaPriority: parseInt(document.getElementById('formulaPriority').value),
-        rangeStart: document.getElementById('rangeStart').value,
-        rangeEnd: document.getElementById('rangeEnd').value
+        formulaPriority: parseInt(document.getElementById('formulaPriority').value)
     };
+    
+    console.log('초기 formData:', formData); // 기본 데이터 확인
+
+    if (selectedCode) {
+        // 기본 데이터 설정
+        formData.formulaName = document.getElementById('formulaCode').options[
+            document.getElementById('formulaCode').selectedIndex
+        ].text;
+
+        // 범위나 등급이 필요한 경우
+        if (['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode)) {
+            // 등급 선택이 필요한 경우
+            if (['RWRD001', 'RWRD002'].includes(selectedCode)) {
+                const grade = document.getElementById('grade').value;
+                formData.rangeStart = grade;
+                formData.rangeEnd = grade;
+                formData.formulaName = `${formData.formulaName} - ${grade}`;
+            } 
+            // 범위 입력이 필요한 경우
+            else {
+                const rangeStart = document.getElementById('rangeStart').value;
+                const rangeEnd = document.getElementById('rangeEnd').value;
+                formData.rangeStart = rangeStart;
+                formData.rangeEnd = rangeEnd;
+                formData.formulaName = `${formData.formulaName} - ${rangeStart}~${rangeEnd}`;
+            }
+        }
+    }
+
+    console.log('최종 formData:', formData); // 최종 데이터 확인
 
     try {
         const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
+        console.log('요청 URL:', url); // URL 확인
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -472,7 +485,11 @@ document.getElementById('salaryForm').addEventListener('submit', async function(
             body: JSON.stringify(formData)
         });
         
+        console.log('서버 응답:', response); // 응답 확인
+        
         const result = await response.json();
+        console.log('응답 결과:', result); // 결과 확인
+        
         if (response.ok) {
             alert(result.message || '저장되었습니다.');
             location.reload();
