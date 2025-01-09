@@ -23,7 +23,7 @@
 			            <h1 class="auth-title">Log in.</h1>
 	<!--		            <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>-->
 	
-			            <form action="loginPro" method="post">
+			            <form action="/loginPro" method="post">
 			                <div class="form-group position-relative has-icon-left mb-4">
 			                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id">
 			                    <div class="form-control-icon">
@@ -42,7 +42,7 @@
 			                        아이디 기억하기
 			                    </label>
 			                </div>
-			                <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
+			                <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Log in</button>
 			            </form>
 						<button class="btn btn-outline-secondary btn-block mt-5 visitors-login" id="low-login">일반 사원으로 로그인하기</button>
 						<button class="btn btn-outline-secondary btn-block mt-2 visitors-login" id="middle-login">중간 관리자로 로그인하기</button>
@@ -76,7 +76,7 @@
 		});
 		
 		function submitLoginForm(empId, empPw) {
-		    const form = $('form[action="loginPro"]');
+		    const form = $('form[action="/loginPro"]');
 		    form.find('input[name="emp_id"]').val(empId); // 사원번호 설정
 		    form.find('input[name="emp_pw"]').val(empPw); // 비밀번호 설정
 
