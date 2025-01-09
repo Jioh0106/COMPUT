@@ -12,7 +12,7 @@ import com.deepen.domain.EmployeesDTO;
 
 @Mapper
 @Repository
-public interface AttendanceMapper {
+public interface AbsenceMapper {
 	
 	List<Map<String, Object>> getAbsenceList();
 
@@ -20,7 +20,9 @@ public interface AttendanceMapper {
 
 	void insertLoab(Map<String, Object> map);
 
-	List<EmployeesDTO> getEmpList(String emp_role);
+	List<Map<String, String>> getEmpList(String emp_role);
+
+	int insertRequest(Map<String, Object> map);
 	
 	
 	
