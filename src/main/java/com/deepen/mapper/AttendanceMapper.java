@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.CommonDetailDTO;
+import com.deepen.domain.EmployeesDTO;
 
 
 @Mapper
@@ -18,6 +19,8 @@ public interface AttendanceMapper {
 	List<CommonDetailDTO> getCommonList(String code);
 
 	void insertLoab(Map<String, Object> map);
+
+	List<EmployeesDTO> getEmpList(String emp_role);
 	
 	
 	

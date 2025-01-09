@@ -25,7 +25,11 @@
 		VALUES()
 	</insert>
 	
-	
+	<select id="getEmpList" resultType="com.deepen.domain.EmployeesDTO">
+		SELECT *
+		FROM EMPLOYEES
+		WHERE emp_role = #{emp_role}
+	</select>
 </mapper>
 
 
