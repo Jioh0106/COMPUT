@@ -7,7 +7,7 @@
 	
 	<select id="commonList" resultType="map">
 		SELECT 
-			common_code, common_name, common_content, common_status, common_display
+			common_code, common_name, common_content, common_status, common_display, 'select' AS row_type
 		FROM 
 			common
 		ORDER BY
