@@ -23,6 +23,8 @@ public interface AbsenceMapper {
 
 	int insertRequest(Map<String, Object> map);
 
+	void deleteAbsences(List<Integer> deleteList);
+
 
 	
 

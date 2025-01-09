@@ -2,12 +2,16 @@ package com.deepen.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.deepen.domain.CommonDetailDTO;
+import com.deepen.domain.EmployeesDTO;
+import com.deepen.entity.Employees;
 import com.deepen.mapper.AbsenceMapper;
+import com.deepen.repository.PersonnelRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -18,6 +22,8 @@ import lombok.extern.java.Log;
 public class AbsenceService {
 	
 	private final AbsenceMapper attendanceMapper;
+	private final PersonnelRepository personnelRepository;
+	
 	
 	
 	// 휴직관리 ABSENCE_VIEW 리스트 조회
@@ -65,6 +71,18 @@ public class AbsenceService {
 		attendanceMapper.insertLoab(map);
 		
 		
+	}
+	
+	// 로그인한 사용자 정보 조회
+	public Optional<Employees> findById(String emp_id) {
+		
+		return personnelRepository.findById(emp_id);
+	}
+
+	
+	
+	public void deleteAbsences(List<Integer> deleteList) {
+		attendanceMapper.deleteAbsences(deleteList);
 	}
 
 

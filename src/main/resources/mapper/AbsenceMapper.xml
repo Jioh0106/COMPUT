@@ -8,6 +8,7 @@
 	<select id="getAbsenceList" resultType="Map">
 		SELECT *
 		FROM ABSENCE_VIEW 
+		ORDER BY ABSENCE_NO DESC
 	</select>
 	
 	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
@@ -76,6 +77,14 @@
 	
 	</insert>
 	
+	<delete id="deleteAbsences" parameterType="java.util.List">
+	    DELETE FROM ABSENCE
+	    WHERE ABSENCE_NO IN
+	    <foreach item="ABSENCE_NO" collection="list" open="(" separator="," close=")">
+	        #{ABSENCE_NO}
+	    </foreach>
+	</delete>
+
 	
 	
 </mapper>
