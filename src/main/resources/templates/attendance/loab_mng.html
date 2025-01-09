@@ -79,10 +79,10 @@
 									<i data-feather="x"></i>
 								</button>
 							</div>
-							<div class="modal-body">
-								<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
-								<form th:action="@{/laob-insert}" method="post">
-								
+							<form th:action="@{/loab-insert}" method="post">
+								<div class="modal-body">
+									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
+									
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사번: </label>
@@ -139,30 +139,36 @@
 											</div>
 										</div>
 									</div>
-									
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>승인 요청 선택 </label>
 											<fieldset class="form-group">
-												<select class="form-select" id="requestSelect" name="middle_approval">
+												<select class="form-select" id="requestSelect" name="request_approval" >
 													<option value="" disabled selected>선택하세요</option>
 												</select>
 											</fieldset>
 										</div>
+										<div class="child-input2">
+											<label>요청 기한</label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="date_deadline" onchange="calcDate2()">
+											</div>
+										</div>
 									</div>
-								</form> <!-- 휴직 신청서 모달폼 끝 -->
-								
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-									<i class="bx bx-x d-block d-sm-none"></i>
-									<span class="d-none d-sm-block">닫기</span>
-								</button>
-								<button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal">
-									<i class="bx bx-check d-block d-sm-none"></i>
-									<span class="d-none d-sm-block">신청</span>
-								</button>
-							</div>
+									<input type="hidden" id="requestRole" name="request_role">
+									<input type="hidden" id="deadline" name="request_deadline">
+								</div><!-- modal body -->
+								<div class="modal-footer">
+									<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+										<i class="bx bx-x d-block d-sm-none"></i>
+										<span class="d-none d-sm-block">닫기</span>
+									</button>
+									<button type="submit" class="btn btn-primary ml-1" >
+										<i class="bx bx-check d-block d-sm-none"></i>
+										<span class="d-none d-sm-block">신청</span>
+									</button>
+								</div>
+							</form> <!-- 휴직 신청서 모달폼 끝 -->
 						</div>
 					</div>
 				</div>
@@ -277,12 +283,19 @@
 			axios.get(`/api/absence/request/${role}`)
 	        .then(function (response) {
 	            const data = response.data;
+	            data.forEach(item => {
+	                console.log(item); // 각 아이템 확인
+	            });
+
 	            $('#requestSelect').empty().append('<option value="" disabled selected>선택하세요</option>');
 				
 	            data.forEach(item => {
 	                $('#requestSelect').append(
-	                    $('<option></option>').val(item.emp_id).text(item.emp_name + " / " + item.emp_dept + " / " + item.emp_position)
+	                    $('<option></option>').val(item.EMP_ID).text(item.EMP_NAME + " / " + item.EMP_DEPT_NAME + " / " + item.EMP_POSITION_NAME)
 	                );
+	                
+	                $('#requestRole').val(item.EMP_ROLE);
+	                
 	            });
 	        })
 	        .catch(function (error) {
@@ -295,7 +308,7 @@
 		
 		// type으로 공통 코드 가져오는 함수
 		function getCommonList(type) {
-		    return axios.get(`/api/common/list/${type}`)
+		    return axios.get(`/api/absence/common/list/${type}`)
 		        .then(function (response) {
 		            return response.data; // 데이터 반환
 		        })
@@ -598,19 +611,20 @@
 	<script>
 		function calcDate() {
 			// 사용 시작일과 종료일 가져오기
-			const startDateValue = document.getElementById('use-start-date').value; // yyyy-mm-dd 형식
-			const endDateValue = document.getElementById('use-end-date').value;
+			const startDateValue = $('#use-start-date').val(); // yyyy-mm-dd 형식
+			const endDateValue = $('#use-end-date').val();
 
 			const startDate = new Date(startDateValue);
 			const endDate = new Date(endDateValue);
 
 
-			var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
-
+			let count = 0; //일수
+			
 			if (startDateValue && endDateValue) {
 
 				while (true) {
 					const temp_date = startDate; //임시 날짜 변수에 시작일을 할당
+					
 					if (temp_date.getTime() > endDate.getTime()) {
 						break;
 
@@ -623,12 +637,39 @@
 						temp_date.setDate(startDate.getDate() + 1); //다음 날로 이동
 					}
 				}
-				document.getElementById('use-days').value = count;
+				$('#use-days').val(count);
 			}
 		}
 		
 		
-		$
+		function calcDate2() {
+			// 사용 시작일과 종료일 가져오기
+			const today = new Date();
+			const yyyy = today.getFullYear();
+			const mm = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+			const dd = String(today.getDate()).padStart(2, '0');
+			
+			const startDateValue = `${yyyy}-${mm}-${dd}`; // yyyy-mm-dd 형식
+			const endDateValue = $('#date_deadline').val();
+
+			const startDate = new Date(startDateValue);
+		    const endDate = new Date(endDateValue);
+
+		    if (startDateValue && endDateValue) {
+		        // 두 날짜의 차이를 밀리초 단위로 계산
+		        const timeDifference = endDate.getTime() - startDate.getTime();
+
+		        // 밀리초를 일(day) 단위로 변환
+		        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+		        // 결과를 hidden에 저장
+		        $('#deadline').val(dayDifference);
+		    }
+		    
+		    
+		}
+		
+		
 	</script>
 
 

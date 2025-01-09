@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.AbsenceMapper">
+
+	
+	<select id="getAbsenceList" resultType="Map">
+		SELECT *
+		FROM ABSENCE_VIEW 
+	</select>
+	
+	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
+		SELECT common_detail_code, common_detail_name
+		FROM common_detail
+		WHERE common_detail_status = 'Y'
+		<if test="code != null">
+			AND REGEXP_LIKE(common_detail_code, '^${code}')
+		</if>
+	</select>
+	
+	<select id="getEmpList" resultType="Map">
+		SELECT e.emp_id,
+			   e.emp_name,
+			   e.emp_role,
+			   c_dept.common_detail_name AS emp_dept_name,
+			   c_position.common_detail_name AS emp_position_name
+		  FROM employees e
+	 LEFT JOIN common_detail c_dept
+            ON e.emp_dept = c_dept.common_detail_code
+	 LEFT JOIN common_detail c_position
+		    ON e.emp_position = c_position.common_detail_code
+		 WHERE emp_role = #{emp_role}
+	</select>
+	
+	<insert id="insertRequest" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="request_no">
+		INSERT INTO REQUEST (
+			REQUEST_TYPE, 
+			REQUEST_STATUS, 
+			REQUEST_DATE, 
+			REQUEST_DEADLINE, 
+			MIDDLE_APPROVAL, 
+			<if test="high_approval != null">
+	            HIGH_APPROVAL,
+	        </if>
+			EMP_ID
+		) VALUES (
+		    #{request_type},
+		    #{request_status},
+		    #{request_date},
+		    #{request_date} + #{request_deadline},
+		    #{middle_approval},
+		     <if test="high_approval != null">
+	            #{high_approval},
+	        </if>
+		    #{emp_id}
+		)
+	</insert>
+	
+	<insert id="insertLoab" parameterType="java.util.Map">
+		INSERT INTO ABSENCE (
+			EMP_ID,
+			ABSENCE_TYPE,
+			ABSENCE_START,
+			ABSENCE_END,
+			REQUEST_NO,
+			ABSENCE_REMARK
+		) VALUES (
+		    #{emp_id},
+		    #{absence_type},
+		    #{absence_start},
+		    #{absence_end},
+		    #{request_no},
+		    #{absence_remark}
+		)
+	
+	</insert>
+	
+	
+	
+</mapper>
+
+
+
