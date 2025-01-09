@@ -59,7 +59,7 @@
 				</div>
 				<div class="card-content">
 					<div class="card-body">
-					<form class="form">
+					<form class="form" id="assignForm">
 						
 						<div class="row">
 							
@@ -101,7 +101,7 @@
 								<div class="form-group">
 									<label>발령일자</label>
 									<div class="form-group">
-										<input type="date" class="form-control" id="assign_date" onchange="calcDate()"
+										<input type="date" class="form-control" id="assign_date"
 										name="assign_date">
 									</div>
 								</div>
@@ -270,6 +270,8 @@
 	<script src="assets/js/main.js"></script>
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	 <!-- 제이쿼리 -->
+   	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script src="js/assign_insert.js"></script>
 	<script>
 	    
@@ -405,7 +407,7 @@
 	            alert(`중간승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
 	        }
 	    }); // 토스트 UI 모달창 그리드 끝
-
+		
 	    
 		// 승인 요청 버튼 클릭 시 실행되는 함수
 	    function requestApproval() {
@@ -418,30 +420,42 @@
 
 	        // 이후 AJAX 요청 등의 처리 로직을 여기에 추가할 수 있음
 	        alert('승인 요청이 정상적으로 처리되었습니다.');
-			
-			
-			const requestData = {
-				
-				assignRegist : {
+					
+				 const assignmentDTO = {
 					assign_emp_id : $('#assign_emp_id').val(),
 					assign_emp_name : $('#assign_emp_name').val(),
 					assign_date : $('#assign_date').val(),
-					assign_type : $('assign_type').val(),
-					prev_pos : $('prev_pos').val(),
-					new_pos : $('new_pos').val(),
-					prev_dept : $('prev_dept').val(),
-					new_dept : $('new_dept').val()
-				},
-				requestList : {
-					emp_id :'2025010413',
-					middle_approval : selectApprover
-				}
+					assign_type : $('#assign_type').val(),
+					prev_pos : $('#prev_pos').val(),
+					new_pos : $('#new_pos').val(),
+					prev_dept : $('#prev_dept').val(),
+					new_dept : $('#new_dept').val()
+				};
 				
-			}; //requestData 끝
-			
-			
-			
-			//ajax로 객체 보내기 시작
+				const requestDTO = {
+					emp_id :'2025010820',
+					middle_approval : JSON.stringify(selectApprover)
+				};
+				
+		
+			// AJAX 요청
+			    $.ajax({
+			        url: '/assign-insertPOST',
+			        type: 'POST',
+			        contentType: 'application/json',
+			        data: JSON.stringify({
+			        	requestDto : requestDTO,
+			        	assignmentDto : assignmentDTO
+			        }),
+			        success: function(response) {
+			            alert('발령 등록 및 요청 내역 저장이 완료되었습니다.');
+			            window.location.href = '/request-list';
+			        },
+			        error: function(error) {
+			            alert('발령 등록 및 요청 내역 저장에 실패실패실패ㅗㅗㅗ.');
+			            console.error(error);
+			        }
+			    });
 			
 			
 	    } // requestApproval() 함수 끝
