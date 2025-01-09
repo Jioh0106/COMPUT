@@ -31,7 +31,7 @@ public class Employees {
 	@Column(name = "emp_no", nullable = false, unique = true)
 	private int emp_no; // 구분용 pk
 	
-	@Column(name ="emp_pw", length = 30, nullable = false)
+	@Column(name ="emp_pw", length = 255, nullable = false)
 	private String emp_pw;
 	
 	@Column(name ="emp_role", length = 20, nullable = false)
