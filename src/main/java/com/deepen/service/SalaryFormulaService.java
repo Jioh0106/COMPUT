@@ -55,6 +55,8 @@ public class SalaryFormulaService {
             formula.setFormulaPriority(dto.getFormulaPriority());
             formula.setUpdatedAt(LocalDateTime.now());
             formula.setCommonDetail(commonDetail);
+            formula.setRangeStart(dto.getRangeStart());
+            formula.setRangeEnd(dto.getRangeEnd());
             
             salaryFormulaRepository.save(formula);
             
@@ -75,6 +77,8 @@ public class SalaryFormulaService {
         formula.setApplyYear(dto.getApplyYear());
         formula.setFormulaPriority(dto.getFormulaPriority());
         formula.setUpdatedAt(LocalDateTime.now());
+        formula.setRangeStart(dto.getRangeStart());
+        formula.setRangeEnd(dto.getRangeEnd());
         
         salaryFormulaRepository.save(formula);
     }

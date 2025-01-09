@@ -37,6 +37,19 @@
             color: #6c757d;
             margin-top: 0.25rem;
         }
+        .btn-group .btn {
+            padding: 8px 15px;
+            font-size: 16px;
+        }
+        .btn-check:checked + .btn-outline-secondary {
+            background-color: #6c757d;
+            color: white;
+            border-color: #6c757d;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #5a6268;
+            color: white;
+        }
     </style>
 </head>
 
@@ -63,21 +76,24 @@
             
             <section class="section">
                 <div class="card">
-                	<div class="card-header">
+                    <div class="card-header">
                         <div class="row">
-                            <div class="col-md-3">
-                                <select class="form-control" id="typeFilter">
-                                    <option value="">전체 구분</option>
-                                    <option value="수당">수당</option>
-                                    <option value="공제">공제</option>
-                                </select>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="급여 구분 필터">
+                                    <input type="radio" class="btn-check" name="typeFilter" id="all" value="" checked>
+                                    <label class="btn btn-outline-secondary" for="all">전체</label>
+                                    
+                                    <input type="radio" class="btn-check" name="typeFilter" id="allowance" value="수당">
+                                    <label class="btn btn-outline-secondary" for="allowance">수당</label>
+                                    
+                                    <input type="radio" class="btn-check" name="typeFilter" id="deduction" value="공제">
+                                    <label class="btn btn-outline-secondary" for="deduction">공제</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
-                        <!-- 그리드 -->
                         <div id="grid"></div>
-                        <!-- 버튼 그룹 -->
                         <div class="float-end">
                             <input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
                             <input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
@@ -90,354 +106,488 @@
     </div>
 
     <!-- 모달 창 -->
-    <div class="modal fade" id="salaryModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">급여 항목 입력</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="salaryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">급여 항목 입력</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="salaryForm">
+                    <!-- 구분 선택 -->
+                    <div class="form-group">
+                        <label class="form-label">구분<span class="text-danger">*</span></label>
+                        <select class="form-control" id="typeSelect" required>
+                            <option value="">선택하세요</option>
+                            <option value="수당">수당</option>
+                            <option value="공제">공제</option>
+                        </select>
+                    </div>
+
+                    <!-- 항목명 선택 -->
+                    <div class="form-group">
+                        <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
+                        <select class="form-control" id="formulaCode" name="formulaCode" required disabled>
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+
+                    <input type="hidden" id="formulaType" name="formulaType">
+                    <input type="hidden" id="formulaName" name="formulaName">
+
+                    <!-- 상세 정보 입력 영역 -->
+<div id="detailSection" style="display: none;">
+    <!-- 상세명 입력 -->
+    <div class="form-group">
+        <label for="detailName" class="form-label">항목 상세명<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="detailName" required>
+    </div>
+    
+    <!-- 숫자 범위 (소득세, 근속수당용) -->
+    <div id="numberRangeSection" style="display: none;">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="rangeStart" class="form-label">범위 시작<span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="rangeStart" name="rangeStart">
                 </div>
-                <div class="modal-body">
-                    <form id="salaryForm" th:action="@{/payroll/pay-mng}" method="post">
-                        <div class="form-group">
-                            <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
-                            <select class="form-control" id="formulaCode" name="formulaCode" required>
-                                <option value="">선택하세요</option>
-                            </select>
-                        </div>
-
-                        <input type="hidden" id="formulaType" name="formulaType">
-                        
-                        <input type="hidden" id="formulaName" name="formulaName">
-
-                        <div class="form-group">
-                            <label for="displayType" class="form-label">구분<span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="displayType"
-                            	   readonly
-                            	   disabled
-                            	   style="background-color: #e9ecef"
-                                   maxlength="100"
-                                   required placeholder="항목명을 선택하세요">
-                        </div>
-                        
-                        <div class="form-group" id="salaryRangeGroup" style="display: none;">
-						    <label for="salaryRange" class="form-label">급여 구간<span class="text-danger">*</span></label>
-						    <select class="form-control" id="salaryRange" name="salaryRange">
-						        <option value="">구간을 선택하세요</option>
-						        <option value="1,200만원 이하">1,200만원 이하</option>
-						        <option value="4,600만원 이하">4,600만원 이하</option>
-						        <option value="8,800만원 초과">8,800만원 이하</option>
-						        <option value="1.5억원 초과">1.5억원 초과</option>
-						    </select>
-						</div>
-                        
-                        <div class="form-group">
-                            <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="formulaContent" name="formulaContent" 
-                                    rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
-                            <div class="help-text">예시: 기본급 * 0.1</div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
-                            <select class="form-control" id="applyYear" name="applyYear" required>
-                                <option value="">선택하세요</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
-                            <select class="form-control" id="formulaPriority" name="formulaPriority" required>
-                                <option value="">선택하세요</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                            <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-outline-success">
-                                저장
-                            </button>
-                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
-                                취소
-                            </button>
-                        </div>
-                    </form>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="rangeEnd" class="form-label">범위 끝<span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="rangeEnd" name="rangeEnd">
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- 등급 선택 (기술등급, 성과등급용) -->
+    <div id="gradeSection" style="display: none;">
+        <div class="form-group">
+            <label for="grade" class="form-label">등급<span class="text-danger">*</span></label>
+            <select class="form-control" id="grade" required>
+                <option value="">선택하세요</option>
+            </select>
+        </div>
+    </div>
+</div>
 
-    <!-- Scripts -->
-    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/assets/js/main.js}"></script>
-    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+                    <!-- 계산식 -->
+                    <div class="form-group">
+                        <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="formulaContent" name="formulaContent" 
+                                rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
+                        <div class="help-text">예시: 기본급 * 0.1</div>
+                    </div>
 
-    <script th:inline="javascript">
-        // 서버에서 전달받은 데이터
-        const formulas = /*[[${formulas}]]*/ [];
+                    <!-- 적용연도 -->
+                    <div class="form-group">
+                        <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
+                        <select class="form-control" id="applyYear" name="applyYear" required>
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+
+                    <!-- 우선순위 -->
+                    <div class="form-group">
+                        <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
+                        <select class="form-control" id="formulaPriority" name="formulaPriority" required>
+                            <option value="">선택하세요</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success">저장</button>
+                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+
+<script th:inline="javascript">
+// 서버에서 전달받은 데이터
+const formulas = /*[[${formulas}]]*/ [];
+
+// 그리드 초기화
+const grid = new tui.Grid({
+    el: document.getElementById('grid'),
+    data: formulas,
+    rowHeaders: ['checkbox'],
+    columns: [
+        { 
+            header: '구분',
+            name: 'formulaType',
+            sortable: true,
+            sortingType: 'asc',
+        },
+        { header: '항목명', name: 'formulaName'},
+        { header: '계산식', name: 'formulaContent'},
+        { 
+            header: '범위 시작',
+            name: 'rangeStart',
+            sortable: true
+        },
+        { 
+            header: '범위 끝',
+            name: 'rangeEnd',
+            sortable: true
+        },
+        { 
+            header: '적용년도',
+            name: 'applyYear',
+            sortable: true
+        },
+        {
+            header: '우선순위',
+            name: 'formulaPriority',
+            sortable: true
+        },
+        { 
+            header: '수정일시', 
+            name: 'updatedAt',
+            sortable: true,
+            formatter: value => value.value ? new Date(value.value).toLocaleString() : ''
+        }
+    ]
+});
+
+// 구분 필터 이벤트 리스너
+document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const selectedType = this.value;
+        let filteredData = formulas;
         
-        // 적용년도 옵션 설정
-        const yearSelect = document.getElementById('applyYear');
-        const currentYear = new Date().getFullYear();
-        for(let i = currentYear; i <= currentYear+2; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i + '년';
-            yearSelect.appendChild(option);
+        if (selectedType) {
+            filteredData = formulas.filter(formula => formula.formulaType === selectedType);
         }
         
-        // 그리드 초기화
-        const grid = new tui.Grid({
-            el: document.getElementById('grid'),
-            data: formulas,
-            rowHeaders: ['checkbox'],
-            columns: [
-                { 
-                    header: '구분',
-                    name: 'formulaType',
-                    sortable: true,
-                    sortingType: 'asc',
-                },
-                { header: '항목명', name: 'formulaName'},
-                { header: '계산식', name: 'formulaContent'},
-                { 
-                    header: '적용년도',
-                    name: 'applyYear',
-                    sortable: true
-                },
-                {
-                    header: '우선순위',
-                    name: 'formulaPriority',
-                    sortable: true
-                },
-                { 
-                    header: '수정일시', 
-                    name: 'updatedAt',
-                    sortable: true,
-                    formatter: value => {
-                        if (value.value) {
-                            return new Date(value.value).toLocaleString();
-                        }
-                        return '';
-                    }
-                }
-            ]
-        });
+        grid.resetData(filteredData);
+    });
+});
 
-        // 페이지 로드 시 구분 데이터 로딩
-        async function loadFormulaTypes() {
-            try {
-                const response = await fetch('/pay-mng/formula-types');
-                const data = await response.json();
-                
-                const select = document.getElementById('formulaCode');
-                select.innerHTML = '<option value="">선택하세요</option>';
-                
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.code;
-                    option.textContent = `${item.name} (${item.type})`;
-                    option.dataset.type = item.type;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('구분 데이터 로딩 중 오류:', error);
-            }
+// 구분 선택 시 항목명 필터링
+document.getElementById('typeSelect').addEventListener('change', async function() {
+    const formulaCodeSelect = document.getElementById('formulaCode');
+    formulaCodeSelect.disabled = !this.value;
+    formulaCodeSelect.innerHTML = '<option value="">선택하세요</option>';
+    
+    if (this.value) {
+        try {
+            const response = await fetch('/pay-mng/formula-types');
+            const data = await response.json();
+            
+            // 선택된 구분에 해당하는 항목만 필터링
+            const filteredData = data.filter(item => item.type === this.value);
+            filteredData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.code;
+                option.textContent = item.name;
+                option.dataset.type = item.type;
+                formulaCodeSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('항목 데이터 로딩 중 오류:', error);
         }
+    }
+});
+
+const RANGE_OPTIONS = {
+	    'RWRD003': { // 기술수당
+	        type: 'string',
+	        options: ['초급', '중급', '고급']
+	    },
+	    'RWRD005': { // 성과금
+	        type: 'string',
+	        options: ['A', 'B', 'C', 'D', 'F']
+	    }
+	};
+
+//항목명 선택 시 상세 정보 표시
+document.getElementById('formulaCode').addEventListener('change', function() {
+    const selectedCode = this.value;
+    const detailSection = document.getElementById('detailSection');
+    const numberRangeSection = document.getElementById('numberRangeSection');
+    const gradeSection = document.getElementById('gradeSection');
+    
+    // 초기 설정
+    document.getElementById('formulaType').value = this.options[this.selectedIndex].dataset.type;
+    
+    if (selectedCode) {
+//         const baseName = this.options[this.selectedIndex].text;
         
-     // 중복 검사 함수
-        async function checkDuplicate(value) {
-            try {
-                const response = await fetch(`/pay-mng/check-duplicate?name=${value}`);  // name 파라미터로 변경
-                const result = await response.json();
-                return result.isDuplicate;
-            } catch (error) {
-                console.error('중복 검사 오류:', error);
-                return false;
-            }
+//         // 상세 입력이 필요한 케이스 확인
+//         if (['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode)) {
+//             detailSection.style.display = 'block';
+            
+//             // 문자열 범위 사용 (기술수당, 성과금)
+//             if (['RWRD001', 'RWRD002'].includes(selectedCode)) {
+//                 numberRangeSection.style.display = 'none';
+//                 stringRangeSection.style.display = 'block';
+                
+//                 // 옵션 설정
+//                 const options = selectedCode === 'RWRD001' ? 
+//                     ['초급', '중급', '고급'] : ['A', 'B', 'C', 'D', 'E', 'F'];
+                
+//                 ['rangeStartText', 'rangeEndText'].forEach(id => {
+//                     const select = document.getElementById(id);
+//                     select.innerHTML = '<option value="">선택하세요</option>';
+//                     options.forEach(opt => {
+//                         const option = document.createElement('option');
+//                         option.value = opt;
+//                         option.textContent = opt;
+//                         select.appendChild(option);
+//                     });
+//                     select.required = true;
+//                 });
+//             }
+//             // 숫자 범위 사용 (소득세, 근속수당)
+//             else {
+//                 numberRangeSection.style.display = 'block';
+//                 stringRangeSection.style.display = 'none';
+//                 ['rangeStart', 'rangeEnd'].forEach(id => {
+//                     document.getElementById(id).required = true;
+//                 });
+//             }
+            
+//             // 상세명 placeholder 설정
+//             document.getElementById('detailName').placeholder = 
+//                 selectedCode === 'DDCT005' ? '예: 1200만원 이하' :
+//                 selectedCode === 'RWRD001' ? '예: 초급' :
+//                 selectedCode === 'RWRD002' ? '예: A등급' : '예: 3년미만';
+//             document.getElementById('detailName').required = true;
+            
+//         } else {
+//             // 상세 입력이 필요없는 경우
+//             detailSection.style.display = 'none';
+//             document.getElementById('formulaName').value = baseName;
+//             ['detailName', 'rangeStart', 'rangeEnd', 'rangeStartText', 'rangeEndText']
+//                 .forEach(id => {
+//                     const element = document.getElementById(id);
+//                     if (element) {
+//                         element.required = false;
+//                         element.value = '';
+//                     }
+//                 });
+//         }
+//     }
+    
+    	// 기술수당
+        if (selectedCode === 'RWRD001') {
+            detailSection.style.display = 'block';
+            numberRangeSection.style.display = 'none';
+            gradeSection.style.display = 'block';
+            
+            const gradeSelect = document.getElementById('grade');
+            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
+            ['초급', '중급', '고급'].forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade;
+                option.textContent = grade;
+                gradeSelect.appendChild(option);
+            });
+        } 
+        // 성과수당
+        else if (selectedCode === 'RWRD002') {
+            detailSection.style.display = 'block';
+            numberRangeSection.style.display = 'none';
+            gradeSection.style.display = 'block';
+            
+            const gradeSelect = document.getElementById('grade');
+            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
+            ['A', 'B', 'C', 'D', 'F'].forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade;
+                option.textContent = grade;
+                gradeSelect.appendChild(option);
+            });
         }
+        // 소득세, 근속수당
+        else if (['DDCT005', 'RWRD003'].includes(selectedCode)) {
+            detailSection.style.display = 'block';
+            numberRangeSection.style.display = 'block';
+            gradeSection.style.display = 'none';
+        }
+    }
+});
+
+//등급 선택 시 range 값 자동 설정
+document.getElementById('grade').addEventListener('change', function() {
+    const selectedGrade = this.value;
+    if (selectedGrade) {
+        document.getElementById('rangeStart').value = selectedGrade;
+        document.getElementById('rangeEnd').value = selectedGrade;
+    }
+});
+
+// 상세명 입력 시 formulaName 업데이트
+document.getElementById('detailName').addEventListener('input', function() {
+    const formulaCode = document.getElementById('formulaCode');
+    const baseName = formulaCode.options[formulaCode.selectedIndex].text;
+    document.getElementById('formulaName').value = `${baseName} - ${this.value}`;
+});
+
+// 폼 제출 처리
+document.getElementById('salaryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const selectedCode = document.getElementById('formulaCode').value;
+    const needsDetail = ['DDCT002', 'RWRD003', 'RWRD004', 'RWRD005'].includes(selectedCode);
+    
+    const formData = {
+        formulaId: this.dataset.id,
+        formulaCode: selectedCode,
+        formulaName: document.getElementById('formulaName').value,
+        formulaType: document.getElementById('formulaType').value,
+        formulaContent: document.getElementById('formulaContent').value,
+        applyYear: parseInt(document.getElementById('applyYear').value),
+        formulaPriority: parseInt(document.getElementById('formulaPriority').value),
+        rangeStart: document.getElementById('rangeStart').value,
+        rangeEnd: document.getElementById('rangeEnd').value
+    };
+
+    try {
+        const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
         
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message || '저장되었습니다.');
+            location.reload();
+        } else {
+            alert(result.message || '저장 중 오류가 발생했습니다');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('저장 중 오류가 발생했습니다.');
+    }
+});
 
-     	// 구분 선택 시 타입 자동 설정
-        document.getElementById('formulaCode').addEventListener('change', function() {
-		    const selected = this.options[this.selectedIndex];
-		    const salaryRangeGroup = document.getElementById('salaryRangeGroup');
-		    const salaryRange = document.getElementById('salaryRange');
-		    
-		    if (selected.value) {
-		        // 기본 설정
-		        document.getElementById('formulaName').value = selected.textContent.split(' (')[0];
-		        document.getElementById('formulaType').value = selected.dataset.type;
-		        const typeInParentheses = selected.textContent.match(/\((.*?)\)/)[1];
-		        document.getElementById('displayType').value = typeInParentheses;
-		
-		        // 소득세 선택 시 급여 구간 선택창 표시
-		        if (selected.value === 'DDCT002') {
-		            salaryRangeGroup.style.display = 'block';
-		            salaryRange.required = true;
-		        } else {
-		            salaryRangeGroup.style.display = 'none';
-		            salaryRange.required = false;
-		            salaryRange.value = '';
-		        }
-		    } else {
-		        document.getElementById('formulaName').value = '';
-		        document.getElementById('formulaType').value = '';
-		        document.getElementById('displayType').value = '';
-		        salaryRangeGroup.style.display = 'none';
-		        salaryRange.required = false;
-		        salaryRange.value = '';
-		    }
-		});
+// 적용연도 초기화
+function initializeYearSelect() {
+    const yearSelect = document.getElementById('applyYear');
+    const currentYear = new Date().getFullYear();
+    yearSelect.innerHTML = '<option value="">선택하세요</option>';
+    for(let i = currentYear; i <= currentYear+2; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '년';
+        yearSelect.appendChild(option);
+    }
+}
 
-		// 급여 구간 선택 시 항목명 업데이트
-		document.getElementById('salaryRange').addEventListener('change', function() {
-		    const formulaCode = document.getElementById('formulaCode');
-		    const selected = formulaCode.options[formulaCode.selectedIndex];
-		    
-		    if (selected.value && this.value) {
-		        const baseName = selected.textContent.split(' (')[0];
-		        document.getElementById('formulaName').value = `${baseName} - ${this.value}`;
-		    }
-		});
+// 수정 버튼 클릭 이벤트
+document.getElementById('editBtn').addEventListener('click', function(){
+    const checkedRows = grid.getCheckedRows();
+    if (checkedRows.length !== 1) {
+        alert('수정할 항목을 하나만 선택해주세요.');
+        return;
+    }
+    
+    const selectedRow = checkedRows[0];
+    
+    document.getElementById('typeSelect').value = selectedRow.formulaType;
+    document.getElementById('formulaCode').disabled = false;
+    
+    // 나머지 필드 설정
+    document.getElementById('formulaType').value = selectedRow.formulaType;
+    document.getElementById('formulaName').value = selectedRow.formulaName;
+    document.getElementById('formulaContent').value = selectedRow.formulaContent;
+    document.getElementById('applyYear').value = selectedRow.applyYear;
+    document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
+    
+    // 구간 정보가 있는 경우
+    const needsDetail = ['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedRow.formulaCode);
+    if (needsDetail) {
+        document.getElementById('detailSection').style.display = 'block';
+        document.getElementById('rangeStart').value = selectedRow.rangeStart;
+        document.getElementById('rangeEnd').value = selectedRow.rangeEnd;
+        document.getElementById('detailName').value = selectedRow.formulaName.split(' - ')[1];
+    }
+    
+    // 수정을 위한 ID 저장
+    document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
+    
+    // 모달 타이틀 변경 및 표시
+    document.querySelector('.modal-title').textContent = '급여 항목 수정';
+    new bootstrap.Modal(document.getElementById('salaryModal')).show();
+});
 
-        // 폼 제출 처리
-        document.getElementById('salaryForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-         	// 수정 모드가 아닐 때만 중복 검사 실행
-            if (!this.dataset.id) {
-            	
-            	// 항목명 중복 검사만 수행
-                const isNameDuplicate = await checkDuplicate(formulaName);
-                if (isNameDuplicate) {
-                    alert('이미 존재하는 급여 항목명입니다.');
-                    return;
-                }
-            }
-         	
-         	// 소득세 선택 시 급여 구간 필수 체크
-            if (formulaCode.value === 'DDCT001' && !salaryRange.value) {
-                alert('급여 구간을 선택해주세요.');
-                return;
-            }
-            
-            const formData = {
-            	    formulaId: this.dataset.id,
-            	    formulaCode: document.getElementById('formulaCode').value,
-            	    formulaName: document.getElementById('formulaName').value,  // 소득세와 같은 이름
-            	    formulaType: document.getElementById('formulaType').value,  // 공제/수당
-            	    formulaContent: document.getElementById('formulaContent').value,
-            	    applyYear: parseInt(document.getElementById('applyYear').value),
-            	    formulaPriority: parseInt(document.getElementById('formulaPriority').value)
-           	};
-            
-            const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(result.message || '저장되었습니다.');
-                    location.reload();
-                } else {
-                    alert(result.message || '저장 중 오류가 발생했습니다');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('저장 중 오류가 발생했습니다.');
-            }
+// 삭제 버튼 클릭 이벤트
+document.getElementById('deleteBtn').addEventListener('click', async function() {
+    const checkedRows = grid.getCheckedRows();
+    if(checkedRows.length == 0) {
+        alert('삭제할 항목을 선택해주세요.')
+        return;
+    }
+    
+    if(!confirm('선택한 항목을 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    try {
+        const ids = checkedRows.map(row => row.formulaId);
+        const response = await fetch('/pay-mng/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(ids)
         });
+        
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message || '삭제되었습니다.');
+            location.reload();
+        } else {
+        	alert(result.message || '삭제 중 오류가 발생했습니다.')
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('삭제 중 오류가 발생했습니다.')
+    }
+});
 
-        // 수정 버튼 클릭 이벤트
-        document.getElementById('editBtn').addEventListener('click', function(){
-            const checkedRows = grid.getCheckedRows();
-            if (checkedRows.length !== 1) {
-                alert('수정할 항목을 하나만 선택해주세요.');
-                return;
-            }
-            
-            const selectedRow = checkedRows[0];
-            
-            // 모달 폼에 데이터 설정
-            document.getElementById('formulaCode').value = selectedRow.commonDetail.common_detail_code;
-            document.getElementById('formulaType').value = selectedRow.formulaType;
-            document.getElementById('formulaName').value = selectedRow.formulaName;
-            document.getElementById('formulaContent').value = selectedRow.formulaContent;
-            document.getElementById('applyYear').value = selectedRow.applyYear;
-            document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
-            
-            // 수정을 위한 ID 저장
-            document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
-            
-            // 모달 타이틀 변경
-            document.querySelector('.modal-title').textContent = '급여 항목 수정';
-            
-            // 모달 표시
-            new bootstrap.Modal(document.getElementById('salaryModal')).show();
-        });
+// 모달이 닫힐 때 폼 초기화
+document.getElementById('salaryModal').addEventListener('hidden.bs.modal', function () {
+    const form = document.getElementById('salaryForm');
+    form.reset();
+    delete form.dataset.id;
+    document.querySelector('.modal-title').textContent = '급여 항목 입력';
+    document.getElementById('formulaCode').disabled = true;
+    document.getElementById('detailSection').style.display = 'none';
+    ['detailName', 'rangeStart', 'rangeEnd'].forEach(id => {
+        document.getElementById(id).required = false;
+    });
+});
 
-        // 삭제 버튼 클릭 이벤트
-        document.getElementById('deleteBtn').addEventListener('click', async function() {
-            const checkedRows = grid.getCheckedRows();
-            if(checkedRows.length == 0) {
-                alert('삭제할 항목을 선택해주세요.')
-                return;
-            }
-            
-            if(!confirm('선택한 항목을 삭제하시겠습니까?')) {
-                return;
-            }
-            
-            try {
-                const ids = checkedRows.map(row => row.formulaId);
-                const response = await fetch('/pay-mng/delete', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(ids)
-                });
-                
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message || '삭제되었습니다.');
-                    location.reload();
-                } else {
-                    alert(result.message || '삭제 중 오류가 발생했습니다.')
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('삭제 중 오류가 발생했습니다.')
-            }
-        });
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', function() {
+    initializeYearSelect();
+});
 
-        // 모달이 닫힐 때 폼 초기화
-        document.getElementById('salaryModal').addEventListener('hidden.bs.modal', function () {
-            document.getElementById('salaryForm').reset();
-            delete document.getElementById('salaryForm').dataset.id;
-            document.querySelector('.modal-title').textContent = '급여 항목 입력';
-        });
-
-        // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFormulaTypes();
-        });
-    </script>
+</script>
 </body>
 </html>
