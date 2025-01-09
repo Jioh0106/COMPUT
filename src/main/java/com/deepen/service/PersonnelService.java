@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.CommonDetailDTO;
@@ -28,7 +27,7 @@ public class PersonnelService {
 	private final CommonDetailRepository cdRepo;
 	private final PersonnelMapper psMapper;
 	
-	private final PasswordEncoder passwordEncoder;
+	//private final PasswordEncoder passwordEncoder;
 	
 	//JPA
 	public void regEmployees(EmployeesDTO empDTO) {
@@ -46,7 +45,7 @@ public class PersonnelService {
 		String phoneNum = empDTO.getFirstEmpPhoneNo()+"-"+empDTO.getMiddleEmpPhoneNo()+"-"+empDTO.getLastEmpPhoneNo();
 		
 		// 비밀번호 암호화
-		String encodingPw = passwordEncoder.encode(pw);
+		//String encodingPw = passwordEncoder.encode(pw);
 		
 		// 정보 설정
 		empDTO.setEmp_id(id);
