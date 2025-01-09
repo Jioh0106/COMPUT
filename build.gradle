@@ -50,15 +50,15 @@ dependencies {
 	
 	// Spring Boot Starter Security 
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	
 	// Thymeleaf Extras Springsecurity5 
 	// https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity5
-//	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	
 	// Spring Security Test 
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
-//	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	
 	
 }
