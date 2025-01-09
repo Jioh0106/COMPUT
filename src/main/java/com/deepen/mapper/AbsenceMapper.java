@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.CommonDetailDTO;
-import com.deepen.domain.EmployeesDTO;
 
 
 @Mapper
@@ -23,8 +22,10 @@ public interface AbsenceMapper {
 	List<Map<String, String>> getEmpList(String emp_role);
 
 	int insertRequest(Map<String, Object> map);
+
+
 	
-	
-	
+
 	
 }
+	

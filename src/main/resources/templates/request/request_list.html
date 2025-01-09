@@ -173,20 +173,8 @@
 			<!-- TOAST UI CDN -->
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 			<script>
-				
-				
+			document.addEventListener('DOMContentLoaded', function () {
 				var Grid = tui.Grid;
-
-				// 데이터 정의
-				const data = [
-					{
-					request_no: '1', request_division: '발신', request_type: '발령', emp_num: '12-123', emp_name: '홍망고', 
-					emp_dept: '인사팀', request_date: '2024-12-20',request_deadline: '2024-12-26',
-						middle_approval: '22-123/홍팀장/인사팀', high_approval: '',
-						request_status: '1차대기중',request_rejection:''
-					}
-
-				];
 
 				// Grid 생성
 				const grid = new Grid({
@@ -203,11 +191,30 @@
 						{header: '중간승인권자', name: 'middle_approval'},
 						{header: '최종승인권자', name: 'high_approval'},
 						{header: '요청상태', name: 'request_status'},
-						{header: '반려사유', name: 'request_rejection'}
+						{header: '반려사유', name: 'request_rejection'},
+						{header: '처리상태', name: 'complete'}
 					],
-					data: data
+					data: []
 				});
 
+				
+				  // 요청 내역 불러오기 (Fetch API)
+		        fetch('/requestApi/request-list')
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error('Network response was not ok ' + response.statusText);
+		                }
+		                return response.json();
+		            })
+		            .then(data => {
+		                console.log('Fetched Data:', data); // 확인용
+		                grid.resetData(data); // TOAST UI Grid에 데이터 적용
+		            })
+		            .catch(error => {
+		                console.error('Error fetching request list:', error);
+		            });
+		   
+			 });
 				
 		// Grid의 row 클릭 이벤트 추가
 		    grid.on('click', (ev) => {

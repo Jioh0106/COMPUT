@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class AssignmentDTO {
 	
-	private String emp_id; //사원번호
-	private String emp_name; //사원이름
+//	private String emp_id; 
+//	private String emp_name;
 	
 	
 	private Integer assignment_no; //발령번호 PK

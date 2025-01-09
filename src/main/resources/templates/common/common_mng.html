@@ -31,6 +31,10 @@
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
 
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+	rel="stylesheet" type="text/css" />
+
+
 <style>
 .buttons {
 	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
@@ -55,19 +59,17 @@
 	-webkit-overflow-scrolling: touch;
 }
 
-/* 체크박스가 있는 첫 번째 열의 너비 설정 */
+/* 체크박스가 있는 첫 번째 열의 너비 설정 
+-> 삭제 기능 불가능으로 변경되어 체크박스 관련 전부 주석 처리
 th:first-child, td:first-child {
 	width: 40px;
 	text-align: center;
-}
-
+}*/
 td {
-  border: 1px solid black;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+	overflow: hidden;
+	text-overflow: clip;
+	white-space: nowrap;
 }
-
 </style>
 
 </head>
@@ -104,18 +106,17 @@ td {
 							<div class="card-header">
 								<h4 class="card-title">공통코드</h4>
 								<div class="buttons">
-									<button type="button" class="btn btn-outline-secondary"
-										onclick='addRow("parent")'>추가</button>
+									<button type="button" id="appendBtn" class="btn btn-outline-secondary"
+										>추가</button>
 									<button type="button" class="btn btn-outline-success"
-										onclick="saveChanges('parent')">저장</button>
+										onclick="save('parent')">저장</button>
 									<!-- 									<button type="button" class="btn btn-outline-danger"
 										onclick='deleteRow("parent")'>삭제</button> -->
 								</div>
 							</div>
 							<div class="card-body">
-								<div class="table-responsive">
-									<!-- 설정한 높이 이상이면 스크롤을 나타내기 위한 div -->
-									<table class="table table-bordered mb-0" id="parent">
+								<div class="table-responsive" id="parent">
+									<!-- <table class="table table-bordered mb-0" id="parent">
 										<tr>
 											<th><input class="form-check-input" type="checkbox"
 												onclick='selectAll(this, "parent")'></th>
@@ -124,7 +125,7 @@ td {
 											<th>내용</th>
 											<th>사용여부</th>
 										</tr>
-										<tr th:each="map : ${commonList}" onclick="rowVal(this)"
+										<tr th:each="map : ${commonList}" ondblclick="rowVal(this)"
 											id="parent">
 											<td><input type="checkbox" name="parent"
 												class="form-check-input" value="1" /></td>
@@ -134,7 +135,7 @@ td {
 											<td contenteditable="true" th:text="${map.COMMON_STATUS}"></td>
 											<td style="display: none;" th:text="${map.COMMON_DISPLAY}"></td>
 										</tr>
-									</table>
+									</table> -->
 								</div>
 								<!-- 스크롤 -->
 							</div>
@@ -150,7 +151,7 @@ td {
 									<button type="button" class="btn btn-outline-secondary"
 										onclick='addRow("child")'>추가</button>
 									<button type="button" class="btn btn-outline-success"
-										onclick="saveChanges('child')">저장</button>
+										onclick="save('child')">저장</button>
 									<!-- 									<button type="button" class="btn btn-outline-danger"
 										onclick='deleteRow("child")'>삭제</button> -->
 								</div>
@@ -158,8 +159,8 @@ td {
 							<div class="card-body">
 								<table class="table table-bordered mb-0" id="child">
 									<tr>
-										<th><input class="form-check-input" type="checkbox"
-											onclick='selectAll(this, "child")'></th>
+										<!--<th><input class="form-check-input" type="checkbox"
+											onclick='selectAll(this, "child")'></th>-->
 										<th>구분코드</th>
 										<th>구분명</th>
 										<th>사용여부</th>
@@ -195,7 +196,76 @@ td {
 	<!-- sweetAlert CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-	<script>
+
+	<script th:inline="javascript">
+
+	window.onload = function () {
+		// Thymeleaf 데이터를 JSON으로 변환하여 JS 변수에 저장
+		const gridData = /*[[${commonList}]]*/ [];
+		const Grid = tui.Grid;
+
+		// Toast Grid 생성
+		const grid = new Grid({
+			el: document.getElementById('parent'),
+			columns: [
+				{header: '구분코드', name: 'COMMON_CODE', editor: 'text'},
+				{header: '구분명', name: 'COMMON_NAME', editor: 'text'}, 
+				{header: '내용', name: 'COMMON_CONTENT', editor: 'text'},
+				{header: '사용여부', name: 'COMMON_STATUS', editor: 'text'},
+				{header: '타입', name: 'ROW_TYPE'}
+			],
+			data: gridData, // 서버에서 전달받은 데이터
+			draggable: true
+		});
+		
+		//rowType 숨기기
+		grid.hideColumn("ROW_TYPE");
+
+		 grid.on('click', ev => {
+			 const target = grid.getValue(ev.rowKey, "COMMON_CODE");    
+			 const rowType = grid.getValue(ev.rowKey, "ROW_TYPE");  
+			 rowVal("parent", target, grid.getRowCount());
+
+		     
+		  });
+		 
+		 grid.on('dblclick', ev => {
+			 const rowType = grid.getValue(ev.rowKey, "ROW_TYPE");  
+			 console.info(rowType);
+			if(rowType == "select"){
+				grid.disableColumn("COMMON_CODE");
+			 } else {
+				 grid.enableRow("COMMON_CODE");
+			 }
+		     
+		  });
+		 
+		 /**
+		     * '추가' 버튼 수행 이벤트 등록
+		     */
+		    appendBtn.addEventListener('click', () => {
+		        grid.appendRow({
+		                "COMMON_CODE": "",
+		                "COMMON_NAME": "",
+		                "COMMON_CONTENT": "",
+		                "COMMON_STATUS": "",
+		            },
+		            {
+		            	at:0, // 행 추가 인덱스
+		            	focus: true
+		            });
+		        //grid.enableColumn("COMMON_CODE");
+		        // 방금 추가한 행의 첫 번째 셀을 편집 모드로 설정
+		        const rowKey = 0; // prependRow로 추가된 행의 rowKey는 0번 인덱스
+		        const createdRows = grid.getModifiedRows().createdRows.length;
+		        const updatedRows = grid.getModifiedRows().updatedRows.length;
+		        console.info(createdRows);
+		       grid.startEditingAt(0, 0, ); // 'COMMON_CODE' 컬럼을 편집 모드로 전환
+		        
+		    });
+	};
+	
+	
 
 		// 등록 버튼 클릭 시 행 추가
 		function addRow(tableId) {
@@ -204,32 +274,39 @@ td {
 
 			// 새 행(Row) 추가
 			const newRow = table.insertRow(1); // 상단에 행 추가하기 위해 인덱스 고정
-			
+
 			// 새 행이라는 구분 추가
 			newRow.setAttribute('data-new', 'true');
 
 			// 새 행(Row)에 Cell 추가
+			//const newCell1 = newRow.insertCell(0);
 			const newCell1 = newRow.insertCell(0);
 			const newCell2 = newRow.insertCell(1);
 			const newCell3 = newRow.insertCell(2);
 			const newCell4 = newRow.insertCell(3);
-			const newCell5 = newRow.insertCell(4);
+			// 공통코드와 상세공통코드 셀 개수 상이하므로 구분 처리
+			const newCell5 = tableId == "parent" ? newRow.insertCell(4) : '';
 
 			// Cell에 입력 필드 추가
-			const input1 = document.createElement('input');
+			/*const input1 = document.createElement('input');
 			input1.type = 'checkbox';
 			input1.className = 'form-check-input';
-			input1.name = tableId;
+			input1.name = tableId;*/
+
+			const input1 = document.createElement('input');
+			input1.type = 'text';
+			input1.className = 'full-width-input';
+			input1.placeholder = '코드 입력';
 
 			const input2 = document.createElement('input');
 			input2.type = 'text';
 			input2.className = 'full-width-input';
-			input2.placeholder = '코드 입력';
+			input2.placeholder = '이름 입력';
 
 			const input3 = document.createElement('input');
 			input3.type = 'text';
 			input3.className = 'full-width-input';
-			input3.placeholder = '이름 입력';
+			input3.placeholder = '내용 입력';
 
 			const input4 = document.createElement('input');
 			input4.type = 'text';
@@ -238,191 +315,214 @@ td {
 
 			// 순번 셀 숨김
 			const input5 = document.createElement('input');
-			newCell5.style.display = 'none';
-			
+
 			// 입력 필드를 Cell에 추가
-			newCell1.appendChild(input1);
-			newCell2.appendChild(input2);
-			newCell3.appendChild(input3);
-			newCell4.appendChild(input4);
-			newCell5.appendChild(input5);
-			
+			//newCell1.appendChild(input1); // 체크박스
+			newCell1.appendChild(input1); // 코드
+			newCell2.appendChild(input2); // 코드명
+
+			// 공통코드에는 내용 셀이 포함되어 있으므로 상세구분코드와 구분 처리
+			if (tableId == "parent") {
+				newCell3.appendChild(input3); // 내용
+				newCell4.appendChild(input4); // 여부
+				newCell5.appendChild(input5); // 순번(숨김)
+				newCell5.style.display = 'none';
+
+			} else {
+				newCell3.appendChild(input3); // 여부
+				newCell4.appendChild(input4); // 순번(숨김)
+				newCell4.style.display = 'none';
+			}
+
+		};
+
+		// 공통코드 행 선택 시 이벤트 처리
+		function rowVal(tableId, target, rowCount) {
+
+			//const table = target.parentNode;
+			//const trs = table.getElementsByTagName('tr');
+
+			for (i = 0; i < rowCount; i++) { // 테이블 해더 부분 제외
+
+				/*var row = trs[i];
+
+				// 선택한 행 배경색 및 글자색 변경
+				if (trs[i] != target) { // param으로 가져온 target과 요소가 다른 경우 -> 선택 행 x
+					row.style.backgroundColor = 'transparent';
+					row.style.color = '#607080';
+
+				} else { // 같은 경우 -> 선택 행 o
+					row.style.backgroundColor = '#435ebe';
+					row.style.color = '#fff';
+					 
+
+					//var celVal = row.cells[0].textContent; // 두 번째 셀의 텍스트 값 가져오기*/
+
+					var data = {
+						celVal: target
+					};
+					if (tableId == "parent") {
+
+						$.ajax({
+							url: "/commonCd",
+							contentType: "application/json",
+							data: JSON.stringify(data),
+							type: 'POST',
+							success: function (response) {
+								// 테이블에 데이터를 추가하기 전에 기존의 데이터를 초기화
+								$('#child').find('tr:not(:first)').remove(); // 헤더 제외
+
+								// 받은 데이터를 HTML에 동적으로 뿌리기
+								response.forEach(function (item) {
+									// 새로운 행 (tr)을 생성
+									var newRow = $('<tr id="child" ondblclick="rowVal(this)"></tr>');
+
+									// 각 데이터 항목을 <td>로 생성하여 추가
+									/*var checkBoxCell = $('<td></td>').append(
+										$('<input>').attr({
+											type: 'checkbox',
+											name: 'child',
+											class: 'form-check-input',
+											value: 1
+										})
+									);*/
+
+									var codeCell = $('<td></td>').text(item.COMMON_DETAIL_CODE);
+									var nameCell = $('<td contenteditable="true"></td>').text(item.COMMON_DETAIL_NAME);
+									var statusCell = $('<td contenteditable="true"></td>').text(item.COMMON_DETAIL_STATUS);
+									var displayCell = $('<td style="display:none;"></td>').text(item.COMMON_DETAIL_DISPLAY);
+
+									// 생성된 <td>들을 <tr>에 추가
+									newRow.append(/*checkBoxCell,*/ codeCell, nameCell, statusCell, displayCell);
+
+									// 생성된 <tr>를 테이블에 삽입
+									$('#child').append(newRow);
+								});
+							}
+						}) // ajax
+					}
+				//}
+
+			};
+
+		};
+
+		// 수정된 셀에 data-modified 속성 추가
+		$(document).on('input', 'td[contenteditable="true"]', function () {
+			$(this).closest('tr').attr('data-modified', 'true');
+		});
+
+		function saveData(tableId) {
+			const table = document.getElementById(tableId);
+			const rows = table.querySelectorAll('tr[data-new="true"], tr[data-modified="true"]'); // 새로 추가된 또는 수정된 행만 선택
+
+			const modifiedData = [];
+
+			rows.forEach(row => {
+				const rowData = {};
+
+				const cells = row.cells;
+
+				// 새 행에 대한 input 요소를 추출하기 위한 선언
+				const input1 = cells[0].querySelector('input'); // 코드
+				const input2 = cells[1].querySelector('input'); // 이름
+				const input3 = cells[2].querySelector('input'); // 내용(공통코드) or 상태(상세공통코드)
+				const input4 = cells[3].querySelector('input'); // 상태(공통코드) or 순번(상세공통코드)
+
+
+				// input이면 인풋 값을 rowData에 삽입 아니면 셀에서 수정된 값 삽입
+				rowData.commonCode = input1 ? input1.value.trim() : cells[0].textContent.trim();	// 코드
+				rowData.commonName = input2 ? input2.value.trim() : cells[1].textContent.trim();	// 이름
+
+				// 공통코드와 상세공통코드 셀 개수가 상이하므로 구분 처리
+				if (tableId == "parent") {
+					const input5 = cells[4].querySelector('input'); // 순번
+					rowData.commonContent = input3 ? input3.value.trim() : cells[2].textContent.trim();	// 내용
+					// 상태에 값이 없으면 통신할 때 null이 넘어가게 돼서 파싱 오류 발생 -> N으로 값 설정
+					rowData.commonStatus = input4 ? input4.value.trim() || "N" : cells[3].textContent.trim();	// 상태
+					rowData.commonDisplay = input5 ? null : Number(cells[4].textContent.trim());		// 순번
+
+				} else {
+					rowData.commonStatus = input3 ? input4.value.trim() || "N" : cells[2].textContent.trim();	// 상태
+					rowData.commonDisplay = input4 ? null : Number(cells[3].textContent.trim());		// 순번
+				}
+
+				rowData.tableSe = tableId;
+
+				// 새로 추가된 행이라면 'insert', 수정된 행이라면 'update'
+				if (row.hasAttribute('data-new')) {
+					rowData.action = 'insert';
+					row.removeAttribute('data-new'); // 속성 제거
+				} else if (row.hasAttribute('data-modified')) {
+					rowData.action = 'update';
+					row.removeAttribute('data-modified'); // 속성 제거
+				}
+
+				modifiedData.push(rowData);
+			});
+
+			return modifiedData;
+		}
+
+		// 추가 및 수정된 값이 저장된 json을 들고 통신
+		function save(tableId) {
+			const modifiedData = saveData(tableId);
+
+			if (modifiedData.length === 0) {
+				Swal.fire({
+					title: "수정된 내용이 없습니다.",
+					icon: "warning",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
+
+			$.ajax({
+				url: "/saveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(modifiedData),
+				success: function (res) {
+					if (res == 1) {
+						Swal.fire({
+							title: "저장 성공",
+							icon: "success",
+							confirmButtonText: "확인"
+						}).then(function () { // 확인 클릭 시 새로고침
+							// ajax인데 새로고침하는 이유
+							// - 저장을 성공했다는 알럿이 표시되지만 확실한 완료를 보여 주기 위해
+							// - 상세공통코드를 저장 후 비동기 방식으로 데이터를 가져오려면
+							//   어떤 공통코드에 대한 상세공통코드인지 알아야 하는데
+							//   그 방법을 어떻게 해야 될지 모르겠어서 시간상 고민 없이 reload 처리
+							location.reload(true);
+						});
+					} else {
+						Swal.fire({
+							title: "저장 실패",
+							icon: "error",
+							confirmButtonText: "확인"
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
 		};
 
 		// 전체 선택 처리
-		function selectAll(obj, objNm) {
+		/*function selectAll(obj, objNm) {
 			console.info(obj);
 			const checkboxes = document.getElementsByName(objNm);
 
 			checkboxes.forEach((checkbox) => {
 				checkbox.checked = obj.checked;
 			})
-		};
-		
-		// 공통코드 행 선택 시 이벤트 처리
-		function rowVal(target) {
-			
-			const table = target.parentNode;
-			const trs = table.getElementsByTagName('tr');
-			console.info(target.id);
-			
-			for(i=0; i<trs.length; i++){ // 테이블 해더 부분 제외
-				
-				var row = trs[i];
-	
-				// 선택한 행 배경색 및 글자색 변경
-				if (trs[i] != target) { // param으로 가져온 target과 요소가 다른 경우 -> 선택 행 x
-					row.style.backgroundColor = 'transparent';
-					row.style.color = '#607080';
-					
-				} else { // 같은 경우 -> 선택 행 o
-					row.style.backgroundColor = '#435ebe';
-					row.style.color = '#fff';
-					
-					var celVal = row.cells[1].textContent; // 두 번째 셀의 텍스트 값 가져오기
-					
-		            var data = {
-		            		celVal : celVal
-	                };
-					
-					if(target.id == "parent"){
-		            
-					$.ajax({
-						url : "/commonCd",
-						contentType: "application/json",
-						data : JSON.stringify(data),
-						type : 'POST',
-						success: function(response) {
-						    // 테이블에 데이터를 추가하기 전에 기존의 데이터를 초기화
-						    $('#child').find('tr:not(:first)').remove(); // 헤더 제외
-
-						    // 받은 데이터를 HTML에 동적으로 뿌리기
-						    response.forEach(function(item) {
-						        // 새로운 행 (tr)을 생성
-						        var newRow = $('<tr id="child" onclick="rowVal(this)"></tr>');
-
-						        // 각 데이터 항목을 <td>로 생성하여 추가
-						        var checkBoxCell = $('<td></td>').append(
-						            $('<input>').attr({
-						                type: 'checkbox',
-						                name: 'child',
-						                class: 'form-check-input',
-						                value: 1
-						            })
-						        );
-
-						        var codeCell = $('<td></td>').text(item.COMMON_DETAIL_CODE);
-						        var nameCell = $('<td contenteditable="true"></td>').text(item.COMMON_DETAIL_NAME);
-						        var statusCell = $('<td contenteditable="true"></td>').text(item.COMMON_DETAIL_STATUS);
-						        var displayCell = $('<td style="display:none;"></td>').text(item.COMMON_DETAIL_DISPLAY);
-
-						        // 생성된 <td>들을 <tr>에 추가
-						        newRow.append(checkBoxCell, codeCell, nameCell, statusCell, displayCell);
-
-						        // 생성된 <tr>를 테이블에 삽입
-						        $('#child').append(newRow);
-						    });
-						}
-					}) // ajax
-					}
-				}
-				
-			};
-			
-		};
-		
-		// 수정된 셀에 data-modified 속성 추가
-		$(document).on('input', 'td[contenteditable="true"]', function() {
-		    $(this).closest('tr').attr('data-modified', 'true');
-		});
-		
-		function collectChanges(tableId) {
-		    const table = document.getElementById(tableId);
-		    const rows = table.querySelectorAll('tr[data-new="true"], tr[data-modified="true"]'); // 새로 추가된 또는 수정된 행만 선택
-		    
-		    const modifiedData = [];
-
-		    rows.forEach(row => {
-		        const rowData = {};
-
-		        const cells = row.cells;
-		        
-		        // input 필드의 값을 추출해야 하므로, input 요소에 대한 접근
-		        const input2 = cells[1].querySelector('input'); // 코드 셀의 input 요소
-		        const input3 = cells[2].querySelector('input'); // 이름 셀의 input 요소
-		        const input4 = cells[3].querySelector('input'); // 상태 셀의 input 요소
-		        const input5 = cells[4].querySelector('input'); // 상태 셀의 input 요소
-
-		        rowData.commonCode = input2 ? input2.value.trim() : cells[1].textContent.trim(); // 코드 입력값
-		        rowData.commonName = input3 ? input3.value.trim() : cells[2].textContent.trim(); // 이름 입력값
-		        rowData.commonStatus = input4 ? input4.value.trim() : cells[3].textContent.trim(); // 상태 입력값
-		        rowData.commonDisplay = input5 ? null : Number(cells[4].textContent.trim()); // 화면상 순번
-		        rowData.tableSe = tableId;
-
-		        // 새로 추가된 행이라면 'insert'로 표시, 수정된 행이라면 'update'로 표시
-		        if (row.hasAttribute('data-new')) {
-		            rowData.action = 'insert';
-		            row.removeAttribute('data-new'); // 속성 제거
-		        } else if (row.hasAttribute('data-modified')) {
-		            rowData.action = 'update';
-		            row.removeAttribute('data-modified'); // 속성 제거
-		        }
-
-		        modifiedData.push(rowData);
-		    });
-
-		    return modifiedData;
-		}
-		
-		// 추가 및 수정된 값이 저장된 json을 들고 통신
-		function saveChanges(tableId) {
-		    const modifiedData = collectChanges(tableId);
-		    
-		    if (modifiedData.length === 0) {
-		        Swal.fire({
-		            title: "수정된 내용이 없습니다.",
-		            icon: "warning",
-		            confirmButtonText: "확인"
-		        });
-		        return;
-		    }
-		    			
-		    $.ajax({
-		        url: "/saveData", // 변경된 데이터를 처리할 컨트롤러 URL
-		        type: 'POST',
-		        contentType: "application/json",
-		        data: JSON.stringify(modifiedData),
-		        success: function(res) {
-		            if (res == 1) {
-		                Swal.fire({
-		                    title: "저장 성공",
-		                    icon: "success",
-		                    confirmButtonText: "확인"
-		                }).then(function(){ // 확인 클릭 시 새로고침
-		                	// ajax인데 새로고침하는 이유
-		                	// - 저장을 성공했다는 알럿이 표시되지만 확실한 완료를 보여 주기 위해
-		                	// - 상세공통코드를 저장 후 비동기 방식으로 데이터를 가져오려면
-		                	//   어떤 공통코드에 대한 상세공통코드인지 알아야 하는데
-		                	//   그 방법을 어떻게 해야 될지 모르겠어서 시간상 고민 없이 reload 처리
-		                	location.reload(true);
-		                });
-		            } else {
-		                Swal.fire({
-		                    title: "저장 실패",
-		                    icon: "error",
-		                    confirmButtonText: "확인"
-		                });
-		            }
-		        },
-		        error: function() {
-		            Swal.fire({
-		                title: "서버 오류",
-		                icon: "error",
-		                confirmButtonText: "확인"
-		            });
-		        }
-		    });
-		};
+		};*/
 
 		// 삭제 버튼 클릭 시 선택된 행만 삭제 -> 삭제 기능 철회
 		/*function deleteRow(tableId) {

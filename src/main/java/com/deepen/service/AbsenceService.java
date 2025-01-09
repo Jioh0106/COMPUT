@@ -2,16 +2,12 @@ package com.deepen.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.deepen.domain.CommonDetailDTO;
-import com.deepen.domain.EmployeesDTO;
-import com.deepen.entity.Employees;
 import com.deepen.mapper.AbsenceMapper;
-import com.deepen.repository.PersonnelRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -76,7 +72,4 @@ public class AbsenceService {
 
 
 	
-	
-	
-
 }

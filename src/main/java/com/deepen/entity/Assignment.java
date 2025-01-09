@@ -4,6 +4,8 @@ import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -14,6 +16,7 @@ import lombok.Data;
 public class Assignment {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "assignment_no", nullable = false, unique = true)
 	private Integer assignment_no; //발령번호 PK
 	
@@ -38,7 +41,7 @@ public class Assignment {
 	@Column(name = "new_dept", length = 50, nullable = false)
 	private String new_dept; //발령부서
 	
-	@Column(name = "registr_date", nullable = false)
+	@Column(name = "registr_date")
 	private Date registr_date; //최종승인일자
 	
 	

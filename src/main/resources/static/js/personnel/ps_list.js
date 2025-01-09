@@ -41,7 +41,11 @@ const empListGrid = new Grid({
 		name: 'EMP_POSITION_NAME',
 		filter : 'select'
 	},
-    { header: 'E-mail', name: 'EMP_EMAIL'}
+    { 
+		header: '재직상태', 
+		name: 'EMP_STATUS_NAME',
+		filter : 'select'
+	}
   ],
   columnOptions: {
           resizable: true

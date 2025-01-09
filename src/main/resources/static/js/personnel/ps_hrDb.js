@@ -24,7 +24,7 @@ const instance2 = new tui.DatePicker(container2, {
 
 // toast ui 그리드
 const Grid = tui.Grid;
-
+Grid.applyTheme('clean'); // 테마 적용
 const exInfoList = new Grid({
   el: document.getElementById('grid'), // Container element
   columns: [
@@ -84,19 +84,6 @@ const exInfoList = new Grid({
   data: [] // 초기 데이터 비워둠
 });
 
-/*$.ajax({
-       url: '/api/test1', // Spring Boot에서 정의한 엔드포인트
-       method: 'GET',
-       success: function(response) {
-		
-			console.log(response);
-			exInfoList.resetData(response); // 데이터 로드
-       },
-       error: function(error) {
-           console.error('Error fetching data:', error);
-       }
-   });*/
 
-Grid.applyTheme('clean'); // 테마 적용
 
 
