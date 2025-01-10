@@ -49,7 +49,6 @@ public class Request {
 	@Column(name = "emp_id", nullable = false, length = 30)
 	private String emp_id; //요청자사번
 	
-
 	
 	@PrePersist // 엔티티에 디비에 insert 하기 전에 호출되는 어노테이션
 	public void prepersist() { //요청일자는 오늘로설정, 요청마감일은 오늘로부터 +5일
