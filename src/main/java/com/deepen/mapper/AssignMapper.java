@@ -3,8 +3,10 @@ package com.deepen.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.deepen.domain.AssignmentDTO;
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
 
@@ -21,6 +23,8 @@ public interface AssignMapper {
 	//중간승인권자 조회 모달창
 	List<EmployeesDTO> middleRoleSearch();
 	
+	//요청번호로 발령테이블 조회
+	AssignmentDTO selectAssign(@Param("request_no") Integer request_no);
 	
 	
 }

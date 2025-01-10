@@ -2,6 +2,7 @@ package com.deepen.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -67,7 +68,6 @@ public class AssignService {
 	
 	
 	
-	
 	//=============================================================================
 	
 	
@@ -95,6 +95,11 @@ public class AssignService {
 		return asMapper.middleRoleSearch();
 	}
 	
+	
+	//요청번호로 발령테이블 조회
+	public AssignmentDTO selectAssign(Integer request_no){
+		return asMapper.selectAssign(request_no);
+	}
 	
 
 }

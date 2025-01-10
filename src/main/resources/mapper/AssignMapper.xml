@@ -41,6 +41,34 @@
 	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST%'
 	</select>
 	
+	<!-- 요청테이블 요청번호로 발령테이블 조인 -->
+	<select id="selectAssign" parameterType="java.lang.Integer" resultType="com.deepen.domain.AssignmentDTO">
+		 SELECT 
+            a.assign_emp_id AS assign_emp_id,
+            e.emp_name AS assign_emp_name,
+            a.assign_date AS assign_date,
+            cdtype.common_detail_name AS assign_type,
+            a.prev_dept AS prev_dept,
+            cddept.common_detail_name AS new_dept,
+            a.prev_pos AS prev_pos,
+            cdpos.common_detail_name AS new_pos,
+            a.request_no AS request_no
+        FROM 
+            assignment a
+        JOIN 
+            employees e ON a.assign_emp_id = e.emp_id
+        JOIN 
+            request r ON a.request_no = r.request_no
+        JOIN    
+			common_detail cdtype on a.assign_type = cdtype.common_detail_code
+		JOIN   
+ 			common_detail cddept on a.new_dept = cddept.common_detail_code
+ 		JOIN
+ 			common_detail cdpos on a.new_pos = cdpos.common_detail_code
+        WHERE 
+            a.request_no = #{request_no}
+	</select>
+	
 	
 	
 	
