@@ -49,7 +49,7 @@ public class Request {
 	@Column(name = "emp_id", nullable = false, length = 30)
 	private String emp_id; //요청자사번
 	
-	@Column(name = "complete", nullable = false, length = 10)
+	@Column(name = "complete", length = 10)
 	private String complete; //처리상태
 	
 	@PrePersist // 엔티티에 디비에 insert 하기 전에 호출되는 어노테이션

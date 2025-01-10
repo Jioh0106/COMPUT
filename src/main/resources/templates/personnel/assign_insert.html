@@ -51,6 +51,8 @@
 <!-- // Basic multiple Column Form section start -->
 <section id="multiple-column-form">
 	<div class="row match-height">
+<!-- 	<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+	<input type="hidden" name="_csrf" th:value="${_csrf.token}" />
 		<div class="col-12">
 			<div class="card">
 				<div class="card-header">
@@ -66,7 +68,7 @@
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="first-name-column">담당자 사번</label>
-									<input type="text" name="emp_id" id="emp_id" class="form-control" 
+									<input type="text" th:value="${emp.emp_id}" name="emp_id" id="emp_id" class="form-control" 
 									readonly>
 								</div>
 							</div>
@@ -74,7 +76,7 @@
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="first-name-column">담당자 성명</label>
-									<input type="text" id="emp_name" name="emp_name" class="form-control" 
+									<input type="text" id="emp_name" th:value="${emp.emp_name}" name="emp_name" class="form-control" 
 									readonly>
 								</div>
 							</div>
@@ -437,10 +439,11 @@
 				};
 				
 				const requestDTO = {
-					emp_id :'2025010820',
 					middle_approval : approverString
 				};
 				
+				const csrfToken = $('input[name="_csrf"]').val();
+
 		
 			// AJAX 요청
 			    $.ajax({
@@ -451,6 +454,10 @@
 			        	requestDto : requestDTO,
 			        	assignmentDto : assignmentDTO
 			        }),
+			        beforeSend: function(xhr) {
+			            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+			        },
+			       
 			        success: function(response) {
 			            alert('발령 등록 및 요청 내역 저장이 완료되었습니다.');
 			            window.location.href = '/request-list';
