@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="_csrf" content="${_csrf.token}">
+
 	<title>휴직 관리</title>
 	
 	<!--공통 -->
@@ -66,7 +68,7 @@
 				<h3>휴직 관리</h3>
 				
 				<div class="buttons">
-			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loab-request">휴직 신청</button>
+			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loab-request" id="req_button">휴직 신청</button>
 				
 				<!-- 휴직 신청서 Modal 시작 -->
 				<div class="modal fade text-left" id="loab-request" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
@@ -81,19 +83,18 @@
 							</div>
 							<form th:action="@{/loab-insert}" method="post">
 								<div class="modal-body">
-									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
 									
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사번: </label>
 											<div class="form-group">
-												<input type="text" value="11222" name="emp_id" class="form-control" readonly >
+												<input type="text" th:value="${emp.emp_id}" name="emp_id" class="form-control" readonly >
 											</div>
 										</div>
 										<div class="child-input2">
 											<label>이름: </label>
 											<div class="form-group">
-												<input type="text" value="홍길동" class="form-control" readonly>
+												<input type="text" th:value="${emp.emp_name}" class="form-control" readonly>
 											</div>
 										</div>
 									</div>
@@ -184,10 +185,12 @@
 					<div class="row" id="basic-table">
 						<form>
 							<div id="grid"></div>
-							<div class="float-end">
-								<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
-								<input type="button" class="btn btn-outline-success" id="save"  value="저장">
-								<input type="button" class="btn btn-outline-danger" id="delete" value="삭제">
+							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+								<div class="float-end">
+									<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
+									<input type="button" class="btn btn-outline-success" id="save"  value="저장">
+									<input type="button" class="btn btn-outline-danger" id="deleteRow" value="삭제">
+								</div>
 							</div>
 						</form>
 					</div>
@@ -229,7 +232,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	
 	<!-- sweet arert -->
-	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="assets/js/extensions/sweetalert2.js"></script>
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	
 	<!--공통 -->
 	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
@@ -243,6 +247,16 @@
 	<script th:inline="javascript">
 	
 		let grid;
+		
+		let userRoles = /*[[${#authentication.authorities}]]*/[];
+		
+		// 사용자 권한 확인 함수
+		function hasRole(roles, requiredRoles) {
+		    return requiredRoles.some(requiredRole =>
+		        roles.some(role => role.authority === requiredRole)
+		    );
+		}
+
 		
 		const gridData = /*[[${absenceList}]]*/'';
 		
@@ -277,9 +291,17 @@
 		        return;
 		    }
 			
-			// *** 현재 권한자가 LOW면 MIDDLE, 현재 권한자가 MIDDLE 이면 HIGH 조건문 추가 필요****
-			const role = 'MIDDLE';
-
+		    let emp_role = userRoles[0].authority.replace("ROLE_", ""); // 첫 번째 권한 추출
+			console.log("emp_role : " + emp_role);
+			
+			// 기본  middle 권한자 리스트 요청
+			let role = 'ATHR002';
+			
+			// 현재 권한자가 middle이면 high 권한자 리스트 요청
+			if(emp_role === 'ATHR002') {
+				role = 'ATHR001';
+			}
+						
 			axios.get(`/api/absence/request/${role}`)
 	        .then(function (response) {
 	            const data = response.data;
@@ -300,7 +322,11 @@
 	        })
 	        .catch(function (error) {
 	            console.error('Error:', error);
-	            alert('데이터를 가져오는 중 문제가 발생했습니다.');
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
 	        });
 			
 		});
@@ -314,13 +340,21 @@
 		        })
 		        .catch(function (error) {
 		            console.error('Error fetching data:', error);
-		            alert('데이터를 가져오는 중 문제가 발생했습니다.');
+					Swal.fire(
+					        'Error',
+					        '데이터를 가져오는 중 문제가 발생했습니다.',
+					        'error'
+					      )
 		            return []; // 에러 발생 시 빈 배열 반환
 		        });
 		}
 		
 		// 그리드 초기화
 		fetchData().then(function (data) {
+
+			console.log('User Roles:', userRoles);
+			let isEditable = hasRole(userRoles, ['ROLE_ATHR001', 'ROLE_ATHR002']);
+			console.log('Is Editable:', isEditable); 
 			
 		    grid = new tui.Grid({
 		    	el: document.getElementById('grid'),
@@ -331,63 +365,71 @@
 						header: '번호', 
 						name: 'ABSENCE_NO', 
 						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
+						editor: isEditable ? 'text' : null
 					},
 					{ 
 						header: '사원번호', 
 						name: 'EMP_ID', 
 						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
+						editor: isEditable ? 'text' : null
 					},  
 					{ 
 						header: '사원명', 
 						name: 'EMP_NAME', 
 						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
+						editor: isEditable ? 'text' : null
 					},
 					{ 
 						header: '부서', 
 						name: 'EMP_DEPT',
-						editor: {
-							type: 'select',
-							options: {
-								listItems: data.deptCommon
-							}
-					    },
+						editor: isEditable
+		                    ? {
+		                          type: 'select',
+		                          options: {
+		                              listItems: data.deptCommon
+		                          }
+		                      }
+		                    : null,
 						filter: 'select'
 					},
 					{ 
 						header: '직급', 
 						name: 'EMP_POSITION', 
-						editor: {
+						editor: isEditable
+							? {
 							type: 'select',
 							options: {
 								listItems: data.pstnCommon
 							}
-					    },
+					    }
+						: null,
 						filter: 'select'
 					},
 					{ 
 						header: '종류', 
 						name: 'COMMON_DETAIL_NAME',
-						editor: {
+						editor: isEditable
+							? {
 							type: 'select',
 							options: {
 								listItems: data.loabCommon
 							}
-					    },
+					    }
+						: null,
 						filter: 'select'
 					},
 					
 					{ 
 						header: '휴직 시작일', 
 						name: 'ABSENCE_START',
-						editor: {
+						editor: isEditable
+							? {
 			                type: 'datePicker',
 			                options: {
 			                    format: 'yyyy-MM-dd'
 			                }
-			            },
+			            }
+						: null,
 			            filter: {
 			                type: 'date',
 			                options: {
@@ -398,12 +440,14 @@
 			        { 
 						header: '휴직 종료일', 
 						name: 'ABSENCE_END',
-						editor: {
+						editor: isEditable 
+							? {
 			                type: 'datePicker',
 			                options: {
 			                    format: 'yyyy-MM-dd'
 			                }
-			            },
+			            }
+						: null,
 			            filter: {
 			                type: 'date',
 			                options: {
@@ -414,12 +458,14 @@
 			        { 
 						header: '신청일', 
 						name: 'REQUEST_DATE',
-						editor: {
+						editor: isEditable 
+							? {
 			                type: 'datePicker',
 			                options: {
 			                    format: 'yyyy-MM-dd'
 			                }
-			            },
+			            }
+						: null,
 			            filter: {
 			                type: 'date',
 			                options: {
@@ -431,15 +477,15 @@
 						header: '최종 승인자', 
 						name: 'HIGH_APPROVAL', 
 						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
+						editor: isEditable ? 'text' : null
 					},
 					{ 
 						header: '비고', 
 						name: 'ABSENCE_REMARK',
-						editor: 'text'
+						editor: isEditable ? 'text' : null
 					}
 				],
-				editing: true  // 편집 기능 활성화
+				editing: isEditable  // 편집 기능 활성화
 				
 			});
 		    
@@ -601,8 +647,45 @@
 			.catch(error => console.error('Error:', error));
 		}
 		*/
-		
-		
+		$('#deleteRow').on('click', function () {
+			const selectedRows = grid.getCheckedRows();
+			console.log('선택된 데이터:', selectedRows);
+			
+			if (selectedRows.length === 0) {
+				Swal.fire({
+				        icon: "warning",
+				        title: "삭제할 항목을 선택하세요."
+				})
+		        return;
+		    }
+			
+			const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+			const deleteList = selectedRows.map(row => row.ABSENCE_NO);
+			
+			axios.post('/api/absence/delete', deleteList, {
+				headers: {
+				        'X-CSRF-TOKEN': csrfToken
+				    }
+			})
+			        .then(function (response) {
+						Swal.fire(
+						        'Success',
+						        '삭제가 완료되었습니다.',
+						        'success'
+						      )
+			            window.location.reload();
+			        })
+			        .catch(function (error) {
+			            console.error('삭제 중 오류 발생:', error);
+						Swal.fire(
+						        'Error',
+						        '삭제 중 문제가 발생했습니다.',
+						        'error'
+						      )
+			        });
+			
+		});
+			
 		
 		
 	</script>
@@ -670,6 +753,7 @@
 		}
 		
 		
+	
 	</script>
 
 
