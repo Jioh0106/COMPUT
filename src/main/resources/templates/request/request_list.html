@@ -183,7 +183,7 @@
 						{header: '요청번호', name: 'request_no'},
 						{header: '요청구분', name: 'request_division'},
 						{header: '요청유형', name: 'request_type'},
-						{header: '사원번호', name: 'emp_num'},
+						{header: '사원번호', name: 'emp_id'},
 						{header: '성명', name: 'emp_name'},
 						{header: '부서명', name: 'emp_dept'},
 						{header: '요청일', name: 'request_date'},
@@ -209,12 +209,14 @@
 		            .then(data => {
 		                console.log('Fetched Data:', data); // 확인용
 		                grid.resetData(data); // TOAST UI Grid에 데이터 적용
+						grid.refreshLayout(); // 레이아웃 새로고침
+						
 		            })
 		            .catch(error => {
 		                console.error('Error fetching request list:', error);
 		            });
 		   
-			 });
+		
 				
 		// Grid의 row 클릭 이벤트 추가
 		    grid.on('click', (ev) => {
@@ -233,7 +235,7 @@
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
 			
-			
+	});	
 				
 			</script>
 
