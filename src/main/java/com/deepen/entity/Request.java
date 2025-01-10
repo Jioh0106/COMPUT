@@ -3,6 +3,7 @@ package com.deepen.entity;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import com.deepen.domain.RequestDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,6 +57,26 @@ public class Request {
 		this.request_date = LocalDateTime.now();
 		this.request_deadline = request_date.plusDays(5).truncatedTo(ChronoUnit.DAYS);
 	}
+	
+	public static Request requestDTOToEntity(RequestDTO requestDTO) {
+		Request request = new Request();
+		request.setRequest_no(requestDTO.getRequest_no());
+		request.setRequest_type(requestDTO.getRequest_type());
+		request.setRequest_status(requestDTO.getRequest_status());
+		request.setRequest_rejection(requestDTO.getRequest_rejection());
+		request.setRequest_deadline(requestDTO.getRequest_deadline());
+		request.setRequest_date(requestDTO.getRequest_date());
+		request.setMiddle_approval(requestDTO.getMiddle_approval());
+		request.setHigh_approval(requestDTO.getHigh_approval());
+		request.setEmp_id(requestDTO.getEmp_id());
+		request.setComplete(requestDTO.getComplete());
+		
+		return request;
+	}
+	
+	
+	
+	
 	
 	
 	

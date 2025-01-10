@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.deepen.domain.AbsenceDTO;
 import com.deepen.domain.EmployeesDTO;
+import com.deepen.domain.RequestDTO;
 import com.deepen.entity.Employees;
 import com.deepen.service.AbsenceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -81,35 +83,31 @@ public class AbsenceController {
 	
 	
 	@PostMapping("/loab-insert")
-	public String loabInsert( @RequestParam("emp_id") String emp_id,
-						    @RequestParam("absence_start") String absence_start,
-						    @RequestParam("absence_end") String absence_end,
-						    @RequestParam("absence_type") String absence_type,
-						    @RequestParam("absence_remark") String absence_remark,
-						    @RequestParam("request_approval") String request_approval,
-						    @RequestParam("request_role") String request_role,
-						    @RequestParam("request_deadline") int request_deadline,
-						    Model model) {
+	public String loabInsert(Model model, RequestDTO requestDTO, AbsenceDTO absenceDTO,
+							@RequestParam("request_role") String request_role,
+							@RequestParam("request_approval") String request_approval,
+							@RequestParam("request_deadline") int deadline
+						   ) {
 	
-		
 		log.info("loabInsert - request_role : " + request_role);
+		log.info("loabInsert - request_approval : " + request_approval);
 		
-		Map<String, Object> map = new HashMap<>();
+		requestDTO.setRequest_type("휴직");
+//		requestDTO.setRequest_date(new Timestamp(System.currentTimeMillis()));
 		
-		map.put("emp_id", emp_id);
-		map.put("absence_start", absence_start);
-		map.put("absence_end", absence_end);
-		map.put("absence_type", absence_type);
-		map.put("absence_remark", absence_remark);
-		map.put("request_type", "휴직");
-		map.put("request_approval", request_approval);
-		map.put("request_role", request_role);
-		map.put("request_deadline", request_deadline);
-		map.put("request_date", new Timestamp(System.currentTimeMillis()));
 		
-		log.info("loabInsert - map : " + map.toString());
+		// 승인요청 수신자가 high 권한이면 1차 승인자에 본인 아이디, 요청 상태는 2차대기		
+		if(request_role.equals("ATHR001")) {
+			requestDTO.setMiddle_approval(requestDTO.getEmp_id());
+			requestDTO.setHigh_approval(request_approval);
+			requestDTO.setRequest_status("RQST006");
+		}
 		
-		absenceService.insertRequest(map);
+		// 아니라면 (middle이러면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
+		requestDTO.setMiddle_approval(request_approval);
+		requestDTO.setRequest_status("RQST006");
+		
+		absenceService.insertAbsenceAndRequest(requestDTO, absenceDTO);
 		
 		
 		return "redirect:/loab-mng";

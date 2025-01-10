@@ -7,11 +7,15 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.deepen.domain.AbsenceDTO;
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
+import com.deepen.domain.RequestDTO;
 import com.deepen.entity.Employees;
+import com.deepen.entity.Request;
 import com.deepen.mapper.AbsenceMapper;
 import com.deepen.repository.PersonnelRepository;
+import com.deepen.repository.RequestRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -23,6 +27,7 @@ public class AbsenceService {
 	
 	private final AbsenceMapper absenceMapper;
 	private final PersonnelRepository personnelRepository;
+	private final RequestRepository requestRepository;
 	
 	
 	
@@ -97,6 +102,18 @@ public class AbsenceService {
 		for (Map<String, Object> row : createdRows) {
             absenceMapper.insertAbsence(row);
         }
+	}
+	
+	@Transactional
+	public void insertAbsenceAndRequest(RequestDTO requestDTO, AbsenceDTO absenceDTO) {
+		
+		Request request = Request.requestDTOToEntity(requestDTO);
+		
+		requestRepository.save(request);
+		
+		
+		
+		
 	}
 
 
