@@ -52,11 +52,8 @@ public class SalaryFormula {
     @JoinColumn(name = "formula_code", referencedColumnName = "common_detail_code", nullable = false)
     private CommonDetail commonDetail; // FK 참조
     
-    @Column(name = "range_start")
-    private String rangeStart;
-    
-    @Column(name = "range_end")
-    private String rangeEnd;
+    @Column(name = "formula_comment")
+    private String formulaComment;
     
     public static SalaryFormula setSalaryFormulaEntity(SalaryFormulaDTO salaryformulaDTO) {
     	SalaryFormula salaryFormula = new SalaryFormula();
@@ -71,8 +68,7 @@ public class SalaryFormula {
         commonDetail.setCommon_detail_code(salaryformulaDTO.getFormulaCode());
         salaryFormula.setCommonDetail(commonDetail);
     	salaryFormula.setUpdatedAt(LocalDateTime.now());
-    	salaryFormula.setRangeStart(salaryformulaDTO.getRangeStart());
-    	salaryFormula.setRangeEnd(salaryformulaDTO.getRangeEnd());
+    	salaryFormula.setFormulaComment(salaryformulaDTO.getFormulaComment());
 		return salaryFormula;
     }
 	

@@ -55,9 +55,7 @@ public class SalaryFormulaService {
             formula.setFormulaPriority(dto.getFormulaPriority());
             formula.setUpdatedAt(LocalDateTime.now());
             formula.setCommonDetail(commonDetail);
-            formula.setRangeStart(dto.getRangeStart());
-            formula.setRangeEnd(dto.getRangeEnd());
-            
+            formula.setFormulaComment(dto.getFormulaComment());
             salaryFormulaRepository.save(formula);
             
         } catch (Exception e) {
@@ -77,9 +75,7 @@ public class SalaryFormulaService {
         formula.setApplyYear(dto.getApplyYear());
         formula.setFormulaPriority(dto.getFormulaPriority());
         formula.setUpdatedAt(LocalDateTime.now());
-        formula.setRangeStart(dto.getRangeStart());
-        formula.setRangeEnd(dto.getRangeEnd());
-        
+        formula.setFormulaComment(dto.getFormulaComment());
         salaryFormulaRepository.save(formula);
     }
 
