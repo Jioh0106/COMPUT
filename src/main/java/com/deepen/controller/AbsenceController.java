@@ -85,8 +85,8 @@ public class AbsenceController {
 	@PostMapping("/loab-insert")
 	public String loabInsert(Model model, RequestDTO requestDTO, AbsenceDTO absenceDTO,
 							@RequestParam("request_role") String request_role,
-							@RequestParam("request_approval") String request_approval,
-							@RequestParam("request_deadline") int deadline
+							@RequestParam("request_approval") String request_approval
+//							@RequestParam("request_deadline") int deadline
 						   ) {
 	
 		log.info("loabInsert - request_role : " + request_role);
@@ -100,12 +100,12 @@ public class AbsenceController {
 		if(request_role.equals("ATHR001")) {
 			requestDTO.setMiddle_approval(requestDTO.getEmp_id());
 			requestDTO.setHigh_approval(request_approval);
+			requestDTO.setRequest_status("RQST005");
+		} else {
+			// 아니라면 (middle이라면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
+			requestDTO.setMiddle_approval(request_approval);
 			requestDTO.setRequest_status("RQST006");
 		}
-		
-		// 아니라면 (middle이러면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
-		requestDTO.setMiddle_approval(request_approval);
-		requestDTO.setRequest_status("RQST006");
 		
 		absenceService.insertAbsenceAndRequest(requestDTO, absenceDTO);
 		
