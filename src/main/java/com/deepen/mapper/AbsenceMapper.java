@@ -25,6 +25,11 @@ public interface AbsenceMapper {
 
 	void deleteAbsences(List<Integer> deleteList);
 
+	void updateAbsence(Map<String, Object> row);
+	
+	void insertAbsence(Map<String, Object> row);
+
+
 
 	
 
