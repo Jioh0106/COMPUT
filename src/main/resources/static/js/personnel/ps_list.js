@@ -28,7 +28,7 @@ const empListGrid = new Grid({
 		name: 'EMP_ID',
 	},
     { 
-		header: '성명', 
+		header: '이름', 
 		name: 'EMP_NAME',
 	},
     { 
