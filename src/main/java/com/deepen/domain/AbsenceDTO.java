@@ -4,8 +4,9 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
-import oracle.sql.DATE;
 
 @Data
 public class AbsenceDTO {
@@ -15,9 +16,11 @@ public class AbsenceDTO {
 	private String absence_type;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate absence_start;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate absence_end;
 	
 	private Integer request_no;
