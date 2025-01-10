@@ -244,7 +244,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	
 	<!-- sweet arert -->
-	<script src="assets/js/extensions/sweetalert2.js"></script>
 	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	
 	<!--공통 -->
@@ -328,9 +327,16 @@
 			$('#appendRow').on('click', function (e) {
 				e.preventDefault(); // 기본 동작 방지
 				
+			    // 현재 그리드 데이터를 가져와 ABSENCE_NO의 최대값 계산
+			    const gridData = grid.getData();
+			    const maxAbsenceNo = gridData.reduce((max, row) => {
+			        const absenceNo = parseInt(row.ABSENCE_NO, 10); // ABSENCE_NO를 숫자로 변환
+			        return !isNaN(absenceNo) && absenceNo > max ? absenceNo : max;
+			    }, 0);
+			    
 				// 기본값으로 새 행 데이터 생성
 				const newRow = {
-					ABSENCE_NO: grid.getRowCount() + 1,
+					ABSENCE_NO: maxAbsenceNo +1,
 					EMP_ID: '',
 					EMP_NAME: '',
 					EMP_DEPT: '', 
@@ -343,7 +349,7 @@
 				};
 				
 				// 새 행을 TOAST UI Grid에 추가
-				grid.appendRow(newRow, {
+				grid.prependRow(newRow, {
 					focus: true // 추가된 행에 포커스
 				});
 				
@@ -486,7 +492,6 @@
 			}
 
 			
-			const gridData = /*[[${absenceList}]]*/'';
 			
 			
 			
@@ -527,6 +532,9 @@
 			            return []; // 에러 발생 시 빈 배열 반환
 			        });
 			}
+			
+			const gridData = /*[[${absenceList}]]*/'';
+			
 			
 			// 그리드 초기화
 			fetchData().then(function (data) {
