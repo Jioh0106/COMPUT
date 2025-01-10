@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import com.deepen.entity.Employees;
 import com.deepen.service.AbsenceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -33,13 +35,17 @@ public class AbsenceController {
 	
 	// 휴직 관리
 	@GetMapping("/loab-mng")
-	public String absence(Model model, @AuthenticationPrincipal User user) throws JsonProcessingException {
+	public String absence(Model model, @AuthenticationPrincipal User user, HttpServletRequest request) throws JsonProcessingException {
 		//http://localhost:8082/loab-mng
 		
 		log.info("user.getUsername() : " + user.getUsername());
 		String emp_id = user.getUsername();
 		
 		Optional<Employees> emp = absenceService.findById(emp_id);
+		
+		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+	    model.addAttribute("_csrf", csrfToken);
+	    
 		
 		List<Map<String, Object>> absenceList = absenceService.getAbsenceList();
 		

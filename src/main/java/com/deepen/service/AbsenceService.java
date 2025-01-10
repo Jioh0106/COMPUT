@@ -21,7 +21,7 @@ import lombok.extern.java.Log;
 @Log
 public class AbsenceService {
 	
-	private final AbsenceMapper attendanceMapper;
+	private final AbsenceMapper absenceMapper;
 	private final PersonnelRepository personnelRepository;
 	
 	
@@ -29,12 +29,12 @@ public class AbsenceService {
 	// 휴직관리 ABSENCE_VIEW 리스트 조회
 	public List<Map<String, Object>> getAbsenceList() {
 		
-		return attendanceMapper.getAbsenceList();
+		return absenceMapper.getAbsenceList();
 	}
 
 	// 공통코드 항목 조회
 	public List<CommonDetailDTO> getCommonList(String code) {
-		List<CommonDetailDTO> list = attendanceMapper.getCommonList(code);
+		List<CommonDetailDTO> list = absenceMapper.getCommonList(code);
 		log.info("AttendanceService - getCommonList : " + list);
 		
 		return list;
@@ -42,7 +42,7 @@ public class AbsenceService {
 	
 	// 특정 권한자 리스트 조회
 	public List<Map<String, String>> getEmpList(String emp_role) {
-		List<Map<String, String>> list = attendanceMapper.getEmpList(emp_role);
+		List<Map<String, String>> list = absenceMapper.getEmpList(emp_role);
 		log.info("AttendanceService - getEmpList : " + list);
 		return list;
 	}
@@ -64,11 +64,11 @@ public class AbsenceService {
 		map.put("middle_approval", (String)map.get("request_approval"));
 		map.put("request_status", "RQST005");
 		
-		int request_no = attendanceMapper.insertRequest(map);
+		int request_no = absenceMapper.insertRequest(map);
 		
 		map.put("request_no", request_no);
 		
-		attendanceMapper.insertLoab(map);
+		absenceMapper.insertLoab(map);
 		
 		
 	}
@@ -80,10 +80,26 @@ public class AbsenceService {
 	}
 
 	
-	
+	// 휴직 테이블 삭제(여러건)
 	public void deleteAbsences(List<Integer> deleteList) {
-		attendanceMapper.deleteAbsences(deleteList);
+		absenceMapper.deleteAbsences(deleteList);
 	}
+	
+	// 휴직 테이블 업데이트(여러건)
+	public void updateAbsences(List<Map<String, Object>> updatedRows) {
+		for (Map<String, Object> row : updatedRows) {
+            absenceMapper.updateAbsence(row);
+        }
+	}
+	
+	// 휴직 테이블 추가(여러건)
+	public void insertAbsences(List<Map<String, Object>> createdRows) {
+		for (Map<String, Object> row : createdRows) {
+            absenceMapper.insertAbsence(row);
+        }
+	}
+
+
 
 
 

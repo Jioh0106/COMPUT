@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,6 +67,28 @@ public class AbsenceRestController {
 		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
 	    }
 	}
+	
+	
+	@PostMapping("/update")
+    public ResponseEntity<List<Map<String, Object>>> updateAbsences(@RequestBody Map<String, List<Map<String, Object>>> modifiedRows, @AuthenticationPrincipal UserDetails userDetails) {
+        List<Map<String, Object>> updatedRows = modifiedRows.get("updatedRows");
+        List<Map<String, Object>> createdRows = modifiedRows.get("createdRows");
+        
+        // 업데이트 처리
+        if (updatedRows != null && !updatedRows.isEmpty()) {
+            absenceService.updateAbsences(updatedRows);
+        }
+
+        // 삽입 추가 처리
+        if (createdRows != null && !createdRows.isEmpty()) {
+            absenceService.insertAbsences(createdRows);
+        }
+
+        // 최신 데이터 반환
+        List<Map<String, Object>> absenceList = absenceService.getAbsenceList();
+        return ResponseEntity.ok(absenceList);
+    }
+	 
 	
 	
 }

@@ -85,7 +85,27 @@
 	    </foreach>
 	</delete>
 
-	
+	<!-- 업데이트 SQL -->
+    <update id="updateAbsence" parameterType="java.util.Map">
+        UPDATE ABSENCE
+	       SET 
+	           EMP_ID = #{EMP_ID},
+	           ABSENCE_TYPE = #{ABSENCE_TYPE},
+	           ABSENCE_START = #{ABSENCE_START},
+	           ABSENCE_END = #{ABSENCE_END},
+	           ABSENCE_REMARK = #{ABSENCE_REMARK},
+	           HIGH_APPROVAL = #{HIGH_APPROVAL}
+         WHERE ABSENCE_NO = #{ABSENCE_NO}
+    </update>
+
+    <!-- 삽입 SQL -->
+    <insert id="insertAbsence" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="ABSENCE_NO">
+        INSERT INTO ABSENCE (
+            EMP_ID, ABSENCE_TYPE, ABSENCE_START, ABSENCE_END, ABSENCE_REMARK
+        ) VALUES (
+            #{EMP_ID}, #{ABSENCE_TYPE}, #{ABSENCE_START}, #{ABSENCE_END}, #{ABSENCE_REMARK}
+        )
+    </insert>
 	
 </mapper>
 
