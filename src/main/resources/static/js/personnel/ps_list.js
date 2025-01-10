@@ -200,7 +200,7 @@ deleteBtn.addEventListener("click",() => {
 			alert("삭제할 정보를 선택해주세요");
 		}else{
 			if(confirm("삭제하시겠습니까?")){
-				empDelete("http://localhost:8082/restApi/empDelete",checkedRowIds);
+				empDelete("http://localhost:8082/api/empDelete",checkedRowIds);
 				alert("삭제 완료");
 			}else{
 				alert("삭제 취소");
@@ -215,7 +215,7 @@ deleteBtn.addEventListener("click",() => {
 async function fetchEmpList() {
 	try	{	
 			const params = new URLSearchParams(empListFilters).toString();
-	       	const response = await fetch(`http://localhost:8082/restApi/empList?${params}`);
+	       	const response = await fetch(`http://localhost:8082/api/empList?${params}`);
 			
 	       	if (!response.ok) {
 	           	throw new Error("네트워크 응답 실패");
@@ -234,7 +234,7 @@ async function fetchEmpList() {
 // 필요한 공통 코드 상세 조회	
 async function fetchCommonDetails() {
 	try{
-	  	const response = await fetch("http://localhost:8082/restApi/commonDetail");
+	  	const response = await fetch("http://localhost:8082/api/commonDetail");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

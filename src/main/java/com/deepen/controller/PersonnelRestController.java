@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/restApi")
+@RequestMapping("/api")
 @Log
 public class PersonnelRestController {
 	

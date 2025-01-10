@@ -45,6 +45,7 @@
 			
 			<!-- 수정폼 시작  -->
             <form action="/ps-update" method="POST"  enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" id="emp_id" name="emp_id">
             <input type="hidden" id="emp_pw" name="emp_pw">
             <input type="hidden" id="emp_no" name="emp_no">

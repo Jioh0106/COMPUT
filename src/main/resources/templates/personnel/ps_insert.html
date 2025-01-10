@@ -29,6 +29,7 @@
 			
 			<!-- 사원 등록 form 시작 -->
             <form action="/ps-reg" method="post" enctype="multipart/form-data">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 			<!--card 시작-->
             <div class="col-md-12 col-12">
                 <div class="card">
