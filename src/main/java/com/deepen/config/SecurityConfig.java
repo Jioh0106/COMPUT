@@ -35,10 +35,12 @@ public class SecurityConfig {
 						.requestMatchers("/login/**","/css/**", "/js/**", "/images/**", "/webjars/**", "/mapTest/**", "/assets/**")
 						.permitAll()
 						.requestMatchers("/", "/request-list/**", "/ps-empDb/**", "/ps-hrDb/**", "/assign-stts/**", "/assign-insert/**", 
-											"/ps-list/**", "/ps-reg/**", "/restApi/**", "/api/**", 
+											"/ps-list/**", "/ps-reg/**", "/api/**", 
 											 "/cmt-stts/**",  "/loab-mng/**", "/vctn-mng/**",  "/work-mng/**",
-											 "/pay-stts/**", "/pay-list/**", "/pay-mng/**")
+											 "/pay-info/**", "/pay-list/**", "/pay-mng/**")
 						.hasAnyRole("ATHR001", "ATHR002", "ATHR003")
+						.requestMatchers("/ps-update/**")
+						.hasAnyRole("ATHR001", "ATHR002")
 						.requestMatchers("/common-mng/**")
 						.hasRole("ATHR001")
 						.anyRequest()
