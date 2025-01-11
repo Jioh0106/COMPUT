@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<title>휴직 관리</title>
 	
 	<!--공통 -->
@@ -15,10 +16,15 @@
 	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
 	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
 	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
-
+	
+	<!--  sweetalert  -->
+	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
+	
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.css">
+	
 	<style>
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */
@@ -64,9 +70,10 @@
 			
 			<div class="display-flex">
 				<h3>휴직 관리</h3>
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 				
 				<div class="buttons">
-			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loab-request">휴직 신청</button>
+			 	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loab-request" id="req_button">휴직 신청</button>
 				
 				<!-- 휴직 신청서 Modal 시작 -->
 				<div class="modal fade text-left" id="loab-request" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
@@ -81,19 +88,18 @@
 							</div>
 							<form th:action="@{/loab-insert}" method="post">
 								<div class="modal-body">
-									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
 									
 									<div class="display-flex">
 										<div class="child-input1">
 											<label>사번: </label>
 											<div class="form-group">
-												<input type="text" value="11222" name="emp_id" class="form-control" readonly >
+												<input type="text" th:value="${emp.emp_id}" name="emp_id" class="form-control" readonly >
 											</div>
 										</div>
 										<div class="child-input2">
 											<label>이름: </label>
 											<div class="form-group">
-												<input type="text" value="홍길동" class="form-control" readonly>
+												<input type="text" th:value="${emp.emp_name}" class="form-control" readonly>
 											</div>
 										</div>
 									</div>
@@ -156,7 +162,7 @@
 										</div>
 									</div>
 									<input type="hidden" id="requestRole" name="request_role">
-									<input type="hidden" id="deadline" name="request_deadline">
+									<input type="hidden" id="deadline" name="deadline">
 								</div><!-- modal body -->
 								<div class="modal-footer">
 									<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
@@ -175,7 +181,7 @@
 				<!-- 휴가 신청서 Modal 끝 -->
 		  </div> <!-- buttons -->
 		</div> <!-- display-flex -->
-
+	
 		<div class="card">
 			<div class="card-body">
 
@@ -184,10 +190,14 @@
 					<div class="row" id="basic-table">
 						<form>
 							<div id="grid"></div>
-							<div class="float-end">
-								<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
-								<input type="button" class="btn btn-outline-success" id="save"  value="저장">
-								<input type="button" class="btn btn-outline-danger" id="delete" value="삭제">
+							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+								<div class="float-end">
+									<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
+									<input type="button" class="btn btn-outline-success" id="save"  value="저장">
+									<input type="button" class="btn btn-outline-danger" id="deleteRow" value="삭제">
+									
+									
+								</div>
 							</div>
 						</form>
 					</div>
@@ -196,7 +206,7 @@
 				
 			</div><!-- card-body --> 
 		</div> <!-- card --> 
-	
+		
 		</div><!--main--> 
 	</div><!-- app -->
 	
@@ -229,7 +239,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	
 	<!-- sweet arert -->
-	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	
 	<!--공통 -->
 	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
@@ -239,371 +249,574 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	
+	<script src="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.js"></script>
+
 	<script th:inline="javascript">
-	
-		let grid;
-		
-		const gridData = /*[[${absenceList}]]*/'';
-		
-		// 모달창 휴직 구분 공통코드 불러오기
-		$('#loabSelect').on('click', function () {
-		    // 이미 데이터가 로드된 경우 추가 요청 방지
-		    if (this.options.length > 1) {
-		        return;
-		    }
-
-		    const type = 'LOAB'; 
-
-		    getCommonList(type).then(function (data) {
-		        $('#loabSelect')
-		            .empty()
-		            .append('<option value="" disabled selected>선택하세요</option>');
-
-		        data.forEach(item => {
-		            if (item.common_detail_code && item.common_detail_name) {
-		                $('#loabSelect').append(
-		                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
-		                );
-		            }
-		        });
-		    });
-		});
-		
-		// 모달창 승인 대상자 리스트 불러오기
-		$('#requestSelect').on('click', function () {
-		    // 이미 데이터가 로드된 경우 추가 요청 방지
-		    if (this.options.length > 1) {
-		        return;
-		    }
+		$(function () {
 			
-			// *** 현재 권한자가 LOW면 MIDDLE, 현재 권한자가 MIDDLE 이면 HIGH 조건문 추가 필요****
-			const role = 'MIDDLE';
+			let grid;
+			
+			let userRoles = /*[[${#authentication.authorities}]]*/[];
+			
+			// 모달창 휴직 구분 공통코드 불러오기
+			$('#loabSelect').on('click', function () {
+			    // 이미 데이터가 로드된 경우 추가 요청 방지
+			    if (this.options.length > 1) {
+			        return;
+			    }
 
-			axios.get(`/api/absence/request/${role}`)
-	        .then(function (response) {
-	            const data = response.data;
-	            data.forEach(item => {
-	                console.log(item); // 각 아이템 확인
-	            });
+			    const type = 'LOAB'; 
 
-	            $('#requestSelect').empty().append('<option value="" disabled selected>선택하세요</option>');
+			    getCommonList(type).then(function (data) {
+			        $('#loabSelect')
+			            .empty()
+			            .append('<option value="" disabled selected>선택하세요</option>');
+
+			        data.forEach(item => {
+			            if (item.common_detail_code && item.common_detail_name) {
+			                $('#loabSelect').append(
+			                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+			                );
+			            }
+			        });
+			    });
+			    
+			}); // 모달창 휴직구분 이벤트
+			
+			// 모달창 승인 대상자 리스트 불러오기
+			$('#requestSelect').on('click', function () {
+			    // 이미 데이터가 로드된 경우 추가 요청 방지
+			    if (this.options.length > 1) {
+			        return;
+			    }
 				
-	            data.forEach(item => {
-	                $('#requestSelect').append(
-	                    $('<option></option>').val(item.EMP_ID).text(item.EMP_NAME + " / " + item.EMP_DEPT_NAME + " / " + item.EMP_POSITION_NAME)
-	                );
-	                
-	                $('#requestRole').val(item.EMP_ROLE);
-	                
-	            });
-	        })
-	        .catch(function (error) {
-	            console.error('Error:', error);
-	            alert('데이터를 가져오는 중 문제가 발생했습니다.');
-	        });
+			    let emp_role = userRoles[0].authority.replace("ROLE_", ""); // 첫 번째 권한 추출
+				console.log("emp_role : " + emp_role);
+				
+				// 기본  middle 권한자 리스트 요청
+				let role = 'ATHR002';
+				
+				// 현재 권한자가 middle이면 high 권한자 리스트 요청
+				if(emp_role === 'ATHR002') {
+					role = 'ATHR001';
+				}
+				
+				getRequestMngList(role).then(function (data) {
+			        $('#requestSelect')
+			            .empty()
+			            .append('<option value="" disabled selected>선택하세요</option>');
+
+			        data.forEach(item => {
+		                $('#requestSelect').append(
+		                    $('<option></option>').val(item.EMP_ID).text(item.EMP_NAME + " / " + item.EMP_DEPT_NAME + " / " + item.EMP_POSITION_NAME)
+		                );
+		                
+		                $('#requestRole').val(item.EMP_ROLE);
+			        });
+			    });
+				
+				
+			}); // 모달창 승인 대상자 이벤트
 			
-		});
-		
-		
-		// type으로 공통 코드 가져오는 함수
-		function getCommonList(type) {
-		    return axios.get(`/api/absence/common/list/${type}`)
+			
+			// "추가" 버튼 클릭 이벤트
+			$('#appendRow').on('click', function (e) {
+				e.preventDefault(); // 기본 동작 방지
+				
+			    // 현재 그리드 데이터를 가져와 ABSENCE_NO의 최대값 계산
+			    const gridData = grid.getData();
+			    const maxAbsenceNo = gridData.reduce((max, row) => {
+			        const absenceNo = parseInt(row.ABSENCE_NO, 10); // ABSENCE_NO를 숫자로 변환
+			        return !isNaN(absenceNo) && absenceNo > max ? absenceNo : max;
+			    }, 0);
+			    
+				// 기본값으로 새 행 데이터 생성
+				const newRow = {
+					ABSENCE_NO: maxAbsenceNo +1,
+					EMP_ID: '',
+					EMP_NAME: '',
+					EMP_DEPT: '', 
+					EMP_POSITION: '', 
+					ABSENCE_TYPE: '', 
+					ABSENCE_START: '',
+					ABSENCE_END: '',
+					REQUEST_DATE: '',
+					HIGH_APPROVAL: ''
+				};
+				
+				// 새 행을 TOAST UI Grid에 추가
+				grid.prependRow(newRow, {
+					focus: true // 추가된 행에 포커스
+				});
+				
+				
+			}); // 추가 클릭 이벤트
+			
+			
+			
+			// "저장" 버튼 클릭 이벤트
+			$('#save').on('click', async function () {
+				const modifiedRows = grid.getModifiedRows();
+				console.log(modifiedRows); 
+				
+				let emp_role = userRoles[0].authority.replace("ROLE_", "");
+				
+				if (modifiedRows.updatedRows.length === 0 && modifiedRows.createdRows.length === 0) {
+			        Swal.fire('Info', '수정 또는 추가된 데이터가 없습니다.', 'info');
+			        return;
+			    }
+				
+			    if(emp_role === 'ATHR002') {
+			    	
+			    	 try {
+			             // 승인자 리스트 가져오기
+			             const requestMngList = await getRequestMngList(emp_role);
+
+			             // 가져온 데이터를 Swal의 select 옵션 형식으로 변환
+			             const inputOptions = requestMngList.reduce((options, item) => {
+			                 options[item.id] = item.name; // `id`와 `name`은 데이터 속성에 맞게 수정
+			                 return options;
+			             }, {});
+
+			             const { value: selectedManager } = await Swal.fire({
+			                 title: '승인자를 선택하세요',
+			                 input: 'select',
+			                 inputOptions: inputOptions,
+			                 inputPlaceholder: '선택하세요',
+			                 showCancelButton: true,
+			                 inputValidator: (value) => {
+			                     return new Promise((resolve) => {
+			                         if (value) {
+			                             resolve();
+			                         } else {
+			                             resolve('승인자를 선택해주세요.');
+			                         }
+			                     });
+			                 }
+			             });
+
+			             if (selectedManager) {
+			                 Swal.fire(`선택한 승인자: ${inputOptions[selectedManager]}`);
+			             } else {
+			                 return; // 선택 취소 시 처리 중단
+			             }
+			         } catch (error) {
+			             console.error('Error loading request managers:', error);
+			             return;
+			         }
+			    }
+			    
+				sendToServer(modifiedRows);
+				
+			}); // 저장 클릭 이벤트
+			
+			
+			
+			// "삭제" 버튼 클릭 이벤트
+			$('#deleteRow').on('click', function () {
+				const selectedRows = grid.getCheckedRows();
+				console.log('선택된 데이터:', selectedRows);
+				
+				if (selectedRows.length === 0) {
+					Swal.fire({
+					        icon: "warning",
+					        title: "삭제할 항목을 선택하세요."
+					})
+			        return;
+			    }
+				
+			    // CSRF 토큰 가져오기
+			    const csrfToken = $('input[name="_csrf"]').val();
+			    console.log("CSRF Token:", csrfToken);
+
+			    if (!csrfToken) {
+			        console.error('CSRF 토큰을 가져오지 못했습니다.');
+			        return;
+			    }
+				
+				const deleteList = selectedRows.map(row => row.ABSENCE_NO);
+				
+				axios.post('/api/absence/delete', deleteList, {
+					headers: {
+					        'X-CSRF-TOKEN': csrfToken
+					    }
+				})
+		        .then(function (response) {
+					Swal.fire(
+					        'Success',
+					        '삭제가 완료되었습니다.',
+					        'success'
+					      )
+		            window.location.reload();
+		        })
+		        .catch(function (error) {
+		            console.error('삭제 중 오류 발생:', error);
+					Swal.fire(
+					        'Error',
+					        '삭제 중 문제가 발생했습니다.',
+					        'error'
+					      )
+		        });
+				
+			}); // 삭제 버튼 이벤트
+			
+			
+			$('#new_emp_serch').on('change', function () {
+				axios.get('/api/absence/emp/serch')
+		        .then(function (response) {
+					$('#serch_emp_list').empty()
+		            .append();
+						
+		        	
+		        })
+		        .catch(function (error) {
+		        	Swal.fire(
+					        'Error',
+					        '데이터를 가져오는 중 문제가 발생했습니다.',
+					        'error'
+					      )
+		            return []; // 에러 발생 시 빈 배열 반환
+		        });
+			}); 
+			
+			// ==============================================================
+			// 사용자 권한 확인 함수
+			function hasRole(roles, requiredRoles) {
+			    return requiredRoles.some(requiredRole =>
+			        roles.some(role => role.authority === requiredRole)
+			    );
+			}
+
+			
+			
+			
+			
+			//  승인 대상자 리스트 불러오는 함수
+			function getRequestMngList(role) {
+				
+				return axios.get(`/api/absence/request/${role}`)
 		        .then(function (response) {
 		            return response.data; // 데이터 반환
 		        })
 		        .catch(function (error) {
 		            console.error('Error fetching data:', error);
-		            alert('데이터를 가져오는 중 문제가 발생했습니다.');
+					Swal.fire(
+					        'Error',
+					        '데이터를 가져오는 중 문제가 발생했습니다.',
+					        'error'
+					      )
 		            return []; // 에러 발생 시 빈 배열 반환
 		        });
-		}
-		
-		// 그리드 초기화
-		fetchData().then(function (data) {
+				
+				
+			}
 			
-		    grid = new tui.Grid({
-		    	el: document.getElementById('grid'),
-				data: gridData,
-				rowHeaders: ['checkbox'],
-				columns: [
-					{
-						header: '번호', 
-						name: 'ABSENCE_NO', 
-						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
-					},
-					{ 
-						header: '사원번호', 
-						name: 'EMP_ID', 
-						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
-					},  
-					{ 
-						header: '사원명', 
-						name: 'EMP_NAME', 
-						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
-					},
-					{ 
-						header: '부서', 
-						name: 'EMP_DEPT',
-						editor: {
-							type: 'select',
-							options: {
-								listItems: data.deptCommon
-							}
-					    },
-						filter: 'select'
-					},
-					{ 
-						header: '직급', 
-						name: 'EMP_POSITION', 
-						editor: {
-							type: 'select',
-							options: {
-								listItems: data.pstnCommon
-							}
-					    },
-						filter: 'select'
-					},
-					{ 
-						header: '종류', 
-						name: 'COMMON_DETAIL_NAME',
-						editor: {
-							type: 'select',
-							options: {
-								listItems: data.loabCommon
-							}
-					    },
-						filter: 'select'
-					},
+			
+			// type으로 공통 코드 가져오는 함수
+			function getCommonList(type) {
+			    return axios.get(`/api/absence/common/list/${type}`)
+			        .then(function (response) {
+			            return response.data; // 데이터 반환
+			        })
+			        .catch(function (error) {
+			            console.error('Error fetching data:', error);
+						Swal.fire(
+						        'Error',
+						        '데이터를 가져오는 중 문제가 발생했습니다.',
+						        'error'
+						      )
+			            return []; // 에러 발생 시 빈 배열 반환
+			        });
+			}
+			
+			const gridData = /*[[${absenceList}]]*/'';
+			gridData.forEach(row => {
+			    console.log('Row data:', row);
+			});
+			
+			// 그리드 초기화
+			fetchData().then(function (data) {
+
+				console.log('User Roles:', userRoles);
+				let isEditable = hasRole(userRoles, ['ROLE_ATHR001', 'ROLE_ATHR002']);
+				
+				console.log('Is Editable:', isEditable); 
+				
+			    grid = new tui.Grid({
+			    	el: document.getElementById('grid'),
+					data: gridData,
+					rowHeaders: ['checkbox'],
+					columns: [
+						{
+							header: '번호', 
+							name: 'ABSENCE_NO', 
+							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+							editor: isEditable ? 'text' : null
+						},
+						{ 
+							header: '사원번호', 
+							name: 'EMP_ID', 
+							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+							editor: isEditable ? 'text' : null
+						},  
+						{ 
+							header: '사원명', 
+							name: 'EMP_NAME', 
+							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+							editor: isEditable ? 'text' : null
+						},
+						{ 
+							header: '부서', 
+							name: 'EMP_DEPT',
+							editor: isEditable
+			                    ? {
+			                          type: 'select',
+			                          options: {
+			                              listItems: data.deptCommon
+			                          }
+			                      }
+			                    : null,
+							filter: 'select'
+						},
+						{ 
+							header: '직급', 
+							name: 'EMP_POSITION', 
+							editor: isEditable
+								? {
+								type: 'select',
+								options: {
+									listItems: data.pstnCommon
+								}
+						    }
+							: null,
+							filter: 'select'
+						},
+						{ 
+							header: '종류', 
+							name: 'COMMON_DETAIL_NAME',
+							editor: isEditable
+								? {
+								type: 'select',
+								options: {
+									listItems: data.loabCommon
+								}
+						    }
+							: null,
+							filter: 'select'
+						},
+						
+						{ 
+							header: '휴직 시작일', 
+							name: 'ABSENCE_START',
+							editor: isEditable
+								? {
+				                type: 'datePicker',
+				                options: {
+				                    format: 'yyyy-MM-dd'
+				                }
+				            }
+							: null,
+				            filter: {
+				                type: 'date',
+				                options: {
+				                    format: 'yyyy-MM-dd'
+				                }
+				            }
+				        },
+				        { 
+							header: '휴직 종료일', 
+							name: 'ABSENCE_END',
+							editor: isEditable 
+								? {
+				                type: 'datePicker',
+				                options: {
+				                    format: 'yyyy-MM-dd'
+				                }
+				            }
+							: null,
+				            filter: {
+				                type: 'date',
+				                options: {
+				                    format: 'yyyy-MM-dd'
+				                }
+				            }
+				        },
+				        {
+				            header: '신청일', 
+				            name: 'REQUEST_DATE',
+				            editor: isEditable 
+				                ? {
+				                    type: 'datePicker',
+				                    options: {
+				                        format: 'yyyy-MM-dd hh:mm', 
+				                    }
+				                }
+				                : null,
+				            filter: {
+				                type: 'date',
+				                options: {
+				                    format: 'yyyy-MM-dd hh:mm', 
+				                }
+				            }
+				        },
+				        { 
+							header: '최종 승인자', 
+							name: 'HIGH_APPROVAL', 
+							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+							editor: isEditable ? 'text' : null
+						},
+						{ 
+							header: '비고', 
+							name: 'ABSENCE_REMARK',
+							editor: isEditable ? 'text' : null
+						}
+					],
+					editing: isEditable  // 편집 기능 활성화
 					
-					{ 
-						header: '휴직 시작일', 
-						name: 'ABSENCE_START',
-						editor: {
-			                type: 'datePicker',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            },
-			            filter: {
-			                type: 'date',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            }
-			        },
-			        { 
-						header: '휴직 종료일', 
-						name: 'ABSENCE_END',
-						editor: {
-			                type: 'datePicker',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            },
-			            filter: {
-			                type: 'date',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            }
-			        },
-			        { 
-						header: '신청일', 
-						name: 'REQUEST_DATE',
-						editor: {
-			                type: 'datePicker',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            },
-			            filter: {
-			                type: 'date',
-			                options: {
-			                    format: 'yyyy-MM-dd'
-			                }
-			            }
-			        },
-			        { 
-						header: '최종 승인자', 
-						name: 'HIGH_APPROVAL', 
-						filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-						editor: 'text'
-					},
-					{ 
-						header: '비고', 
-						name: 'ABSENCE_REMARK',
-						editor: 'text'
-					}
-				],
-				editing: true  // 편집 기능 활성화
+				});
+			    
+			    
+			 	// 사원번호/사원명 수정 시 모달창에서 사원 조회 후 등록
+			 	/*
+			    grid.on('editingStart', function (ev) {
+			    	const { rowKey, columnName } = ev;
+
+			        // 사원번호 또는 사원명 수정 시 모달 띄우기
+			        if (columnName === 'EMP_ID' || columnName === 'EMP_NAME' || columnName === 'EMP_DEPT' || columnName === 'EMP_POSITION') {
+			            ev.stop(); // 기본 편집 동작 중단
+			            
+			        	// 해당 행의 데이터 가져오기
+			            const rowData = grid.getRow(rowKey);
+
+			            // 사원번호와 사원명을 함께 전달
+			            showEmpModal(rowKey, columnName, rowData.EMP_ID, rowData.EMP_NAME, rowData.EMP_DEPT, rowData.EMP_POSITION);
+			        }
+			        
+			    });
+			 	*/
+			 
 				
 			});
-		    
-		    
-		 // 사원번호/사원명 수정 시 모달창에서 사원 조회 후 등록
-		    grid.on('editingStart', function (ev) {
-		    	const { rowKey, columnName } = ev;
-
-		        // 사원번호 또는 사원명 수정 시 모달 띄우기
-		        if (columnName === 'EMP_ID' || columnName === 'EMP_NAME') {
-		            ev.stop(); // 기본 편집 동작 중단
-		            
-		        	// 해당 행의 데이터 가져오기
-		            const rowData = grid.getRow(rowKey);
-
-		            // 사원번호와 사원명을 함께 전달
-		            showEmpModal(rowKey, columnName, rowData.EMP_ID, rowData.EMP_NAME);
-		        }
-		        
-		    });
-		 
-		 
 			
-		});
-		
-		
-		// 사원 조회 모달창 표시 함수 
-		function showEmpModal(rowKey, columnName, empId, empName) {
 			
-		    const $modal = $('#empSerchModal');
-		    const $modalTitle = $('#empSerchModalLabel');
-		    const $modalBody = $('#empSerchModalBody');
-
-		    // 모달 내용 업데이트
-		    $modalBody.html(`
-		        <form>
-		            <div class="form-group">
-		               
-		                <div class="display-flex">
-						<div class="child-input1">
-							<label>사번: </label>
-							<div class="form-group">
-								<input type="text" value="${empId || ''}" name="emp_id" class="form-control emp-serch">
-							</div>
-						</div>
-						<div class="child-input2">
-							<label>이름: </label>
-							<div class="form-group">
-								<input type="text" value="${empName || ''}" class="form-control emp-serch" >
-							</div>
-						</div>
-					</div>
-		            </div>
-		        </form>
-		    `);
-
-		    // 모달 표시
-		    $modal.modal('show');
-
-			 // 확인 버튼 클릭 시 이벤트 처리
-		    $('#modalConfirmButton').off('click').on('click', function () {
-		        // 모달에서 입력된 값을 가져오기
-		        const newEmpId = $('input[name="emp_id"]').val();
-		        const newEmpName = $('input[name="emp_name"]').val();
-
-		        // 그리드 데이터 업데이트
-		        if (columnName === 'EMP_ID') {
-		            grid.setValue(rowKey, 'EMP_ID', newEmpId);
-		        } else if (columnName === 'EMP_NAME') {
-		            grid.setValue(rowKey, 'EMP_NAME', newEmpName);
-		        }
-		        
-		        // 모달 닫기
-		        $modal.modal('hide');
-		    });
-		}
-		
+			// 사원 조회 모달창 표시 함수 
+			function showEmpModal(rowKey, columnName, empId, empName) {
 				
-		
-		// 그리드 수정 시 공통코드 셀렉트값 가져오기
-		function fetchData() {
-		    
-		    return Promise.all([
-		    	 getCommonList('DEPT'),  // 부서 
-		         getCommonList('PSTN'),   // 직급
-		         getCommonList('LOAB') // 휴직 
-		        
-		        
-		    ])
-		    .then(function ([deptCommon, pstnCommon, loabCommon]) {
-		        return {
-		        	deptCommon: deptCommon.map(item => ({
-		                text: item.common_detail_name,
-		                value: item.common_detail_name
-		            })),
-		            pstnCommon: pstnCommon.map(item => ({
-		                text: item.common_detail_name,
-		                value: item.common_detail_name
-		            })),
-		            loabCommon: loabCommon.map(item => ({
-		                text: item.common_detail_name,
-		                value: item.common_detail_name
-		            }))
-		        };
-		    })
-		    .catch(function (error) {
-		        console.error('Error fetching data:', error);
-		        return { deptCommon: [], pstnCommon: [], loabCommon: [] };
-		    });
-		}
-		
-		
-		// "추가" 버튼 클릭 이벤트
-		$('#appendRow').on('click', function (e) {
-			e.preventDefault(); // 기본 동작 방지
+			    const $modal = $('#empSerchModal');
+			    const $modalTitle = $('#empSerchModalLabel');
+			    const $modalBody = $('#empSerchModalBody');
+
+			    // 모달 내용 업데이트
+			    $modalBody.html(`
+			        <form>
+			            <div class="form-group">
+			               
+			                <div class="display-flex">
+								<div class="child-input1">
+									<label>사번 / 이름 </label>
+									<div class="form-group">
+										<input type="text" value="${empId || ''}" name="new_emp_serch" id ="new_emp_serch" class="form-control emp-serch" >
+									</div>
+								</div>
+							</div>
+							
+							 <div class="" id="serch_emp_list">
+							 	
+							</div>
+							
+			            </div>
+			        </form>
+			    `);
+
+			    // 모달 표시
+			    $modal.modal('show');
+
+				 // 확인 버튼 클릭 시 이벤트 처리
+			    $('#modalConfirmButton').off('click').on('click', function () {
+			        // 모달에서 입력된 값을 가져오기
+			        const newEmpId = $('input[name="emp_id"]').val();
+			        const newEmpName = $('input[name="emp_name"]').val();
+			        const newEmpDept = $('input[name="emp_dept"]').val();
+			        const newEmpPosition = $('input[name="emp_position"]').val();
+
+			        // 그리드 데이터 업데이트
+			        if (columnName === 'EMP_ID') {
+			            grid.setValue(rowKey, 'EMP_ID', newEmpId);
+			        } else if (columnName === 'EMP_NAME') {
+			            grid.setValue(rowKey, 'EMP_NAME', newEmpName);
+			        } 
+			        
+			        // 모달 닫기
+			        $modal.modal('hide');
+			    });
+			}
 			
-			// 기본값으로 새 행 데이터 생성
-			const newRow = {
-				ABSENCE_NO: grid.getRowCount() + 1,
-				EMP_ID: '',
-				EMP_NAME: '',
-				EMP_DEPT: '', 
-				EMP_POSITION: '', 
-				ABSENCE_TYPE: '', 
-				ABSENCE_START: '',
-				ABSENCE_END: '',
-				REQUEST_DATE: '',
-				HIGH_APPROVAL: ''
-			};
+					
 			
-			// 새 행을 TOAST UI Grid에 추가
-			grid.appendRow(newRow, {
-				focus: true // 추가된 행에 포커스
-			});
-		});
-		
-		
-		
-		// "저장" 버튼 클릭 이벤트
-		$('#save').on('click', function () {
+			// 그리드 수정 시 공통코드 셀렉트값 가져오기
+			function fetchData() {
+			    
+			    return Promise.all([
+			    	 getCommonList('DEPT'),  // 부서 
+			         getCommonList('PSTN'),   // 직급
+			         getCommonList('LOAB') // 휴직 
+			        
+			        
+			    ])
+			    .then(function ([deptCommon, pstnCommon, loabCommon]) {
+			        return {
+			        	deptCommon: deptCommon.map(item => ({
+			                text: item.common_detail_name,
+			                value: item.common_detail_name
+			            })),
+			            pstnCommon: pstnCommon.map(item => ({
+			                text: item.common_detail_name,
+			                value: item.common_detail_name
+			            })),
+			            loabCommon: loabCommon.map(item => ({
+			                text: item.common_detail_name,
+			                value: item.common_detail_name
+			            }))
+			        };
+			    })
+			    .catch(function (error) {
+			        console.error('Error fetching data:', error);
+			        return { deptCommon: [], pstnCommon: [], loabCommon: [] };
+			    });
+			}
 			
-			const modifiedRows = grid.getModifiedRows();
-			console.log(modifiedRows); 
-// 			sendToServer(modifiedRows);
-		});
-		/*
-		function sendToServer(data) {
-			fetch('/update-data', {
-				method: 'POST',
-				headers: {
-				  'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(data),
-			})
-			.then(response => response.json())
-			.then(result => {
-				console.log('Server response:', result);
-			})
-			.catch(error => console.error('Error:', error));
-		}
-		*/
+			
+			
+			
+
+			function sendToServer(modifiedRows) {
+				 // CSRF 토큰 가져오기
+			    const csrfToken = $('input[name="_csrf"]').val();
+			    console.log("CSRF Token:", csrfToken);
+			    
+			    
+			    axios.post('/api/absence/update', modifiedRows, {
+			        headers: {
+			            'X-CSRF-TOKEN': csrfToken
+			        }
+			    })
+			    .then(function (response) {
+			        Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success');
+			        grid.resetData(response.data); // 서버에서 반환된 최신 데이터로 그리드 갱신
+			    })
+			    .catch(function (error) {
+			        console.error('데이터 저장 중 오류 발생:', error);
+			        Swal.fire('Error', '데이터 저장 중 문제가 발생했습니다.', 'error');
+			    });
+			}
+			
+			
+			
+		}); //돔로드이벤트
 		
 		
 		
+
 		
 	</script>
 	
@@ -663,13 +876,14 @@
 		        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
 
 		        // 결과를 hidden에 저장
-		        $('#deadline').val(dayDifference);
+// 		        $('#deadline').val(dayDifference);
 		    }
 		    
 		    
 		}
 		
 		
+	
 	</script>
 
 

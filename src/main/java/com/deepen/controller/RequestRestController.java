@@ -25,7 +25,7 @@ public class RequestRestController {
 	@GetMapping("/request-list")
     public List<Request> getRequestList() {
 		List<Request> allList = rqService.requestAllList();
-		log.info(allList.toString());
+		log.info("요청내역전체리스트!!!"+allList.toString());
         return allList;
     }
 	

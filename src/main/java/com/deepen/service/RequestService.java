@@ -14,8 +14,9 @@ import lombok.extern.java.Log;
 @Log
 @RequiredArgsConstructor // 객체생성
 public class RequestService {
-
+	
 	private final RequestRepository rqRepository;
+	
 	
 	public List<Request> requestAllList(){
 		return rqRepository.findAll();

@@ -28,15 +28,6 @@ public class AttendanceController {
 	
 	
 	
-	// 근무 관리
-	@GetMapping("/work-mng")
-	public String workMng() {
-		//http://localhost:8082/work-mng
-		return "attendance/work_mng";
-	}
-	
-	
-	
 	
 	
 	

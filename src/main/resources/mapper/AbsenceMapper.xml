@@ -8,6 +8,7 @@
 	<select id="getAbsenceList" resultType="Map">
 		SELECT *
 		FROM ABSENCE_VIEW 
+		ORDER BY ABSENCE_NO DESC
 	</select>
 	
 	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
@@ -76,7 +77,35 @@
 	
 	</insert>
 	
-	
+	<delete id="deleteAbsences" parameterType="java.util.List">
+	    DELETE FROM ABSENCE
+	    WHERE ABSENCE_NO IN
+	    <foreach item="ABSENCE_NO" collection="list" open="(" separator="," close=")">
+	        #{ABSENCE_NO}
+	    </foreach>
+	</delete>
+
+	<!-- 업데이트 SQL -->
+    <update id="updateAbsence" parameterType="java.util.Map">
+        UPDATE ABSENCE
+	       SET 
+	           EMP_ID = #{EMP_ID},
+	           ABSENCE_TYPE = #{ABSENCE_TYPE},
+	           ABSENCE_START = #{ABSENCE_START},
+	           ABSENCE_END = #{ABSENCE_END},
+	           ABSENCE_REMARK = #{ABSENCE_REMARK},
+	           HIGH_APPROVAL = #{HIGH_APPROVAL}
+         WHERE ABSENCE_NO = #{ABSENCE_NO}
+    </update>
+
+    <!-- 삽입 SQL -->
+    <insert id="insertAbsence" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="ABSENCE_NO">
+        INSERT INTO ABSENCE (
+            EMP_ID, ABSENCE_TYPE, ABSENCE_START, ABSENCE_END, ABSENCE_REMARK
+        ) VALUES (
+            #{EMP_ID}, #{ABSENCE_TYPE}, #{ABSENCE_START}, #{ABSENCE_END}, #{ABSENCE_REMARK}
+        )
+    </insert>
 	
 </mapper>
 

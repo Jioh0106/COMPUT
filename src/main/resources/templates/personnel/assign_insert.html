@@ -225,7 +225,7 @@
                 role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel18">승인권자 선택</h4>
+                        <h4 class="modal-title" id="myModalLabel18">중간승인권자 선택</h4>
                         <button type="button" class="close" data-bs-dismiss="modal"
                             aria-label="Close">
                             <i data-feather="x"></i>
@@ -288,7 +288,8 @@
 		
 	    // 토스트 UI 모달창 그리드 시작
 		
-		let selectApprover = {}; //전역변수!!!!!! 중간승인권자 그리드 행을 담는 변수
+		let approverString = {}; //전역변수!!!!!! 중간승인권자 그리드 행을 담는 변수
+		let selectApprover ={};
 		
 	    document.addEventListener('DOMContentLoaded', function () {
 	        var Grid = tui.Grid;
@@ -404,6 +405,9 @@
 	                approverEmp_dept: row.emp_dept,
 	                approverEmp_position: row.emp_position
 	            };
+				
+				// 문자열 형태로 변환 (사원번호/이름/부서명/직급)
+			approverString = `${selectApprover.approverEmp_id}/${selectApprover.approverEmp_name}/${selectApprover.approverEmp_dept}/${selectApprover.approverEmp_position}`;
 	            alert(`중간승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
 	        }
 	    }); // 토스트 UI 모달창 그리드 끝
@@ -434,7 +438,7 @@
 				
 				const requestDTO = {
 					emp_id :'2025010820',
-					middle_approval : JSON.stringify(selectApprover)
+					middle_approval : approverString
 				};
 				
 		
