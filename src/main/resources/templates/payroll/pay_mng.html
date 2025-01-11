@@ -61,6 +61,15 @@
         .detail-link:hover {
             color: #0a58ca;
         }
+		
+		#detailContent {
+		    white-space: pre-wrap; /* 개행 문자(\n)를 유지하고 자동 줄바꿈 */
+		    word-wrap: break-word; /* 단어 단위로 줄바꿈 */
+		    word-break: break-word; /* 긴 단어가 있을 경우 강제로 줄바꿈 */
+		    overflow-wrap: break-word; /* 텍스트가 넘칠 경우 줄바꿈 */
+			max-height: 300px; /* 최대 높이를 제한 */
+		    overflow-y: auto;
+		}
     </style>
 </head>
 
@@ -201,7 +210,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">계산식 설명</h5>
+                    <h5 class="modal-title" id="detailTitle">계산식 설명</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -278,12 +287,19 @@ grid.on('click', (ev) => {
         const rowData = grid.getRow(ev.rowKey);
         console.log('Clicked row data:', rowData); // 클릭한 로우 데이터 로그
         
-        if (rowData && rowData.formulaComment) {
-            document.getElementById('detailContent').textContent = rowData.formulaComment;
+        if (rowData) {
+            const formulaName = rowData.formulaName || '항목명 없음'; // 항목명이 없을 경우 대비
+            const formulaComment = rowData.formulaComment || '등록된 설명이 없습니다.'; // 설명이 없을 경우 대비
+            
+            // 제목 설정 (항목명 + 설명)
+            document.getElementById('detailTitle').textContent = `${formulaName}의 내용`;
+            
+            // 내용 설정
+            document.getElementById('detailContent').textContent = formulaComment;
+            
+            // 모달 표시
             new bootstrap.Modal(document.getElementById('detailModal')).show();
         } else {
-            // 어떤 값이 들어있는지 확인
-            console.log('formulaComment value:', rowData?.formulaComment);
             alert('등록된 설명이 없습니다.');
         }
     }
