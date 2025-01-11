@@ -28,7 +28,6 @@ public class RequestDTO {
 	private String high_approval; //최종승인권자 사번
 	private String emp_id; //요청자사번
 	
-	
 	private  EmployeesDTO approver; //중간승인권자 정보 저장
 	
 	

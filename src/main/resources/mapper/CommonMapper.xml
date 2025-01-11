@@ -16,7 +16,7 @@
 	
 	<select id="commonDtlList" resultType="map" parameterType="string">
 		SELECT 
-			common_detail_code, common_detail_name, common_detail_status, common_detail_display, 'select' AS row_type
+			common_detail_code, common_detail_name, common_detail_status, common_detail_display
 		FROM 
 			common_detail
 		WHERE 
@@ -57,11 +57,7 @@
 			UPDATE common
 			SET common_code = #{commonCode}
 				, common_name = #{commonName}
-				, common_content = #{commonContent}
 				, common_status = #{commonStatus}
-				<if test = 'commonDisplay != null and commonDisplay != ""'>
-		  		, common_display = #{commonDisplay}
-		  		</if>
 			WHERE common_code = #{commonCode}
 	</update>
 	
@@ -70,9 +66,6 @@
 			SET common_detail_code = #{commonCode}
 				, common_detail_name = #{commonName}
 				, common_detail_status = #{commonStatus}
-				<if test = 'commonDisplay != null and commonDisplay != ""'>
-		  		, common_detail_display = #{commonDisplay}
-		  		</if>
 			WHERE common_detail_code = #{commonCode}
 	</update>
 	

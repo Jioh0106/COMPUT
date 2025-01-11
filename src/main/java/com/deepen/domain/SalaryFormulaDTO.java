@@ -14,5 +14,6 @@ public class SalaryFormulaDTO {
     private int applyYear;
     private int formulaPriority;
     private String formulaCode;
-    private String formulaComment;
+    private String rangeStart;
+    private String rangeEnd;
 }
