@@ -13,11 +13,13 @@ import com.deepen.domain.CommonDetailDTO;
 @Repository
 public interface PersonnelMapper {
 	
-	// 등록페이지 필요 공통 코드 조회
+	 //등록페이지 필요 공통 코드 조회
 	 List<CommonDetailDTO> selectCommonDetailCodeList();
 	 
 	 List<Map<String, Object>> selectEmpList(Map<String, Object> params);
 	 
+	 List<Map<String, Object>> countByAgeGroupAndGender();
 	 
+	 List<Map<String, Object>> selectByAgeGroupInfo(String ageGroup);
 	
 }

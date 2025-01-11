@@ -115,7 +115,7 @@
 		        WHEN emp_age_group = '60대' THEN 2
 		        ELSE 1
 		    END,
-		    emp_gender;
+		    emp_gender
 	</select>
 	
 	<select id="selectByAgeGroupInfo" parameterType="String" resultType="java.util.Map">
@@ -172,7 +172,7 @@
 		) ela
 		ON ea.emp_id = ela.emp_id
 		WHERE ea.emp_age_group = #{ageGroup}
-		ORDER BY ea.emp_no; 
+		ORDER BY ea.emp_no 
 	</select>
 	
 </mapper>

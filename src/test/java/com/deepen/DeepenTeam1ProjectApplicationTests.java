@@ -22,6 +22,8 @@ class DeepenTeam1ProjectApplicationTests {
 		
 //		mapper.selectCommonDetailCodeList();
 //		mapper.selectEmpList();
+//		mapper.countByAgeGroupAndGender();
+//		mapper.selectByAgeGroupInfo("30대");
 //		service.getEmpList();
 	}
 
