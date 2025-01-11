@@ -23,8 +23,6 @@
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.css">
-	
 	<style>
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */
@@ -249,8 +247,7 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	<script src="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.js"></script>
-
+	
 	<script th:inline="javascript">
 		$(function () {
 			
@@ -530,9 +527,7 @@
 			}
 			
 			const gridData = /*[[${absenceList}]]*/'';
-			gridData.forEach(row => {
-			    console.log('Row data:', row);
-			});
+			
 			
 			// 그리드 초기화
 			fetchData().then(function (data) {
@@ -641,21 +636,21 @@
 				                }
 				            }
 				        },
-				        {
-				            header: '신청일', 
-				            name: 'REQUEST_DATE',
-				            editor: isEditable 
-				                ? {
-				                    type: 'datePicker',
-				                    options: {
-				                        format: 'yyyy-MM-dd hh:mm', 
-				                    }
+				        { 
+							header: '신청일', 
+							name: 'REQUEST_DATE',
+							editor: isEditable 
+								? {
+				                type: 'datePicker',
+				                options: {
+				                    format: 'yyyy-MM-dd'
 				                }
-				                : null,
+				            }
+							: null,
 				            filter: {
 				                type: 'date',
 				                options: {
-				                    format: 'yyyy-MM-dd hh:mm', 
+				                    format: 'yyyy-MM-dd'
 				                }
 				            }
 				        },
