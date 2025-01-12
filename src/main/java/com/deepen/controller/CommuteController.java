@@ -88,11 +88,4 @@ public class CommuteController {
 		return searchCmtList;
 	}
 
-	// 휴가 관리
-	@GetMapping("/vctn-mng")
-	public String vctnMng() {
-		// http://localhost:8082/vctn-mng
-		return "attendance/vctn_mng";
-	}
-
 }
