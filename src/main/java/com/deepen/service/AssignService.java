@@ -44,7 +44,6 @@ public class AssignService {
 		//psService에서 매서드 만들어서? 부서랑 성명을 가져와야하나..?
 		// 반려사유는 여기서처리 x
 		request.setRequest_status("RQST005"); //요청상태
-		request.setComplete("N"); //처리상태
 		request.setRequest_type("발령"); //요청유형
 		request.setMiddle_approval(requestDto.getMiddle_approval());//중간권한자
 		// 요청일과 요청마감일은 @PrePersist에 의해 자동 설정됨(서비스단에서 처리 안해도된다!)
