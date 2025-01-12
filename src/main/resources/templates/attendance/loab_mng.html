@@ -10,12 +10,12 @@
 	<!--공통 -->
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
-	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
-	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
-	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
-	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+	<link rel="stylesheet" href="/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="/assets/vendors/iconly/bold.css">
+	<link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="/assets/css/app.css">
+	<link rel="shortcut icon" href="/assets/images/favicon.svg" type="/assets/image/x-icon">
 	
 	<!--  sweetalert  -->
 	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
@@ -26,6 +26,9 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	
 	<style>
+		.tui-grid-cell-content {
+		    color: #000 !important; /* 글자를 검은색으로 강제 설정 */
+		}
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */
 			background-color: #ffffff !important;
@@ -212,7 +215,7 @@
 		</div><!--main--> 
 	</div><!-- app -->
 	
-	<!-- 모달 정의 -->
+	<!-- 사원 조회 모달 정의 -->
 	<div class="modal fade" id="empSerchModal" tabindex="-1" aria-labelledby="empSerchModalLabel" aria-hidden="true">
 	    <div class="modal-dialog">
 	        <div class="modal-content">
@@ -220,22 +223,39 @@
 	                <h5 class="modal-title" id="empSerchModalLabel">사원 조회</h5>
 	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	            </div>
-	            <div class="modal-body" id="empSerchModalBody">
-	                <!-- 동적 컨텐츠 -->
-	            </div>
-	            <div class="modal-footer">
-	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-	                <button type="button" class="btn btn-primary" id="modalConfirmButton">확인</button>
-	            </div>
+				<form>
+		            <div class="modal-body" id="empSerchModalBody">
+			            <div class="form-group">
+			                <div class="display-flex">
+			                    <div class="child-input1">
+			                        <label>사원명 </label>
+			                        <div class="form-group">
+			                            <input type="text" name="new_emp_serch" id="new_emp_serch" class="form-control emp-serch mb-2">
+										
+			                            <div id="modal-grid"></div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+		                <button type="button" class="btn btn-primary" id="empSerchModalConfirm">확인</button>
+		            </div>
+		        </form>
 	        </div>
 	    </div>
 	</div>
 	
 	
 		
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 		
 	<!-- 제이쿼리 -->
-	<script th:src="@{/js/jquery-3.7.1.js}"></script>	
+	<script src="/js/jquery-3.7.1.js"></script>	
 	
 	<!--Axios -->
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -244,21 +264,14 @@
 	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	
 	<!--공통 -->
-	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-	<script th:src="@{/assets/js/main.js}"></script>
+	<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="/assets/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/main.js"></script>
 
-	<!-- TOAST UI CDN -->
-	<script src="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.js"></script>
-	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
-	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 
 	<script th:inline="javascript">
 		$(function () {
 			
-			let grid;
-			
-
 			let emp_role = /*[[${emp.emp_role}]]*/'';
 			console.log("emp_role : " + emp_role); 
 			
@@ -400,10 +413,31 @@
 			        return;
 			    }
 				
-			    if(emp_role === 'ATHR002') {
-			    	
-			    	
-			    }
+				// 추가된 행 중 빈 필드가 있는지 검사 (ABSENCE_REMARK 제외)
+				const invalidRows = modifiedRows.createdRows.filter(row => {
+					console.log('검사 중인 행 데이터:', row); // 디버깅용 출력
+				    return (
+				        !row.EMP_ID ||
+				        !row.EMP_NAME ||
+				        !row.EMP_DEPT ||
+				        !row.EMP_POSITION ||
+				        !row.ABSENCE_TYPE ||
+				        !row.ABSENCE_START ||
+				        !row.ABSENCE_END ||
+				        !row.HIGH_APPROVAL
+				    );
+				});
+
+				// 빈 필드가 있는 행이 존재하면 알림 표시 후 중단
+				if (invalidRows.length > 0) {
+					console.log('유효하지 않은 행:', invalidRows);
+				    Swal.fire({
+				        icon: 'error',
+				        title: '모든 항목을 입력하세요.',
+				        text: '추가된 행 중 비어 있는 필드가 존재합니다. (비고사항 제외)',
+				    });
+				    return; // 저장 중단
+				}
 			    
 				sendToServer(modifiedRows);
 				
@@ -460,23 +494,7 @@
 			}); // 삭제 버튼 이벤트
 			
 			
-			$('#new_emp_serch').on('change', function () {
-				axios.get('/api/absence/emp/serch')
-		        .then(function (response) {
-					$('#serch_emp_list').empty()
-		            .append();
-						
-		        	
-		        })
-		        .catch(function (error) {
-		        	Swal.fire(
-					        'Error',
-					        '데이터를 가져오는 중 문제가 발생했습니다.',
-					        'error'
-					      )
-		            return []; // 에러 발생 시 빈 배열 반환
-		        });
-			}); 
+			
 			
 			// ==============================================================
 			
@@ -536,13 +554,14 @@
 			        });
 			}
 			
-			const gridData = /*[[${absenceList}]]*/'';
-			gridData.forEach(row => {
-			    console.log('Row data:', row);
-			});
+			let grid;		// 휴직 메인 그리드 전역 변수
+			let modalGrid; 	// 사원 검색 모달창 그리드 전역 변수
+			
+			const gridData = /*[[${absenceList}]]*/''; // 메인 그리드 데이터
+			
 			
 			// 그리드 초기화
-			fetchData().then(function (data) {
+			mainFetchData().then(function (data) {
 
 				let isEditable = emp_role === 'ATHR001' || emp_role === 'ATHR002';
 				
@@ -578,28 +597,14 @@
 							header: '부서', 
 							name: 'EMP_DEPT',
 							width: 100,
-							editor: isEditable
-			                    ? {
-			                          type: 'select',
-			                          options: {
-			                              listItems: data.deptCommon
-			                          }
-			                      }
-			                    : null,
+							editor: isEditable ? 'text' : null,
 							filter: 'select'
 						},
 						{ 
 							header: '직급', 
 							name: 'EMP_POSITION', 
 							width: 100,
-							editor: isEditable
-								? {
-								type: 'select',
-								options: {
-									listItems: data.pstnCommon
-								}
-						    }
-							: null,
+							editor: isEditable ? 'text' : null,
 							filter: 'select'
 						},
 						{ 
@@ -712,9 +717,9 @@
 			            
 			        	// 해당 행의 데이터 가져오기
 			            const rowData = grid.getRow(rowKey);
-
-			            // 사원번호와 사원명을 함께 전달
-			            showEmpModal(rowKey, columnName, rowData.EMP_ID, rowData.EMP_NAME, rowData.EMP_DEPT, rowData.EMP_POSITION);
+						
+						// 행정보 전달
+			            showEmpModal(rowKey, columnName);
 			        }
 			        
 			    });
@@ -722,79 +727,98 @@
 			});
 			
 			
-			// 사원 조회 모달창 표시 함수 
-			function showEmpModal(rowKey, columnName, empId, empName) {
+			
+			// 사원 조회 모달창 표시 함수
+			function showEmpModal(rowKey, columnName) {
+			    const $modal = $('#empSerchModal'); // 모달창 요소
+
+			    // Toast UI Grid 초기화 (최초 1회만 실행)
+			    if (!modalGrid) {
+			        modalGrid = new tui.Grid({
+			            el: document.getElementById('modal-grid'), // Grid를 표시할 요소
+			            data: [], // 초기 데이터
+			            rowHeaders: ['checkbox'], // 행 헤더: 체크박스 추가
+			            columns: [
+			                { header: '사번', name: 'EMP_ID', width: 120 },
+			                { header: '이름', name: 'EMP_NAME', width: 100 },
+			                { header: '부서', name: 'EMP_DEPT', width: 100 },
+			                { header: '직급', name: 'EMP_POSITION', width: 100 }
+			            ]
+			        });
+			    }
 				
-			    const $modal = $('#empSerchModal');
-			    const $modalTitle = $('#empSerchModalLabel');
-			    const $modalBody = $('#empSerchModalBody');
+				// 모달 열릴 때 입력 필드와 그리드 초기화
+				$modal.on('show.bs.modal', function () {
+				    $('#new_emp_serch').val(''); // 입력 필드 초기화
+					$('#new_emp_serch').focus();
+				    modalGrid.resetData([]); // 그리드 데이터 초기화
+				});
 
-			    // 모달 내용 업데이트
-			    $modalBody.html(`
-			        <form>
-			            <div class="form-group">
-			               
-			                <div class="display-flex">
-								<div class="child-input1">
-									<label>사번 / 이름 </label>
-									<div class="form-group">
-										<input type="text" value="${empId || ''}" name="new_emp_serch" id ="new_emp_serch" class="form-control emp-serch" >
-									</div>
-								</div>
-							</div>
-							
-							 <div class="" id="serch_emp_list">
-							 	
-							</div>
-							
-			            </div>
-			        </form>
-			    `);
-
-			    // 모달 표시
-			    $modal.modal('show');
-
-				 // 확인 버튼 클릭 시 이벤트 처리
-			    $('#modalConfirmButton').off('click').on('click', function () {
-			        // 모달에서 입력된 값을 가져오기
-			        const newEmpId = $('input[name="emp_id"]').val();
-			        const newEmpName = $('input[name="emp_name"]').val();
-			        const newEmpDept = $('input[name="emp_dept"]').val();
-			        const newEmpPosition = $('input[name="emp_position"]').val();
-
-			        // 그리드 데이터 업데이트
-			        if (columnName === 'EMP_ID') {
-			            grid.setValue(rowKey, 'EMP_ID', newEmpId);
-			        } else if (columnName === 'EMP_NAME') {
-			            grid.setValue(rowKey, 'EMP_NAME', newEmpName);
-			        } 
-			        
-			        // 모달 닫기
-			        $modal.modal('hide');
-			    });
-			}
-			
+				// 입력창 값 변경 이벤트 (한 번만 등록)
+				$('#new_emp_serch').off('input').on('input', function () {
+				    let emp_name = $('#new_emp_serch').val().trim(); // 입력된 값 가져오기
 					
+				    if (emp_name) {
+				        // API 호출 및 그리드 데이터 갱신
+				        getEmpSerch(emp_name).then(data => {
+							console.log("Fetched Data:", data); // 반환된 데이터 구조 확인
+				            modalGrid.resetData(data); // 새로운 데이터로 그리드 갱신
+				        });
+				    } else {
+				        modalGrid.resetData([]); // 입력값이 비어있을 경우 그리드 초기화
+				    }
+				});
+
+
+				// 확인 버튼 클릭 이벤트 (한 번만 바인딩)
+				$('#empSerchModalConfirm').off('click').on('click', function () {
+				    const selectedRows = modalGrid.getCheckedRows(); // 선택된 행 데이터
+				    if (selectedRows.length === 1) {
+				        const selectedRow = selectedRows[0]; // 첫 번째 선택된 행
+				        // 메인 Grid 데이터 업데이트
+				        grid.setValue(rowKey, 'EMP_ID', selectedRow.EMP_ID); // EMP_ID 업데이트
+				        grid.setValue(rowKey, 'EMP_NAME', selectedRow.EMP_NAME); // EMP_NAME 업데이트
+				        grid.setValue(rowKey, 'EMP_DEPT', selectedRow.EMP_DEPT); // EMP_DEPT 업데이트
+				        grid.setValue(rowKey, 'EMP_POSITION', selectedRow.EMP_POSITION); // EMP_POSITION 업데이트
+
+				        $modal.modal('hide'); // 모달창 닫기
+				    } else if (selectedRows.length > 1) {
+				        // 선택된 행이 두 개 이상인 경우 경고 알림
+				        Swal.fire('Error', '하나의 행만 선택해주세요.', 'warning');
+				    } else {
+				        // 선택된 행이 없는 경우 경고 알림
+				        Swal.fire('Error', '사원을 선택해주세요.', 'error');
+				    }
+				});
+
+
+			    // 모달창 표시
+			    $modal.modal('show');
+			}
+
+			// 사원 검색 API 호출 함수
+			function getEmpSerch(emp_name) {
+			    return axios.get(`/api/absence/serch/${emp_name}`)
+			        .then(function (response) {
+			            return response.data; // 데이터 반환
+			        })
+			        .catch(function (error) {
+			            console.error('Error fetching data:', error);
+			            return []; // 에러 발생 시 빈 배열 반환
+			        });
+			}
+
 			
+			// ===================================================
 			// 그리드 수정 시 공통코드 셀렉트값 가져오기
-			function fetchData() {
+			function mainFetchData() {
 			    
 			    return Promise.all([
-			    	 getCommonList('DEPT'),  		// 부서 
-			         getCommonList('PSTN'),   		// 직급
 			         getCommonList('LOAB'), 		// 휴직 
 					 getRequestMngList('ATHR001') 	// 최종승인자리스트 - high
 			    ])
-			    .then(function ([deptCommon, pstnCommon, loabCommon, highList]) {
+			    .then(function ([loabCommon, highList]) {
 			        return {
-			        	deptCommon: deptCommon.map(item => ({
-			                text: item.common_detail_name,
-			                value: item.common_detail_name
-			            })),
-			            pstnCommon: pstnCommon.map(item => ({
-			                text: item.common_detail_name,
-			                value: item.common_detail_name
-			            })),
 			            loabCommon: loabCommon.map(item => ({
 			                text: item.common_detail_name,
 			                value: item.common_detail_name
@@ -807,7 +831,7 @@
 			    })
 			    .catch(function (error) {
 			        console.error('Error fetching data:', error);
-			        return { deptCommon: [], pstnCommon: [], loabCommon: [], highList: [] };
+			        return { loabCommon: [], highList: [] };
 			    });
 			}
 			
@@ -817,9 +841,9 @@
 			// 수정/추가 컬럼 반영
 			function sendToServer(modifiedRows) {
 				 // CSRF 토큰 가져오기
-			    const csrfToken = $('input[name="_csrf"]').val();
+			    let csrfToken = $('input[name="_csrf"]').val();
 			    console.log("CSRF Token:", csrfToken);
-			    
+				let emp_id = /*[[${emp.emp_id}]]*/'';
 			    
 			    axios.post('/api/absence/update', modifiedRows, {
 			        headers: {

@@ -2,11 +2,13 @@ package com.deepen.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.RequestDTO;
 import com.deepen.entity.Request;
+import com.deepen.mapper.RequestMapper;
 import com.deepen.repository.RequestRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import lombok.extern.java.Log;
 public class RequestService {
 	
 	private final RequestRepository rqRepository;
+	private final RequestMapper rqMapper;
 	
 	//로그인한 요청내역 조회
 	public List<RequestDTO> requestAllList(String emp_id){
@@ -89,6 +92,15 @@ public class RequestService {
             
             
     }
+
+	public Map<String, Object> getAbsenceWithRequest(int request_no) {
+		
+		Map<String, Object> map = rqMapper.getAbsenceWithRequest(request_no);
+		log.info("RequestService -  absence" + map.toString());
+		
+		
+		return map;
+	}
 
 		
 		
