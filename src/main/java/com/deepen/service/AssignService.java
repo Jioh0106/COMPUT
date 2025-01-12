@@ -52,7 +52,7 @@ public class AssignService {
 		//요청번호는 자동생성
 		request.setEmp_id(emp_id);
 		// 반려사유는 여기서처리 x
-//		request.setRequest_status("RQST005"); //요청상태
+
 		request.setRequest_type("발령"); //요청유형
 //		request.setMiddle_approval(requestDto.getMiddle_approval());//중간권한자
 		
