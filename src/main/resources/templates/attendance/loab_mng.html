@@ -21,9 +21,9 @@
 	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
 	
 	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.css">
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.css">
 	
 	<style>
 		.tui-grid-cell {
@@ -139,14 +139,6 @@
 									
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>비고사항 </label>
-											<div class="form-group">
-												<textarea id="remark"class="form-control" name="absence_remark"></textarea>
-											</div>
-										</div>
-									</div>
-									<div class="display-flex">
-										<div class="child-input1">
 											<label>승인 요청 선택 </label>
 											<fieldset class="form-group">
 												<select class="form-select" id="requestSelect" name="request_approval" >
@@ -154,13 +146,23 @@
 												</select>
 											</fieldset>
 										</div>
-										<div class="child-input2">
-											<label>요청 기한</label>
+<!--										<div class="child-input2">-->
+<!--											<label>요청 기한</label>-->
+<!--											<div class="form-group">-->
+<!--												<input type="date" class="form-control" id="date_deadline" onchange="calcDate2()">-->
+<!--											</div>-->
+<!--										</div>-->
+									</div>
+																		
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>비고사항 </label>
 											<div class="form-group">
-												<input type="date" class="form-control" id="date_deadline" onchange="calcDate2()">
+												<textarea id="remark"class="form-control" name="absence_remark"></textarea>
 											</div>
 										</div>
 									</div>
+									
 									<input type="hidden" id="requestRole" name="request_role">
 									<input type="hidden" id="deadline" name="deadline">
 								</div><!-- modal body -->
@@ -247,16 +249,18 @@
 	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	<script src="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.min.js"></script>
 
 	<script th:inline="javascript">
 		$(function () {
 			
 			let grid;
 			
-			let userRoles = /*[[${#authentication.authorities}]]*/[];
+
+			let emp_role = /*[[${emp.emp_role}]]*/'';
+			console.log("emp_role : " + emp_role); 
 			
 			// 모달창 휴직 구분 공통코드 불러오기
 			$('#loabSelect').on('click', function () {
@@ -290,30 +294,41 @@
 			        return;
 			    }
 				
-			    let emp_role = userRoles[0].authority.replace("ROLE_", ""); // 첫 번째 권한 추출
-				console.log("emp_role : " + emp_role);
-				
 				// 기본  middle 권한자 리스트 요청
 				let role = 'ATHR002';
 				
 				// 현재 권한자가 middle이면 high 권한자 리스트 요청
 				if(emp_role === 'ATHR002') {
 					role = 'ATHR001';
+				} 
+				
+				if(emp_role === 'ATHR001') {
+					let emp_id = /*[[${emp.emp_id}]]*/'';
+					
+					getSelf(emp_id).then(function (data) {
+				        $('#requestSelect')
+				            .empty()
+				            .append( $('<option></option>').val(data.EMP_ID).text(data.EMP_NAME + " / " + data.EMP_DEPT_NAME + " / " + data.EMP_POSITION_NAME));
+						$('#requestRole').val("self");
+				    });
+					
+				} else {
+					getRequestMngList(role).then(function (data) {
+				        $('#requestSelect')
+				            .empty()
+				            .append('<option value="" disabled selected>선택하세요</option>');
+	
+				        data.forEach(item => {
+			                $('#requestSelect').append(
+			                    $('<option></option>').val(item.EMP_ID).text(item.EMP_NAME + " / " + item.EMP_DEPT_NAME + " / " + item.EMP_POSITION_NAME)
+			                );
+			                
+			                $('#requestRole').val(item.EMP_ROLE);
+				        });
+				    });
+					
 				}
 				
-				getRequestMngList(role).then(function (data) {
-			        $('#requestSelect')
-			            .empty()
-			            .append('<option value="" disabled selected>선택하세요</option>');
-
-			        data.forEach(item => {
-		                $('#requestSelect').append(
-		                    $('<option></option>').val(item.EMP_ID).text(item.EMP_NAME + " / " + item.EMP_DEPT_NAME + " / " + item.EMP_POSITION_NAME)
-		                );
-		                
-		                $('#requestRole').val(item.EMP_ROLE);
-			        });
-			    });
 				
 				
 			}); // 모달창 승인 대상자 이벤트
@@ -330,6 +345,27 @@
 			        return !isNaN(absenceNo) && absenceNo > max ? absenceNo : max;
 			    }, 0);
 			    
+				const now = new Date(); // 현재 날짜와 시간 가져오기
+
+				// 년, 월, 일
+				const year = now.getFullYear();
+				const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+				const day = String(now.getDate()).padStart(2, '0');
+
+				// 시간, 분
+				const hours = String(now.getHours()).padStart(2, '0');
+				const minutes = String(now.getMinutes()).padStart(2, '0');
+				
+				// 행 추가 시 신청일은 현재 시간
+				let request_date = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+				let high_approval = '';
+				// 사용자가 high 권한자라면 승인 절차 생략
+				if(emp_role === 'ATHR001') {
+					high_approval = "2025010928";
+				}
+				
+				
 				// 기본값으로 새 행 데이터 생성
 				const newRow = {
 					ABSENCE_NO: maxAbsenceNo +1,
@@ -340,8 +376,8 @@
 					ABSENCE_TYPE: '', 
 					ABSENCE_START: '',
 					ABSENCE_END: '',
-					REQUEST_DATE: '',
-					HIGH_APPROVAL: ''
+					REQUEST_DATE: request_date,
+					HIGH_APPROVAL: high_approval
 				};
 				
 				// 새 행을 TOAST UI Grid에 추가
@@ -359,8 +395,6 @@
 				const modifiedRows = grid.getModifiedRows();
 				console.log(modifiedRows); 
 				
-				let emp_role = userRoles[0].authority.replace("ROLE_", "");
-				
 				if (modifiedRows.updatedRows.length === 0 && modifiedRows.createdRows.length === 0) {
 			        Swal.fire('Info', '수정 또는 추가된 데이터가 없습니다.', 'info');
 			        return;
@@ -368,42 +402,7 @@
 				
 			    if(emp_role === 'ATHR002') {
 			    	
-			    	 try {
-			             // 승인자 리스트 가져오기
-			             const requestMngList = await getRequestMngList(emp_role);
-
-			             // 가져온 데이터를 Swal의 select 옵션 형식으로 변환
-			             const inputOptions = requestMngList.reduce((options, item) => {
-			                 options[item.id] = item.name; // `id`와 `name`은 데이터 속성에 맞게 수정
-			                 return options;
-			             }, {});
-
-			             const { value: selectedManager } = await Swal.fire({
-			                 title: '승인자를 선택하세요',
-			                 input: 'select',
-			                 inputOptions: inputOptions,
-			                 inputPlaceholder: '선택하세요',
-			                 showCancelButton: true,
-			                 inputValidator: (value) => {
-			                     return new Promise((resolve) => {
-			                         if (value) {
-			                             resolve();
-			                         } else {
-			                             resolve('승인자를 선택해주세요.');
-			                         }
-			                     });
-			                 }
-			             });
-
-			             if (selectedManager) {
-			                 Swal.fire(`선택한 승인자: ${inputOptions[selectedManager]}`);
-			             } else {
-			                 return; // 선택 취소 시 처리 중단
-			             }
-			         } catch (error) {
-			             console.error('Error loading request managers:', error);
-			             return;
-			         }
+			    	
 			    }
 			    
 				sendToServer(modifiedRows);
@@ -480,16 +479,6 @@
 			}); 
 			
 			// ==============================================================
-			// 사용자 권한 확인 함수
-			function hasRole(roles, requiredRoles) {
-			    return requiredRoles.some(requiredRole =>
-			        roles.some(role => role.authority === requiredRole)
-			    );
-			}
-
-			
-			
-			
 			
 			//  승인 대상자 리스트 불러오는 함수
 			function getRequestMngList(role) {
@@ -511,7 +500,25 @@
 				
 			}
 			
-			
+			function getSelf(emp_id) {
+										
+				return axios.get(`/api/absence/self/${emp_id}`)
+		        .then(function (response) {
+		            return response.data; // 데이터 반환
+		        })
+		        .catch(function (error) {
+		            console.error('Error fetching data:', error);
+					Swal.fire(
+					        'Error',
+					        '데이터를 가져오는 중 문제가 발생했습니다.',
+					        'error'
+					      )
+		            return []; // 에러 발생 시 빈 배열 반환
+		        });
+				
+				
+			}
+						
 			// type으로 공통 코드 가져오는 함수
 			function getCommonList(type) {
 			    return axios.get(`/api/absence/common/list/${type}`)
@@ -537,8 +544,7 @@
 			// 그리드 초기화
 			fetchData().then(function (data) {
 
-				console.log('User Roles:', userRoles);
-				let isEditable = hasRole(userRoles, ['ROLE_ATHR001', 'ROLE_ATHR002']);
+				let isEditable = emp_role === 'ATHR001' || emp_role === 'ATHR002';
 				
 				console.log('Is Editable:', isEditable); 
 				
@@ -550,24 +556,28 @@
 						{
 							header: '번호', 
 							name: 'ABSENCE_NO', 
+							width: 60,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
 							editor: isEditable ? 'text' : null
 						},
 						{ 
 							header: '사원번호', 
 							name: 'EMP_ID', 
+							width: 120,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
 							editor: isEditable ? 'text' : null
 						},  
 						{ 
 							header: '사원명', 
 							name: 'EMP_NAME', 
+							width: 100,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
 							editor: isEditable ? 'text' : null
 						},
 						{ 
 							header: '부서', 
 							name: 'EMP_DEPT',
+							width: 100,
 							editor: isEditable
 			                    ? {
 			                          type: 'select',
@@ -581,6 +591,7 @@
 						{ 
 							header: '직급', 
 							name: 'EMP_POSITION', 
+							width: 100,
 							editor: isEditable
 								? {
 								type: 'select',
@@ -593,7 +604,8 @@
 						},
 						{ 
 							header: '종류', 
-							name: 'COMMON_DETAIL_NAME',
+							name: 'ABSENCE_TYPE',
+							width: 100,
 							editor: isEditable
 								? {
 								type: 'select',
@@ -608,6 +620,7 @@
 						{ 
 							header: '휴직 시작일', 
 							name: 'ABSENCE_START',
+							width: 100,
 							editor: isEditable
 								? {
 				                type: 'datePicker',
@@ -626,6 +639,7 @@
 				        { 
 							header: '휴직 종료일', 
 							name: 'ABSENCE_END',
+							width: 100,
 							editor: isEditable 
 								? {
 				                type: 'datePicker',
@@ -644,11 +658,13 @@
 				        {
 				            header: '신청일', 
 				            name: 'REQUEST_DATE',
+							width: 150,
 				            editor: isEditable 
 				                ? {
 				                    type: 'datePicker',
 				                    options: {
 				                        format: 'yyyy-MM-dd hh:mm', 
+										timepicker: true
 				                    }
 				                }
 				                : null,
@@ -662,12 +678,22 @@
 				        { 
 							header: '최종 승인자', 
 							name: 'HIGH_APPROVAL', 
+							width: 150,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-							editor: isEditable ? 'text' : null
+							editor: isEditable
+								? {
+								type: 'select',
+								options: {
+									listItems: data.highList
+								}
+						    }
+							: null,
+							filter: 'select'
 						},
 						{ 
 							header: '비고', 
 							name: 'ABSENCE_REMARK',
+							width: 200,
 							editor: isEditable ? 'text' : null
 						}
 					],
@@ -677,7 +703,6 @@
 			    
 			    
 			 	// 사원번호/사원명 수정 시 모달창에서 사원 조회 후 등록
-			 	/*
 			    grid.on('editingStart', function (ev) {
 			    	const { rowKey, columnName } = ev;
 
@@ -693,8 +718,6 @@
 			        }
 			        
 			    });
-			 	*/
-			 
 				
 			});
 			
@@ -757,13 +780,12 @@
 			function fetchData() {
 			    
 			    return Promise.all([
-			    	 getCommonList('DEPT'),  // 부서 
-			         getCommonList('PSTN'),   // 직급
-			         getCommonList('LOAB') // 휴직 
-			        
-			        
+			    	 getCommonList('DEPT'),  		// 부서 
+			         getCommonList('PSTN'),   		// 직급
+			         getCommonList('LOAB'), 		// 휴직 
+					 getRequestMngList('ATHR001') 	// 최종승인자리스트 - high
 			    ])
-			    .then(function ([deptCommon, pstnCommon, loabCommon]) {
+			    .then(function ([deptCommon, pstnCommon, loabCommon, highList]) {
 			        return {
 			        	deptCommon: deptCommon.map(item => ({
 			                text: item.common_detail_name,
@@ -776,19 +798,23 @@
 			            loabCommon: loabCommon.map(item => ({
 			                text: item.common_detail_name,
 			                value: item.common_detail_name
+			            })),
+						highList: highList.map(item => ({
+			                text: item.EMP_NAME+"("+item.EMP_ID+")",
+			                value: item.EMP_ID
 			            }))
 			        };
 			    })
 			    .catch(function (error) {
 			        console.error('Error fetching data:', error);
-			        return { deptCommon: [], pstnCommon: [], loabCommon: [] };
+			        return { deptCommon: [], pstnCommon: [], loabCommon: [], highList: [] };
 			    });
 			}
 			
 			
 			
 			
-
+			// 수정/추가 컬럼 반영
 			function sendToServer(modifiedRows) {
 				 // CSRF 토큰 가져오기
 			    const csrfToken = $('input[name="_csrf"]').val();
@@ -811,7 +837,48 @@
 			}
 			
 			
-			
+
+			// 시작일 변경 시 종료일의 최소값(min) 설정 및 검증
+			$('#use-start-date').on('change', function () {
+			    const startDateValue = $(this).val(); // yyyy-MM-dd 형식
+			    if (startDateValue) {
+			        // 종료일의 최소값 설정
+			        $('#use-end-date').attr('min', startDateValue);
+
+			        // 종료일 값 검증: 종료일이 시작일보다 이전인 경우 초기화
+			        const endDateValue = $('#use-end-date').val();
+			        if (endDateValue && endDateValue < startDateValue) {
+			            alert('종료일은 시작일보다 이후 날짜여야 합니다.');
+			            $('#use-end-date').val(''); // 잘못된 값 초기화
+			        }
+			    }
+			});
+
+			// 종료일 변경 시 검증 및 시작일의 최대값(max) 설정
+			$('#use-end-date').on('change', function () {
+			    const endDateValue = $(this).val(); // 종료일 값 (yyyy-MM-dd 형식)
+			    if (endDateValue) {
+			        const endDate = new Date(endDateValue);
+			        endDate.setDate(endDate.getDate() - 1); // 종료일 하루 이전 날짜 계산
+
+			        // yyyy-MM-dd 형식으로 변환
+			        const yyyy = endDate.getFullYear();
+			        const mm = String(endDate.getMonth() + 1).padStart(2, '0');
+			        const dd = String(endDate.getDate()).padStart(2, '0');
+			        const maxStartDate = `${yyyy}-${mm}-${dd}`;
+
+			        // 시작일의 최대값 설정
+			        $('#use-start-date').attr('max', maxStartDate);
+
+			        // 시작일 값 검증: 시작일이 종료일 이후로 설정된 경우 초기화
+			        const startDateValue = $('#use-start-date').val();
+			        if (startDateValue && startDateValue >= endDateValue) {
+			            alert('시작일은 종료일보다 이전 날짜여야 합니다.');
+			            $('#use-start-date').val(''); // 잘못된 값 초기화
+			        }
+			    }
+			});
+
 		}); //돔로드이벤트
 		
 		
@@ -882,7 +949,12 @@
 		    
 		}
 		
-		
+		function updateEndDateMin() {
+		    const startDateValue = $('#use-start-date').val(); // yyyy-mm-dd 형식
+		    if (startDateValue) {
+		        $('#use-end-date').attr('min', startDateValue); // 종료일의 최소값 설정
+		    }
+		}
 	
 	</script>
 
