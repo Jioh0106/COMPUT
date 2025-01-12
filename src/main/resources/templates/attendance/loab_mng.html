@@ -191,7 +191,7 @@
 				<section class="section">
 					<div class="row" id="basic-table">
 						<form>
-							<div id="grid"></div>
+							<div id="absence-grid"></div>
 							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
 								<div class="float-end">
 									<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
@@ -549,7 +549,7 @@
 				console.log('Is Editable:', isEditable); 
 				
 			    grid = new tui.Grid({
-			    	el: document.getElementById('grid'),
+			    	el: document.getElementById('absence-grid'),
 					data: gridData,
 					rowHeaders: ['checkbox'],
 					columns: [
