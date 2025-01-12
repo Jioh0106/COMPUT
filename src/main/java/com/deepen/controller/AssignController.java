@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deepen.domain.AssignmentDTO;
@@ -44,6 +45,8 @@ public class AssignController {
 		Optional<Employees> emp = asService.findById(emp_id);
 		model.addAttribute("emp", emp.get());
 		
+
+		
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 	    model.addAttribute("_csrf", csrfToken);
 		
@@ -56,22 +59,26 @@ public class AssignController {
 	//발령등록, 요청내역 데이터 저장
 	@ResponseBody
 	@PostMapping("/assign-insertPOST")
-    public ResponseEntity<String> saveAssignmentAndRequest(@RequestBody Map<String, Object> requestData,
-    		@AuthenticationPrincipal User user, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<RequestDTO> saveAssignmentAndRequest(@RequestBody Map<String, Object> requestData,
+    		@AuthenticationPrincipal User user) {
         try {
         	log.info(requestData.toString());
         	
         	String emp_id = user.getUsername(); //시큐리티 로그인한 사원번호
         	log.info("로그인한 사원번호!!!!!!!!!"+emp_id);
         	
-        	Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        	  // 로그인한 사용자의 권한 가져오기
+        	
+        	// **권한 가져오기 (ROLE_ 접두어 제거)**
+            Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
             String role = authorities.stream()
-                                     .map(GrantedAuthority::getAuthority) // 권한 이름 문자열로 변환
-                                     .findFirst() // 첫 번째 권한만 가져옴
-                                     .orElse("UNKNOWN"); // 권한이 없을 경우 기본값
+                                     .map(GrantedAuthority::getAuthority)
+                                     .map(auth -> auth.replace("ROLE_", "")) // ROLE_ 접두어 제거
+                                     .findFirst()
+                                     .orElse("ATHR003"); // 권한이 없을 경우 기본값 설정
 
             log.info("로그인한 사원의 권한: " + role);
+        	
+        	
         	
         	// JSON 데이터를 각각의 DTO로 변환
             ObjectMapper mapper = new ObjectMapper();
@@ -80,12 +87,20 @@ public class AssignController {
             
            log.info(requestDto.toString());
            log.info(assignmentDto.toString());
-            asService.saveAssigmentAndRequest(requestDto, assignmentDto, emp_id);
+            
+           //서비스호출 및 요청번호 반환
+           Integer request_no = asService.saveAssigmentAndRequest(requestDto, assignmentDto, emp_id, role);
            
-            return ResponseEntity.ok("발령 등록 및 요청 내역 저장이 완료되었습니다. ");
+            
+           //반환된 요청번호를 통해 요청 구분 정보 조회
+           RequestDTO resultRequestDto = asService.getRequestDivision(emp_id, request_no);
+
+            log.info("요청 구분: " + resultRequestDto.getRequest_division());
+            
+            return ResponseEntity.ok(resultRequestDto);
         } catch (Exception e) {
         	log.info("무슨오류냐고"+e.toString());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("발령 등록 및 요청 내역 저장에 실패했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 	

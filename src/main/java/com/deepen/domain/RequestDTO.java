@@ -12,6 +12,7 @@ import lombok.Data;
 public class RequestDTO {
 	
 	private Integer request_no; //요청번호
+	private String request_division; //요청구분
 	private String request_type; //요청유형
 	private String request_status; //요청상태
 	private String request_rejection; //반려사유

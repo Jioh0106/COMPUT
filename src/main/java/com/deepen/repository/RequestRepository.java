@@ -1,7 +1,11 @@
 package com.deepen.repository;
 
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.entity.Request;
@@ -9,7 +13,15 @@ import com.deepen.entity.Request;
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Integer> {
 	
-	//요청내역 모두 조회
+	//로그인한 자신의 요청내역 조회
+//	@Query("SELECT r FROM Request r WHERE r.emp_id = :empId")
+//	List<Request> findByEmp_id(@Param("empId") String empId);
 	
-	
+	@Query("SELECT r FROM Request r WHERE " +
+		       "r.emp_id = :empId OR " +
+		       "r.middle_approval = :empId OR " +
+		       "r.high_approval = :empId")
+	List<Request> findByEmp_id(@Param("empId") String empId);
+
+
 }

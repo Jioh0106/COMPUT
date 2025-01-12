@@ -40,7 +40,7 @@ public class Request {
 	@Column(name = "request_date", nullable = false)
 	private LocalDateTime request_date; //요청일자
 	
-	@Column(name = "middle_approval", nullable = false, length = 200)
+	@Column(name = "middle_approval", length = 200)
 	private String middle_approval; //중간승인권자 사번
 	
 	@Column(name = "high_approval", length = 200)
