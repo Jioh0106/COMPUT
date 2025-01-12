@@ -23,6 +23,9 @@ public interface AssignMapper {
 	//중간승인권자 조회 모달창
 	List<EmployeesDTO> middleRoleSearch();
 	
+	//최종승인권자 조회 모달창
+	List<EmployeesDTO> highRoleSearch();
+	
 	//요청번호로 발령테이블 조회
 	AssignmentDTO selectAssign(@Param("request_no") Integer request_no);
 	

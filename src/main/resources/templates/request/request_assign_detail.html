@@ -276,6 +276,8 @@
 			
 			            if (data) {
 			                // 발령 테이블 데이터로 폼 채우기
+							$('#emp_id').val(data.emp_id);
+							$('#emp_name').val(data.emp_name);
 			                $('#assign_emp_id').val(data.assign_emp_id);
 			                $('#assign_emp_name').val(data.assign_emp_name);
 			                $('#assign_date').val(data.assign_date);
