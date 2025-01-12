@@ -11,9 +11,6 @@ import com.deepen.entity.PayInfo;
 
 @Repository
 public interface PayInfoRepository extends JpaRepository<PayInfo, Long> {
-//    List<PayInfo> findByEmpIdContaining(String empId);
-//    List<PayInfo> findByPaymentDate(String paymentDate);
-    
     @Query("SELECT p FROM PayInfo p WHERE p.empId IN :empIds")
     List<PayInfo> findByEmpIds(@Param("empIds") List<String> empIds);
     
