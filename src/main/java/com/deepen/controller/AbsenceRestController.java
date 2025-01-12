@@ -55,6 +55,21 @@ public class AbsenceRestController {
 		
 		
 	} // getAbsenceRequest
+	@GetMapping("/self/{emp_id}")
+	public ResponseEntity<Map<String, String>> getAbsenceRequestself(@PathVariable("emp_id")  String emp_id) {
+		
+		log.info("getAbsenceRequestself - emp_id : " + emp_id);
+		
+		Map<String, String> emp_self = absenceService.getEmpSelf(emp_id);
+		return ResponseEntity.ok(emp_self);
+		
+		
+	} // getAbsenceRequest
+	
+	
+	
+	
+	
 	
 	@PostMapping("/delete")
 	public ResponseEntity<String> deleteAbsences(@RequestBody List<Integer> deleteList) {

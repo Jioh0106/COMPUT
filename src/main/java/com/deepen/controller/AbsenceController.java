@@ -45,7 +45,7 @@ public class AbsenceController {
 		
 		// 사용자 정보 조회
 		Optional<Employees> emp = absenceService.findById(emp_id);
-		
+		model.addAttribute("emp", emp.get());
 		
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 	    model.addAttribute("_csrf", csrfToken);
@@ -91,11 +91,12 @@ public class AbsenceController {
 	            }
 	        }
 	    });
+	    
+	    
 
 	    
 		log.info("absenceList : " + absenceList.toString());
 		
-		model.addAttribute("emp", emp.get());
 		model.addAttribute("absenceList", absenceList);
 		
 		return "attendance/loab_mng";
@@ -117,14 +118,18 @@ public class AbsenceController {
 		
 		
 		// 승인요청 수신자가 high 권한이면 1차 승인자에 본인 아이디, 요청 상태는 2차대기		
-		if(request_role.equals("ATHR001")) {
+		if(request_role.equals("self")) {
+			requestDTO.setHigh_approval(requestDTO.getEmp_id());
+			requestDTO.setRequest_status("RQST005");
+			
+		} else if(request_role.equals("ATHR001")) {
 			requestDTO.setMiddle_approval(requestDTO.getEmp_id());
 			requestDTO.setHigh_approval(request_approval);
-			requestDTO.setRequest_status("RQST005");
+			requestDTO.setRequest_status("RQST003");
 		} else {
 			// 아니라면 (middle이라면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
 			requestDTO.setMiddle_approval(request_approval);
-			requestDTO.setRequest_status("RQST006");
+			requestDTO.setRequest_status("RQST001");
 		}
 		
 		absenceService.insertAbsenceAndRequest(requestDTO, absenceDTO);

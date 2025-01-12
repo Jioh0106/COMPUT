@@ -96,6 +96,11 @@ public class AbsenceService {
 		
 	}
 
+	public Map<String, String> getEmpSelf(String emp_id) {
+		// TODO Auto-generated method stub
+		return absenceMapper.getEmpSelf(emp_id);
+	}
+
 
 
 
