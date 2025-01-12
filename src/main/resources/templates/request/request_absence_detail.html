@@ -50,16 +50,15 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">담당자 사번</label>
-													<input type="text" name="emp_id" id="emp_id"  class="form-control" 
-													readonly>
+													<input type="text" th:value="${emp.emp_id}" name="emp_id" id="emp_id"  class="form-control" readonly>
+													
 												</div>
 											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">담장자 성명</label>
-													<input type="text" id="emp_name" name="emp_name" class="form-control" 
-													readonly>
+													<input type="text" th:value="${emp.emp_name}" id="emp_name" name="emp_name" class="form-control" readonly>
 												</div>
 											</div>
 										
@@ -67,25 +66,35 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">신청자 사번</label>
-													<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control"
-														>
+													<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control" th:value="${absence.EMP_ID}" readonly>
 												</div>
 											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="last-name-column">신청자 성명</label>
-													<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"
-														 >
+													<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"  th:value="${absence.EMP_NAME}" readonly>
+												</div>
+											</div>
+											<div class="col-md-6 col-12">
+												<div class="form-group">
+													<label for="first-name-column">부서</label>
+													<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control" th:value="${absence.EMP_DEPT}" readonly>
 												</div>
 											</div>
 											
+											<div class="col-md-6 col-12">
+												<div class="form-group">
+													<label for="last-name-column"> 직급</label>
+													<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"  th:value="${absence.EMP_POSITION}" readonly>
+												</div>
+											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label>신청일자</label>
 													<div class="form-group">
-														<input type="date" class="form-control" id="request_date" name="assign_date">
+														<input type="text" class="form-control" id="request_date" name="assign_date" th:value="${absence.REQUEST_DATE}" readonly > 
 													</div>
 												</div>
 											</div>
@@ -94,33 +103,33 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="city-column">휴직구분</label>
-													<input type="text" id="assign_type" name="absence_type" class="form-control">
+													<input type="text" id="assign_type" name="absence_type" class="form-control" th:value="${absence.ABSENCE_TYPE}" readonly>
 												</div>
 											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="company-column">휴직 시작일</label>
-													<input type="text" id="prev_pos" name="prev_pos" class="form-control">
+													<input type="text" id="prev_pos" name="prev_pos" class="form-control" th:value="${absence.ABSENCE_START}" readonly>
 												</div>
 											</div>
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="email-id-column">휴직 종료일</label>
-													<input type="text" id="new_pos" name="new_pos" class="form-control">
+													<input type="text" id="new_pos" name="new_pos" class="form-control" th:value="${absence.ABSENCE_END}" readonly>
 												</div>
 											</div>
 											<div class="col-12">
 												<div class="form-group">
 													<label for="company-column">비고</label>
-													<input type="text" id="prev_dept" class="form-control"
-														name="prev_dept">
+													<input type="text" id="prev_dept" class="form-control" name="prev_dept" readonly>
+														
 												</div>
 											</div>
 											
 											<div class="col-12 d-flex justify-content-end">
 												<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal">승인</button>
-												<button type="reset" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
+												<button type="button" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
 											</div>
 										</div>
 									</form>
@@ -245,49 +254,6 @@
    	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script>
 		
-		// 저장 버튼 클릭 이벤트
-		      document.getElementById('rejectBtn').addEventListener('click', () => {
-		          const modal = new bootstrap.Modal(document.getElementById('defaultSize'));
-		          modal.show();
-		      });
-	
-		   // 부모 창에서 postMessage로 전달한 요청번호 수신
-		   
-		   // URL에서 쿼리 파라미터로 전달된 요청번호 추출
-			const urlParams = new URLSearchParams(window.location.search);
-			const request_no = urlParams.get('request_no'); // request_no 추출
-			
-			if (request_no) {
-			    fetch(`/api/selectAssign/${request_no}`)
-			        .then(response => {
-			            if (!response.ok) {
-			                throw new Error(`HTTP error! status: ${response.status}`);
-			            }
-			            return response.json();
-			        })
-			        .then(data => {
-			            console.log('REST API 반환 데이터:', data);
-			
-			            if (data) {
-			                // 발령 테이블 데이터로 폼 채우기
-			                $('#assign_emp_id').val(data.assign_emp_id);
-			                $('#assign_emp_name').val(data.assign_emp_name);
-			                $('#assign_date').val(data.assign_date);
-			                $('#assign_type').val(data.assign_type);
-			                $('#prev_pos').val(data.prev_pos);
-			                $('#new_pos').val(data.new_pos);
-			                $('#prev_dept').val(data.prev_dept);
-			                $('#new_dept').val(data.new_dept);
-			            } else {
-			                alert("발령 정보를 찾을 수 없습니다.");
-			            }
-			        })
-			        .catch(error => {
-			            alert('발령 정보를 불러오는 데 실패했습니다.');
-			            console.error('Error:', error);
-			        });
-			}
-
 		//-----------------------------------------------------------------최종승인권자 모달창시작
 		
 		  // 최종승인권자 선택 모달창 Grid 생성

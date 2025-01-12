@@ -230,7 +230,16 @@
 				
 				// 팝업 창 열기
 				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
-				   const popupUrl = `/request-assign-detail?request_no=${request_no}`; // 요청번호 포함한 URL 생성
+				   let popupUrl = ''; // 요청번호 포함한 URL 생성
+				   			   
+	   				if(rowData.request_type === '발령') {
+	   					popupUrl = `/request-assign-detail?request_no=${request_no}`;
+	   					
+	   				} else if(rowData.request_type === '휴직') {
+	   					popupUrl = `/request-absence-detail?request_no=${request_no}`;
+	   				}
+				   
+				   
 				   window.open(popupUrl, '_blank', popupOptions);
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
