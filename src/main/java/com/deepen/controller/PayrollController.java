@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.deepen.domain.PayInfoDTO;
 import com.deepen.domain.SalaryFormulaDTO;
 import com.deepen.entity.SalaryFormula;
+import com.deepen.service.PayInfoService;
 import com.deepen.service.SalaryFormulaService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,8 @@ public class PayrollController {
 
 
     private final SalaryFormulaService salaryFormulaService;
-
+    private final PayInfoService payInfoService;
+    
     // 급여 종류 관리 추가 GET
     @GetMapping("/pay-mng")
     public String payMng(Model model) {
@@ -102,11 +105,13 @@ public class PayrollController {
 	    }
 	}
 
-    
     // 급여 지급 이력
-    @GetMapping("/pay-stts")
-    public String payStts() {
-        return "payroll/pay_stts";
+    @GetMapping("/pay-info")
+    public String payrollMain(Model model) {
+        List<PayInfoDTO> payInfoList = payInfoService.getAllPayInfo();
+        model.addAttribute("payInfoList", payInfoList);
+        System.out.println(payInfoList);
+        return "payroll/pay_info";
     }
     
     // 급여 대장 관리
