@@ -50,14 +50,14 @@ categoryMenu.addEventListener("input",() => {
 	const selectCategory = categoryMenu.value;
 	console.log(selectCategory);
 	
-	// empChartContainer.innerHTML = "";
-	
 	if(selectCategory==="학력별"){
 		empChartContainer.innerHTML = "<div id='empChart'></div>";
-		createEmpPieChart();
+        countByEdu();
+		//infoListByEdu();
 	}else if(selectCategory==="연령별"){
 		empChartContainer.innerHTML = "<div id='empGroupStackBarChart'></div>";
-		createEmpGroupStackBarChart();
+      	countByAgeAndGender();
+		//infoListByAgeGroup();
 	}
 });
 
@@ -67,65 +67,41 @@ function initChart(){
 	
 	if(defaultCategory === "학력별"){
 		defaultCategory.innerHTML="<div id='empChart'></div>";
-		createEmpPieChart();	
+		countByEdu();
+		//infoListByEdu();	
 	}
 	
 	if(defaultCategory === "연령별"){
 		defaultCategory.innerHTML = "<div id='empGroupStackBarChart'></div>";
-		createEmpGroupStackBarChart()
+		countByAgeAndGender();
+		//infoListByAgeGroup();
 	}
 }
 
 // toast ui chart
-function createEmpPieChart(){
-	const empPieChart = new toastui.Chart.pieChart({
+function createEmpPieChart(pieChartData){
+	empPieChart = new toastui.Chart.pieChart({
 		el : document.getElementById("empChart"),
-		data : {
-		    categories: ['성별'],
-		    series: [
-		  	 {
-		       name: '고졸',
-		       data: 50,
-		     },
-		     {
-		       name: '학사',
-		       data: 45,
-		     },
-			 {
- 		       name: '석사',
- 		       data: 30,
- 		     },
-			 {
-  		       name: '박사',
-  		       data: 10,
-  		     },
-		   ],
-		 },
+		data : pieChartData,
 	 	options : {
-		   	chart: { title: "학력별 사원 현황", width: 700, height: 400 },
+		   	chart: { 
+				title: "학력별 사원 현황", 
+				width: 850, 
+				height: 400,
+			},
 			series: {
-			          radiusRange: {
-			            inner: '40%',
-			            outer: '100%',
-			          },
-			          angleRange: {
-			            start: -90,
-			            end: 90,
-			          },
-			          dataLabels: {
-			            visible: true,
-			            pieSeriesName: {
-			              visible: true,
-			              anchor: 'outer',
-			            },
-			          },
-			        },
+	         	radiusRange: {inner: '40%', outer: '100%'},
+	          	angleRange: {start: -90, end: 90},
+	          	dataLabels: {
+					visible: true, 
+					pieSeriesName: {visible: true, anchor: 'outer'}}
+	        },
 		 },
 	});
 }
 
 function createEmpGroupStackBarChart(){
-	const empGroupStackBarChart = toastui.Chart.barChart({
+	empGroupStackBarChart = toastui.Chart.barChart({
 		el : document.getElementById('empGroupStackBarChart'), 
 		data : 	{
 		        categories: [
@@ -163,13 +139,92 @@ function createEmpGroupStackBarChart(){
 			chart: { title: '연령별 인원 현황', width: 800, height: 550 },
 	      	yAxis: { title: 'Age Group', align: 'center', },
 	      	series: { stack: true, diverging: true, },
-		} 
+		}
 	});
 }
 
+//
+function test(){
+	const checkedLegend = empPieChart.getCheckedLegend()
+	console.log(checkedLegend);
+}
 
+// ajax
+async function countByEdu(){
+	try{
+		const response = await fetch("http://localhost:8082/api/count-by-edu");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		const result = await response.json();
+		console.log(result);
+		
+		const pieChartData = {
+			categories: ["학력"],
+		    series: result.map(item => ({
+				name: item.EMP_EDU,
+				data: item.EMP_COUNT_EDU
+			}))
+		};
+		// 차트 생성 및 데이터 설정
+		createEmpPieChart(pieChartData);
+		
+		//
+		empPieChart.on("clickLegendCheckbox",test)
+		
+		const eduArray = result.map(item => item.EMP_EDU);
+		infoListByEdu(eduArray);
+		
+	}catch(error){
+		console.error(error);
+	}
+}
 
+async function infoListByEdu(eduArray){
+	try{
+		const param = new URLSearchParams();
+		eduArray.forEach(item => param.append("edu",item));
+		//console.log(param.toString());
+		
+		const response = await fetch(`http://localhost:8082/api/infoList-by-edu?${param.toString()}`);
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		const result = await response.json();
+		console.log(result);
+		
+		empInfoList.resetData(result);
+	}catch(error){
+		console.error(error);
+	}
+}
 
+async function countByAgeAndGender(){
+	try{
+		const response = await fetch("http://localhost:8082/api/count-by-ageGroupAndGender");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		const result = await response.json();
+		console.log(result);
+			
+	}catch(error){
+		console.error(error);
+	}
+	
+}
 
+async function infoListByAgeGroup(){
+	try{
+		const response = await fetch("http://localhost:8082/api/infoList-by-ageGroup?ageGroup=");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		const result = await response.json();
+		console.log(result);
+	}catch(error){
+		console.error(error);
+	}
+}
 
 

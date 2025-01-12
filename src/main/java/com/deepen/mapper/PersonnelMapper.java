@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.CommonDetailDTO;
@@ -18,8 +19,12 @@ public interface PersonnelMapper {
 	 
 	 List<Map<String, Object>> selectEmpList(Map<String, Object> params);
 	 
+	 List<Map<String, Object>> countByEdu();
+	 
+	 List<Map<String, Object>> selectInfoByEdu(@Param("edu") List<String> edu);
+	 
 	 List<Map<String, Object>> countByAgeGroupAndGender();
 	 
-	 List<Map<String, Object>> selectByAgeGroupInfo(String ageGroup);
+	 List<Map<String, Object>> selectInfoByAgeGroup(List<String> ageGroup);
 	
 }
