@@ -2,250 +2,278 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>휴가 관리</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>휴가 관리</title>
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="assets/css/bootstrap.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link
+	href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" href="assets/css/bootstrap.css">
 
-	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
 
-	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
-	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" href="assets/css/app.css">
-	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
-	<!-- TOAST UI CDN -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+<link rel="stylesheet"
+	href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+<link rel="stylesheet"
+	href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="shortcut icon" href="assets/images/favicon.svg"
+	type="assets/image/x-icon">
 
-	<style>
-		.tui-grid-cell {
-			/* !important -> 우선순위 높아짐 */
-			background-color: #ffffff !important;
-		}
+<!-- TOAST UI CDN -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 
-		.display-flex {
-			display: flex;
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-		}
 
-		.buttons {
-			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			margin-left: auto
-		}
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
 
-		.child-input1 {
-			flex: 1;
-			width: 30%;
-			box-sizing: border-box;
-		}
+.display-flex {
+	display: flex;
+}
 
-		.child-input2 {
-			flex: 1;
-			margin: 0px 5%;
-			width: 30%;
-			box-sizing: border-box;
-		}
-	</style>
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.child-input1 {
+	flex: 1;
+	width: 30%;
+	box-sizing: border-box;
+}
+
+.child-input2 {
+	flex: 1;
+	margin: 0px 5%;
+	width: 30%;
+	box-sizing: border-box;
+}
+</style>
 
 </head>
 
 <body>
 
+	<div class="card" role="document">
+		<div class="card-body">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel33">휴가 신청서</h4>
+			</div>
+			<div class="modal-body">
+				<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
 
-					<!-- 휴가 신청서 Modal 시작 -->
-						<div class="modal-dialog modal-dialog-scrollable" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h4 class="modal-title" id="myModalLabel33">휴가 신청서</h4>
-									<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-										<i data-feather="x"></i>
-									</button>
-								</div>
-								<div class="modal-body">
-									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
-
-									<div class="display-flex">
-										<div class="child-input1">
-											<label>사번: </label>
-											<div class="form-group">
-												<input type="text" value="11222" class="form-control" readonly>
-											</div>
-										</div>
-										<div class="child-input2">
-											<label>이름: </label>
-											<div class="form-group">
-												<input type="text" value="홍길동" class="form-control" readonly>
-											</div>
-										</div>
-									</div>
-
-									<div class="display-flex">
-										<div class="child-input1">
-											<label>사용 시작일: </label>
-											<div class="form-group">
-												<input type="date" class="form-control" id="use-start-date"
-													onchange="calcDate()">
-											</div>
-										</div>
-										<div class="child-input2">
-											<label>사용 종료일: </label>
-											<div class="form-group">
-												<input type="date" class="form-control" id="use-end-date"
-													onchange="calcDate()">
-											</div>
-										</div>
-									</div>
-
-									<div class="display-flex">
-										<div class="child-input1">
-											<label>사용일수: </label>
-											<div class="form-group">
-												<input type="text" id="use-days" class="form-control" readonly>
-											</div>
-										</div>
-										<div class="child-input2">
-											<label>잔여일수: </label>
-											<div class="form-group">
-												<input type="text" class="form-control" readonly>
-											</div>
-										</div>
-									</div>
-
-									<label>휴가 구분</label>
-									<fieldset class="form-group">
-										<select class="form-select" id="basicSelect">
-											<option>연차</option>
-											<option>월차</option>
-											<option>병가</option>
-											<option>출산휴가</option>
-											<option>산재</option>
-											<option>일반</option>
-											<option>경조사</option>
-										</select>
-									</fieldset>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-										<i class="bx bx-x d-block d-sm-none"></i>
-										<span class="d-none d-sm-block">닫기</span>
-									</button>
-									<button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal" value="신청"u>
-										<i class="bx bx-check d-block d-sm-none"></i>
-										<span class="d-none d-sm-block">신청</span>
-									</button>
-								</div>
-							</div>
+				<div class="display-flex">
+					<div class="child-input1">
+						<label>사번: </label>
+						<div class="form-group">
+							<input type="text" th:value="${empInfo.empId}" id="empId"
+								class="form-control" readonly>
 						</div>
-					<!-- 휴가 신청서 Modal 끝 -->
+					</div>
+					<div class="child-input2">
+						<label>이름: </label>
+						<div class="form-group">
+							<input type="text" th:value="${empInfo.empName}" id="empName"
+								class="form-control" readonly>
+						</div>
+					</div>
+				</div>
 
+				<div class="display-flex">
+					<div class="child-input1">
+						<label>사용 시작일: </label>
+						<div class="form-group">
+							<input type="date" class="form-control" id="use-start-date"
+								onchange="calcDate()">
+						</div>
+					</div>
+					<div class="child-input2">
+						<label>사용 종료일: </label>
+						<div class="form-group">
+							<input type="date" class="form-control" id="use-end-date"
+								onchange="calcDate()">
+						</div>
+					</div>
+				</div>
 
+				<div class="display-flex">
+					<div class="child-input1">
+						<label>사용일수: </label>
+						<div class="form-group">
+							<input type="text" id="use-days" class="form-control" readonly>
+						</div>
+					</div>
+					<div class="child-input2">
+						<label>잔여일수: </label>
+						<div class="form-group">
+							<input type="text" class="form-control"
+								th:value="${empInfo.vctnDays}" readonly>
+						</div>
+					</div>
+				</div>
+
+				<label>휴가 구분</label>
+				<fieldset class="form-group">
+					<select class="form-select" id="vctnSe">
+						<option value="">선택</option>
+						<option th:each="commonDtl :${commonDtlList}"
+							th:value="${commonDtl.CODE}" th:text="${commonDtl.NAME}"></option>
+					</select>
+				</fieldset>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-light-secondary"
+					onClick='window.close()'>닫기</button>
+				<button type="button" class="btn btn-primary"
+					data-bs-target="#defaultSize" data-bs-toggle="modal"
+					onclick="middleAprvr()">신청</button>
+			</div>
+		</div>
+	</div>
+
+	<!--승인권자 선택 모달창 시작-->
+	<!--Default size Modal -->
+	<div class="modal fade text-left" id="defaultSize" tabindex="-1"
+		role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+		<div
+			class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+			role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel18">중간승인권자 선택</h4>
+				</div>
+				<div class="modal-body">
+
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<div id="grid"></div>
+						</div>
+					</section>
+					<!-- 그리드 끝 -->
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-light-secondary"
+						data-bs-dismiss="modal">
+						<i class="bx bx-x d-block d-sm-none"></i> <span
+							class="d-none d-sm-block">취소</span>
+					</button>
+					<button type="button" class="btn btn-primary ml-1" onclick="requestApproval()">
+						<i class="bx bx-check d-block d-sm-none"></i> <span
+							class="d-none d-sm-block">승인요청</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--승인권자 선택 모달창 끝-->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
 	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 	<script src="assets/js/bootstrap.bundle.min.js"></script>
-	<script src="assets/js/main.js"></script>
 
-	<!-- DatePicker 스크립트 -->
-	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
-	<script>
-		// 첫 번째 DatePicker 초기화
-		const container1 = document.getElementById('tui-date-picker-container-1');
-		const target1 = document.getElementById('tui-date-picker-target-1');
-		const instance1 = new tui.DatePicker(container1, {
-			date: new Date(),
-			input: {
-				element: target1,
-				format: 'yyyy-MM-dd'
-			}
-		});
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	
+	<!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-		// 두 번째 DatePicker 초기화
-		const container2 = document.getElementById('tui-date-picker-container-2');
-		const target2 = document.getElementById('tui-date-picker-target-2');
-		const instance2 = new tui.DatePicker(container2, {
-			date: new Date(),
-			input: {
-				element: target2,
-				format: 'yyyy-MM-dd'
-			}
-		});
-	</script>
 
-	<!-- Grid 스크립트 -->
-	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
-	<script>
-		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
-			var Grid = tui.Grid;
+	<script th:inline="javascript">
+	
+		const token = $("meta[name='_csrf']").attr("content")
+		const header = $("meta[name='_csrf_header']").attr("content");
+		const name = $("#userName").val()
+		
+		let selectApprover ={};
+		
+		// Toast Grid 초기화
+		let grid;
+	
+		// 중간승인권자 그리드 함수
+		function middleAprvr() {
+			const gridData = /*[[${middleAprvr}]]*/[];
+			const Grid = tui.Grid;
 			
-			const data = [
-				{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
-				{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
-				{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
-				{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
-				{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
-			];
-
-			const grid = new Grid({
-				el: document.getElementById('useGrid'),
-				columns: [
-					{header: '사원번호', name: 'id'},
-					{header: '이름', name: 'name'},
-					{header: '부서', name: 'dept'},
-					{header: '사용일', name: 'useDate'},
-					{header: '구분', name: 'se'},
-					{header: '차감일수', name: 'useDays'},
-					{header: '잔여일수', name: 'rmnngDays'}
-				],
-				data: data
+			 // 만약 이전 그리드 객체가 있다면 제거
+		    if (grid) {
+		        grid.destroy();  // 이전 그리드를 파괴
+		    }
+			
+			//------------------------------------------------------------- 승인권자 선택 모달창 시작
+			// 승인권자 선택 모달창 Grid 생성
+			grid = new Grid({
+	            el: document.getElementById('grid'),
+	            columns: [
+	                {header: '사원번호', name: 'empId' },
+	                {header: '성명', name: 'empName' },
+	                {header: '부서명', name: 'dept' },
+	                {header: '직급', name: 'pstn' }
+	            ],
+	            data: gridData
+	        });
+			
+			$('#defaultSize').on('shown.bs.modal', function () {
+			    grid.refreshLayout();  // 그리드 레이아웃 새로 고침
 			});
-		};
+			
+			// 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+		       
+	        grid.on('click', (ev) => {
+	            if (ev.rowKey !== null) {
+	                const row = grid.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
+	                console.info(row);
+	                Approver(row); // Approver(row) 함수 호출
+	            }
+	        });
 
-		document.addEventListener('DOMContentLoaded', () => {
-			var Grid = tui.Grid;
-			var gridId = document.getElementById('useGrid');
-			// 데이터 정의
-			const data = [
-				{id: '10012', name: '이기영', dept: '인사부', useDate: '2024-12-24', se: '일반', useDays: '1', rmnngDays: '3'},
-				{id: '10013', name: '이기철', dept: '인사부', useDate: '2024-12-24', se: '연차', useDays: '1', rmnngDays: '3'},
-				{id: '10014', name: '이말룡', dept: '인사부', useDate: '2024-12-24', se: '경조사', useDays: '1', rmnngDays: '3'},
-				{id: '10015', name: '땡구', dept: '인사부', useDate: '2024-12-24', se: '병가', useDays: '1', rmnngDays: '3'},
-				{id: '10016', name: '춘심', dept: '인사부', useDate: '2024-12-24', se: '출산휴가', useDays: '1', rmnngDays: '3'}
-			];
+	        function Approver(row) {
+	            selectApprover = {
+	                approverEmp_id: row.empId,
+	                approverEmp_name: row.empName,
+	                approverEmp_dept: row.dept,
+	                approverEmp_position: row.pstn
+	            };
+				
+			var name = `${selectApprover.approverEmp_name}`; //중간승인권자 이름
+				swal(name + "님이 선택되었습니다.");
+	        }
+			
+		}; 
 
-			// 탭 전환 이벤트 처리
-			const tabList = document.querySelector('.nav'); //querySelector(clas명)으로 탭 리스트 선언
-
-			tabList.addEventListener('shown.bs.tab', function (e) {
-				//'shown.bs.tab' - 부트스트랩에 내장된 이벤트 타입이며 이 이벤트는 탭이 표시된 이후 탭 표시 시 발생합니다.
-				//event.target 과 event.relatedTarget 을 사용하여 각각 활성화된 탭과 이전 활성화된 탭을 타깃으로 합니다.
-				const tabId = e.target.id; // 현재 활성화된 탭의 ID
-
-				// 그리드 컨테이너 선택
-				gridId = tabId === "holdTab" ? document.getElementById('holdGrid') : document.getElementById('useGrid');
-
-				gridId.innerHTML = ""; //그리드 초기
-				const grid = new Grid({
-					el: gridId,
-					columns: [
-						{header: '사원번호', name: 'id'},
-						{header: '이름', name: 'name'},
-						{header: '부서', name: 'dept'},
-						{header: '사용일', name: 'useDate'},
-						{header: '구분', name: 'se'},
-						{header: '차감일수', name: 'useDays'},
-						{header: '잔여일수', name: 'rmnngDays'}
-					],
-					data: data
-				});
-
-			});
-		});
-
-	</script>
-
-	<!-- Modal 내에 있는 일수 계산 스크립트 -->
-	<script>
+		// 승인 요청 클릭 시 실행되는 함수
+		function requestApproval() {
+			const vctnSeList = document.getElementById("vctnSe"); // 휴가 구분 리스트
+			
+			if (!selectApprover.approverEmp_id) {
+				swal("중간승인권자를 선택하세요.");
+		        return;
+		    }
+			
+			const vctnDTO = {
+				  type: vctnSe.options[vctnSe.selectedIndex].value
+				, startDate: document.getElementById('use-start-date').value
+				, endDate: document.getElementById('use-end-date').value
+				, total: document.getElementById('use-days').value
+				, leaveId: document.getElementById('empId').value
+				, aprvId: selectApprover.approverEmp_id
+			}
+			
+			console.info(vctnDTO);
+		}
+		// 일수 계산 스크립트
 		function calcDate() {
 			// 사용 시작일과 종료일 가져오기
 			const startDateValue = document.getElementById('use-start-date').value; // yyyy-mm-dd 형식
@@ -253,7 +281,6 @@
 
 			const startDate = new Date(startDateValue);
 			const endDate = new Date(endDateValue);
-
 
 			var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
 

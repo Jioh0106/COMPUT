@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.VacationMapper">
+
+	<select id="selectCommonDtl" resultType="map">
+		SELECT
+			  common_detail_code AS code
+			, common_detail_name AS name
+			, common_detail_display AS display
+		FROM
+			common_detail
+		WHERE
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'VCTN'
+		AND
+			common_detail_status = 'Y'
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<select id="selectEmpInfo" resultType="map" parameterType="String">
+		SELECT 
+			  emp_id AS "empId"
+			, emp_no AS "empNo"
+			, emp_name AS "empName"
+			, emp_role AS "empRole"
+			, emp_dept AS "empDept"
+			, TO_CHAR(emp_hire_date, 'YYYYMMDD') AS "hireDate"
+			, (SELECT NVL2(SUM(vacation_total), SUM(vacation_total), 0) 
+				FROM vacation 
+				WHERE vacation_leave = #{value}
+				AND EXTRACT(YEAR FROM vacation_start) = EXTRACT(YEAR FROM SYSDATE)) AS "total"
+		FROM 
+			employees
+		WHERE 
+			emp_id = #{value}
+	</select>
+	
+	<select id="selectMiddleAprvr" resultType="map">
+		SELECT 
+			  emp_id AS "empId"
+			, emp_name AS "empName"
+			, dept.common_detail_name AS "dept"
+			, pstn.common_detail_name AS "pstn"
+		FROM
+			COMMON_DETAIL dept
+		LEFT JOIN
+			EMPLOYEES emp
+		ON
+			dept.COMMON_DETAIL_CODE = emp.EMP_DEPT
+		LEFT JOIN
+			COMMON_DETAIL pstn
+		ON
+			pstn.COMMON_DETAIL_CODE = emp.EMP_POSITION 
+		WHERE 
+			emp_role = 'ATHR002'
+		AND
+			emp_exit_date IS NOT NULL
+		ORDER BY
+			emp_no
+	</select>
+
+</mapper>
+
+
+
