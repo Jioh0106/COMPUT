@@ -129,7 +129,7 @@
 											
 											<div id="check-receiver" style="display: none;" >
 												<div class="col-12 d-flex justify-content-end" >
-													<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal" data-bs-target="#approveModal">승인</button>
+													<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal" >승인</button>
 													<button type="button" id="rejectBtn" class="btn btn-danger me-1 mb-1" data-bs-toggle="modal" data-bs-target="#rejectModal">반려</button>
 												</div>
 											</div>
@@ -279,7 +279,8 @@
 			// CSRF 토큰 가져오기
 		    let csrfToken = $('input[name="_csrf"]').val();
 		    console.log("CSRF Token:", csrfToken);
-		    
+
+			let request_no = /*[[${request_no}]]*/null;
 			let user_id = /*[[${emp.emp_id}]]*/'null';
 			let emp_id = /*[[${absence.EMP_ID}]]*/'null';
 		    let high_approval = /*[[${absence.HIGH_APPROVAL}]]*/'null';
@@ -291,6 +292,7 @@
 		    console.log("high_approval = " + high_approval);
 		    console.log("middle_approval = " + middle_approval);
 		    console.log("request_status = " + request_status);
+			console.log("request_no : " + request_no);
 		    
 		    
 			if(request_status == 'RQST005' ) {
@@ -322,13 +324,16 @@
 			$('#approveBtn').on('click', function() {
 				
 				if(user_id == middle_approval) {
+					// middle 단계 승인일 경우 최종 승인권자 선택 모달창
 					let modal = $('#approveModal');
 					modal.modal('show');
 					
-					return;
-				} 
+				} else {
+					// high일 경우 즉시 최종 승인으로 상태 변경
+					updateRequest('RQST005', null, null);
+					
+				}
 				
-				updateRequest('RQST005', null, null);
 				
 				
 			}); // approveBtn  클릭 이벤트
@@ -348,6 +353,7 @@
 				
 				if(!rejaction) {
 					Swal.fire('Warning', '반려 사유를 작성해 주세요.', 'warning');
+					return;
 				}
 				
 				updateRequest(status, rejaction, null);
@@ -399,12 +405,15 @@
 			function updateRequest(status, rejection, high) {
 				
 				const updateData = {
+					request_no: request_no,
 			        status: status,
 			        rejection: rejection,
 			        high: high
 			    };
 				
-			    axios.post('/api/request/update', updateData, {
+				console.log("updateData : " + updateData);
+				
+			    axios.post('/api/request/absence/update', updateData, {
 			        headers: {
 			            'X-CSRF-TOKEN': csrfToken
 			        }
@@ -424,7 +433,36 @@
 			    });
 			}
 			
-		    
+			// 승인자 선택 모달창 승인버튼
+			$('#approveModalBtn').on('click', function () {
+			    // 선택된 행 가져오기
+			    const selectedRows = grid2.getCheckedRows();
+
+			    if (selectedRows.length === 0) {
+			        // 선택된 항목이 없을 경우
+			        Swal.fire('Warning', '항목을 선택해 주세요.', 'warning');
+			        return;
+			    } else if (selectedRows.length > 1) {
+			        // 여러 항목이 선택된 경우
+			        Swal.fire('Warning', '하나의 항목만 선택해 주세요.', 'warning');
+			        return;
+			    }
+
+			    // 선택된 항목의 EMP_ID 가져오기
+			    const selectedEmpId = selectedRows[0].EMP_ID;
+
+			    console.log("Selected EMP_ID:", selectedEmpId);
+
+			    // updateRequest 함수 호출
+			    updateRequest("RQST003", null, selectedEmpId);
+
+			    // 모달 닫기
+			    $('#approveModal').modal('hide');
+			});
+			
+			
+			
+			
 		}); // 돔 로드 이벤트
 	
 		
