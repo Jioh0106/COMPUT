@@ -40,6 +40,12 @@ public class AbsenceService {
 		
 		return absenceMapper.getAbsenceList();
 	}
+	
+	// Low 권한 본인 정보만 조회
+	public List<Map<String, Object>> getLowAbsenceList(String emp_id) {
+		
+		return absenceMapper.getLowAbsenceList(emp_id);
+	}
 
 	// 공통코드 항목 조회
 	public List<CommonDetailDTO> getCommonList(String code) {
@@ -174,6 +180,8 @@ public class AbsenceService {
 	public List<Map<String, String>> getEmpSerch(String emp_name) {
 		return absenceMapper.getEmpSerch(emp_name);
 	}
+
+
 
 	
 

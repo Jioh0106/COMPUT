@@ -624,7 +624,7 @@
 						{ 
 							header: '휴직 시작일', 
 							name: 'ABSENCE_START',
-							width: 100,
+							width: 120,
 							editor: isEditable
 								? {
 				                type: 'datePicker',
@@ -643,7 +643,7 @@
 				        { 
 							header: '휴직 종료일', 
 							name: 'ABSENCE_END',
-							width: 100,
+							width: 120,
 							editor: isEditable 
 								? {
 				                type: 'datePicker',
@@ -682,7 +682,7 @@
 				        { 
 							header: '최종 승인자', 
 							name: 'HIGH_APPROVAL', 
-							width: 150,
+							width: 160,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
 							editor: isEditable
 								? {
@@ -751,7 +751,7 @@
 			
 			// 사원 조회 모달창 표시 함수
 			function showEmpModal(rowKey, columnName) {
-			    const $modal = $('#empSerchModal'); // 모달창 요소
+			    const modal = $('#empSerchModal'); // 모달창 요소
 
 			    // Toast UI Grid 초기화 (최초 1회만 실행)
 			    if (!modalGrid) {
@@ -769,7 +769,7 @@
 			    }
 				
 				// 모달 열릴 때 입력 필드와 그리드 초기화
-				$modal.on('show.bs.modal', function () {
+				modal.on('show.bs.modal', function () {
 				    $('#new_emp_serch').val(''); // 입력 필드 초기화
 					$('#new_emp_serch').focus();
 				    modalGrid.resetData([]); // 그리드 데이터 초기화
@@ -803,7 +803,7 @@
 				        grid.setValue(rowKey, 'EMP_DEPT', selectedRow.EMP_DEPT); // EMP_DEPT 업데이트
 				        grid.setValue(rowKey, 'EMP_POSITION', selectedRow.EMP_POSITION); // EMP_POSITION 업데이트
 
-				        $modal.modal('hide'); // 모달창 닫기
+				        modal.modal('hide'); // 모달창 닫기
 				    } else if (selectedRows.length > 1) {
 				        // 선택된 행이 두 개 이상인 경우 경고 알림
 				        Swal.fire('Error', '하나의 행만 선택해주세요.', 'warning');
@@ -815,7 +815,7 @@
 
 
 			    // 모달창 표시
-			    $modal.modal('show');
+			    modal.modal('show');
 			}
 
 			// 사원 검색 API 호출 함수

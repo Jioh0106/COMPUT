@@ -35,6 +35,8 @@ public interface AbsenceMapper {
 
 	String getUpdateCommon(String name);
 
+	List<Map<String, Object>> getLowAbsenceList(String emp_id);
+
 
 
 	
