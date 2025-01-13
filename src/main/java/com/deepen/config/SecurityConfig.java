@@ -41,7 +41,7 @@ public class SecurityConfig {
 						.hasAnyRole("ATHR001", "ATHR002", "ATHR003")
 						.requestMatchers("/ps-update/**")
 						.hasAnyRole("ATHR001", "ATHR002")
-						.requestMatchers("/common-mng/**")
+						.requestMatchers("/common-mng/**", "/commonCd/**", "/saveData/**")
 						.hasRole("ATHR001")
 						.anyRequest()
 						.authenticated()

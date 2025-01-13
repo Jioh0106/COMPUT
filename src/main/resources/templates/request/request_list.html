@@ -172,6 +172,8 @@
 			<script src="assets/js/main.js"></script>
 			<!-- TOAST UI CDN -->
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+			 <!-- 제이쿼리 -->
+   			<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 			<script>
 			document.addEventListener('DOMContentLoaded', function () {
 				var Grid = tui.Grid;
@@ -179,11 +181,12 @@
 				// Grid 생성
 				const grid = new Grid({
 					el: document.getElementById('grid'),
+					rowKey: 'request_no', // rowKey에 request_no를 설정
 					columns: [
 						{header: '요청번호', name: 'request_no'},
 						{header: '요청구분', name: 'request_division'},
 						{header: '요청유형', name: 'request_type'},
-						{header: '사원번호', name: 'emp_num'},
+						{header: '사원번호', name: 'emp_id'},
 						{header: '성명', name: 'emp_name'},
 						{header: '부서명', name: 'emp_dept'},
 						{header: '요청일', name: 'request_date'},
@@ -194,6 +197,7 @@
 						{header: '반려사유', name: 'request_rejection'},
 						{header: '처리상태', name: 'complete'}
 					],
+					
 					data: []
 				});
 
@@ -209,31 +213,38 @@
 		            .then(data => {
 		                console.log('Fetched Data:', data); // 확인용
 		                grid.resetData(data); // TOAST UI Grid에 데이터 적용
+						grid.refreshLayout(); // 레이아웃 새로고침
+						
 		            })
 		            .catch(error => {
 		                console.error('Error fetching request list:', error);
 		            });
 		   
-			 });
+		
 				
 		// Grid의 row 클릭 이벤트 추가
 		    grid.on('click', (ev) => {
 		        // 클릭된 row 데이터 가져오기
 		        const rowData = ev.instance.getRow(ev.rowKey);
+		        const request_no = rowData.request_no;
 				
 				// 팝업 창 열기
 				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
-				   const popup = window.open('/request-assign-detail', '_blank', popupOptions);
-
-				   // 팝업 창이 로드되었을 때 데이터 전달
-				   popup.onload = () => {
-				       popup.postMessage(rowData, '*'); // rowData 객체를 팝업에 전달
-				   };
-
+				   let popupUrl = ''; // 요청번호 포함한 URL 생성
+				   			   
+	   				if(rowData.request_type === '발령') {
+	   					popupUrl = `/request-assign-detail?request_no=${request_no}`;
+	   					
+	   				} else if(rowData.request_type === '휴직') {
+	   					popupUrl = `/request-absence-detail?request_no=${request_no}`;
+	   				}
+				   
+				   
+				   window.open(popupUrl, '_blank', popupOptions);
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
 			
-			
+	});	
 				
 			</script>
 

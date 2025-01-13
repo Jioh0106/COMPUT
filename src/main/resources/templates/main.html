@@ -1,20 +1,85 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-	<div th:fragment="main">
-		<!-- main.html -->
-		<div id="main">
-			
-		    <header class="mb-3">
-		        <a href="#" class="burger-btn d-block d-xl-none">
-		            <i class="bi bi-justify fs-3"></i>
-		        </a>
-		    </header>
-			
-		    <div class="page-heading">
-		        <button type="button" class="btn btn-danger btn-lg" id="checkBtn">출근하기</button>
-		    </div>
-				
-		</div>
-		<!-- main.html 끝-->
+<div th:fragment="main">
+	<!-- main.html -->
+	<div id="main">
+
+		<header class="mb-3">
+			<a href="#" class="burger-btn d-block d-xl-none">
+				<i class="bi bi-justify fs-3"></i>
+			</a>
+		</header>
+
+		<body>
+			<div class="page-heading">
+				<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
+					onclick="cmtBtn(this.id)">출근하기</button>
+				<button type="button" class="btn btn-success btn-lg" id="leaveBtn"
+					onclick="cmtBtn(this.id)">퇴근하기</button>
+			</div>
+
 	</div>
+	<!-- main.html 끝-->
+</div>
+
+<!-- 제이쿼리 -->
+<script th:src="@{/js/jquery-3.7.1.js}"></script>
+<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
+
+<script th:inline="javascript">
+
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+	const token = document.querySelector('meta[name="_csrf"]').content;
+
+	// 화면 로드 시 공통코드 조회
+	window.onload = function () {
+		fetch(
+			"/searchCmt",
+			{
+				method: "POST"
+				, headers: {
+					'header': header,
+					"Content-Type": "application/json",
+					'X-CSRF-Token': token
+				}
+				, body: JSON.stringify({
+					btnType: id
+				})
+
+			})
+			.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+			.then(data => {
+				
+			})
+	};
+
+	// 출/퇴근 버튼 처리
+	function cmtBtn(id) {
+		fetch(
+			"/searchCmt",
+
+			{
+				method: "POST"
+				, headers: {
+					'header': header,
+					"Content-Type": "application/json",
+					'X-CSRF-Token': token
+				}
+				, body: JSON.stringify({
+					btnType: id
+				})
+
+			})
+			.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+			.then(data => {
+				grid.resetData(data);
+			})
+	};
+
+</script>
+
+</body>
+
 </html>

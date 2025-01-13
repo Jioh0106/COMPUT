@@ -6,8 +6,11 @@
 
 	
 	<select id="getAbsenceList" resultType="Map">
-		SELECT *
-		FROM ABSENCE_VIEW 
+		SELECT av.*
+		FROM ABSENCE_VIEW av
+		LEFT JOIN request r
+		ON av.request_no = r.request_no
+		WHERE r.request_status = 'RQST005'
 		ORDER BY ABSENCE_NO DESC
 	</select>
 	
@@ -21,17 +24,17 @@
 	</select>
 	
 	<select id="getEmpList" resultType="Map">
-		SELECT e.emp_id,
-			   e.emp_name,
-			   e.emp_role,
-			   c_dept.common_detail_name AS emp_dept_name,
-			   c_position.common_detail_name AS emp_position_name
-		  FROM employees e
-	 LEFT JOIN common_detail c_dept
-            ON e.emp_dept = c_dept.common_detail_code
-	 LEFT JOIN common_detail c_position
-		    ON e.emp_position = c_position.common_detail_code
-		 WHERE emp_role = #{emp_role}
+			SELECT e.emp_id,
+				   e.emp_name,
+				   e.emp_role,
+				   c_dept.common_detail_name AS emp_dept_name,
+				   c_position.common_detail_name AS emp_position_name
+			  FROM employees e
+		 LEFT JOIN common_detail c_dept
+	            ON e.emp_dept = c_dept.common_detail_code
+		 LEFT JOIN common_detail c_position
+			    ON e.emp_position = c_position.common_detail_code
+			 WHERE emp_role = #{emp_role}
 	</select>
 	
 	<insert id="insertRequest" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="request_no">
@@ -40,7 +43,9 @@
 			REQUEST_STATUS, 
 			REQUEST_DATE, 
 			REQUEST_DEADLINE, 
-			MIDDLE_APPROVAL, 
+			<if test="middle_approval != null">
+	            MIDDLE_APPROVAL,
+	        </if>
 			<if test="high_approval != null">
 	            HIGH_APPROVAL,
 	        </if>
@@ -77,6 +82,7 @@
 	
 	</insert>
 	
+	<!-- 삭제 SQL -->
 	<delete id="deleteAbsences" parameterType="java.util.List">
 	    DELETE FROM ABSENCE
 	    WHERE ABSENCE_NO IN
@@ -84,7 +90,16 @@
 	        #{ABSENCE_NO}
 	    </foreach>
 	</delete>
-
+	
+	<select id="getUpdateCommon" resultType="String">
+		SELECT common_detail_code
+		  FROM common_detail
+		 WHERE common_detail_name = #{name}
+		   AND REGEXP_LIKE(common_detail_code, '^LOAB')
+	</select>
+	
+	
+	
 	<!-- 업데이트 SQL -->
     <update id="updateAbsence" parameterType="java.util.Map">
         UPDATE ABSENCE
@@ -93,19 +108,43 @@
 	           ABSENCE_TYPE = #{ABSENCE_TYPE},
 	           ABSENCE_START = #{ABSENCE_START},
 	           ABSENCE_END = #{ABSENCE_END},
-	           ABSENCE_REMARK = #{ABSENCE_REMARK},
-	           HIGH_APPROVAL = #{HIGH_APPROVAL}
+	           <if test="ABSENCE_REMARK != null">
+					ABSENCE_REMARK = #{ABSENCE_REMARK},
+				</if>
+	           HIGH_APPROVAL = #{HIGH_APPROVAL},
+	           UPDATE_DATE = SYSTIMESTAMP,
+	           UPDATE_EMP_ID = #{UPDATE_EMP_ID}
          WHERE ABSENCE_NO = #{ABSENCE_NO}
     </update>
-
-    <!-- 삽입 SQL -->
-    <insert id="insertAbsence" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="ABSENCE_NO">
-        INSERT INTO ABSENCE (
-            EMP_ID, ABSENCE_TYPE, ABSENCE_START, ABSENCE_END, ABSENCE_REMARK
-        ) VALUES (
-            #{EMP_ID}, #{ABSENCE_TYPE}, #{ABSENCE_START}, #{ABSENCE_END}, #{ABSENCE_REMARK}
-        )
-    </insert>
+    
+    
+    <select id="getEmpSelf" resultType="Map">
+	    	SELECT e.emp_id, 
+	    		   e.emp_name, 
+	    		   e.emp_role,
+	    		   ddept.common_detail_name AS emp_dept_name, 
+	    		   dpos.common_detail_name AS emp_position_name
+			  FROM employees e
+		 LEFT JOIN common_detail ddept
+			    ON e.emp_dept = ddept.common_detail_code
+		 LEFT JOIN common_detail dpos
+			    ON e.emp_position = dpos.common_detail_code
+			 WHERE e.emp_id = #{emp_id}
+    </select>
+    
+    <select id="getEmpSerch" resultType="Map">
+			SELECT e.emp_id, 
+				   e.emp_name, 
+				   ddept.common_detail_name AS emp_dept, 
+				   dpos.common_detail_name AS emp_position
+			  FROM employees e
+		 LEFT JOIN common_detail ddept
+			    ON e.emp_dept = ddept.common_detail_code
+		 LEFT JOIN common_detail dpos
+			    ON e.emp_position = dpos.common_detail_code
+			 WHERE e.emp_name LIKE '%' || #{emp_name} || '%'
+    </select>
+    
 	
 </mapper>
 
