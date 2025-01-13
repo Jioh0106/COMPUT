@@ -58,6 +58,7 @@
 			SET common_code = #{commonCode}
 				, common_name = #{commonName}
 				, common_status = #{commonStatus}
+				, common_display = #{commonDisplay}
 			WHERE common_code = #{commonCode}
 	</update>
 	
@@ -66,6 +67,7 @@
 			SET common_detail_code = #{commonCode}
 				, common_detail_name = #{commonName}
 				, common_detail_status = #{commonStatus}
+				, common_detail_display = #{commonDisplay}
 			WHERE common_detail_code = #{commonCode}
 	</update>
 	
