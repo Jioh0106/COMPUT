@@ -201,7 +201,6 @@
 									<input type="button" class="btn btn-outline-success" id="save"  value="저장">
 									<input type="button" class="btn btn-outline-danger" id="deleteRow" value="삭제">
 									
-									
 								</div>
 							</div>
 						</form>
@@ -723,6 +722,28 @@
 			        }
 			        
 			    });
+			 	
+			 	
+			    grid.on('editingFinish', function (ev) {
+			    	const { rowKey, columnName } = ev;
+
+			        // 사원번호 또는 사원명 수정 시 모달 띄우기
+			        if (columnName === 'ABSENCE_START' || columnName === 'ABSENCE_END') {
+			            ev.stop(); // 기본 편집 동작 중단
+			            
+			        	// 해당 행의 데이터 가져오기
+			            const rowData = grid.getRow(rowKey);
+						
+						// 행정보 전달
+			            showEmpModal(rowKey, columnName);
+			        }
+			        
+			    });
+			 	
+			 	
+			 	
+			 	
+			 	
 				
 			});
 			
@@ -763,6 +784,7 @@
 				        getEmpSerch(emp_name).then(data => {
 							console.log("Fetched Data:", data); // 반환된 데이터 구조 확인
 				            modalGrid.resetData(data); // 새로운 데이터로 그리드 갱신
+				            modalGrid.refreshLayout();  // 그리드 레이아웃 새로 고침
 				        });
 				    } else {
 				        modalGrid.resetData([]); // 입력값이 비어있을 경우 그리드 초기화
