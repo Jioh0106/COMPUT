@@ -100,53 +100,16 @@ function createEmpPieChart(pieChartData){
 	});
 }
 
-function createEmpGroupStackBarChart(){
+function createEmpGroupBarChart(groupBarChartData){
 	empGroupStackBarChart = toastui.Chart.barChart({
 		el : document.getElementById('empGroupStackBarChart'), 
-		data : 	{
-		        categories: [
-		          '그 외',
-		          '60 ~ 69',
-		          '50 ~ 59',
-		          '40 ~ 49',
-		          '30 ~ 39',
-		          '20 ~ 29',
-		        ],
-		        series: [
-		          {
-		            name: 'Male - Seoul',
-		            data: [4007, 5067, 7221, 8358, 8500, 7730, 4962, 2670, 6700, 776, 131],
-		            stackGroup: 'Male',
-		          },
-		          {
-		            name: 'Female - Seoul',
-		            data: [3805, 4728, 7244, 8291, 8530, 8126, 5483, 3161, 1274, 2217, 377],
-		            stackGroup: 'Female',
-		          },
-		          {
-		            name: 'Male - Incheon',
-		            data: [1392, 1671, 2092, 2339, 2611, 2511, 1277, 6145, 1713, 1974, 194],
-		            stackGroup: 'Male',
-		          },
-		          {
-		            name: 'Female - Incheon',
-		            data: [1320, 1558, 1927, 2212, 2556, 2433, 1304, 8076, 3800, 6057, 523],
-		            stackGroup: 'Female',
-		          },
-		        ],
-		      }, 
+		data : groupBarChartData,
 		options : {
 			chart: { title: '연령별 인원 현황', width: 800, height: 550 },
 	      	yAxis: { title: 'Age Group', align: 'center', },
-	      	series: { stack: true, diverging: true, },
+	      	series: { stack: false, diverging: true },
 		}
 	});
-}
-
-//
-function test(){
-	const checkedLegend = empPieChart.getCheckedLegend()
-	console.log(checkedLegend);
 }
 
 // ajax
@@ -168,12 +131,18 @@ async function countByEdu(){
 		};
 		// 차트 생성 및 데이터 설정
 		createEmpPieChart(pieChartData);
+		let defaultEduArray = result.map(item => item.EMP_EDU);
+		// 초기 값 정보 조회
+		infoListByEdu(defaultEduArray);
 		
-		//
-		empPieChart.on("clickLegendCheckbox",test)
-		
-		const eduArray = result.map(item => item.EMP_EDU);
-		infoListByEdu(eduArray);
+		empPieChart.on("clickLegendCheckbox",() => {
+			const checkedLegend = empPieChart.getCheckedLegend();
+				if(checkedLegend){
+					const eduArray = checkedLegend.map(item =>item.label);
+					console.log(eduArray);
+					infoListByEdu(eduArray);
+				}
+		});
 		
 	}catch(error){
 		console.error(error);
@@ -182,6 +151,12 @@ async function countByEdu(){
 
 async function infoListByEdu(eduArray){
 	try{
+		if (eduArray.length === 0) {
+	           console.log("차트라벨을 선택하지 않았습니다.(pieChart)");
+	           empInfoList.resetData([]);
+	           return;
+	       }
+		
 		const param = new URLSearchParams();
 		eduArray.forEach(item => param.append("edu",item));
 		//console.log(param.toString());
@@ -199,6 +174,12 @@ async function infoListByEdu(eduArray){
 	}
 }
 
+//
+function test(){
+	const checkedLegend = empPieChart.getCheckedLegend()
+	console.log(checkedLegend);
+}
+
 async function countByAgeAndGender(){
 	try{
 		const response = await fetch("http://localhost:8082/api/count-by-ageGroupAndGender");
@@ -207,6 +188,45 @@ async function countByAgeAndGender(){
 		}
 		const result = await response.json();
 		console.log(result);
+		
+   		const ageGroups = ['그 외', '60대', '50대', '40대', '30대', '20대'];
+		
+		const maleData = ageGroups.map(ageGroup => {
+		   	const match = result.find(item => item.EMP_AGE_GROUP === ageGroup && item.EMP_GENDER === '남');
+			//console.log(match);
+		   	return match ? match.EMP_COUNT : 0;
+        });
+		// console.log("maleData : ",maleData);
+		
+		const femaleData = ageGroups.map(ageGroup => {
+            const match = result.find(item => item.EMP_AGE_GROUP === ageGroup && item.EMP_GENDER === '여');
+            return match ? match.EMP_COUNT : 0;
+        });
+		// console.log("femaleData : ",femaleData);
+		
+		
+		const groupBarChartData = {
+			categories : ageGroups,
+			series :[
+				{name: "남", data:maleData},
+				{name: "여", data:femaleData}
+			]
+		};
+		console.log("그룹바차트 data",groupBarChartData);
+		// 차트 생성
+		createEmpGroupBarChart(groupBarChartData);
+		// 초기 값 정보 조회
+		let defaultEduArray =["남","여"];
+		infoListByAgeGroup(defaultEduArray);
+		
+		empGroupStackBarChart.on("clickLegendCheckbox",() => {
+			const checkedLegend = empGroupStackBarChart.getCheckedLegend();
+			//console.log("checkedLegend",checkedLegend);
+			if(checkedLegend){
+				const ageGroupArray = checkedLegend.map(item => item.label);
+				infoListByAgeGroup(ageGroupArray);
+			}
+		});
 			
 	}catch(error){
 		console.error(error);
@@ -214,14 +234,25 @@ async function countByAgeAndGender(){
 	
 }
 
-async function infoListByAgeGroup(){
+async function infoListByAgeGroup(ageGroupArray){
 	try{
-		const response = await fetch("http://localhost:8082/api/infoList-by-ageGroup?ageGroup=");
+		if(ageGroupArray.length === 0){
+				console.log("차트라벨을 선택하지 않았습니다.(groupBarChart)");
+		        empInfoList.resetData([]);
+			return;
+		}
+		
+		const param = new URLSearchParams();
+		ageGroupArray.forEach(item => param.append("ageGroupByGender",item));
+		
+		const response = await fetch(`http://localhost:8082/api/infoList-by-ageGroup?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
+		console.log("성별 연령대 정보:",result);
+		empInfoList.resetData(result);
+		
 	}catch(error){
 		console.error(error);
 	}

@@ -121,7 +121,7 @@ public class PersonnelService {
 	public List<Map<String , Object>> getInfoListByEdu(List<String> edu){
 		//log.info(edu.toString());
 		List<Map<String , Object>> infoList = psMapper.selectInfoByEdu(edu);
-		log.info(infoList.toString());
+		//log.info(infoList.toString());
 		
 		return infoList;
 	}
@@ -131,8 +131,11 @@ public class PersonnelService {
 		return psMapper.countByAgeGroupAndGender();
 	}
 	
-	public  List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroup){
-		return psMapper.selectInfoByAgeGroup(ageGroup);
+	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroupByGender){
+		log.info(ageGroupByGender.toString());
+		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(ageGroupByGender);
+		log.info(infoList.toString());
+		return infoList;
 	}
 }
 

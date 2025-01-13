@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,8 @@ public class PersonnelRestController {
 	}
 	
 	@GetMapping("/infoList-by-ageGroup")
-	public List<Map<String, Object>> empinfoListAgeGroup(@RequestParam(value = "ageGroup") List<String> ageGroup){
-		return psService.getInfoListByAgeGroup(ageGroup);
+	public List<Map<String, Object>> empinfoListAgeGroup(@RequestParam(value = "ageGroupByGender") List<String> ageGroupByGender){
+		log.info(ageGroupByGender.toString());
+		return psService.getInfoListByAgeGroup(ageGroupByGender);
 	}
 }

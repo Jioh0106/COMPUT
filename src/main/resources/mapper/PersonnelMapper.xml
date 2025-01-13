@@ -122,7 +122,7 @@
 			emp_account
 		FROM emp_list_all
 		WHERE emp_status_name != '퇴사'
-		<if test="edu != null">
+		<if test="edu != null and edu.size()>0">
 			AND emp_edu IN 
 			<foreach item="item" index="idx" collection="edu" open="(" separator="," close=")">
 				#{item}
@@ -223,9 +223,9 @@
 			FROM emp_list_all
 		) ela
 		ON ea.emp_id = ela.emp_id
-		<if test="ageGroup != null and ageGroup.size > 0">
-		WHERE ea.emp_age_group IN 
-			<foreach item="item" index="idx" collection="ageGroup" open="(" separator="," close=")">
+		<if test="ageGroupByGender != null and ageGroupByGender.size > 0">
+		WHERE ea.emp_gender IN 
+			<foreach item="item" index="idx" collection="ageGroupByGender" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>

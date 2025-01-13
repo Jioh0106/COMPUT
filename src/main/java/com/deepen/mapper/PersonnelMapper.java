@@ -25,6 +25,6 @@ public interface PersonnelMapper {
 	 
 	 List<Map<String, Object>> countByAgeGroupAndGender();
 	 
-	 List<Map<String, Object>> selectInfoByAgeGroup(List<String> ageGroup);
+	 List<Map<String, Object>> selectInfoByAgeGroup(@Param("ageGroupByGender") List<String> ageGroupByGender);
 	
 }
