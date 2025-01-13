@@ -344,9 +344,11 @@
 				let status = '';
 				let rejaction = $('#request_rejaction').val();
 				
+				// 1차 대기 상태에서는 1차 반려로 변경
 				if(request_status == 'RQST001') {
 					status = 'RQST002';
 					
+				// 2차 대기 상태에서는 2차 반려로 변경
 				} else if(request_status == 'RQST003') {
 					status = 'RQST004';
 				} 
