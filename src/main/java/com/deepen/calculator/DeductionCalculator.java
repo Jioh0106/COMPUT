@@ -58,8 +58,11 @@ public class DeductionCalculator {
         
         JsonNode brackets = formula.get("brackets");
         for (JsonNode bracket : brackets) {
-            JsonNode limit = bracket.get("limit");
-            if (limit == null || annualIncome.compareTo(new BigDecimal(limit.asText())) <= 0) {
+            JsonNode limitNode = bracket.get("limit");
+            BigDecimal limit = limitNode != null && !limitNode.isNull() ? 
+                new BigDecimal(limitNode.asText()) : null;
+                
+            if (limit == null || annualIncome.compareTo(limit) <= 0) {
                 BigDecimal rate = new BigDecimal(bracket.get("rate").asText());
                 return monthlyIncome.multiply(rate).setScale(0, RoundingMode.DOWN);
             }
@@ -84,18 +87,35 @@ public class DeductionCalculator {
      * 비율 기반 공제 계산 (국민연금, 건강보험, 고용보험)
      */
     private BigDecimal calculatePercentageDeduction(JsonNode formula, PayInfo payInfo) {
+        log.info("비율 기반 공제 계산 시작 - formula: {}", formula);
+        
         BigDecimal base = BigDecimal.ZERO;
         JsonNode baseFields = formula.get("baseFields");
         
         for (JsonNode field : baseFields) {
-            switch (field.asText()) {
-                case "emp_salary" -> base = base.add(new BigDecimal(payInfo.getEmpSalary()));
-                case "allow_amt" -> base = base.add(payInfo.getAllowAmt());
+            String fieldName = field.asText();
+            log.info("기준금액 필드 처리: {}", fieldName);
+            
+            switch (fieldName) {
+                case "emp_salary" -> {
+                    BigDecimal salary = new BigDecimal(payInfo.getEmpSalary());
+                    base = base.add(salary);
+                    log.info("기본급 추가: {}", salary);
+                }
+                case "allow_amt" -> {
+                    if (payInfo.getAllowAmt() != null) {
+                        base = base.add(payInfo.getAllowAmt());
+                        log.info("수당 추가: {}", payInfo.getAllowAmt());
+                    }
+                }
             }
         }
         
         BigDecimal rate = new BigDecimal(formula.get("rate").asText());
-        return base.multiply(rate).setScale(0, RoundingMode.DOWN);
+        BigDecimal result = base.multiply(rate).setScale(0, RoundingMode.DOWN);
+        log.info("계산 결과 - 기준금액: {}, 요율: {}, 결과: {}", base, rate, result);
+        
+        return result;
     }
 
     /**

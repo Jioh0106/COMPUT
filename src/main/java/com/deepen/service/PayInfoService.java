@@ -16,7 +16,6 @@ import com.deepen.entity.PayInfo;
 import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 

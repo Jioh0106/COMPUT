@@ -15,7 +15,9 @@ public interface SalaryFormulaMapper {
     /**
      * 현재 적용중인 급여 공식 목록 조회
      */
-    List<SalaryFormulaDTO> getCurrentFormulas(@Param("year") int year);
+    List<SalaryFormulaDTO> getCurrentFormulas(
+//    		@Param("name") String name,
+    		@Param("year") int year);
     
     /**
      * 특정 코드의 급여 공식 조회

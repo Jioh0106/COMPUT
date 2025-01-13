@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -96,9 +97,27 @@ public class PayrollCalculatorService {
      */
     private List<SalaryFormulaDTO> getFormulas(String paymentDate) {
         int year = YearMonth.parse(paymentDate).getYear();
-        List<SalaryFormulaDTO> formulas = salaryFormulaMapper.getCurrentFormulas(year);
+        log.info("급여 계산식 조회 시작 - 년도: {}", year);
         
+        List<SalaryFormulaDTO> formulas = salaryFormulaMapper.getCurrentFormulas(year);
+        log.info("조회된 계산식 수: {}", formulas.size());
+        
+        // null 체크 추가
+        formulas = formulas.stream()
+            .filter(formula -> formula != null && formula.getFormulaCode() != null)
+            .collect(Collectors.toList());
+        
+        // 상세 로깅 추가
+        formulas.forEach(formula -> {
+            log.info("계산식 정보: code={}, name={}, type={}, content={}",
+                formula.getFormulaCode(),
+                formula.getFormulaName(),
+                formula.getFormulaType(),
+                formula.getFormulaContent());
+        });
+
         if (formulas.isEmpty()) {
+            log.warn("{}년도 급여 계산식이 존재하지 않습니다.", year);
             throw new RuntimeException(String.format("%d년도 급여 계산 공식이 정의되어 있지 않습니다.", year));
         }
         
@@ -161,8 +180,10 @@ public class PayrollCalculatorService {
 
         // 수당 공식만 필터링
         List<SalaryFormulaDTO> allowanceFormulas = formulas.stream()
-            .filter(f -> f.getFormulaCode().startsWith("RWRD"))
-            .toList();
+        		.filter(f -> f != null && 
+	                f.getFormulaCode() != null && 
+	                f.getFormulaCode().startsWith("RWRD"))
+        		.collect(Collectors.toList());
 
         for (SalaryFormulaDTO formula : allowanceFormulas) {
             try {
@@ -214,6 +235,8 @@ public class PayrollCalculatorService {
             Employees emp,
             PayInfo payInfo,
             List<SalaryFormulaDTO> formulas) {
+    	
+    	log.info("공제 계산 시작 - 사원: {}", emp.getEmp_id());
             
         BigDecimal totalDeduction = BigDecimal.ZERO;
         BigDecimal totalSalary = new BigDecimal(payInfo.getEmpSalary())
@@ -221,8 +244,10 @@ public class PayrollCalculatorService {
 
         // 공제 공식만 필터링
         List<SalaryFormulaDTO> deductionFormulas = formulas.stream()
-            .filter(f -> f.getFormulaCode().startsWith("DDCT"))
-            .toList();
+        		.filter(f -> f != null && 
+                f.getFormulaCode() != null && 
+                f.getFormulaCode().startsWith("DDCT"))
+     .collect(Collectors.toList());
 
         for (SalaryFormulaDTO formula : deductionFormulas) {
             try {
