@@ -45,7 +45,7 @@
 			</header>
 
 			<h3>요청내역</h3>
-
+			<h2 th:text="'권한: ' + ${emp.emp_role}"></h2>
 			<div class="card">
 				<div class="card-body">
 					
@@ -174,7 +174,9 @@
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 			 <!-- 제이쿼리 -->
    			<script th:src="@{/js/jquery-3.7.1.js}"></script>   
-			<script>
+			<script th:inline="javascript">
+			
+			const userRole = /*[[${emp.emp_role}]]*/ 'UNKNOWN';
 			document.addEventListener('DOMContentLoaded', function () {
 				var Grid = tui.Grid;
 
@@ -227,10 +229,10 @@
 		        // 클릭된 row 데이터 가져오기
 		        const rowData = ev.instance.getRow(ev.rowKey);
 		        const request_no = rowData.request_no;
-				
+		       
 				// 팝업 창 열기
 				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
-				   const popupUrl = `/request-assign-detail?request_no=${request_no}`; // 요청번호 포함한 URL 생성
+				   const popupUrl = `/request-assign-detail?request_no=${request_no}&userRole=${userRole}`; // 요청번호 포함한 URL 생성
 				   window.open(popupUrl, '_blank', popupOptions);
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  

@@ -41,11 +41,11 @@
 	<div class="row match-height">
 		<div class="col-12">
 			<div class="card">
-				<input type="hidden" name="_csrf" th:value="${_csrf.token}" />	
 				<div class="card-content">
 					<div class="card-body">
-					
+						
 						<form class="form" action="/request-assign-detail" method="post" enctype="multipart/form-data">
+							<input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}" />	
 						<div class="row">
 							<div class="col-md-6 col-12">
 								<div class="form-group">
@@ -125,8 +125,8 @@
 								</div>
 							</div>
 							<div class="col-12 d-flex justify-content-end">
-								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal"
-								data-bs-target="#approvedefaultSize">승인</button>
+								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1"
+								>승인</button>
 								<button type="button" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
 							</div>
 						</div>
@@ -172,7 +172,7 @@
                             <i class="bx bx-x d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">취소</span>
                         </button>
-                        <button type="button" class="btn btn-primary ml-1" onclick="requestApproval()">
+                        <button type="button" id="approveRequestBtn" class="btn btn-primary ml-1" >
                             <i class="bx bx-check d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">승인요청</span>
                         </button>
@@ -252,7 +252,7 @@
    	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script>
 		
-		// 저장 버튼 클릭 이벤트
+			//반려 버튼 클릭 이벤트
 		      document.getElementById('rejectBtn').addEventListener('click', () => {
 		          const modal = new bootstrap.Modal(document.getElementById('defaultSize'));
 		          modal.show();
@@ -262,6 +262,7 @@
 		   // URL에서 쿼리 파라미터로 전달된 요청번호 추출
 			const urlParams = new URLSearchParams(window.location.search);
 			const request_no = urlParams.get('request_no'); // request_no 추출
+			console.log('요청번호!!!!:', request_no); // 요청번호 출력
 			
 			if (request_no) {
 			    fetch(`/api/selectAssign/${request_no}`)
@@ -273,6 +274,8 @@
 			        })
 			        .then(data => {
 			            console.log('REST API 반환 데이터:', data);
+			            const requestDivision = data.request.request_division;
+			            console.log('요청 구분:', requestDivision); // 요청 구분 값 출력
 						const assignment = data.assignment;
 			            if (data) {
 			                // 발령 테이블 데이터로 상세정보 팝업창 채우기
@@ -297,7 +300,7 @@
 								document.getElementById('rejectBtn').style.display = 'inline-block';
 							}
 							
-			            } else {
+			           } else {
 			                alert("발령 정보를 찾을 수 없습니다.");
 			            }
 			        })
@@ -309,10 +312,58 @@
 
 		//-----------------------------------------------------------------최종승인권자 모달창시작
 		
+		// URL에서 userRole 파라미터 추출
+		const userRole = urlParams.get('userRole'); // userRole 값 추출
+		console.log('현재 사용자 권한:', userRole);
 		// 승인 버튼 클릭 시 최종 승인권자 선택 모달창 열기
 	    
 		document.addEventListener('DOMContentLoaded', function () {
-			var Grid = tui.Grid;
+			const csrfToken = document.getElementById('csrfToken').value; //토큰
+			
+	    	// 승인 버튼 클릭 시 동작 시작
+	       	 document.getElementById('approveBtn').addEventListener('click', function () {
+	       		console.log('승인 버튼 클릭됨');
+	       		 if(userRole.trim() === 'ATHR001'){
+	       			console.log('ATHR001 권한 승인 처리 시작'); // 디버깅 로그
+	       			const requestDTO = {
+	       					request_no: request_no,
+	       					request_status: 'RQST005'
+	       				};
+	       			console.log('리퀘스트디티오:', requestDTO);
+	       		 $.ajax({
+	                 url: '/request-update',
+	                 type: 'POST',
+	                 contentType: 'application/json',
+	                 data: JSON.stringify({ requestDto: requestDTO }),
+	                 beforeSend: function (xhr) {
+	                     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+	                 },
+	                 success: function (response) {
+	                     alert('최종 승인 처리가 완료되었습니다.');
+	                     window.opener.location.reload(); // 부모창 새로고침
+	                     window.close(); // 팝업창 닫기
+	                 },
+	                 error: function (error) {
+	                     alert('최종 승인 처리에 실패했습니다.');
+	                     console.error(error);
+	                 }
+	             });
+	       			
+	       	}else if(userRole.trim() === 'ATHR002'){
+	       	 // 중간 승인자 권한: 최종 승인자를 선택하는 모달 창 열기
+	            const modal = new bootstrap.Modal(document.getElementById('approvedefaultSize'), {
+	                backdrop: 'static' // 모달 바깥 클릭 시 닫히지 않도록 설정
+	            });
+	            modal.show();
+	       		
+	         }else{
+	        	 alert("승인권한없음");
+	         }
+	    
+	    });//승인버튼 클릭시 동작 끝
+	    
+	    
+	    var Grid = tui.Grid;
 		  // 최종승인권자 선택 모달창 Grid 생성
 	        const grid2 = new Grid({
 	            el: document.getElementById('grid2'),
@@ -324,10 +375,10 @@
 	            ],
 	            data: []
 	        });
-
-			    // 두 번째 모달이 열릴 때 Grid 리렌더링
-				const defaultModal = document.getElementById('approvedefaultSize');
-				defaultModal.addEventListener('shown.bs.modal', function () {
+	    
+			    // 최종승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+	       		 const defaultModal = document.getElementById('approvedefaultSize');
+				 defaultModal.addEventListener('shown.bs.modal', function () {
 			        // ajax로 데이터 가져오기
 			        fetch('/api/highRole')
 			            .then(response => response.json()) // json 형태로 파싱
@@ -340,10 +391,10 @@
 			                console.error('Error fetching middle role data:', error);
 							alert('승인권자 데이터를 가져오는 중 오류가 발생했습니다.');
 			            });
-			    });
-
-				
-			    // 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+			   		 });
+				 
+				let selectApprover = {};
+				let approverString ={};
 			    grid2.on('click', (ev) => {
 			        if (ev.rowKey !== null) {
 			            const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
@@ -363,9 +414,9 @@
 				approverString = `${selectApprover.approverEmp_id}`;
 			        alert(`최종승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
 			    }
-	});
 
-			// 승인 요청 버튼 클릭 시 실행되는 함수
+
+			// 승인 요청 버튼 클릭 시 실행되는 함수(중간승인권자만 실행)
 			function requestApproval() {
 			    if (!selectApprover.approverEmp_id) {
 			        alert('최종승인권자를 선택하세요.');
@@ -379,6 +430,7 @@
 					
 					const requestDTO = {
 						request_no: request_no,
+						request_status: 'RQST003',
 						high_approval : approverString
 					};
 					
@@ -418,8 +470,9 @@
 				
 				
 			} // requestApproval() 함수 끝
-	
-			
+			 // 승인 요청 버튼에 이벤트 핸들러 연결
+		    document.querySelector('#approveRequestBtn').addEventListener('click', requestApproval);
+		});//DOMContentLoaded끝	
 			
 		
 	</script>
