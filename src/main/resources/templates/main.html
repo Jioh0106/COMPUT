@@ -10,23 +10,92 @@
 			</a>
 		</header>
 
-		<body>
-			<div class="page-heading">
-				<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
-					onclick="cmtBtn(this.id)">출근하기</button>
-				<button type="button" class="btn btn-success btn-lg" id="leaveBtn"
-					onclick="cmtBtn(this.id)">퇴근하기</button>
+		<div class="page-heading">
+			<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
+				onclick="cmtBtn(this.id)">출근하기</button>
+			<button type="button" class="btn btn-success btn-lg" id="leaveBtn"
+				onclick="cmtBtn(this.id)">퇴근하기</button>
+		</div>
+		<div class="card">
+			<div class="card-body">
+				<h4>근무 일정</h4>
+				<div id="calendar" style="height: 600px;"></div>
 			</div>
-
+		</div>	
+     
 	</div>
 	<!-- main.html 끝-->
-</div>
 
+
+<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
 <!-- 제이쿼리 -->
 <script th:src="@{/js/jquery-3.7.1.js}"></script>
 <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/js/main.js}"></script>
+<script th:inline="javascript">
+	const Calendar = tui.Calendar;
+	
+	const container = document.getElementById('calendar');
+	const options = {
+	  defaultView: 'month',
+	  timezone: {
+	    zones: [
+	      {
+	        timezoneName: 'Asia/Seoul',
+	        displayLabel: 'Seoul',
+	      },
+	      {
+	        timezoneName: 'Europe/London',
+	        displayLabel: 'London',
+	      },
+	    ],
+	  },
+	  calendars: [
+	    {
+	      id: 'cal1',
+	      name: '개인',
+	      backgroundColor: '#03bd9e',
+	    },
+	    {
+	      id: 'cal2',
+	      name: '직장',
+	      backgroundColor: '#00a9ff',
+	    },
+	  ],
+	};
+
+	const calendar = new Calendar(container, options);
+	
+	calendar.createEvents([
+		  {
+		    id: 'event1',
+		    calendarId: 'cal2',
+		    title: '주간 회의',
+		    start: '2025-01-13T09:00:00',
+		    end: '2025-01-13T10:00:00',
+		  },
+		  {
+		    id: 'event2',
+		    calendarId: 'cal1',
+		    title: '점심 약속',
+		    start: '2025-01-14T12:00:00',
+		    end: '2025-01-14T13:00:00',
+		  },
+		  {
+		    id: 'event3',
+		    calendarId: 'cal2',
+		    title: '휴가',
+		    start: '2022-06-08',
+		    end: '2022-06-10',
+		    isAllday: true,
+		    category: 'allday',
+		  },
+		]);
+
+
+	
+</script>
 
 <script th:inline="javascript">
 
@@ -53,6 +122,45 @@
 			.then(data => {
 				
 			})
+			
+			
+		  var Calendar = window.tui.Calendar;
+
+	      var cal = new Calendar('#main-calendar', {
+	        defaultView: 'month',
+	        calendars: MOCK_CALENDARS,
+	        template: {
+	          monthGridHeader: function (data) {
+	            var date = parseInt(data.date.split('-')[2], 10);
+
+	            return (
+	              '<span class="calendar-month-header" style="margin-left: 4px;">' +
+	              (data.month + 1) +
+	              '/' +
+	              date +
+	              '</span>'
+	            );
+	          },
+	          monthGridHeaderExceed: function (hiddenEvents) {
+	            return (
+	              '<span class="calendar-month-header-exceed" style="font-size: 0.8rem">' +
+	              '+' +
+	              hiddenEvents +
+	              '</span>'
+	            );
+	          },
+	          monthDayName: function (data) {
+	            var label = data.label;
+
+	            if (data.day === 5) {
+	              label = '🎉 TGIF';
+	            }
+
+	            return '<span class="calendar-month-day-name">' + label + '</span>';
+	          },
+	        },
+	      });
+	    
 	};
 
 	// 출/퇴근 버튼 처리
@@ -79,7 +187,7 @@
 	};
 
 </script>
-
+</div>
 </body>
 
 </html>
