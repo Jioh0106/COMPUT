@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
@@ -129,45 +127,41 @@ public class PersonnelService {
 		return psMapper.countByAgeGroupAndGender();
 	}
 	
-	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroupByGender){
-		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(ageGroupByGender);
+	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> gender){
+		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(gender);
 		return infoList;
 	}
 	
 	public List<Map<String, Object>> getCountByMonthlyHireExit(){
-		return null;
+		return null; //psMapper.countByMonthlyHireExit();
 	}
 	
-	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> hireExit){
+		return null; //psMapper.selectInfoByMonthlyHireExit(hireExit);
 	}
 	
 	public List<Map<String, Object>> getCountDeptListByPosition() {
-		return null;
+		return psMapper.countDeptByPosition();
 	}
 	
-	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> position){
+		return null; //psMapper.selectDeptInfoByPosition(position);
 	}
 	
 	public List<Map<String, Object>> getCountListByJobType() {
-		return null;
+		return psMapper.countByJobType();
 	}
 	
-	public List<Map<String, Object>> getInfoListByJobType(List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> getInfoListByJobType(List<String> jobType){
+		return psMapper.selectInfoByJobType(jobType);
 	}
 	
 	public List<Map<String, Object>> getCountListByRank(){
-		return null;
+		return psMapper.countByRank();
 	}
 	
-	public List<Map<String, Object>> getInfoListByRank(List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> getInfoListByRank(List<String> rank){
+		return psMapper.selectInfoByRank(rank);
 	}
 }
 

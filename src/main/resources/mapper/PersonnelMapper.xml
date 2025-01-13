@@ -201,9 +201,9 @@
 			FROM emp_list_all
 		) ela
 		ON ea.emp_id = ela.emp_id
-		<if test="ageGroupByGender != null and ageGroupByGender.size > 0">
+		<if test="gender != null and gender.size > 0">
 		WHERE ea.emp_gender IN 
-			<foreach item="item" index="idx" collection="ageGroupByGender" open="(" separator="," close=")">
+			<foreach item="item" index="idx" collection="gender" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
@@ -223,7 +223,7 @@
 			emp_position_name,
 			COUNT(*) AS count_position
 		FROM emp_list_all_exc_exitstatus
-		GROUP BY emp_dept_name, emp_position_name;
+		GROUP BY emp_dept_name, emp_position_name
 	</select>
 	
 	<select id="selectDeptInfoByPosition" parameterType="java.util.List" resultType="java.util.Map">
@@ -231,7 +231,7 @@
 			*
 		FROM emp_list_all_exc_exitstatus
 		WHERE emp_dept_name = '인사'
-			AND emp_position_name = '이사';
+			AND emp_position_name = '이사'
 	</select>
 	
 	<select id="countByJobType" resultType="java.util.Map">
@@ -239,14 +239,19 @@
 			emp_status_name,
 			count(emp_status_name) AS count_status
 		FROM emp_list_all_inc_exitstatus
-		GROUP BY emp_status_name;
+		GROUP BY emp_status_name
 	</select>
 	
 	<select id="selectInfoByJobType" parameterType="java.util.List" resultType="java.util.Map">
 		SELECT 
 			*
 		FROM emp_list_all_inc_exitstatus
-		WHERE emp_status_name IN ('재직','휴직','퇴사');
+		<if test="jobType != null and jobType.size > 0">
+		WHERE emp_status_name IN 
+			<foreach item="item" index="idx" collection="jobType" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 	
 	<select id="countByRank" resultType="java.util.Map">
@@ -254,14 +259,19 @@
 			job_type_name,
 			COUNT(job_type_name) AS count_job_type 
 		FROM emp_list_all_exc_exitstatus
-		GROUP BY job_type_name;
+		GROUP BY job_type_name
 	</select>
 	
 	<select id="selectInfoByRank"  parameterType="java.util.List"  resultType="java.util.Map">
 		SELECT 
 			*
 		FROM emp_list_all_exc_exitstatus
-		WHERE job_type_name IN ('일반직','계약직','기술직');
+		<if test="rank != null and rank.size > 0">
+		WHERE job_type_name IN 
+			<foreach item="item" index="idx" collection="rank" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 </mapper>
 

@@ -1,10 +1,11 @@
 package com.deepen.controller;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,8 +15,6 @@ import com.deepen.service.PersonnelService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -78,52 +77,48 @@ public class PersonnelRestController {
 	}
 	
 	@GetMapping("/infoList-by-ageGroup")
-	public List<Map<String, Object>> empInfoListAgeGroup(@RequestParam(value = "ageGroupByGender") List<String> ageGroupByGender){
-		log.info(ageGroupByGender.toString());
-		return psService.getInfoListByAgeGroup(ageGroupByGender);
+	public List<Map<String, Object>> empInfoListAgeGroup(@RequestParam(value = "gender") List<String> gender){
+		log.info(gender.toString());
+		return psService.getInfoListByAgeGroup(gender);
 	}
 	
 	@GetMapping("/count-by-monthlyHireExit")
 	public List<Map<String, Object>> countListByMonthlyHireExit(){
-		return null;
+		return null; //psService.getCountByMonthlyHireExit();
 	}
 	
 	@GetMapping("/infoList-by-monthlyHireExit")
-	public List<Map<String, Object>> hrInfoListByMonthlyHireExit(@RequestParam(value = "ex") List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> hrInfoListByMonthlyHireExit(@RequestParam(value = "hireExit") List<String> hireExit){
+		return null; //psService.getInfoListByMonthlyHireExit(hireExit); 
 	}
 	
 	@GetMapping("/count-by-dept-and-position")
 	public List<Map<String, Object>> countDeptListByPosition() {
-		return null;
+		return psService.getCountDeptListByPosition();
 	}
 	
 	@GetMapping("/infoList-by-dept-and-position")
-	public List<Map<String, Object>> hrInfoListByDeptAndPosition(@RequestParam(value = "ex") List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> hrInfoListByDeptAndPosition(@RequestParam(value = "position") List<String> position){
+		return null;//psService.getInfoListByDeptAndPosition(position);
 	}
 	
 	@GetMapping("/count-by-jobType")
 	public List<Map<String, Object>> countListByJobType() {
-		return null;
+		return psService.getCountListByJobType();
 	}
 	
 	@GetMapping("/infoList-by-jobType")
-	public List<Map<String, Object>> hrInfoListByJobType(@RequestParam(value = "ex") List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> hrInfoListByJobType(@RequestParam(value = "jobType") List<String> jobType){
+		return psService.getInfoListByJobType(jobType);
 	}
 	
 	@GetMapping("/count-by-rank")
 	public List<Map<String, Object>> countListByRank(){
-		return null;
+		return psService.getCountListByRank();
 	}
 	
 	@GetMapping("/infoList-by-rank")
-	public List<Map<String, Object>> hrInfoListByRank(@RequestParam(value = "ex") List<String> ex){
-		
-		return null;
+	public List<Map<String, Object>> hrInfoListByRank(@RequestParam(value = "rank") List<String> rank){
+		return psService.getInfoListByRank(rank);
 	}
 }

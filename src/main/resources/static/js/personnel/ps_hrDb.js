@@ -31,16 +31,16 @@ categoryMenu.addEventListener("input",() => {
 	
 	if(selectCategory === "입/퇴사자"){
 		empChartContainer.innerHTML="<div id='lineChart'></div>";
-		
-	}else if(defaultCategory === "부서/직급별"){
+		countMonthlyHireExit();
+	}else if(selectCategory === "부서/직급별"){
 		empChartContainer.innerHTML="<div id='groupBarChart'></div>";
-		
-	}else if(defaultCategory === "고용유형별"){
+		//countDeptByPosition();
+	}else if(selectCategory === "고용유형별"){
 		empChartContainer.innerHTML="<div id='jobTypePieChart'></div>";
-		
-	}else if(defaultCategory === "성과등급별"){
+		//countByJobType();
+	}else if(selectCategory === "성과등급별"){
 		empChartContainer.innerHTML = "<div id='rankPieChart'></div>";
-		
+		//countByRank();
 	}
 });
 
@@ -50,16 +50,16 @@ function initChart(){
 	
 	if(defaultCategory === "입/퇴사자"){
 		empChartContainer.innerHTML="<div id='lineChart'></div>";
-		
+		countMonthlyHireExit();
 	}else if(defaultCategory === "부서/직급별"){
 		empChartContainer.innerHTML="<div id='groupBarChart'></div>";
-		
+		//countDeptByPosition();
 	}else if(defaultCategory === "고용유형별"){
 		empChartContainer.innerHTML="<div id='jobTypePieChart'></div>";
-		
+		//countByJobType();
 	}else if(defaultCategory === "성과등급별"){
 		empChartContainer.innerHTML = "<div id='rankPieChart'></div>";
-		
+		//countByRank();
 	}
 }
 
@@ -68,14 +68,18 @@ function createLineChart(/*data*/) {
     hrLineChart = toastui.Chart.lineChart({
         el: document.getElementById('lineChart'),
         data: {
-            categories: ['1월','2월','3월','4월'], //data.months, // ['1월', '2월', ..., '12월']
+            categories: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'], //data.months, // ['1월', '2월', ..., '12월']
             series: [
-                { name: '입사', data: data.joinCounts }, // 월별 입사자 수
-                { name: '퇴사', data: data.leaveCounts } // 월별 퇴사자 수
+                { name: '입사', 
+				  data: [3,1,4,8,9,5,7,1,0,2,13,9]//data.joinCounts 
+			    }, // 월별 입사자 수
+                { name: '퇴사', 
+				  data: [1,3,5,6,5,7,4,3,0,1,1,3]//data.leaveCounts 
+			  	} // 월별 퇴사자 수
             ]
         },
         options: {
-            chart: { title: '월별 입/퇴사자 (년도별)', width: 800, height: 550 },
+            chart: { title: '월별 입/퇴사자', width: 800, height: 550 },
             xAxis: { title: '월' },
             yAxis: { title: '인원 수' },
             series: { spline: true } // 부드러운 선
@@ -141,6 +145,7 @@ function createRankPieChart(pieChartData){
 async function countMonthlyHireExit(){
 	try{
 		const response = await fetch("http://localhost:8082/api/count-by-monthlyHireExit");
+		createLineChart();
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -171,14 +176,18 @@ async function countMonthlyHireExit(){
 		console.error(error);
 	}
 }
-async function infoListByMonthlyHireExit(){
+async function infoListByMonthlyHireExit(hireExitArray){
 	try{
 		if (eduArray.length === 0) {
 	           console.log("차트라벨을 선택하지 않았습니다.(pieChart)");
 	           empInfoList.resetData([]);
 	           return;
 	       }
-		const response = await fetch("http://localhost:8082/api//infoList-by-monthlyHireExit");
+		   
+  	 	const param = new URLSearchParams();
+ 		hireExitArray.forEach(item => param.append("hireExit",item)); 
+		  
+		const response = await fetch(`http://localhost:8082/api/infoList-by-monthlyHireExit?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -202,7 +211,8 @@ async function infoListByMonthlyHireExit(){
 
 async function countDeptByPosition(){
 	try{
-		const response = await fetch("http://localhost:8082/api/");
+		const response = await fetch("http://localhost:8082/api/count-by-dept-and-position");
+		
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -220,7 +230,7 @@ async function countDeptByPosition(){
 		*/
 		
 		// 차트 생성 및 데이터 설정
-		
+		createGroupBarChart();
 		// 초기 값 정보 조회
 		
 		/*
@@ -233,14 +243,18 @@ async function countDeptByPosition(){
 		console.error(error);
 	}
 }
-async function deptInfoListByPosition(){
+async function deptInfoListByPosition(positionArray){
 	try{
 		if (eduArray.length === 0) {
 	           console.log("차트라벨을 선택하지 않았습니다.(pieChart)");
 	           empInfoList.resetData([]);
 	           return;
 	       }
-		const response = await fetch("http://localhost:8082/api/");
+		   
+	   	const param = new URLSearchParams();
+  		positionArray.forEach(item => param.append("position",item));
+  		   
+  		const response = await fetch(`http://localhost:8082/api/infoList-by-dept-and-position?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -264,7 +278,7 @@ async function deptInfoListByPosition(){
 
 async function countByJobType(){
 	try{
-		const response = await fetch("http://localhost:8082/api/");
+		const response = await fetch("http://localhost:8082/api/count-by-jobType");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -283,7 +297,7 @@ async function countByJobType(){
 		
 		
 		// 차트 생성 및 데이터 설정
-		
+		createJobTypePieChart();
 		// 초기 값 정보 조회
 		
 		/*
@@ -296,14 +310,18 @@ async function countByJobType(){
 		console.error(error);
 	}
 }
-async function infoListByJobType(){
+async function infoListByJobType(jobTypeArray){
 	try{
 		if (eduArray.length === 0) {
 	           console.log("차트라벨을 선택하지 않았습니다.(pieChart)");
 	           empInfoList.resetData([]);
 	           return;
 	       }
-		const response = await fetch("http://localhost:8082/api/");
+		   
+	   	const param = new URLSearchParams();
+   		jobTypeArray.forEach(item => param.append("jobType",item));
+   		   
+   		const response = await fetch(`http://localhost:8082/api/infoList-by-jobType?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -327,7 +345,7 @@ async function infoListByJobType(){
 
 async function countByRank(){
 	try{
-		const response = await fetch("http://localhost:8082/api/");
+		const response = await fetch("http://localhost:8082/api/count-by-rank");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -345,7 +363,7 @@ async function countByRank(){
 		*/
 		
 		// 차트 생성 및 데이터 설정
-		
+		createRankPieChart();
 		// 초기 값 정보 조회
 		
 		/*
@@ -358,14 +376,18 @@ async function countByRank(){
 		console.error(error);
 	}
 }
-async function infoListByRank(){
+async function infoListByRank(rankArray){
 	try{
 		if (eduArray.length === 0) {
 	           console.log("차트라벨을 선택하지 않았습니다.(pieChart)");
 	           empInfoList.resetData([]);
 	           return;
 	       }
-		const response = await fetch("http://localhost:8082/api/");
+		
+  	 	const param = new URLSearchParams();
+		rankArray.forEach(item => param.append("rank",item));
+		   
+		const response = await fetch(`http://localhost:8082/api/infoList-by-rank?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

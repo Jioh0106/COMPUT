@@ -192,8 +192,8 @@ async function countByAgeAndGender(){
 			const checkedLegend = empGroupStackBarChart.getCheckedLegend();
 			//console.log("checkedLegend",checkedLegend);
 			if(checkedLegend){
-				const ageGroupArray = checkedLegend.map(item => item.label);
-				infoListByAgeGroup(ageGroupArray);
+				const genderArray = checkedLegend.map(item => item.label);
+				infoListByAgeGroup(genderArray);
 			}
 		});
 			
@@ -203,16 +203,16 @@ async function countByAgeAndGender(){
 	
 }
 
-async function infoListByAgeGroup(ageGroupArray){
+async function infoListByAgeGroup(genderArray){
 	try{
-		if(ageGroupArray.length === 0){
+		if(genderArray.length === 0){
 				console.log("차트라벨을 선택하지 않았습니다.(groupBarChart)");
 		        empInfoList.resetData([]);
 			return;
 		}
 		
 		const param = new URLSearchParams();
-		ageGroupArray.forEach(item => param.append("ageGroupByGender",item));
+		genderArray.forEach(item => param.append("gender",item));
 		
 		const response = await fetch(`http://localhost:8082/api/infoList-by-ageGroup?${param.toString()}`);
 		if(!response.ok){
