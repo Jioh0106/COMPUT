@@ -104,7 +104,7 @@ public class PayrollRestController {
     }
     
     
-    
+    //특정 월의 급여 미지급 직원 목록
     @GetMapping("/pay-info/missing")
     public ResponseEntity<?> getMissingPaymentEmployees(@RequestParam("paymentDate") String paymentDate) {
         try {
@@ -121,36 +121,6 @@ public class PayrollRestController {
             return ResponseEntity.badRequest().body(Map.of("message", "조회 중 오류가 발생했습니다."));
         }
     }
-////    특정 월의 급여 미지급 직원 목록을 조회합니다.
-//   @GetMapping("/pay-info/missing")
-//   public ResponseEntity<?> getMissingPaymentEmployees(
-//           @RequestParam("paymentDate") String paymentDate) {
-//       try {
-//           List<Map<String, Object>> missingEmployees = 
-//               payInfoService.getMissingPaymentEmployees(paymentDate);
-//           
-//           if (missingEmployees.isEmpty()) {
-//               return ResponseEntity.ok()
-//                   .body(Map.of(
-//                       "message", "해당 월의 모든 직원에게 급여가 지급되었습니다.",
-//                       "data", missingEmployees
-//                   ));
-//           }
-//           
-//           return ResponseEntity.ok()
-//               .body(Map.of(
-//                   "message", String.format("%d명의 미지급 직원이 있습니다.", 
-//                       missingEmployees.size()),
-//                   "data", missingEmployees
-//               ));
-//       } catch (IllegalArgumentException e) {
-//           return ResponseEntity.badRequest()
-//               .body(Map.of("message", e.getMessage()));
-//       } catch (Exception e) {
-//           return ResponseEntity.internalServerError()
-//               .body(Map.of("message", "조회 중 오류가 발생했습니다."));
-//       }
-//   }
 }
     
     

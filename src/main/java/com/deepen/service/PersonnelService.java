@@ -13,7 +13,6 @@ import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
 import com.deepen.entity.Employees;
 import com.deepen.mapper.PersonnelMapper;
-import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,9 @@ import lombok.extern.java.Log;
 public class PersonnelService {
 	
 	private final PersonnelRepository psRepo;
-	private final CommonDetailRepository cdRepo;
+	
+	// private final CommonDetailRepository cdRepo;
+	
 	private final PersonnelMapper psMapper;
 	
 	private final PasswordEncoder passwordEncoder;
@@ -112,6 +113,29 @@ public class PersonnelService {
 		
 		return empList;
 	}
-
+	
+	public List<Map<String , Object>> getCountByEdu(){
+		return psMapper.countByEdu();
+	}
+	
+	public List<Map<String , Object>> getInfoListByEdu(List<String> edu){
+		//log.info(edu.toString());
+		List<Map<String , Object>> infoList = psMapper.selectInfoByEdu(edu);
+		//log.info(infoList.toString());
+		
+		return infoList;
+	}
+	
+	public List<Map<String, Object>> getCountByAgeGroupAndGender(){
+		
+		return psMapper.countByAgeGroupAndGender();
+	}
+	
+	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroupByGender){
+		log.info(ageGroupByGender.toString());
+		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(ageGroupByGender);
+		log.info(infoList.toString());
+		return infoList;
+	}
 }
 

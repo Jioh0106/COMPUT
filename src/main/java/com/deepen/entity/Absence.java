@@ -1,6 +1,7 @@
 package com.deepen.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.deepen.domain.AbsenceDTO;
 import com.deepen.domain.RequestDTO;
@@ -41,6 +42,13 @@ public class Absence {
 	@Column(name = "absence_remark", length = 300)
 	private String absence_remark;
 	
+	@Column(name = "update_date")
+	private LocalDateTime update_date;
+	
+	@Column(name = "update_emp_id", length = 30)
+	private String update_emp_id;
+	
+	
 	public static Absence absenceDTOToEntity(AbsenceDTO absenceDTO) {
 		Absence absence = new Absence();
 		absence.setAbsence_no(absenceDTO.getAbsence_no());
@@ -50,7 +58,8 @@ public class Absence {
 		absence.setAbsence_end(absenceDTO.getAbsence_end());
 		absence.setAbsence_no(absenceDTO.getAbsence_no());
 		absence.setAbsence_remark(absenceDTO.getAbsence_remark());
-		
+		absence.setUpdate_date(absenceDTO.getUpdate_date());
+		absence.setUpdate_emp_id(absenceDTO.getUpdate_emp_id());
 		
 		return absence;
 	}

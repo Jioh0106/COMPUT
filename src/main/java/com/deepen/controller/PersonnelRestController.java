@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class PersonnelRestController {
 		return cdDetailList;
 	}
 	
-	@GetMapping("/empList")
+	@GetMapping("/emp-list")
 	public List<Map<String, Object>> empList(
 			@RequestParam(value = "startDate")String startDate,
 			@RequestParam(value = "endDate")String endDate,
@@ -49,13 +50,36 @@ public class PersonnelRestController {
 		return empList;
 	}
 	
-	@PostMapping("/empDelete")
+	@PostMapping("/emp-delete")
 	public String postMethodName(@RequestBody List<String> ids) {
 		log.info("삭제할 ids - "+ids);
 		psService.deleteAllEmpById(ids);
 		return "서버 : 삭제 성공";
 	}
 	
+	@GetMapping("/count-by-edu")
+	public List<Map<String, Object>> countListByEdu() {
+		
+		return psService.getCountByEdu();
+	}
 	
+	@GetMapping("/infoList-by-edu")
+	public List<Map<String, Object>> empinfoListByEdu(@RequestParam(value = "edu") List<String> edu){
+		log.info(edu.toString());
+		
+		return psService.getInfoListByEdu(edu);
+	}
 	
+	@GetMapping("/count-by-ageGroupAndGender")
+	public List<Map<String, Object>> countListByAgeAndGender(){
+		log.info(psService.getCountByAgeGroupAndGender().toString());
+		
+		return psService.getCountByAgeGroupAndGender();
+	}
+	
+	@GetMapping("/infoList-by-ageGroup")
+	public List<Map<String, Object>> empinfoListAgeGroup(@RequestParam(value = "ageGroupByGender") List<String> ageGroupByGender){
+		log.info(ageGroupByGender.toString());
+		return psService.getInfoListByAgeGroup(ageGroupByGender);
+	}
 }

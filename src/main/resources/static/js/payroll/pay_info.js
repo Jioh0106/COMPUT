@@ -389,7 +389,7 @@ function initializeMissingPaymentGrid() {
             {
                 header: '사원번호',
                 name: 'empId',
-                width: 100,
+                width: 210,
                 align: 'center',
                 formatter: function(cell) {
                     return cell.value; // 직접 value 값을 반환
@@ -398,7 +398,7 @@ function initializeMissingPaymentGrid() {
             {
                 header: '사원명',
                 name: 'empName',
-                width: 100,
+                width: 150,
                 align: 'center',
                 formatter: function(cell) {
                     return cell.value;
@@ -407,7 +407,7 @@ function initializeMissingPaymentGrid() {
             {
                 header: '부서',
                 name: 'departmentName',
-                width: 150,
+                width: 200,
                 align: 'center',
                 formatter: function(cell) {
                     return cell.value;
@@ -416,7 +416,7 @@ function initializeMissingPaymentGrid() {
             {
                 header: '직급',
                 name: 'positionName',
-                width: 100,
+                width: 150,
                 align: 'center',
                 formatter: function(cell) {
                     return cell.value;

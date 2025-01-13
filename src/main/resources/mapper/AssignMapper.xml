@@ -41,32 +41,50 @@
 	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST%'
 	</select>
 	
+	
+	<!--최종 승인권자 조회 모달창-->
+	<select id="highRoleSearch" resultType="com.deepen.domain.EmployeesDTO">
+		select emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+		pos_code.common_detail_name AS emp_position
+		FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    where emp_role LIKE 'ATHR001' and emp_status LIKE 'WRST%'
+	</select>
+	
+	
 	<!-- 요청테이블 요청번호로 발령테이블 조인 -->
 	<select id="selectAssign" parameterType="java.lang.Integer" resultType="com.deepen.domain.AssignmentDTO">
-		 SELECT 
-            a.assign_emp_id AS assign_emp_id,
-            e.emp_name AS assign_emp_name,
-            a.assign_date AS assign_date,
-            cdtype.common_detail_name AS assign_type,
-            a.prev_dept AS prev_dept,
-            cddept.common_detail_name AS new_dept,
-            a.prev_pos AS prev_pos,
-            cdpos.common_detail_name AS new_pos,
-            a.request_no AS request_no
-        FROM 
-            assignment a
-        JOIN 
-            employees e ON a.assign_emp_id = e.emp_id
-        JOIN 
-            request r ON a.request_no = r.request_no
-        JOIN    
-			common_detail cdtype on a.assign_type = cdtype.common_detail_code
+	   SELECT 
+		    a.assign_emp_id AS assign_emp_id,
+		    e_assign.emp_name AS assign_emp_name,
+		    a.assign_date AS assign_date,
+		    cdtype.common_detail_name AS assign_type,
+		    a.prev_dept AS prev_dept,
+		    cddept.common_detail_name AS new_dept,
+		    a.prev_pos AS prev_pos,
+		    cdpos.common_detail_name AS new_pos,
+		    a.request_no AS request_no,
+		    r.emp_id AS emp_id,
+		    e_request.emp_name AS emp_name
+		FROM 
+		    assignment a
+		JOIN 
+		    employees e_assign ON a.assign_emp_id = e_assign.emp_id
+		JOIN 
+		    request r ON a.request_no = r.request_no
+		JOIN 
+		    employees e_request ON r.emp_id = e_request.emp_id
+		JOIN    
+		    common_detail cdtype ON a.assign_type = cdtype.common_detail_code
 		JOIN   
- 			common_detail cddept on a.new_dept = cddept.common_detail_code
- 		JOIN
- 			common_detail cdpos on a.new_pos = cdpos.common_detail_code
-        WHERE 
-            a.request_no = #{request_no}
+		    common_detail cddept ON a.new_dept = cddept.common_detail_code
+		JOIN
+		    common_detail cdpos ON a.new_pos = cdpos.common_detail_code
+		WHERE 
+		    a.request_no = #{request_no}
 	</select>
 	
 	
