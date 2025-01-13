@@ -50,6 +50,23 @@
             background-color: #5a6268;
             color: white;
         }
+        .custom-tooltip {
+            position: absolute;
+            z-index: 1000;
+            background: #fff;
+            color: #000;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+        }
+        .custom-text {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #007bff;
+        }
     </style>
 </head>
 
@@ -136,50 +153,20 @@
                     <input type="hidden" id="formulaType" name="formulaType">
                     <input type="hidden" id="formulaName" name="formulaName">
 
-                    <!-- 상세 정보 입력 영역 -->
-<div id="detailSection" style="display: none;">
-    <!-- 상세명 입력 -->
-    <div class="form-group">
-        <label for="detailName" class="form-label">항목 상세명<span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="detailName" required>
-    </div>
-    
-    <!-- 숫자 범위 (소득세, 근속수당용) -->
-    <div id="numberRangeSection" style="display: none;">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="rangeStart" class="form-label">범위 시작<span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="rangeStart" name="rangeStart">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="rangeEnd" class="form-label">범위 끝<span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="rangeEnd" name="rangeEnd">
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 등급 선택 (기술등급, 성과등급용) -->
-    <div id="gradeSection" style="display: none;">
-        <div class="form-group">
-            <label for="grade" class="form-label">등급<span class="text-danger">*</span></label>
-            <select class="form-control" id="grade" required>
-                <option value="">선택하세요</option>
-            </select>
-        </div>
-    </div>
-</div>
-
                     <!-- 계산식 -->
                     <div class="form-group">
                         <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
                         <textarea class="form-control" id="formulaContent" name="formulaContent" 
                                 rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
-                        <div class="help-text">예시: 기본급 * 0.1</div>
                     </div>
+                    
+                    <!-- 계산식 설명 -->
+				    <div class="form-group">
+				        <label for="formulaComment" class="form-label">계산식 설명</label>
+				        <textarea class="form-control" id="formulaComment" name="formulaComment" 
+				                rows="2" maxlength="500" placeholder="계산식에 대한 설명을 입력하세요"></textarea>
+				        <div class="help-text">계산식에 대한 상세 설명을 입력해주세요.</div>
+				    </div>
 
                     <!-- 적용연도 -->
                     <div class="form-group">
@@ -199,6 +186,8 @@
                             <option value="3">3</option>
                             <option value="4">4</option>
                             <option value="5">5</option>
+                            <option value="5">6</option>
+                            <option value="5">7</option>
                         </select>
                         <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
                     </div>
@@ -233,40 +222,32 @@ const grid = new tui.Grid({
     rowHeaders: ['checkbox'],
     columns: [
         { 
-            header: '구분',
+        	header: '구분',
             name: 'formulaType',
             sortable: true,
-            sortingType: 'asc'
+            sortingType: 'asc',
+            formatter: function(value) {
+                switch(value.value) {
+                    case 'DDCT':
+                        return '공제';
+                    case 'RWRD':
+                        return '수당';
+                    default:
+                        return value.value;
+                }
+            }
         },
         { 
             header: '항목명', 
             name: 'formulaName'
         },
 		{
-		            header: '계산식',
-		            name: 'formulaContent_calc',  // 이름 변경
-		            formatter: function({row}) {  // row 데이터 전체를 받아옴
-		                const value = row.formulaContent;
-		                if (!value) return '';
-		                // 순수 숫자나 빈 문자열이면 공백 반환
-		                if (/^\d+$/.test(value)) return '';
-		                // 계산식이면 그대로 반환
-		                return value;
-		            }
-		        },
-		        {
-		            header: '금액',
-		            name: 'formulaContent_amount',  // 이름 변경
-		            formatter: function({row}) {  // row 데이터 전체를 받아옴
-		                const value = row.formulaContent;
-		                if (!value) return '';
-		                // 순수 숫자인 경우에만 금액으로 표시
-		                if (/^\d+$/.test(value)) {
-		                    return new Intl.NumberFormat('ko-KR').format(Number(value)) + '원';
-		                }
-		                return '';
-		            }
-		        },
+        	header: '설명',
+            name: 'formulaComment',
+            formatter: function(value) {
+                return value.value ? '<span class="custom-text">자세히보기</span>' : '';
+            }
+        },
         { 
             header: '적용년도',
             name: 'applyYear',
@@ -286,6 +267,54 @@ const grid = new tui.Grid({
     ]
 });
 
+let tooltipEl = null;
+
+function showTooltip(event, comment) {
+    if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.classList.add('custom-tooltip');
+        document.body.appendChild(tooltipEl);
+    }
+
+    tooltipEl.innerText = comment;
+    
+    const tooltipRect = tooltipEl.getBoundingClientRect();
+    
+    let posX = event.pageX + 10;
+    let posY = event.pageY + 10;
+    
+    if (posX + tooltipRect.width > window.innerWidth) {
+        posX = event.pageX - tooltipRect.width - 10;
+    }
+    
+    if (posY + tooltipRect.height > window.innerHeight) {
+        posY = event.pageY - tooltipRect.height - 10;
+    }
+    
+    tooltipEl.style.left = posX + 'px';
+    tooltipEl.style.top = posY + 'px';
+}
+
+function hideTooltip() {
+    if (tooltipEl) {
+        tooltipEl.remove();
+        tooltipEl = null;
+    }
+}
+
+grid.on('mouseover', function(event) {
+    if (event.columnName === 'formulaComment' && event.targetType === 'cell') {
+        const rowData = grid.getRow(event.rowKey);
+        showTooltip(event.nativeEvent, rowData.formulaComment);
+    }
+});
+
+grid.on('mouseout', function(event) {
+    if (event.columnName === 'formulaComment' && event.targetType === 'cell') {
+        hideTooltip();
+    }
+});
+
 // 구분 필터 이벤트 리스너
 document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -293,7 +322,11 @@ document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {
         let filteredData = formulas;
         
         if (selectedType) {
-            filteredData = formulas.filter(formula => formula.formulaType === selectedType);
+            const typeMap = {
+                '공제': 'DDCT',
+                '수당': 'RWRD'
+            };
+            filteredData = formulas.filter(formula => formula.formulaType === typeMap[selectedType]);
         }
         
         grid.resetData(filteredData);
@@ -326,101 +359,6 @@ document.getElementById('typeSelect').addEventListener('change', async function(
     }
 });
 
-const RANGE_OPTIONS = {
-	    'RWRD003': { // 기술수당
-	        type: 'string',
-	        options: ['초급', '중급', '고급']
-	    },
-	    'RWRD005': { // 성과금
-	        type: 'string',
-	        options: ['A', 'B', 'C', 'D', 'F']
-	    }
-	};
-
-	// 항목명 선택 시 상세 정보 표시
-	document.getElementById('formulaCode').addEventListener('change', function() {
-	    const selectedCode = this.value;
-	    const detailSection = document.getElementById('detailSection');
-	    const numberRangeSection = document.getElementById('numberRangeSection');
-	    const gradeSection = document.getElementById('gradeSection');
-	    
-	    // 초기 설정
-	    document.getElementById('formulaType').value = this.options[this.selectedIndex].dataset.type;
-	    
-	    if (selectedCode) {
-	        const baseName = this.options[this.selectedIndex].text;
-	        document.getElementById('formulaName').value = baseName;  // 기본 이름 설정
-	        
-	        // 기술수당
-	        if (selectedCode === 'RWRD001') {
-	            detailSection.style.display = 'block';
-	            numberRangeSection.style.display = 'none';
-	            gradeSection.style.display = 'block';
-	            
-	            const gradeSelect = document.getElementById('grade');
-	            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
-	            ['초급', '중급', '고급'].forEach(grade => {
-	                const option = document.createElement('option');
-	                option.value = grade;
-	                option.textContent = grade;
-	                gradeSelect.appendChild(option);
-	            });
-	        } 
-	        // 성과수당
-	        else if (selectedCode === 'RWRD002') {
-	            detailSection.style.display = 'block';
-	            numberRangeSection.style.display = 'none';
-	            gradeSection.style.display = 'block';
-	            
-	            const gradeSelect = document.getElementById('grade');
-	            gradeSelect.innerHTML = '<option value="">선택하세요</option>';
-	            ['A', 'B', 'C', 'D', 'F'].forEach(grade => {
-	                const option = document.createElement('option');
-	                option.value = grade;
-	                option.textContent = grade;
-	                gradeSelect.appendChild(option);
-	            });
-	        }
-	        // 소득세, 근속수당
-	        else if (['DDCT005', 'RWRD003'].includes(selectedCode)) {
-	            detailSection.style.display = 'block';
-	            numberRangeSection.style.display = 'block';
-	            gradeSection.style.display = 'none';
-	        }
-	        // 일반 항목 (명절수당, 휴가수당 등)
-	        else {
-	            detailSection.style.display = 'none';
-	            numberRangeSection.style.display = 'none';
-	            gradeSection.style.display = 'none';
-	            document.getElementById('detailName').required = false;
-	            document.getElementById('grade').required = false;
-	            ['rangeStart', 'rangeEnd'].forEach(id => {
-	                document.getElementById(id).required = false;
-	            });
-	        }
-	    }
-	});
-
-//등급 선택 시 range 값 자동 설정
-document.getElementById('grade').addEventListener('change', function() {
-    const selectedGrade = this.value;
-    if (selectedGrade) {
-        document.getElementById('rangeStart').value = selectedGrade;
-        document.getElementById('rangeEnd').value = selectedGrade;
-        
-        // formulaName 업데이트
-        const formulaCode = document.getElementById('formulaCode');
-        const baseName = formulaCode.options[formulaCode.selectedIndex].text;
-        document.getElementById('formulaName').value = `${baseName} - ${selectedGrade}`;
-    }
-});
-
-// 상세명 입력 시 formulaName 업데이트
-document.getElementById('detailName').addEventListener('input', function() {
-    const formulaCode = document.getElementById('formulaCode');
-    const baseName = formulaCode.options[formulaCode.selectedIndex].text;
-    document.getElementById('formulaName').value = `${baseName} - ${this.value}`;
-});
 
 // 폼 제출 처리
 document.getElementById('salaryForm').addEventListener('submit', async function(e) {
@@ -438,6 +376,7 @@ document.getElementById('salaryForm').addEventListener('submit', async function(
         formulaCode: selectedCode,
         formulaType: document.getElementById('formulaType').value,
         formulaContent: document.getElementById('formulaContent').value,
+        formulaComment: document.getElementById('formulaComment').value,
         applyYear: parseInt(document.getElementById('applyYear').value),
         formulaPriority: parseInt(document.getElementById('formulaPriority').value)
     };
@@ -449,25 +388,6 @@ document.getElementById('salaryForm').addEventListener('submit', async function(
         formData.formulaName = document.getElementById('formulaCode').options[
             document.getElementById('formulaCode').selectedIndex
         ].text;
-
-        // 범위나 등급이 필요한 경우
-        if (['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode)) {
-            // 등급 선택이 필요한 경우
-            if (['RWRD001', 'RWRD002'].includes(selectedCode)) {
-                const grade = document.getElementById('grade').value;
-                formData.rangeStart = grade;
-                formData.rangeEnd = grade;
-                formData.formulaName = `${formData.formulaName} - ${grade}`;
-            } 
-            // 범위 입력이 필요한 경우
-            else {
-                const rangeStart = document.getElementById('rangeStart').value;
-                const rangeEnd = document.getElementById('rangeEnd').value;
-                formData.rangeStart = rangeStart;
-                formData.rangeEnd = rangeEnd;
-                formData.formulaName = `${formData.formulaName} - ${rangeStart}~${rangeEnd}`;
-            }
-        }
     }
 
     console.log('최종 formData:', formData); // 최종 데이터 확인
@@ -516,7 +436,7 @@ function initializeYearSelect() {
 }
 
 // 수정 버튼 클릭 이벤트
-document.getElementById('editBtn').addEventListener('click', function(){
+document.getElementById('editBtn').addEventListener('click', async function(){
     const checkedRows = grid.getCheckedRows();
     if (checkedRows.length !== 1) {
         alert('수정할 항목을 하나만 선택해주세요.');
@@ -524,30 +444,48 @@ document.getElementById('editBtn').addEventListener('click', function(){
     }
     
     const selectedRow = checkedRows[0];
+    console.log('Selected Row Data:', selectedRow);
     
-    document.getElementById('typeSelect').value = selectedRow.formulaType;
-    document.getElementById('formulaCode').disabled = false;
+    // 구분 설정 (RWRD -> 수당, DDCT -> 공제)
+    const displayType = selectedRow.formulaType === 'DDCT' ? '공제' : '수당';
+    document.getElementById('typeSelect').value = displayType;
     
-    // 나머지 필드 설정
-    document.getElementById('formulaType').value = selectedRow.formulaType;
-    document.getElementById('formulaName').value = selectedRow.formulaName;
-    document.getElementById('formulaContent').value = selectedRow.formulaContent;
-    document.getElementById('applyYear').value = selectedRow.applyYear;
-    document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
+    // 항목명 select box 활성화
+    const formulaCodeSelect = document.getElementById('formulaCode');
+    formulaCodeSelect.disabled = false;
     
-    // 구간 정보가 있는 경우
-    const needsDetail = ['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedRow.formulaCode);
-    if (needsDetail) {
-        document.getElementById('detailSection').style.display = 'block';
-        document.getElementById('rangeStart').value = selectedRow.rangeStart;
-        document.getElementById('rangeEnd').value = selectedRow.rangeEnd;
-        document.getElementById('detailName').value = selectedRow.formulaName.split(' - ')[1];
+    try {
+        const response = await fetch('/pay-mng/formula-types');
+        const data = await response.json();
+        
+        formulaCodeSelect.innerHTML = '<option value="">선택하세요</option>';
+        data.forEach(item => {
+            if(item.type === displayType) {
+                const option = document.createElement('option');
+                option.value = item.code;
+                option.textContent = item.name;
+                formulaCodeSelect.appendChild(option);
+            }
+        });
+
+        // formulaCode 설정 (실제 데이터와 일치하는지 확인)
+        if(selectedRow.formulaCode) {
+            formulaCodeSelect.value = selectedRow.formulaCode;
+        }
+    } catch (error) {
+        console.error('Error loading formula types:', error);
     }
-    
-    // 수정을 위한 ID 저장
+
+    // hidden 필드값 설정
+    document.getElementById('formulaType').value = selectedRow.formulaType;
+    document.getElementById('formulaContent').value = selectedRow.formulaContent || '';
+    document.getElementById('formulaName').value = selectedRow.formulaName || '';
+    document.getElementById('applyYear').value = selectedRow.applyYear || '';
+    document.getElementById('formulaPriority').value = selectedRow.formulaPriority || '';
+    document.getElementById('formulaComment').value = selectedRow.formulaComment || '';
+
+    // form의 ID 설정 및 모달 표시
     document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
-    
-    // 모달 타이틀 변경 및 표시
     document.querySelector('.modal-title').textContent = '급여 항목 수정';
     new bootstrap.Modal(document.getElementById('salaryModal')).show();
 });
@@ -595,9 +533,6 @@ document.getElementById('salaryModal').addEventListener('hidden.bs.modal', funct
     document.querySelector('.modal-title').textContent = '급여 항목 입력';
     document.getElementById('formulaCode').disabled = true;
     document.getElementById('detailSection').style.display = 'none';
-    ['detailName', 'rangeStart', 'rangeEnd'].forEach(id => {
-        document.getElementById(id).required = false;
-    });
 });
 
 // 페이지 로드 시 실행
