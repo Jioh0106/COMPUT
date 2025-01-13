@@ -37,10 +37,10 @@ categoryMenu.addEventListener("input",() => {
 		//countDeptByPosition();
 	}else if(selectCategory === "고용유형별"){
 		empChartContainer.innerHTML="<div id='jobTypePieChart'></div>";
-		//countByJobType();
+		countByJobType();
 	}else if(selectCategory === "성과등급별"){
 		empChartContainer.innerHTML = "<div id='rankPieChart'></div>";
-		//countByRank();
+		countByRank();
 	}
 });
 
@@ -150,7 +150,7 @@ async function countMonthlyHireExit(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
+		console.log("hireExit",result);
 		
 		/*
 		const pieChartData = {
@@ -217,7 +217,7 @@ async function countDeptByPosition(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
+		console.log("position",result);
 		
 		/*
 		const pieChartData = {
@@ -230,7 +230,7 @@ async function countDeptByPosition(){
 		*/
 		
 		// 차트 생성 및 데이터 설정
-		createGroupBarChart();
+		//createGroupBarChart();
 		// 초기 값 정보 조회
 		
 		/*
@@ -283,7 +283,7 @@ async function countByJobType(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
+		console.log("jobType",result);
 		
 		/*
 		const pieChartData = {
@@ -297,7 +297,7 @@ async function countByJobType(){
 		
 		
 		// 차트 생성 및 데이터 설정
-		createJobTypePieChart();
+		//createJobTypePieChart();
 		// 초기 값 정보 조회
 		
 		/*
@@ -350,7 +350,7 @@ async function countByRank(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
+		console.log("rank",result);
 		
 		/*
 		const pieChartData = {
@@ -363,7 +363,7 @@ async function countByRank(){
 		*/
 		
 		// 차트 생성 및 데이터 설정
-		createRankPieChart();
+		//createRankPieChart();
 		// 초기 값 정보 조회
 		
 		/*
