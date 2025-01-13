@@ -17,15 +17,15 @@
     p.deduc_amt as deducAmt,
     p.net_salary as netSalary,
     p.payment_date as paymentDate,
-    p.create_at as createAt,
-    p.create_by as createBy
+    p.created_at as createAt,
+    p.created_by as createBy
 FROM payment p
     LEFT JOIN employees e ON p.emp_id = e.emp_id
     LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
     LEFT JOIN common_detail pos_cd ON e.emp_position = pos_cd.common_detail_code
     WHERE e.emp_status LIKE 'WRST%'
     AND cd.common_detail_status = 'Y'
-    ORDER BY p.create_at DESC
+    ORDER BY p.created_at DESC
 </select>
 
 <!-- 부서 목록 조회 -->
@@ -52,8 +52,8 @@ FROM payment p
         p.allow_amt AS allowAmt,
         p.deduc_amt AS deducAmt,
         p.net_salary AS netSalary,
-        p.create_at AS createAt,
-        p.create_by AS createBy
+        p.created_at AS createAt,
+        p.created_by AS createBy
     FROM payment p
     LEFT JOIN employees e ON p.emp_id = e.emp_id
     LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
@@ -108,8 +108,8 @@ FROM payment p
         p.allow_amt AS allowAmt,
         p.deduc_amt AS deducAmt,
         p.net_salary AS netSalary,
-        p.create_at AS createAt,
-        p.create_by AS createBy
+        p.created_at AS createAt,
+        p.created_by AS createBy
     FROM payment p
     LEFT JOIN employees e ON p.emp_id = e.emp_id
     LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
