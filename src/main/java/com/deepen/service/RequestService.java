@@ -2,6 +2,7 @@ package com.deepen.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -72,6 +73,9 @@ public class RequestService {
             else if (emp_id.equals(middleApprovalEmpId) && "RQST003".equals(requestStatus)) {
                 requestDto.setRequest_division("발신");
             } 
+            else if(emp_id.equals(middleApprovalEmpId) && "RQST001".equals(requestStatus)) {
+   	    	 requestDto.setRequest_division("수신");
+            }
             // 최종 승인자가 수신자로 간주될 경우 (상태가 RQST005인 경우에만 수신)
             else if (emp_id.equals(finalApprovalEmpId) && "RQST003".equals(requestStatus)) {
                 requestDto.setRequest_division("수신");
@@ -86,12 +90,25 @@ public class RequestService {
 
         return requestDtos;
             
-            
-            
     }
 
 		
-		
+	//중간승인권자 로그인 시 -> 요청내역에서 최종승인권자 선택 후 업데이트 처리
+	public void updateApproval(RequestDTO requestDto, String  emp_id) {
+		 // 요청번호로 기존 요청 조회
+	    Request request = rqRepository.findById(requestDto.getRequest_no())
+	                                  .orElseThrow(() -> new RuntimeException("요청을 찾을 수 없습니다."));
+	    // 최종 승인자 정보 업데이트
+	    request.setHigh_approval(requestDto.getHigh_approval());
+	    request.setRequest_status("RQST003"); // 중간 승인 완료 상태로 업데이트
+	    
+
+	    // 요청 저장 (업데이트)
+	    rqRepository.save(request);
+	    log.info("최종 승인자 정보가 업데이트되었습니다. 요청번호: " + request.getRequest_no());
+	    
+	    
+	}
 
 
 

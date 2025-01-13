@@ -62,6 +62,7 @@ public class AssignService {
 	        case "ATHR001": // 최종 권한자
 	            request.setRequest_status("RQST005"); // 요청 상태: 최종승인 
 	            request.setHigh_approval(emp_id);     // 최종 승인자: 본인사번
+	            //발령테이블 최종승인날짜(오늘날짜) 컬럼도 insert 해야함.
 	            break;
 
 	        case "ATHR002": // 중간 권한자
@@ -133,8 +134,11 @@ public class AssignService {
 	    } 
 	    // 중간 승인자가 수신자로 간주될 경우 (상태가 RQST003인 경우에만 수신)
 	    else if (emp_id.equals(middleApprovalEmpId) && "RQST003".equals(requestStatus)) {
-	        requestDto.setRequest_division("발신");
-	    } 
+            requestDto.setRequest_division("발신");
+        } 
+	    else if(emp_id.equals(middleApprovalEmpId) && "RQST001".equals(requestStatus)) {
+	    	 requestDto.setRequest_division("수신");
+	    }
 	    // 최종 승인자가 수신자로 간주될 경우 (상태가 RQST005인 경우에만 수신)
 	    else if (emp_id.equals(finalApprovalEmpId) && "RQST003".equals(requestStatus)) {
 	        requestDto.setRequest_division("수신");

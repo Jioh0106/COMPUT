@@ -41,7 +41,7 @@
 	<div class="row match-height">
 		<div class="col-12">
 			<div class="card">
-				
+				<input type="hidden" name="_csrf" th:value="${_csrf.token}" />	
 				<div class="card-content">
 					<div class="card-body">
 					
@@ -125,8 +125,9 @@
 								</div>
 							</div>
 							<div class="col-12 d-flex justify-content-end">
-								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal">승인</button>
-								<button type="reset" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
+								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1" data-bs-toggle="modal"
+								data-bs-target="#approvedefaultSize">승인</button>
+								<button type="button" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
 							</div>
 						</div>
 					</form>
@@ -257,7 +258,6 @@
 		          modal.show();
 		      });
 	
-		   // 부모 창에서 postMessage로 전달한 요청번호 수신
 		   
 		   // URL에서 쿼리 파라미터로 전달된 요청번호 추출
 			const urlParams = new URLSearchParams(window.location.search);
@@ -273,19 +273,30 @@
 			        })
 			        .then(data => {
 			            console.log('REST API 반환 데이터:', data);
-			
+						const assignment = data.assignment;
 			            if (data) {
-			                // 발령 테이블 데이터로 폼 채우기
-							$('#emp_id').val(data.emp_id);
-							$('#emp_name').val(data.emp_name);
-			                $('#assign_emp_id').val(data.assign_emp_id);
-			                $('#assign_emp_name').val(data.assign_emp_name);
-			                $('#assign_date').val(data.assign_date);
-			                $('#assign_type').val(data.assign_type);
-			                $('#prev_pos').val(data.prev_pos);
-			                $('#new_pos').val(data.new_pos);
-			                $('#prev_dept').val(data.prev_dept);
-			                $('#new_dept').val(data.new_dept);
+			                // 발령 테이블 데이터로 상세정보 팝업창 채우기
+							$('#emp_id').val(assignment.emp_id);
+							$('#emp_name').val(assignment.emp_name);
+			                $('#assign_emp_id').val(assignment.assign_emp_id);
+			                $('#assign_emp_name').val(assignment.assign_emp_name);
+			                $('#assign_date').val(assignment.assign_date);
+			                $('#assign_type').val(assignment.assign_type);
+			                $('#prev_pos').val(assignment.prev_pos);
+			                $('#new_pos').val(assignment.new_pos);
+			                $('#prev_dept').val(assignment.prev_dept);
+			                $('#new_dept').val(assignment.new_dept);
+							
+							
+							const request = data.request;
+							if(request.request_division === '발신'){
+								document.getElementById('approveBtn').style.display = 'none';
+								document.getElementById('rejectBtn').style.display = 'none';
+							}else if(request.request_division === '수신'){
+								document.getElementById('approveBtn').style.display = 'inline-block';
+								document.getElementById('rejectBtn').style.display = 'inline-block';
+							}
+							
 			            } else {
 			                alert("발령 정보를 찾을 수 없습니다.");
 			            }
@@ -298,6 +309,10 @@
 
 		//-----------------------------------------------------------------최종승인권자 모달창시작
 		
+		// 승인 버튼 클릭 시 최종 승인권자 선택 모달창 열기
+	    
+		document.addEventListener('DOMContentLoaded', function () {
+			var Grid = tui.Grid;
 		  // 최종승인권자 선택 모달창 Grid 생성
 	        const grid2 = new Grid({
 	            el: document.getElementById('grid2'),
@@ -309,7 +324,103 @@
 	            ],
 	            data: []
 	        });
-		
+
+			    // 두 번째 모달이 열릴 때 Grid 리렌더링
+				const defaultModal = document.getElementById('approvedefaultSize');
+				defaultModal.addEventListener('shown.bs.modal', function () {
+			        // ajax로 데이터 가져오기
+			        fetch('/api/highRole')
+			            .then(response => response.json()) // json 형태로 파싱
+			            .then(data => {
+							console.log('받아온 데이터:', data); // 응답 데이터 출력
+			                grid2.resetData(data); // grid2에 새로운 데이터 바인딩
+			                grid2.refreshLayout();
+			            })
+			            .catch(error => {
+			                console.error('Error fetching middle role data:', error);
+							alert('승인권자 데이터를 가져오는 중 오류가 발생했습니다.');
+			            });
+			    });
+
+				
+			    // 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+			    grid2.on('click', (ev) => {
+			        if (ev.rowKey !== null) {
+			            const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
+			            Approver(row); // Approver(row) 함수 호출
+			        }
+			    });
+
+			    function Approver(row) {
+			        selectApprover = {
+			            approverEmp_id: row.emp_id,
+			            approverEmp_name: row.emp_name,
+			            approverEmp_dept: row.emp_dept,
+			            approverEmp_position: row.emp_position
+			        };
+					
+					// 문자열 형태로 변환 (사원번호/이름/부서명/직급)
+				approverString = `${selectApprover.approverEmp_id}`;
+			        alert(`최종승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
+			    }
+	});
+
+			// 승인 요청 버튼 클릭 시 실행되는 함수
+			function requestApproval() {
+			    if (!selectApprover.approverEmp_id) {
+			        alert('최종승인권자를 선택하세요.');
+			        return;
+			    }
+			    // 유효성 검사 통과 후 모달 닫기 및 요청 처리
+			    $('#approvedefaultSize').modal('hide'); // 모달 창 닫기
+
+			    // 이후 AJAX 요청 등의 처리 로직을 여기에 추가할 수 있음
+			    alert('승인 요청이 정상적으로 처리되었습니다.');
+					
+					const requestDTO = {
+						request_no: request_no,
+						high_approval : approverString
+					};
+					
+					const csrfToken = $('input[name="_csrf"]').val();
+
+
+				// AJAX 요청
+				    $.ajax({//승인버튼 클릭 시 요청내역 업데이트
+				        url: '/request-update',
+				        type: 'POST',
+				        contentType: 'application/json',
+				        data: JSON.stringify({
+				        	requestDto : requestDTO
+				        	
+				        }),
+				        beforeSend: function(xhr) {
+				            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+				        },
+				       
+				        success: function(response) {
+				            alert('요청내역 업데이트완료.');
+							console.log("resultDTO : " + response)
+							// 부모창 새로고침
+				            if (window.opener) {
+				                window.opener.location.reload(); // 부모창 새로고침
+				                window.close(); // 팝업창 닫기
+				            } else {
+				                console.error('부모창이 없습니다.');
+				            }
+				        },
+						
+				        error: function(error) {
+				            alert('요청내역 업데이트 실패실패실패ㅗㅗㅗ.');
+				            console.error(error);
+				        }
+				    });
+				
+				
+			} // requestApproval() 함수 끝
+	
+			
+			
 		
 	</script>
 	
