@@ -29,6 +29,12 @@ public interface AbsenceMapper {
 	
 	void insertAbsence(Map<String, Object> row);
 
+	Map<String, String> getEmpSelf(String emp_id);
+
+	List<Map<String, String>> getEmpSerch(String emp_name);
+
+	String getUpdateCommon(String name);
+
 
 
 	

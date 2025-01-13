@@ -52,6 +52,14 @@ public class AssignRestController {
 		return search;
 	}
 	
+	
+	//최종승인권자 조회 모달창
+	@GetMapping("/highRole")
+	public List<EmployeesDTO> highRole(){
+		List<EmployeesDTO> search = asService.highRoleSearch();
+		return search;
+	}
+	
 	//요청번호로 발령테이블 조회
 	@GetMapping("/selectAssign/{request_no}") 
 	public AssignmentDTO selectAssign(@PathVariable("request_no") Integer request_no){

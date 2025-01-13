@@ -21,7 +21,7 @@ public class PersonnelController {
 	//http://localhost:8082/ex
 	@GetMapping("/ex")
 	public String exPage() {
-		return "/ex/component-card";
+		return "/ex/index";
 	}
 	
 	//http://localhost:8082/ps-list
@@ -78,8 +78,5 @@ public class PersonnelController {
 		
 		return "/personnel/ps_hrDb";
 	}
-	
-	
-	
 	
 }

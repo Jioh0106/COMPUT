@@ -86,6 +86,151 @@
     	</if>
 	    ORDER BY e.emp_no
 	</select>
+	
+	<select id="countByEdu" resultType="java.util.Map">
+		SELECT 
+			emp_edu,
+			count(emp_edu) AS emp_count_edu
+		FROM emp_list_all
+		WHERE emp_status_name != '퇴사'
+		GROUP BY emp_edu
+	</select>
+	
+	<select id="selectInfoByEdu" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			emp_id, 
+			emp_role_name,
+			emp_name,
+			emp_photo,
+			emp_ssn,
+			emp_gender,
+			emp_marital_status,
+			emp_phone,
+			emp_postcode,
+			emp_address,
+			emp_address_detail,
+			emp_email,
+			emp_edu,
+			emp_status_name,
+			job_type_name,
+			emp_dept_name,
+			emp_position_name,
+			emp_hire_date,
+			emp_rank_name,
+			emp_salary,
+			emp_bank,
+			emp_account
+		FROM emp_list_all
+		WHERE emp_status_name != '퇴사'
+		<if test="edu != null">
+			AND emp_edu IN 
+			<foreach item="item" index="idx" collection="edu" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="countByAgeGroupAndGender" resultType="java.util.Map">
+		SELECT 
+		    emp_age_group,
+		    emp_gender,
+		    COUNT(*) AS emp_count
+		FROM (
+		    SELECT 
+		        CASE 
+		            WHEN emp_age BETWEEN 20 AND 29 THEN '20대'
+		            WHEN emp_age BETWEEN 30 AND 39 THEN '30대'
+		            WHEN emp_age BETWEEN 40 AND 49 THEN '40대'
+		            WHEN emp_age BETWEEN 50 AND 59 THEN '50대'
+		            WHEN emp_age BETWEEN 60 AND 69 THEN '60대'
+		            ELSE '그 외'
+		        END AS emp_age_group,
+		        emp_gender
+		    FROM employee_age_group
+		) grouped_data
+		GROUP BY emp_age_group, emp_gender
+		ORDER BY 
+		    CASE 
+		        WHEN emp_age_group = '20대' THEN 6
+		        WHEN emp_age_group = '30대' THEN 5
+		        WHEN emp_age_group = '40대' THEN 4
+		        WHEN emp_age_group = '50대' THEN 3
+		        WHEN emp_age_group = '60대' THEN 2
+		        ELSE 1
+		    END,
+		    emp_gender
+	</select>
+	
+	<select id="selectInfoByAgeGroup" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			ea.emp_id,
+			ea.emp_name,
+			ea.emp_gender,
+			ela.emp_role_name,
+			ela.emp_photo,
+			ela.emp_ssn,
+			ea.emp_age_group,
+			ela.emp_marital_status,
+			ela.emp_phone,
+			ela.emp_postcode,
+			ela.emp_address,
+			ela.emp_address_detail,
+			ela.emp_email,
+			ela.emp_edu,
+			ela.emp_status_name,
+			ela.job_type_name,
+			ela.emp_dept_name,
+			ela.emp_position_name,
+			ela.emp_hire_date,
+			ela.emp_rank_name,
+			ela.emp_exit_date,
+			ela.exit_type_name,
+			ela.emp_bank,
+			ela.emp_account
+		FROM (
+		    SELECT
+		        emp_no,
+		        emp_id, 
+		        emp_name,  
+		        emp_age_group,
+		        emp_gender
+		    FROM employee_age_group
+		) ea
+		LEFT JOIN (
+			SELECT
+				emp_id,
+			    emp_role_name,
+			    emp_photo, 
+			    emp_ssn, 
+			    emp_marital_status,
+			    emp_phone,
+			    emp_postcode,
+			    emp_address,
+			    emp_address_detail,
+			    emp_email,
+			    emp_edu,
+			    emp_status_name,
+			    job_type_name,
+			    emp_dept_name,
+			    emp_position_name,
+			    emp_hire_date,
+			    emp_rank_name,
+			    emp_exit_date,
+			    emp_exit_type,
+			    exit_type_name,
+			    emp_bank,
+			    emp_account
+			FROM emp_list_all
+		) ela
+		ON ea.emp_id = ela.emp_id
+		<if test="ageGroup != null and ageGroup.size > 0">
+		WHERE ea.emp_age_group IN 
+			<foreach item="item" index="idx" collection="ageGroup" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
 </mapper>
 
 

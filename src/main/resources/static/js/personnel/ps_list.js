@@ -28,7 +28,7 @@ const empListGrid = new Grid({
 		name: 'EMP_ID',
 	},
     { 
-		header: '성명', 
+		header: '이름', 
 		name: 'EMP_NAME',
 	},
     { 
@@ -63,13 +63,13 @@ function updateEmpListFilters() {
 	    empListFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
 	    empListFilters.search = document.getElementById('search').value || '';
 	    
-	    fetchEmpList();
+	    fetchEmpList(empListFilters);
 	}
 
 // 페이지가 완전히 로드된 후 함수 실행
 window.onload = function () {
 		
-		fetchEmpList();
+		fetchEmpList(empListFilters);
 		fetchCommonDetails();
 		
 		startDatePicker.on('change', updateEmpListFilters);
@@ -200,7 +200,7 @@ deleteBtn.addEventListener("click",() => {
 			alert("삭제할 정보를 선택해주세요");
 		}else{
 			if(confirm("삭제하시겠습니까?")){
-				empDelete("http://localhost:8082/api/empDelete",checkedRowIds);
+				empDelete("http://localhost:8082/api/emp-delete",checkedRowIds);
 				alert("삭제 완료");
 			}else{
 				alert("삭제 취소");
@@ -212,10 +212,10 @@ deleteBtn.addEventListener("click",() => {
 //--------ajax--------------------------------------------------------------------------------------------------------------------//
 
 // 사원리스트 필터 조회
-async function fetchEmpList() {
+async function fetchEmpList(filter) {
 	try	{	
-			const params = new URLSearchParams(empListFilters).toString();
-	       	const response = await fetch(`http://localhost:8082/api/empList?${params}`);
+			const params = new URLSearchParams(filter).toString();
+	       	const response = await fetch(`http://localhost:8082/api/emp-list?${params}`);
 			
 	       	if (!response.ok) {
 	           	throw new Error("네트워크 응답 실패");

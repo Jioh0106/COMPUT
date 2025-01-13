@@ -34,7 +34,7 @@ async function fetchCommonDetails() {
 		});
 		
 	}catch(error){
-		console.error("공통코드 조회 중 오류:", error);
+		console.error(error);
 	}
 }
 
