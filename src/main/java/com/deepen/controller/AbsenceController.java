@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,8 @@ public class AbsenceController {
 	@GetMapping("/loab-mng")
 	public String absence(Model model, @AuthenticationPrincipal User user, HttpServletRequest request) throws JsonProcessingException {
 		//http://localhost:8082/loab-mng
-		log.info("user.getUsername() : " + user.getUsername());
+		
+		
 		String emp_id = user.getUsername();
 		
 		Collection<GrantedAuthority> authorities = user.getAuthorities();
@@ -56,8 +58,16 @@ public class AbsenceController {
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 	    model.addAttribute("_csrf", csrfToken);
 	    
+	    List<Map<String, Object>> absenceList = new ArrayList<>();
+	    
+	    if(emp_role.equals("ATHR003")) {
+	    	absenceList = absenceService.getLowAbsenceList(emp_id);
+	    	
+	    } else {
+	    	absenceList = absenceService.getAbsenceList();
+	    	
+	    }
 		
-		List<Map<String, Object>> absenceList = absenceService.getAbsenceList();
 		
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	    absenceList.forEach(item -> {

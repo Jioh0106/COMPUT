@@ -104,6 +104,20 @@ public class RequestController {
                 absence.put("REQUEST_DATE", null);
             }
         }
+        
+        
+        if(!absence.containsKey("HIGH_APPROVAL")) {
+        	absence.put("HIGH_APPROVAL", "");
+        }
+        
+        if(!absence.containsKey("MIDDLE_APPROVAL")) {
+        	absence.put("MIDDLE_APPROVAL", "");
+        }
+        
+        if(!absence.containsKey("")) {
+        	absence.put("ABSENCE_REMARK", "");
+        }
+        
 		
         log.info("requestAbsenceDetail - absence : " + absence.toString());
         

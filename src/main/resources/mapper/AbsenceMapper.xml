@@ -14,6 +14,16 @@
 		ORDER BY ABSENCE_NO DESC
 	</select>
 	
+	<select id="getLowAbsenceList" resultType="Map">
+		SELECT av.*
+		FROM ABSENCE_VIEW av
+		LEFT JOIN request r
+		ON av.request_no = r.request_no
+		WHERE r.request_status = 'RQST005'
+		AND av.emp_id = #{emp_id}
+		ORDER BY ABSENCE_NO DESC
+	</select>
+	
 	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
 		SELECT common_detail_code, common_detail_name
 		FROM common_detail
@@ -37,51 +47,6 @@
 			 WHERE emp_role = #{emp_role}
 	</select>
 	
-	<insert id="insertRequest" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="request_no">
-		INSERT INTO REQUEST (
-			REQUEST_TYPE, 
-			REQUEST_STATUS, 
-			REQUEST_DATE, 
-			REQUEST_DEADLINE, 
-			<if test="middle_approval != null">
-	            MIDDLE_APPROVAL,
-	        </if>
-			<if test="high_approval != null">
-	            HIGH_APPROVAL,
-	        </if>
-			EMP_ID
-		) VALUES (
-		    #{request_type},
-		    #{request_status},
-		    #{request_date},
-		    #{request_date} + #{request_deadline},
-		    #{middle_approval},
-		     <if test="high_approval != null">
-	            #{high_approval},
-	        </if>
-		    #{emp_id}
-		)
-	</insert>
-	
-	<insert id="insertLoab" parameterType="java.util.Map">
-		INSERT INTO ABSENCE (
-			EMP_ID,
-			ABSENCE_TYPE,
-			ABSENCE_START,
-			ABSENCE_END,
-			REQUEST_NO,
-			ABSENCE_REMARK
-		) VALUES (
-		    #{emp_id},
-		    #{absence_type},
-		    #{absence_start},
-		    #{absence_end},
-		    #{request_no},
-		    #{absence_remark}
-		)
-	
-	</insert>
-	
 	<!-- 삭제 SQL -->
 	<delete id="deleteAbsences" parameterType="java.util.List">
 	    DELETE FROM ABSENCE
@@ -91,13 +56,13 @@
 	    </foreach>
 	</delete>
 	
+	
 	<select id="getUpdateCommon" resultType="String">
 		SELECT common_detail_code
 		  FROM common_detail
 		 WHERE common_detail_name = #{name}
 		   AND REGEXP_LIKE(common_detail_code, '^LOAB')
 	</select>
-	
 	
 	
 	<!-- 업데이트 SQL -->
