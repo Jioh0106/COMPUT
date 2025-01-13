@@ -6,23 +6,25 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>근무 관리</title>
 	
+	<!--공통 -->
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
-
-	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
-
-	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
-	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
-	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+	<link rel="stylesheet" href="/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="/assets/vendors/iconly/bold.css">
+	<link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="/assets/css/app.css">
+	<link rel="shortcut icon" href="/assets/images/favicon.svg" type="/assets/image/x-icon">
 		
 	<!--  sweetalert  -->
 	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
 
 	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.css">
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+	
 	<style>
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */
@@ -68,97 +70,142 @@
 
 			<div class="card">
 				<div class="card-body">
-					
-				
-	
-					<!-- 그리드 시작 -->
-					<section class="section">
-						<div class="row" id="basic-table">
-							<form>
-								<div id="grid"></div>
-							</form>
+					<h5> 기술직 근무관리</h5>
+					<div class="row" id="basic-table">
+						<div id="grid"></div>
+						<div class="float-end">
+							<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">
+							<input type="button" class="btn btn-outline-success" id="save"  value="저장">
+							<input type="button" class="btn btn-outline-danger" id="deleteRow" value="삭제">
+							
 						</div>
-					</section>
-					<!-- 그리드 끝 -->
+					</div>
 	
 				</div> <!-- card-body -->
 			</div> <!-- card -->
-		
+			
+			<div class="card">
+				<div class="card-body">
+<!-- 					<div id="calendar" style="height: 600px;"></div> -->
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
 		</div><!--main--> 
 	</div><!-- app -->
 		
 		
-	<!-- 제이쿼리 -->
-	<script th:src="@{/js/jquery-3.7.1.js}"></script>	
-	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-	<script th:src="@{/assets/js/main.js}"></script>
-
 	<!-- TOAST UI CDN -->
-	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
 	
-	<script>
+	<!-- 제이쿼리 -->
+	<script src="/js/jquery-3.7.1.js"></script>	
+	<!--Axios -->
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<!-- sweet arert -->
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+	
+	<!-- 공통 -->
+	<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+	
+	<script th:inline="javascript">
+		
+		
 		const gridData = [
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' },
-		      { id: '20210421001', name: '홍길동', dept: '개발', type: '병가', start: '2023-12-02', end: '2024-03-03' }
+		      { No: '1', common_detail_name: '1조', start_time: '08:00:00', end_time: '16:00:00', work_time: '8' },
+		      { No: '2', common_detail_name: '2조', start_time: '16:00:00', end_time: '00:00:00', work_time: '8' },
+		      { No: '3', common_detail_name: '3조', start_time: '00:00:00', end_time: '08:00:00', work_time: '8' },
 		];
 
 		const grid = new tui.Grid({
 			el: document.getElementById('grid'),
 			data: gridData,
+			width: 700,
 			columns: [
-				{ header: '사원번호', name: 'id', editor: 'text' },  // 텍스트 편집기
-				{ header: '이름', name: 'name', editor: 'text' },
-				{ header: '부서', name: 'dept', editor: 'text' },
-				{ header: '구분', name: 'type', editor: 'text' },
-				{ header: '휴직시작일자', name: 'start', editor: 'text' },
-				{ header: '휴직종료일자', name: 'end', editor: 'text' }
+				{ header: 'No', name: 'No'},  // 텍스트 편집기
+				{ header: '근무조', name: 'common_detail_name', editor: 'text' },
+				{ header: '시작시간', name: 'start_time', editor: 'text' },
+				{ header: '종료시간', name: 'end_time', editor: 'text' },
+				{ header: '근무시간', name: 'work_time', editor: 'text' }
 			],
 			editing: true  // 편집 기능 활성화
 		});
 		
-	</script>
-	<!-- Modal 내에 있는 일수 계산 스크립트 -->
-	<script>
-		function calcDate() {
-			// 사용 시작일과 종료일 가져오기
-			const startDateValue = document.getElementById('use-start-date').value; // yyyy-mm-dd 형식
-			const endDateValue = document.getElementById('use-end-date').value;
-
-			const startDate = new Date(startDateValue);
-			const endDate = new Date(endDateValue);
-
-
-			var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
-
-			if (startDateValue && endDateValue) {
-
-				while (true) {
-					const temp_date = startDate; //임시 날짜 변수에 시작일을 할당
-					if (temp_date.getTime() > endDate.getTime()) {
-						break;
-
-					} else {
-						const dateDay = temp_date.getDay(); //요일 구하는 변수
-						if (dateDay !== 0 && dateDay !== 6) { // 0: 일요일, 6: 토요일
-							//평일인 경우에만 count 증가
-							count++;
-						}
-						temp_date.setDate(startDate.getDate() + 1); //다음 날로 이동
-					}
-				}
-				document.getElementById('use-days').value = count;
-			}
-		}
+		
+		
 	</script>
 
-
+	<script th:inline="javascript">
+		const Calendar = tui.Calendar;
+		
+		const container = document.getElementById('calendar');
+		const options = {
+		  defaultView: 'month',
+		  useFormPopup: true,
+		  useDetailPopup: true,
+		  timezone: {
+		    zones: [
+		      {
+		        timezoneName: 'Asia/Seoul',
+		        displayLabel: 'Seoul',
+		      },
+		      {
+		        timezoneName: 'Europe/London',
+		        displayLabel: 'London',
+		      },
+		    ],
+		  },
+		  calendars: [
+		    {
+		      id: 'cal1',
+		      name: '개인',
+		      backgroundColor: '#03bd9e',
+		    },
+		    {
+		      id: 'cal2',
+		      name: '직장',
+		      backgroundColor: '#00a9ff',
+		    },
+		  ],
+		};
+	
+		const calendar = new Calendar(container, options);
+		
+		calendar.createEvents([
+			  {
+			    id: 'event1',
+			    calendarId: 'cal2',
+			    title: '주간 회의',
+			    start: '2025-01-13T09:00:00',
+			    end: '2025-01-13T10:00:00',
+			  },
+			  {
+			    id: 'event2',
+			    calendarId: 'cal1',
+			    title: '점심 약속',
+			    start: '2025-01-14T12:00:00',
+			    end: '2025-01-14T13:00:00',
+			  },
+			  {
+			    id: 'event3',
+			    calendarId: 'cal2',
+			    title: '휴가',
+			    start: '2022-06-08',
+			    end: '2022-06-10',
+			    isAllday: true,
+			    category: 'allday',
+			  },
+			]);
+	
+	
+		
+	</script>
+	
 </body>
 
 </html>
