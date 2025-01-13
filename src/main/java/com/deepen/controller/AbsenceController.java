@@ -6,10 +6,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -43,9 +45,13 @@ public class AbsenceController {
 		log.info("user.getUsername() : " + user.getUsername());
 		String emp_id = user.getUsername();
 		
+		Collection<GrantedAuthority> authorities = user.getAuthorities();
+		String emp_role = authorities.iterator().next().getAuthority().replace("ROLE_", "");
+		log.info("emp_role : " + emp_role);
+		
 		// 사용자 정보 조회
 		Optional<Employees> emp = absenceService.findById(emp_id);
-		
+		model.addAttribute("emp", emp.get());
 		
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 	    model.addAttribute("_csrf", csrfToken);
@@ -91,11 +97,12 @@ public class AbsenceController {
 	            }
 	        }
 	    });
+	    
+	    
 
 	    
 		log.info("absenceList : " + absenceList.toString());
 		
-		model.addAttribute("emp", emp.get());
 		model.addAttribute("absenceList", absenceList);
 		
 		return "attendance/loab_mng";
@@ -103,7 +110,7 @@ public class AbsenceController {
 	
 	
 	@PostMapping("/loab-insert")
-	public String loabInsert(Model model, RequestDTO requestDTO, AbsenceDTO absenceDTO,
+	public String loabInsert(Model model, RequestDTO request, AbsenceDTO absence,
 							@RequestParam("request_role") String request_role,
 							@RequestParam("request_approval") String request_approval
 //							@RequestParam("request_deadline") int deadline
@@ -112,22 +119,27 @@ public class AbsenceController {
 		log.info("loabInsert - request_role : " + request_role);
 		log.info("loabInsert - request_approval : " + request_approval);
 		
-		requestDTO.setRequest_type("휴직");
+		request.setRequest_type("휴직");
 //		requestDTO.setRequest_date(new Timestamp(System.currentTimeMillis()));
 		
 		
-		// 승인요청 수신자가 high 권한이면 1차 승인자에 본인 아이디, 요청 상태는 2차대기		
-		if(request_role.equals("ATHR001")) {
-			requestDTO.setMiddle_approval(requestDTO.getEmp_id());
-			requestDTO.setHigh_approval(request_approval);
-			requestDTO.setRequest_status("RQST005");
+		if(request_role.equals("self")) {
+			// 승인요청 발신자, 수신자가 모두 high 권한으로 최종 자가승인, middle_approval=null
+			request.setHigh_approval(request.getEmp_id());
+			request.setRequest_status("RQST005");
+			
+		} else if(request_role.equals("ATHR001")) {
+			// 승인요청 수신자가 high 권한이면 1차 승인자에 본인 아이디, 요청 상태는 2차대기		
+			request.setMiddle_approval(request.getEmp_id());
+			request.setHigh_approval(request_approval);
+			request.setRequest_status("RQST003");
 		} else {
-			// 아니라면 (middle이라면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
-			requestDTO.setMiddle_approval(request_approval);
-			requestDTO.setRequest_status("RQST006");
+			// 승인요청 수신자가 middle 권한이라면) 1차 승인자에 요청 수신자, 요청 상태는 1차 대기
+			request.setMiddle_approval(request_approval);
+			request.setRequest_status("RQST001");
 		}
 		
-		absenceService.insertAbsenceAndRequest(requestDTO, absenceDTO);
+		absenceService.insertAbsenceAndRequest(request, absence);
 		
 		
 		return "redirect:/loab-mng";

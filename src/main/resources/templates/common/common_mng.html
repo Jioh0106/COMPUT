@@ -25,6 +25,8 @@
 
 	<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
 
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 	<style>
 		.buttons {
@@ -159,7 +161,11 @@ th:first-child, td:first-child {
 
 
 	<script th:inline="javascript">
-		
+
+		const token = $("meta[name='_csrf']").attr("content")
+		const header = $("meta[name='_csrf_header']").attr("content");
+		const name = $("#userName").val();
+
 		let parentGrid; // 전역 변수로 선언
 		let childGrid;  // 전역 변수로 선언
 
@@ -243,8 +249,6 @@ th:first-child, td:first-child {
 				// 마지막으로 입력한 셀에 대한 값이 인식 안 돼서 그리드 포커스 해제 처리
 				parentGrid.blur();
 
-
-
 				// 업데이트 된 행일 경우 ROW_TYPE을 update로 변경
 				const updatedRows = parentGrid.getModifiedRows().updatedRows;
 				updatedRows.forEach((row, index) => {
@@ -265,6 +269,10 @@ th:first-child, td:first-child {
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
 				success: function (response) {
 					$('#child').empty(); // div 초기화
 					// Toast Grid 생성
@@ -429,6 +437,10 @@ th:first-child, td:first-child {
 				type: 'POST',
 				contentType: "application/json",
 				data: JSON.stringify(data),
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
 				success: function (res) {
 					if (res == 1) {
 						Swal.fire({
