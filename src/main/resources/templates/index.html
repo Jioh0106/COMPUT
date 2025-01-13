@@ -16,6 +16,7 @@
     <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
     <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+    <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
 </head>
 
 <body>
@@ -24,20 +25,19 @@
 		<!-- 사이드 메뉴바-->
 		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 		
+	
 		<!-- 메인 content -->
 		<div th:replace="~{main :: main}"></div>
+	
 		
 
     </div> <!--app 끝 -->
 	
-	
     <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
     <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 
-    <script th:src="@{/assets/vendors/apexcharts/apexcharts.js}"></script>
-    <script th:src="@{/assets/js/pages/dashboard.js}"></script>
-	
     <script th:src="@{/assets/js/main.js}"></script>
+   
 
 </body>
 
