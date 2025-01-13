@@ -18,17 +18,16 @@ const utils = {
 
 // 지급월 형식 통일을 위한 함수
 function formatPaymentMonth(value) {
-    const cleaned = value.replace(/[^\d]/g, '');
+    let date = value.replace(/[^0-9]/g, '');
     
-    if (cleaned.length !== 6) {
+    if (date.length !== 6) {
         return null;
     }
 
-    const year = cleaned.substring(0, 4);
-    const month = cleaned.substring(4, 6);
+    let year = date.slice(0, 4);
+    let month = date.slice(4);
 
-    if (parseInt(year) < 2000 || parseInt(year) > 2100 ||
-        parseInt(month) < 1 || parseInt(month) > 12) {
+    if (year < '2000' || year > '2100' || month < '01' || month > '12') {
         return null;
     }
 
@@ -88,6 +87,15 @@ const gridConfig = {
                 width: 110,
                 align: 'center'
             };
+			
+			// 금액 컬럼인 경우 천단위 구분자 formatter 추가
+            if (this.columns.money.includes(key)) {
+                column.align = 'right'; // 금액은 우측 정렬
+                column.formatter = (value) => {
+                    if (!value.value && value.value !== 0) return '';
+                    return value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                };
+            }
 
             switch(key) {
                 case 'empId':
@@ -655,3 +663,86 @@ function savePaymentData() {
 		    initializeMainGrid(isRegularEmployee);
 		    loadInitialData();
 		});
+		
+		// 급여 계산 함수
+		// pay_info.js 수정
+		async function calculateSalary(empId, paymentDate) {
+		    try {
+		        const response = await $.ajax({
+		            url: '/api/payroll/calculator/calculate',
+		            type: 'POST',
+		            contentType: 'application/json',
+		            data: JSON.stringify({
+		                empId, 
+		                paymentDate
+		            })
+		        });
+
+		        if (response.status === 'success') {
+		            const calculatedData = response.data;
+		            
+		            // 모든 급여 항목 업데이트
+		            const fields = [
+		                'empSalary',
+		                'techAllowance',
+		                'tenureAllowance',
+		                'performanceBonus',
+		                'holidayAllowance',
+		                'leaveAllowance',
+		                'allowAmt',
+		                'nationalPension',
+		                'healthInsurance',
+		                'longtermCareInsurance',
+		                'employmentInsurance',
+		                'incomeTax',
+		                'residentTax',
+		                'deducAmt',
+		                'netSalary'
+		            ];
+
+		            fields.forEach(field => {
+		                if (calculatedData[field] !== undefined) {
+		                    grid.setValue(selectedRowKey, field, calculatedData[field]);
+		                }
+		            });
+
+		            // 계산 완료 메시지
+		            alert('급여 계산이 완료되었습니다.');
+		        } else {
+		            alert(response.message || '급여 계산 중 오류가 발생했습니다.');
+		        }
+		    } catch (error) {
+		        console.error('Error:', error);
+		        alert('급여 계산 요청 중 오류가 발생했습니다.');
+		    }
+		}
+
+		// 계산된 데이터로 그리드 업데이트하는 함수
+		function updateGridWithCalculatedData(data) {
+		    const rowKey = selectedRowKey;
+		    Object.entries(data).forEach(([key, value]) => {
+		        grid.setValue(rowKey, key, value);
+		    });
+		}
+		
+		// 선택된 사원 정보로 그리드 업데이트
+		function updateGridWithSelectedEmployee(employee) {
+		    const rowKey = selectedRowKey;
+		    grid.setValue(rowKey, 'empId', employee.empId);
+		    grid.setValue(rowKey, 'empName', employee.empName);
+		    grid.setValue(rowKey, 'empSalary', employee.empSalary);
+		    grid.setValue(rowKey, 'departmentName', employee.departmentName);
+		    grid.setValue(rowKey, 'positionName', employee.positionName);
+
+		    // 지급월 입력 받기
+		    const paymentDate = prompt('지급월을 입력하세요 (예: 2023-06)');
+		    if (paymentDate) {
+		        const formattedDate = formatPaymentMonth(paymentDate);
+		        if (formattedDate) {
+		            grid.setValue(rowKey, 'paymentDate', formattedDate);
+		            calculateSalary(employee.empId, formattedDate);
+		        } else {
+		            alert('올바른 지급월 형식으로 입력해주세요 (예: 2023-06)');
+		        }
+		    }
+		}

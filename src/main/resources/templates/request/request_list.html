@@ -194,8 +194,7 @@
 						{header: '중간승인권자', name: 'middle_approval'},
 						{header: '최종승인권자', name: 'high_approval'},
 						{header: '요청상태', name: 'request_status'},
-						{header: '반려사유', name: 'request_rejection'},
-						{header: '처리상태', name: 'complete'}
+						{header: '반려사유', name: 'request_rejection'}
 					],
 					
 					data: []
@@ -229,7 +228,7 @@
 		        const request_no = rowData.request_no;
 				
 				// 팝업 창 열기
-				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
+				   const popupOptions = "width=800,height=650,scrollbars=yes,resizable=yes";
 				   let popupUrl = ''; // 요청번호 포함한 URL 생성
 				   			   
 	   				if(rowData.request_type === '발령') {
@@ -240,7 +239,7 @@
 	   				}
 				   
 				   
-				   window.open(popupUrl, '_blank', popupOptions);
+				   window.open(popupUrl, 'popup', popupOptions);
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
 			

@@ -21,4 +21,6 @@ public interface PayInfoMapper {
     List<PayInfoDTO> getEmployeePayInfo(@Param("empId") String empId);
     // 특정 월의 급여 미지급 직원 조회
     List<Map<String, Object>> getMissingPaymentEmployees(@Param("paymentDate") String paymentDate);// 특정 월의 급여 미지급 직원 조회
+    
+	void insertPayment(PayInfoDTO payInfoDTO);
 }

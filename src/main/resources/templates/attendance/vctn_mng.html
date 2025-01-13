@@ -2,53 +2,59 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>휴가 관리</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>휴가 관리</title>
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="assets/css/bootstrap.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link
+	href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" href="assets/css/bootstrap.css">
 
-	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
 
-	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
-	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" href="assets/css/app.css">
-	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
-	<!-- TOAST UI CDN -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+<link rel="stylesheet"
+	href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+<link rel="stylesheet"
+	href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="shortcut icon" href="assets/images/favicon.svg"
+	type="assets/image/x-icon">
+<!-- TOAST UI CDN -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
 
-	<style>
-		.tui-grid-cell {
-			/* !important -> 우선순위 높아짐 */
-			background-color: #ffffff !important;
-		}
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
 
-		.display-flex {
-			display: flex;
+.display-flex {
+	display: flex;
+}
 
-		}
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
 
-		.buttons {
-			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			margin-left: auto
-		}
+.child-input1 {
+	flex: 1;
+	width: 30%;
+	box-sizing: border-box;
+}
 
-		.child-input1 {
-			flex: 1;
-			width: 30%;
-			box-sizing: border-box;
-		}
-
-		.child-input2 {
-			flex: 1;
-			margin: 0px 5%;
-			width: 30%;
-			box-sizing: border-box;
-		}
-	</style>
+.child-input2 {
+	flex: 1;
+	margin: 0px 5%;
+	width: 30%;
+	box-sizing: border-box;
+}
+</style>
 
 </head>
 
@@ -64,17 +70,16 @@
 
 			<!-- 반응형 사이드 메뉴 버튼-->
 			<header class="mb-3">
-				<a href="#" class="burger-btn d-block d-xl-none">
-					<i class="bi bi-justify fs-3"></i>
+				<a href="#" class="burger-btn d-block d-xl-none"> <i
+					class="bi bi-justify fs-3"></i>
 				</a>
 			</header>
 
 			<div class="display-flex">
 				<h3>휴가 관리</h3>
 				<div class="buttons">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#default" 
-						onclick="window.open('vctn-appform','휴가신청서','width=430,height=500,location=no,status=no,scrollbars=yes');">휴가 신청</button>
+					<button type="button" class="btn btn-primary" onclick="openView()">휴가
+						신청</button>
 
 					<!-- 휴가 신청서 Modal 시작 -->
 					<!--<div class="modal fade text-left" id="default" tabindex="-1" role="dialog"
@@ -164,8 +169,10 @@
 						</div>
 					</div>-->
 					<!-- 휴가 신청서 Modal 끝 -->
-				</div> <!-- buttons -->
-			</div> <!-- display-flex -->
+				</div>
+				<!-- buttons -->
+			</div>
+			<!-- display-flex -->
 
 			<div class="card">
 				<div class="card-body">
@@ -175,9 +182,10 @@
 						<div style="display: flex; align-items: center; gap: 1rem;">
 							<!-- 첫 번째 데이트 피커 -->
 							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" />
-									<span class="tui-ico-date"></span>
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-1"
+										aria-label="Date-Time" /> <span class="tui-ico-date"></span>
 								</div>
 								<div id="tui-date-picker-container-1"
 									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
@@ -188,19 +196,19 @@
 
 							<!-- 두 번째 데이트 피커 -->
 							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" />
-									<span class="tui-ico-date"></span>
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-2"
+										aria-label="Date-Time" /> <span class="tui-ico-date"></span>
 								</div>
 								<div id="tui-date-picker-container-2"
 									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 							</div>
 							<!-- 데이트 피커 끝 -->
-							<!-- 사번/이름 검색 기능은 아래 링크 참고 -->
-<!--https://velog.io/@hyun/ajax%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EA%B2%80%EC%83%89%EA%B8%B0%EB%8A%A5-%EB%A7%8C%EB%93%A4%EA%B8%B0-->
 							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
 							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
 									<input type="text" id="search" />
 								</div>
 							</div>
@@ -210,18 +218,18 @@
 
 					<!--전체/받은요청/보낸요청 탭 시작-->
 					<ul class="nav nav-tabs" id="tabHead" role="tablist">
-						<li class="nav-item" role="presentation">
-							<a class="nav-link active" id="useTab" data-bs-toggle="tab" href="#use" role="tab"
-								aria-controls="use" aria-selected="true">사용내역</a>
+						<li class="nav-item" role="presentation"><a
+							class="nav-link active" id="useTab" data-bs-toggle="tab"
+							href="#use" role="tab" aria-controls="use" aria-selected="true">사용내역</a>
 						</li>
-						<li class="nav-item" role="presentation">
-							<a class="nav-link" id="holdTab" data-bs-toggle="tab" href="#hold" role="tab"
-								aria-controls="hold" aria-selected="false">보유현황</a>
-						</li>
+						<li class="nav-item" role="presentation"><a class="nav-link"
+							id="holdTab" data-bs-toggle="tab" href="#hold" role="tab"
+							aria-controls="hold" aria-selected="false">보유현황</a></li>
 					</ul>
 					<div class="tab-content" id="tabContent">
 						<!-- 사용내역 탭 시작 -->
-						<div class="tab-pane fade show active" id="use" role="tabpanel" aria-labelledby="useTab">
+						<div class="tab-pane fade show active" id="use" role="tabpanel"
+							aria-labelledby="useTab">
 
 							<!-- 그리드 시작 -->
 							<section class="section">
@@ -234,7 +242,8 @@
 						</div>
 						<!-- 사용내역 탭 끝 -->
 						<!-- 보유현황 탭 시작 -->
-						<div class="tab-pane fade" id="hold" role="tabpanel" aria-labelledby="holdTab">
+						<div class="tab-pane fade" id="hold" role="tabpanel"
+							aria-labelledby="holdTab">
 
 							<!-- 그리드 시작 -->
 							<section class="section">
@@ -249,17 +258,24 @@
 					</div>
 					<!--전체/받은요청/보낸요청 탭 끝-->
 
-				</div> <!-- card-body -->
-			</div> <!-- card -->
-		</div> <!-- main -->
-	</div> <!-- app -->
+				</div>
+				<!-- card-body -->
+			</div>
+			<!-- card -->
+		</div>
+		<!-- main -->
+	</div>
+	<!-- app -->
 
-	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
-	<script src="assets/js/main.js"></script>
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- DatePicker 스크립트 -->
-	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script
+		src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script>
 		// 첫 번째 DatePicker 초기화
 		const container1 = document.getElementById('tui-date-picker-container-1');
@@ -287,6 +303,19 @@
 	<!-- Grid 스크립트 -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	<script>
+	
+		// 팝업창 가운데 위치
+		function openView(){
+			var popupW = 700;
+			var popupH = 550;
+			/* var left = Math.ceil((window.screen.width - popupW)/2);
+			var top = Math.ceil((window.screen.height - popupH)/2); */
+			var left = (document.body.clientWidth / 2) - (popupW / 2); 
+			left += window.screenLeft;	 //듀얼 모니터
+			var top = (screen.availHeight / 2) - (popupH / 2);
+			window.open('/vctn-appform','','width='+popupW+',height='+popupH+',left='+left+',top='+top+',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')			
+		}
+		
 		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
 			var Grid = tui.Grid;
 			
