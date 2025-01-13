@@ -26,5 +26,21 @@ public interface PersonnelMapper {
 	 List<Map<String, Object>> countByAgeGroupAndGender();
 	 
 	 List<Map<String, Object>> selectInfoByAgeGroup(@Param("ageGroupByGender") List<String> ageGroupByGender);
+	 
+	 List<Map<String, Object>> countByMonthlyHireExit();
+	 
+	 List<Map<String, Object>> selectInfoByMonthlyHireExit(@Param("ex") List<String> ex);
+	 
+	 List<Map<String, Object>> countDeptByPosition();
+	 
+	 List<Map<String, Object>> selectDeptInfoByPosition(@Param("ex") List<String> ex);
+	 
+	 List<Map<String, Object>> countByJobType();
+	 
+	 List<Map<String, Object>> selectInfoByJobType(@Param("ex") List<String> ex);
+	 
+	 List<Map<String, Object>> countByRank();
+	 
+	 List<Map<String, Object>> selectInfoByRank(@Param("ex") List<String> ex);
 	
 }

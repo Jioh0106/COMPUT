@@ -4,34 +4,13 @@ Grid.applyTheme('clean'); // 테마 적용
 const empInfoList = new Grid({
 	el: document.getElementById('grid'),
 	  data: [], // 초기 데이터
-	  //rowHeaders: ['checkbox'],
-	  //scrollX: false,
-	  //scrollY: false,
 	  bodyHeight: 200,
 	  columns: [
-	    { 
-			header: '사원번호', 
-			name: 'EMP_ID',
-		},
-	    { 
-			header: '이름', 
-			name: 'EMP_NAME',
-		},
-	    { 
-			header: '부서명', 
-			name: 'EMP_DEPT_NAME',
-			//filter : 'select'
-		},
-	    { 
-			header: '직급명', 
-			name: 'EMP_POSITION_NAME',
-			//filter : 'select'
-		},
-	    { 
-			header: 'E-mail', 
-			name: 'EMP_EMAIL',
-			//filter : 'select'
-		}
+		{ header: '사원번호', name: 'EMP_ID'},
+	    { header: '이름', name: 'EMP_NAME'},
+	    { header: '부서명', name: 'EMP_DEPT_NAME'},
+	    { header: '직급명', name: 'EMP_POSITION_NAME'},
+	    { header: 'E-mail', name: 'EMP_EMAIL'}
 	  ],
 	  columnOptions: {
 	          resizable: true
@@ -53,11 +32,9 @@ categoryMenu.addEventListener("input",() => {
 	if(selectCategory==="학력별"){
 		empChartContainer.innerHTML = "<div id='empChart'></div>";
         countByEdu();
-		//infoListByEdu();
 	}else if(selectCategory==="연령별"){
 		empChartContainer.innerHTML = "<div id='empGroupStackBarChart'></div>";
       	countByAgeAndGender();
-		//infoListByAgeGroup();
 	}
 });
 
@@ -66,15 +43,13 @@ function initChart(){
 	const defaultCategory = categoryMenu.value;
 	
 	if(defaultCategory === "학력별"){
-		defaultCategory.innerHTML="<div id='empChart'></div>";
+		empChartContainer.innerHTML="<div id='empChart'></div>";
 		countByEdu();
-		//infoListByEdu();	
 	}
 	
 	if(defaultCategory === "연령별"){
-		defaultCategory.innerHTML = "<div id='empGroupStackBarChart'></div>";
+		empChartContainer.innerHTML = "<div id='empGroupStackBarChart'></div>";
 		countByAgeAndGender();
-		//infoListByAgeGroup();
 	}
 }
 
@@ -172,12 +147,6 @@ async function infoListByEdu(eduArray){
 	}catch(error){
 		console.error(error);
 	}
-}
-
-//
-function test(){
-	const checkedLegend = empPieChart.getCheckedLegend()
-	console.log(checkedLegend);
 }
 
 async function countByAgeAndGender(){

@@ -64,7 +64,7 @@ public class PersonnelRestController {
 	}
 	
 	@GetMapping("/infoList-by-edu")
-	public List<Map<String, Object>> empinfoListByEdu(@RequestParam(value = "edu") List<String> edu){
+	public List<Map<String, Object>> empInfoListByEdu(@RequestParam(value = "edu") List<String> edu){
 		log.info(edu.toString());
 		
 		return psService.getInfoListByEdu(edu);
@@ -78,8 +78,52 @@ public class PersonnelRestController {
 	}
 	
 	@GetMapping("/infoList-by-ageGroup")
-	public List<Map<String, Object>> empinfoListAgeGroup(@RequestParam(value = "ageGroupByGender") List<String> ageGroupByGender){
+	public List<Map<String, Object>> empInfoListAgeGroup(@RequestParam(value = "ageGroupByGender") List<String> ageGroupByGender){
 		log.info(ageGroupByGender.toString());
 		return psService.getInfoListByAgeGroup(ageGroupByGender);
+	}
+	
+	@GetMapping("/count-by-monthlyHireExit")
+	public List<Map<String, Object>> countListByMonthlyHireExit(){
+		return null;
+	}
+	
+	@GetMapping("/infoList-by-monthlyHireExit")
+	public List<Map<String, Object>> hrInfoListByMonthlyHireExit(@RequestParam(value = "ex") List<String> ex){
+		
+		return null;
+	}
+	
+	@GetMapping("/count-by-dept-and-position")
+	public List<Map<String, Object>> countDeptListByPosition() {
+		return null;
+	}
+	
+	@GetMapping("/infoList-by-dept-and-position")
+	public List<Map<String, Object>> hrInfoListByDeptAndPosition(@RequestParam(value = "ex") List<String> ex){
+		
+		return null;
+	}
+	
+	@GetMapping("/count-by-jobType")
+	public List<Map<String, Object>> countListByJobType() {
+		return null;
+	}
+	
+	@GetMapping("/infoList-by-jobType")
+	public List<Map<String, Object>> hrInfoListByJobType(@RequestParam(value = "ex") List<String> ex){
+		
+		return null;
+	}
+	
+	@GetMapping("/count-by-rank")
+	public List<Map<String, Object>> countListByRank(){
+		return null;
+	}
+	
+	@GetMapping("/infoList-by-rank")
+	public List<Map<String, Object>> hrInfoListByRank(@RequestParam(value = "ex") List<String> ex){
+		
+		return null;
 	}
 }

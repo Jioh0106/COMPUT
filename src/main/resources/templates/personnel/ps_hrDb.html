@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>인사 정보 현황</title>
+    <title>사원 정보 현황</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
     <!-- TOAST UI CDN -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
-
+	<link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+	
     <style>
         .display-flex {
             display: flex;
@@ -26,6 +26,7 @@
         .buttons {
             margin-left: auto;
         }
+        
     </style>
 </head>
 
@@ -44,7 +45,7 @@
             </header>
             
             <div class="display-flex">
-                <h3>인사 정보 현황</h3>
+                <h3>사원 정보 현황</h3>
             </div>
 			
             <!--사원 조회 내용-->
@@ -53,14 +54,43 @@
                     <div class="card-content">
                         <div class="card-body">
 							
-                            <!--회원 정보 리스트 시작-->
+							<section class="section">
+								<div class="row" id="basic-chart">
+								
+									<div class="col-3 ps-lg-5 pe-xl-0">
+										<div class="col-md-7">
+											<div class="mb-xl-2">
+												<label for="categoryMenu"><b>카테고리</b></label>
+											</div>
+	                                        <select id="categoryMenu" class="form-control" name="empCategory">
+	                                        	<option value="입/퇴사자">월별 입/퇴사자</option>
+	                                        	<option value="부서/직급별">부서/직급별</option>
+	                                        	<option value="고용유형별">고용 유형별</option>
+	                                        	<option value="성과등급별">성과 등급별</option>
+	                                        </select>
+                                        </div>	
+									</div>
+								
+									<!--사원 차트 끝-->
+									<div class="col-9 ps-md-5 pe-xl-0">
+										<div id="empChartContainer" class="col-md-12 text-center">
+	                            			<div id="hrChart"></div>
+	                            		</div>
+									</div>
+								</div>
+							</section>
+							
+								
+							<hr>
+								
+							<!--회원 정보 리스트 시작-->
 							<section class="section">
 								<div class="row" id="basic-table">
                             		<div id="grid"></div>
 								</div>
-							</section>
-                            <!--회원 정보 리스트 끝-->
-                            
+							</section>	
+							<!--회원 정보 리스트 끝-->
+							
                         </div>
                     </div>
                 </div>
@@ -75,10 +105,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <!-- TOAST UI CDN -->
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
     <script src="js/personnel/ps_hrDb.js"></script>
     <script>
-		console.log();
         /* TOAST UI , 기타 자바스크립트 코드 작성 */
     </script>
 </body>

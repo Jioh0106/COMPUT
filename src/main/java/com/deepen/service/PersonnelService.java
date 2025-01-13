@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
@@ -119,23 +121,53 @@ public class PersonnelService {
 	}
 	
 	public List<Map<String , Object>> getInfoListByEdu(List<String> edu){
-		//log.info(edu.toString());
 		List<Map<String , Object>> infoList = psMapper.selectInfoByEdu(edu);
-		//log.info(infoList.toString());
-		
 		return infoList;
 	}
 	
 	public List<Map<String, Object>> getCountByAgeGroupAndGender(){
-		
 		return psMapper.countByAgeGroupAndGender();
 	}
 	
 	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroupByGender){
-		log.info(ageGroupByGender.toString());
 		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(ageGroupByGender);
-		log.info(infoList.toString());
 		return infoList;
+	}
+	
+	public List<Map<String, Object>> getCountByMonthlyHireExit(){
+		return null;
+	}
+	
+	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> ex){
+		
+		return null;
+	}
+	
+	public List<Map<String, Object>> getCountDeptListByPosition() {
+		return null;
+	}
+	
+	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> ex){
+		
+		return null;
+	}
+	
+	public List<Map<String, Object>> getCountListByJobType() {
+		return null;
+	}
+	
+	public List<Map<String, Object>> getInfoListByJobType(List<String> ex){
+		
+		return null;
+	}
+	
+	public List<Map<String, Object>> getCountListByRank(){
+		return null;
+	}
+	
+	public List<Map<String, Object>> getInfoListByRank(List<String> ex){
+		
+		return null;
 	}
 }
 
