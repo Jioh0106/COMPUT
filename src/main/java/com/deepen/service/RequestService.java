@@ -102,6 +102,13 @@ public class RequestService {
 		return map;
 	}
 
+	public void updateAbsenceRequest(Map<String, Object> updateData) {
+		
+		rqMapper.updateStatus(updateData);
+		
+		
+	}
+
 		
 		
 

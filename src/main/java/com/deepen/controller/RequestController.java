@@ -122,6 +122,8 @@ public class RequestController {
         log.info("requestAbsenceDetail - absence : " + absence.toString());
         
 		model.addAttribute("absence", absence);
+		model.addAttribute("request_no", request_no);
+		
 		
 		return "request/request_absence_detail";
 	}
