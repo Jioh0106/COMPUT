@@ -10,10 +10,21 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VacationMapper {
 
+	Map<String, Object> selectEmpAthr(String userId);
+	
+	List<Map<String, Object>> selectUseVctnList(Map<String, Object> athrMapList);
+	
+	List<Map<String, Object>> selectVctnDaysList(Map<String, Object> athrMapList);
+	
 	List<Map<String, Object>> selectCommonDtl();
 
 	Map<String, Object> selectEmpInfo(String userId);
 
 	List<Map<String, Object>> selectMiddleAprvr();
+
+	int insertRequest(Map<String, Object> map);
+
+	int insertVctn(Map<String, Object> map);
+
 
 }

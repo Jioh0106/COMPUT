@@ -24,7 +24,6 @@ public class CommuteService {
 	}
 
 	public List<Map<String, Object>> selectCmtList(Map<String, Object> athrMapList) {
-		System.out.println(athrMapList + " // service");
 		return mapper.selectCmtList(athrMapList);
 	}
 

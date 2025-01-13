@@ -2,62 +2,56 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>휴가 관리</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>휴가 관리</title>
 
-<link rel="preconnect" href="https://fonts.gstatic.com">
-<link
-	href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="assets/css/bootstrap.css">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
 
-<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
 
-<link rel="stylesheet"
-	href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
-<link rel="stylesheet"
-	href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-<link rel="stylesheet" href="assets/css/app.css">
-<link rel="shortcut icon" href="assets/images/favicon.svg"
-	type="assets/image/x-icon">
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
 
-<!-- TOAST UI CDN -->
-<link rel="stylesheet"
-	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 
-<meta name="_csrf" th:content="${_csrf.token}" />
-<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 
-<style>
-.tui-grid-cell {
-	/* !important -> 우선순위 높아짐 */
-	background-color: #ffffff !important;
-}
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
 
-.display-flex {
-	display: flex;
-}
+		.display-flex {
+			display: flex;
+		}
 
-.buttons {
-	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-	margin-left: auto
-}
+		.buttons {
+			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+			margin-left: auto
+		}
 
-.child-input1 {
-	flex: 1;
-	width: 30%;
-	box-sizing: border-box;
-}
+		.child-input1 {
+			flex: 1;
+			width: 30%;
+			box-sizing: border-box;
+		}
 
-.child-input2 {
-	flex: 1;
-	margin: 0px 5%;
-	width: 30%;
-	box-sizing: border-box;
-}
-</style>
+		.child-input2 {
+			flex: 1;
+			margin: 0px 5%;
+			width: 30%;
+			box-sizing: border-box;
+		}
+	</style>
 
 </head>
 
@@ -75,15 +69,13 @@
 					<div class="child-input1">
 						<label>사번: </label>
 						<div class="form-group">
-							<input type="text" th:value="${empInfo.empId}" id="empId"
-								class="form-control" readonly>
+							<input type="text" th:value="${empInfo.empId}" id="empId" class="form-control" readonly>
 						</div>
 					</div>
 					<div class="child-input2">
 						<label>이름: </label>
 						<div class="form-group">
-							<input type="text" th:value="${empInfo.empName}" id="empName"
-								class="form-control" readonly>
+							<input type="text" th:value="${empInfo.empName}" id="empName" class="form-control" readonly>
 						</div>
 					</div>
 				</div>
@@ -92,15 +84,13 @@
 					<div class="child-input1">
 						<label>사용 시작일: </label>
 						<div class="form-group">
-							<input type="date" class="form-control" id="use-start-date"
-								onchange="calcDate()">
+							<input type="date" class="form-control" id="use-start-date" onchange="calcDate()">
 						</div>
 					</div>
 					<div class="child-input2">
 						<label>사용 종료일: </label>
 						<div class="form-group">
-							<input type="date" class="form-control" id="use-end-date"
-								onchange="calcDate()">
+							<input type="date" class="form-control" id="use-end-date" onchange="calcDate()">
 						</div>
 					</div>
 				</div>
@@ -115,8 +105,7 @@
 					<div class="child-input2">
 						<label>잔여일수: </label>
 						<div class="form-group">
-							<input type="text" class="form-control"
-								th:value="${empInfo.vctnDays}" readonly>
+							<input type="text" class="form-control" th:value="${empInfo.vctnDays}" readonly>
 						</div>
 					</div>
 				</div>
@@ -125,16 +114,14 @@
 				<fieldset class="form-group">
 					<select class="form-select" id="vctnSe">
 						<option value="">선택</option>
-						<option th:each="commonDtl :${commonDtlList}"
-							th:value="${commonDtl.CODE}" th:text="${commonDtl.NAME}"></option>
+						<option th:each="commonDtl :${commonDtlList}" th:value="${commonDtl.CODE}"
+							th:text="${commonDtl.NAME}"></option>
 					</select>
 				</fieldset>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-light-secondary"
-					onClick='window.close()'>닫기</button>
-				<button type="button" class="btn btn-primary"
-					data-bs-target="#defaultSize" data-bs-toggle="modal"
+				<button type="button" class="btn btn-light-secondary" onClick='window.close()'>닫기</button>
+				<button type="button" class="btn btn-primary" data-bs-target="#defaultSize" data-bs-toggle="modal"
 					onclick="middleAprvr()">신청</button>
 			</div>
 		</div>
@@ -142,11 +129,9 @@
 
 	<!--승인권자 선택 모달창 시작-->
 	<!--Default size Modal -->
-	<div class="modal fade text-left" id="defaultSize" tabindex="-1"
-		role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
-		<div
-			class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-			role="document">
+	<div class="modal fade text-left" id="defaultSize" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title" id="myModalLabel18">중간승인권자 선택</h4>
@@ -163,14 +148,11 @@
 
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-light-secondary"
-						data-bs-dismiss="modal">
-						<i class="bx bx-x d-block d-sm-none"></i> <span
-							class="d-none d-sm-block">취소</span>
+					<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+						<i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">취소</span>
 					</button>
 					<button type="button" class="btn btn-primary ml-1" onclick="requestApproval()">
-						<i class="bx bx-check d-block d-sm-none"></i> <span
-							class="d-none d-sm-block">승인요청</span>
+						<i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">승인요청</span>
 					</button>
 				</div>
 			</div>
@@ -185,94 +167,138 @@
 
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	
+
 	<!-- sweetAlert CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
 	<script th:inline="javascript">
-	
+
 		const token = $("meta[name='_csrf']").attr("content")
 		const header = $("meta[name='_csrf_header']").attr("content");
 		const name = $("#userName").val()
-		
-		let selectApprover ={};
-		
+
+		let selectApprover = {};
+
 		// Toast Grid 초기화
 		let grid;
-	
+
 		// 중간승인권자 그리드 함수
 		function middleAprvr() {
 			const gridData = /*[[${middleAprvr}]]*/[];
 			const Grid = tui.Grid;
-			
-			 // 만약 이전 그리드 객체가 있다면 제거
-		    if (grid) {
-		        grid.destroy();  // 이전 그리드를 파괴
-		    }
-			
-			//------------------------------------------------------------- 승인권자 선택 모달창 시작
+
+			// 만약 이전 그리드 객체가 있다면 제거
+			if (grid) {
+				grid.destroy();  // 이전 그리드를 파괴
+			}
+
 			// 승인권자 선택 모달창 Grid 생성
 			grid = new Grid({
-	            el: document.getElementById('grid'),
-	            columns: [
-	                {header: '사원번호', name: 'empId' },
-	                {header: '성명', name: 'empName' },
-	                {header: '부서명', name: 'dept' },
-	                {header: '직급', name: 'pstn' }
-	            ],
-	            data: gridData
-	        });
-			
-			$('#defaultSize').on('shown.bs.modal', function () {
-			    grid.refreshLayout();  // 그리드 레이아웃 새로 고침
+				el: document.getElementById('grid'),
+				columns: [
+					{header: '사원번호', name: 'empId'},
+					{header: '성명', name: 'empName'},
+					{header: '부서명', name: 'dept'},
+					{header: '직급', name: 'pstn'}
+				],
+				data: gridData
 			});
-			
-			// 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
-		       
-	        grid.on('click', (ev) => {
-	            if (ev.rowKey !== null) {
-	                const row = grid.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
-	                console.info(row);
-	                Approver(row); // Approver(row) 함수 호출
-	            }
-	        });
 
-	        function Approver(row) {
-	            selectApprover = {
-	                approverEmp_id: row.empId,
-	                approverEmp_name: row.empName,
-	                approverEmp_dept: row.dept,
-	                approverEmp_position: row.pstn
-	            };
-				
-			var name = `${selectApprover.approverEmp_name}`; //중간승인권자 이름
+			// 그리드에 값 미현시로 모달창 열린 후 레이아웃 새로 고침 처리
+			$('#defaultSize').on('shown.bs.modal', function () {
+				grid.refreshLayout();
+			});
+
+			// 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+			grid.on('click', (ev) => {
+				if (ev.rowKey !== null) {
+					const row = grid.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
+					console.info(row);
+					Approver(row); // Approver(row) 호출
+				}
+			});
+
+			// 전역변수로 선언한 selectApprover에 배열 형태로 담아 주기
+			function Approver(row) {
+				selectApprover = {
+					approverEmp_id: row.empId,
+					approverEmp_name: row.empName,
+					approverEmp_dept: row.dept,
+					approverEmp_position: row.pstn
+				};
+
+				// 선택된 승인권자 알림
+				var name = `${selectApprover.approverEmp_name}`; //중간승인권자 이름
 				swal(name + "님이 선택되었습니다.");
-	        }
-			
-		}; 
+			}
+		};
 
 		// 승인 요청 클릭 시 실행되는 함수
 		function requestApproval() {
 			const vctnSeList = document.getElementById("vctnSe"); // 휴가 구분 리스트
-			
+
 			if (!selectApprover.approverEmp_id) {
 				swal("중간승인권자를 선택하세요.");
-		        return;
-		    }
-			
+				return;
+			}
+
 			const vctnDTO = {
-				  type: vctnSe.options[vctnSe.selectedIndex].value
+				type: vctnSe.options[vctnSe.selectedIndex].value
 				, startDate: document.getElementById('use-start-date').value
 				, endDate: document.getElementById('use-end-date').value
 				, total: document.getElementById('use-days').value
 				, leaveId: document.getElementById('empId').value
 				, aprvId: selectApprover.approverEmp_id
 			}
-			
-			console.info(vctnDTO);
+
+			const rqstDTO = {
+				type: '휴가'
+				, aprvId: selectApprover.approverEmp_id
+				, empId: document.getElementById('empId').value
+			}
+
+			// AJAX 요청
+			$.ajax({
+				url: '/insertVctn',
+				type: 'POST',
+				contentType: 'application/json',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data: JSON.stringify({
+					vctnDTO: vctnDTO,
+					rqstDTO: rqstDTO
+				}),
+				success: function (res) {
+					if (res == 1) {
+						Swal.fire({
+							title: "신청 완료",
+							icon: "success",
+							confirmButtonText: "확인"
+						}).then(function () { // 확인 클릭 시 실행
+							window.close(); // 팝업 닫기
+						});
+					} else {
+						Swal.fire({
+							title: "신청 실패",
+							icon: "error",
+							confirmButtonText: "확인"
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
 		}
+
 		// 일수 계산 스크립트
 		function calcDate() {
 			// 사용 시작일과 종료일 가져오기
