@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF 토큰 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    
     <title>급여 대장 이력</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -16,16 +20,35 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
-    <style>
-       .tui-grid-cell {
+<style>
+    .tui-grid-cell {
         background-color: #ffffff !important;
-    	}
-        .clickable {
-            cursor: pointer;
-            color: blue;
-            text-decoration: underline;
-        }
-    </style>
+    }
+    .clickable {
+        cursor: pointer;
+        color: blue;
+        text-decoration: underline;
+    }
+    .department-summary {
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+    }
+    .tui-grid-summary-area {
+    background-color: #f0f0f0 !important;
+}
+
+.tui-grid-summary-area td {
+    background-color: #f0f0f0 !important;
+    border-right: 1px solid #e1e1e1 !important;
+}
+
+.tui-grid-summary-area .tui-grid-cell {
+    border-bottom: none !important;
+}
+.tui-grid-cell {
+    padding-right: 0 !important;
+}
+</style>
 </head>
 <body>
     <div id="app">
@@ -38,153 +61,59 @@
             </header>
             
             <h3>급여 대장 이력</h3>
-         <!-- 메인 그리드 카드 -->
-	<div class="card">
-	    <div class="card-body">           
-            <div style="margin-bottom: 10px; display: flex; align-items: center;">
-                <select class="form-select" id="basicSelect" style="width: 150px;">
-                    <option>전체</option>
-                    <option>인사팀</option>
-                    <option>마케팅팀</option>
-                    <option>영업팀</option>
-                    <option>개발팀</option>
-                    <option>재무팀</option>
-                    <option>CS팀</option>
-                </select>
-                <input type="text" class="form-control" id="basicInput" style="margin-left: 5px; width:200px;" placeholder="대장명칭 검색">
-                <a href="#" class="btn btn-primary rounded-pill" style="margin-left: 5px;">Search</a>
-            </div>
-            <div id="mainGrid" style="width:100%; height:100%;"></div>
-            <a href="#" class="btn btn-secondary" style="margin-top: 5px;">선택삭제</a>
-		</div>
-	</div>
-            <!-- Modal -->
-            <div class="modal fade text-left w-100" id="payrollDetailModal" tabindex="-1" role="dialog" 
-                aria-labelledby="payrollDetailModalTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-full" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="payrollDetailModalTitle">급여대장조회</h4>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="detailGrid"></div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">수정</button>
-                            <button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">닫기</button>
-                        </div>
-                    </div>
+            <!-- 메인 그리드 카드 -->
+            <div class="card">
+                <div class="card-body">           
+                  <!-- 검색 부분 수정 -->
+<div style="margin-bottom: 10px; display: flex; align-items: center;">
+   <input type="text" class="form-control" id="basicInput" style="margin-left: 5px; width:200px;" 
+        placeholder="대장명칭을 입력하세요">
+    <a href="#" class="btn btn-primary rounded-pill" style="margin-left: 5px;">Search</a>
+</div>
+<div id="mainGrid" style="width:100%; height:100%;"></div>
                 </div>
+            </div>
+            
+            <!-- 급여 대장 모달 시작-->
+        <div class="modal fade text-left w-100" id="payrollDetailModal" tabindex="-1" role="dialog" 
+    aria-labelledby="payrollDetailModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-full" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="payrollDetailModalTitle">급여대장조회</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+    <!-- 그리드들이 여기에 동적으로 생성됩니다 -->
+			</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
+</div> 
+ <!-- 급여 대장 모달 끝 -->
+ 
+        </div>
+    </div>
 
+    <!-- Scripts -->
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="assets/js/main.js"></script>
+<!--     <script src="/js/payroll/pay_list.js"></script> -->
+   
+    <script th:inline="javascript">
+    
+    // 초기 데이터 설정
+    const payListSummary = /*[[${payListSummary}]]*/ [];
+    
+</script>
 
-    <script>
-        // 메인 그리드 데이터
-        const gridData = [
-            {date:"2024/11", payroll_name:"2024/11 급여", headcount:"10", payroll_all:"조회", allow_amt:"32,000,000"},
-            {date:"2024/10", payroll_name:"2024/10 급여", headcount:"10", payroll_all:"조회", allow_amt:"32,000,000"},
-            {date:"2024/09", payroll_name:"2024/09 급여", headcount:"10", payroll_all:"조회", allow_amt:"32,000,000"},
-            {date:"2024/08", payroll_name:"2024/08 급여", headcount:"10", payroll_all:"조회", allow_amt:"32,000,000"}
-        ];
-
-        // 상세 그리드 데이터
-        const detailGridData = [
-            {emp_num: "001", emp_name: "변종석", dept_name: "인사팀", pstn_name: "팀장", 
-             allow_cd_1: "3,800,000", allow_cd_2: "200,000", allow_cd_3: "100,000", allow_amt: "4,100,000", 
-             deduc_cd_1: "200,000", deduc_cd_2: "50,000", deduc_cd_3: "150,000", deduc_cd_4: "150,000", 
-             deduc_cd_5: "50,000", deduc_cd_6: "50,000", deduc_amt: "650,000", all: "3,450,000"},
-            // ... 나머지 데이터는 동일한 형식으로 추가
-        ];
-
-        // 메인 그리드 설정
-        const mainGrid = new tui.Grid({
-            el: document.getElementById('mainGrid'),
-            data: gridData,
-            rowHeaders: ['checkbox'],
-            scrollX: false,
-            scrollY: false,
-            columns: [
-                { header: '지급일', name: 'date' },
-                { header: '대장명칭', name: 'payroll_name' },
-                { header: '인원수', name: 'headcount' },
-                { 
-                    header: '급여대장', 
-                    name: 'payroll_all',
-                    formatter: () => '<span class="clickable">조회</span>'
-                },
-                { header: '지급총액', name: 'allow_amt' }
-            ]
-        });
-
-        // 상세 그리드 생성 함수
-        function createDetailGrid() {
-            return new tui.Grid({
-                el: document.getElementById('detailGrid'),
-                data: detailGridData,
-                scrollX: false,
-                scrollY: false,
-                header: {
-                    height: 160,
-                    complexColumns: [
-                        {
-                            header: '사원정보',
-                            name: 'mergeColumn1',
-                            childNames: ['emp_num', 'emp_name', 'dept_name', 'pstn_name']
-                        },
-                        {
-                            header: '수당',
-                            name: 'mergeColumn2',
-                            childNames: ['allow_cd_1', 'allow_cd_2', 'allow_cd_3']
-                        },
-                        {
-                            header: '공제',
-                            name: 'mergeColumn3',
-                            childNames: ['deduc_cd_1', 'deduc_cd_2', 'deduc_cd_3', 'deduc_cd_4', 'deduc_cd_5', 'deduc_cd_6']
-                        }
-                    ]
-                },
-                columns: [
-                    { header: '사원번호', name: 'emp_num' },
-                    { header: '성명', name: 'emp_name' },
-                    { header: '부서명', name: 'dept_name' },
-                    { header: '직급명', name: 'pstn_name' },
-                    { header: '기본급', name: 'allow_cd_1' },
-                    { header: '연차수당', name: 'allow_cd_2' },
-                    { header: '성과급', name: 'allow_cd_3' },
-                    { header: '총수당액', name: 'allow_amt' },
-                    { header: '소득세', name: 'deduc_cd_1' },
-                    { header: '주민세', name: 'deduc_cd_2' },
-                    { header: '국민연금', name: 'deduc_cd_3' },
-                    { header: '건강보험', name: 'deduc_cd_4' },
-                    { header: '고용보험', name: 'deduc_cd_5' },
-                    { header: '산재보험', name: 'deduc_cd_6' },
-                    { header: '공제총액', name: 'deduc_amt' },
-                    { header: '실지급액', name: 'all' }
-                ]
-            });
-        }
-
-        // 클릭 이벤트 처리
-        mainGrid.on('click', (ev) => {
-            if (ev.columnName === 'payroll_all') {
-                const modal = new bootstrap.Modal(document.getElementById('payrollDetailModal'));
-                modal.show();
-                
-                // 모달이 표시된 후 상세 그리드 생성
-                document.getElementById('payrollDetailModal').addEventListener('shown.bs.modal', function () {
-                    if (!window.detailGridInstance) {
-                        window.detailGridInstance = createDetailGrid();
-                    }
-                }, { once: true });
-            }
-        });
-    </script>
+<!-- pay_list.js는 마지막에 로드 -->
+<script src="/js/payroll/pay_list.js"></script>
+    
 </body>
 </html>
