@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +63,10 @@ public class AssignService {
 	        case "ATHR001": // 최종 권한자
 	            request.setRequest_status("RQST005"); // 요청 상태: 최종승인 
 	            request.setHigh_approval(emp_id);     // 최종 승인자: 본인사번
+	            //발령테이블 최종승인날짜(오늘날짜) 컬럼도 insert 해야함.
+//	            Assignment assignmentRegistr_Date = asRepository.findByRequest_no(requestDto.getRequest_no())
+//	            									.orElseThrow(()->new RuntimeException("요청을 찾을 수 없음"));
+//	            assignmentRegistr_Date.setRegistr_date(LocalDateTime.now());
 	            break;
 
 	        case "ATHR002": // 중간 권한자
@@ -92,6 +97,10 @@ public class AssignService {
 		assignment.setPrev_dept(assignmentDto.getPrev_dept()); //이전부서
 		assignment.setNew_dept(assignmentDto.getNew_dept()); //발령부서
 		assignment.setRequest_no(request.getRequest_no()); //요청번호 FK값
+		
+		if("ATHR001".equals(role)){
+			assignment.setRegistr_date(LocalDateTime.now());
+		}
 		asRepository.save(assignment);
 		
 		return request.getRequest_no();
@@ -103,21 +112,7 @@ public class AssignService {
 	public RequestDTO getRequestDivision(String emp_id, Integer request_no) {
 		
 		Request request = rqRepository.findById(request_no).get();
-		
-//		// 중간 승인권자 및 최종 승인권자 사번 추출
-//		String middleApprovalEmpId = (request.getMiddle_approval());
-//		String finalApprovalEmpId = (request.getHigh_approval() != null) ? (request.getHigh_approval()) : null;
-//		
-//		RequestDTO requestDto = new RequestDTO();
-//		if(emp_id.equals(request.getEmp_id())) { //요청구분(발신,수신)
-//			requestDto.setRequest_division("발신");
-//		}else if(emp_id.equals(middleApprovalEmpId) || emp_id.equals(finalApprovalEmpId)){
-//			requestDto.setRequest_division("수신");
-//		}
-//		
-//		
-//		 
-//		return requestDto;
+
 		  // 중간 승인권자 및 최종 승인권자 사번 추출
 	    String middleApprovalEmpId = request.getMiddle_approval();
 	    String finalApprovalEmpId = request.getHigh_approval();
@@ -128,25 +123,32 @@ public class AssignService {
 	    RequestDTO requestDto = new RequestDTO();
 
 	    // 요청자가 본인인 경우 항상 발신으로 간주
-	    if (emp_id.equals(request.getEmp_id())) { 
-	        requestDto.setRequest_division("발신");
+	    // 1. 최종 승인자가 "RQST005" 상태일 때 수신으로 간주
+//	    if (emp_id.equals(finalApprovalEmpId) && "RQST005".equals(requestStatus)) {
+//	        requestDto.setRequest_division("수신");
+//	    } 
+	    // 2. 최종 승인자가 "RQST003" 상태일 때 수신으로 간주
+	    if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus))) {
+	        requestDto.setRequest_division("수신");
 	    } 
-	    // 중간 승인자가 수신자로 간주될 경우 (상태가 RQST003인 경우에만 수신)
+	    // 3. 중간 승인자가 "RQST001" 상태일 때 수신으로 간주
+	    else if (emp_id.equals(middleApprovalEmpId) && "RQST001".equals(requestStatus)) {
+	        requestDto.setRequest_division("수신");
+	    } 
+	    // 4. 중간 승인자가 "RQST003" 상태일 때 발신으로 간주
 	    else if (emp_id.equals(middleApprovalEmpId) && "RQST003".equals(requestStatus)) {
 	        requestDto.setRequest_division("발신");
 	    } 
-	    // 최종 승인자가 수신자로 간주될 경우 (상태가 RQST005인 경우에만 수신)
-	    else if (emp_id.equals(finalApprovalEmpId) && "RQST003".equals(requestStatus)) {
-	        requestDto.setRequest_division("수신");
+	    // 5. 요청자가 본인인 경우 항상 발신으로 간주
+	    else if (emp_id.equals(request.getEmp_id())) { 
+	        requestDto.setRequest_division("발신");
 	    } 
-	    // 그 외의 경우 발신으로 간주
+	    // 6. 그 외의 경우 발신으로 간주
 	    else {
 	        requestDto.setRequest_division("발신");
 	    }
 
 	    return requestDto;
-		
-		
 		
 		
 	}
@@ -191,6 +193,17 @@ public class AssignService {
 	//요청번호로 발령테이블 조회
 	public AssignmentDTO selectAssign(Integer request_no){
 		return asMapper.selectAssign(request_no);
+	}
+	
+	 // 반려사유 등록 및 상태 변경
+    public boolean updateRejection(Integer request_no, String request_rejection) {
+        int updatedRows = asMapper.updateRejection(request_no, request_rejection);
+        return updatedRows > 0; // 성공 여부 반환
+    }
+	
+	//반려사유 조회
+	public RequestDTO getRejection(Integer request_no) {
+		return asMapper.getRejection(request_no);
 	}
 	
 

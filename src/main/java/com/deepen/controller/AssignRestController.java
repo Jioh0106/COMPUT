@@ -1,9 +1,16 @@
 package com.deepen.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deepen.domain.AssignmentDTO;
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
+import com.deepen.domain.RequestDTO;
 import com.deepen.service.AssignService;
 
 import lombok.RequiredArgsConstructor;
@@ -62,13 +70,47 @@ public class AssignRestController {
 	
 	//요청번호로 발령테이블 조회
 	@GetMapping("/selectAssign/{request_no}") 
-	public AssignmentDTO selectAssign(@PathVariable("request_no") Integer request_no){
+	public Map<String, Object> selectAssign(@PathVariable("request_no") Integer request_no, 
+			@AuthenticationPrincipal User user){
+		String emp_id = user.getUsername(); //로그인한 사원번호
+		
+		RequestDTO requestDto = asService.getRequestDivision(emp_id, request_no);
 		AssignmentDTO requestAssign = asService.selectAssign(request_no);
 		log.info("@@해당요청번호로 발령조회"+requestAssign.toString());
+		log.info("@@요청구분!!발신수신@@"+ requestDto.getRequest_division());
 		
-		return requestAssign;
+		Map<String, Object> response = new HashMap<>();
+		response.put("assignment",requestAssign);
+		response.put("request", requestDto);
+		
+		return response;
 	}
 	
+	
+	//반려사유 업데이트 및 상태변경
+    @PostMapping("/reject")
+    public ResponseEntity<Map<String, Object>> updateRequestStatusAndReason(@RequestParam Integer request_no,
+                                                                            @RequestParam String request_rejection) {
+        boolean isUpdated = asService.updateRejection(request_no, request_rejection);
+
+        if (isUpdated) {
+            return ResponseEntity.ok(Collections.singletonMap("success", true));
+        } else {
+            return ResponseEntity.status(500).body(Collections.singletonMap("success", false));
+        }
+    }
+
+    // 반려사유 조회
+    @GetMapping("/reject/reason")
+    public ResponseEntity<RequestDTO> getRejectReason(@RequestParam Integer request_no) {
+        RequestDTO rejectReason = asService.getRejection(request_no);
+        if (rejectReason != null) {
+            return ResponseEntity.ok(rejectReason);
+        } else {
+            return ResponseEntity.status(404).build();
+            
+        }
+    }
 	
 	
 	

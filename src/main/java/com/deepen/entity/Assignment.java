@@ -1,6 +1,7 @@
 package com.deepen.entity;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +43,7 @@ public class Assignment {
 	private String new_dept; //발령부서
 	
 	@Column(name = "registr_date")
-	private Date registr_date; //최종승인일자
+	private LocalDateTime registr_date; //최종승인일자
 	
 	
 	@Column(name = "request_no", nullable = false)

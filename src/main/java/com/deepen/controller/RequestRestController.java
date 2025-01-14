@@ -21,7 +21,7 @@ import lombok.extern.java.Log;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/request")
 @Log
 public class RequestRestController {
 	
@@ -40,7 +40,7 @@ public class RequestRestController {
     }
 	
 	
-	@PostMapping("/request/absence/update")
+	@PostMapping("/absence/update")
 	public ResponseEntity<String> updateAbsenceRequest(@RequestBody Map<String, Object> updateData) {
 		
 		log.info("updateAbsenceRequest : "+ updateData.toString());

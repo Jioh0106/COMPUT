@@ -45,7 +45,7 @@
 			</header>
 
 			<h3>요청내역</h3>
-
+			<h2 th:text="'권한: ' + ${emp.emp_role}"></h2>
 			<div class="card">
 				<div class="card-body">
 					
@@ -174,7 +174,11 @@
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 			 <!-- 제이쿼리 -->
    			<script th:src="@{/js/jquery-3.7.1.js}"></script>   
-			<script>
+			<script th:inline="javascript">
+			window.empName = /*[[${emp.emp_name}]]*/ 'UNKNOWN';
+			console.log('사원이름', empName);
+			window.empId = /*[[${emp.emp_id}]]*/ 'UNKNOWN';
+			const userRole = /*[[${emp.emp_role}]]*/ 'UNKNOWN';
 			document.addEventListener('DOMContentLoaded', function () {
 				var Grid = tui.Grid;
 
@@ -202,7 +206,7 @@
 
 				
 				  // 요청 내역 불러오기 (Fetch API)
-		        fetch('/api/request-list')
+		        fetch('/api/request/request-list')
 		            .then(response => {
 		                if (!response.ok) {
 		                    throw new Error('Network response was not ok ' + response.statusText);
@@ -221,13 +225,16 @@
 		   
 		
 				
+				
 		// Grid의 row 클릭 이벤트 추가
 		    grid.on('click', (ev) => {
 		        // 클릭된 row 데이터 가져오기
 		        const rowData = ev.instance.getRow(ev.rowKey);
 		        const request_no = rowData.request_no;
-				
 				// 팝업 창 열기
+				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
+				   const popupUrl = `/request-assign-detail?request_no=${request_no}&userRole=${userRole}`; // 요청번호 포함한 URL 생성
+				   window.open(popupUrl, '_blank', popupOptions);
 				   const popupOptions = "width=800,height=650,scrollbars=yes,resizable=yes";
 				   let popupUrl = ''; // 요청번호 포함한 URL 생성
 				   			   
@@ -242,6 +249,34 @@
 				   window.open(popupUrl, 'popup', popupOptions);
 		      
 		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
+			
+			
+			//반려사유 확인하는 버튼 생성
+			function reloadGrid() {
+			    // 그리드 데이터를 다시 로드하는 함수
+			    grid.reloadData();
+			}
+
+			function renderReasonButton(rowData) {
+			    const { request_status, request_no } = rowData;
+
+			    // 상태가 RQST002 또는 RQST004일 경우 사유확인 버튼 추가
+			    if (request_status === 'RQST002' || request_status === 'RQST004') {
+			        return `<button onclick="openRejectReasonModal(${request_no})">사유확인</button>`;
+			    }
+			    return '';
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 	});	
 				
