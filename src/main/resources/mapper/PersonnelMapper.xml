@@ -210,11 +210,78 @@
 	</select>
 	
 	<select id="countByMonthlyHireExit" resultType="java.util.Map">
-	
+		SELECT 
+		    TO_NUMBER(month) || '월' AS month,
+		    SUM(hire_count) AS hire_count,
+		    SUM(exit_count) AS exit_count
+		FROM (SELECT
+				NVL(SUBSTR(emp_hire_date, 6, 2), '0') AS month,
+		    	1 AS hire_count,
+		    	0 AS exit_count
+		    FROM emp_list_all 
+		    WHERE emp_hire_date IS NOT NULL 
+		    	AND SUBSTR(emp_hire_date, 1, 4) = TO_CHAR(SYSDATE, 'YYYY')
+			UNION ALL
+			SELECT
+				NVL(SUBSTR(emp_exit_date, 6, 2), '0') AS month,
+		        0 AS hire_count,
+		        1 AS exit_count
+		    FROM emp_list_all
+		   	WHERE emp_exit_date IS NOT NULL
+		   		AND SUBSTR(emp_exit_date, 1, 4) = TO_CHAR(SYSDATE, 'YYYY')
+			) actions
+		GROUP BY month
+		ORDER BY LPAD(month, 2, '0')
 	</select>
 	
 	<select id="selectInfoByMonthlyHireExit" parameterType="java.util.List" resultType="java.util.Map">
-	
+		SELECT *
+		FROM (
+		    SELECT 
+		        SUBSTR(emp_hire_date, 1, 4) AS hire_year,
+		        SUBSTR(emp_hire_date, 6, 2) AS hire_month,
+		        SUBSTR(emp_exit_date, 1, 4) AS exit_year,
+		        SUBSTR(emp_exit_date, 6, 2) AS exit_month,
+		        emp_id,
+		        emp_name,
+		        emp_gender,
+		        emp_role_name,
+		        emp_photo,
+		        emp_ssn,
+		        emp_marital_status,
+		        emp_phone,
+		        emp_postcode,
+		        emp_address,
+		        emp_address_detail,
+		        emp_email,
+		        emp_edu,
+		        emp_status_name,
+		        job_type_name,
+		        emp_dept_name,
+		        emp_position_name,
+		        emp_hire_date,
+		        emp_rank_name,
+		        emp_exit_date,
+		        exit_type_name,
+		        emp_bank,
+		        emp_account,
+		        CASE 
+		            WHEN emp_exit_date IS NOT NULL THEN '퇴사'
+		            ELSE '입사'
+		        END AS action_type
+		    FROM emp_list_all
+		    WHERE emp_hire_date IS NOT NULL 
+		       OR emp_exit_date IS NOT NULL
+		) actions
+		WHERE (hire_year = TO_CHAR(SYSDATE, 'YYYY') 
+			OR exit_year = TO_CHAR(SYSDATE, 'YYYY'))
+			<if test="hireExit != null and hireExit.size > 0">
+			AND action_type IN
+				<foreach item="item" index="idx" collection="hireExit" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		ORDER BY hire_year, hire_month, exit_year, exit_month
 	</select>
 	
 	<select id="countDeptByPosition" resultType="java.util.Map">
@@ -236,18 +303,19 @@
 	
 	<select id="countByJobType" resultType="java.util.Map">
 		SELECT 
-			emp_status_name,
-			count(emp_status_name) AS count_status
-		FROM emp_list_all_inc_exitstatus
-		GROUP BY emp_status_name
+			job_type_name,
+			COUNT(job_type_name) AS count_job_type 
+		FROM emp_list_all_exc_exitstatus
+		GROUP BY job_type_name
+		ORDER BY count_job_type desc
 	</select>
 	
 	<select id="selectInfoByJobType" parameterType="java.util.List" resultType="java.util.Map">
 		SELECT 
 			*
-		FROM emp_list_all_inc_exitstatus
+		FROM emp_list_all_exc_exitstatus
 		<if test="jobType != null and jobType.size > 0">
-		WHERE emp_status_name IN 
+		WHERE job_type_name IN 
 			<foreach item="item" index="idx" collection="jobType" open="(" separator="," close=")">
 				#{item}
 			</foreach>
@@ -256,10 +324,12 @@
 	
 	<select id="countByRank" resultType="java.util.Map">
 		SELECT 
-			job_type_name,
-			COUNT(job_type_name) AS count_job_type 
+			emp_rank_name,
+			COUNT(emp_rank_name) AS count_rank
 		FROM emp_list_all_exc_exitstatus
-		GROUP BY job_type_name
+		WHERE emp_rank_name IS NOT NULL
+		GROUP BY emp_rank_name
+		ORDER BY emp_rank_name
 	</select>
 	
 	<select id="selectInfoByRank"  parameterType="java.util.List"  resultType="java.util.Map">
@@ -267,7 +337,7 @@
 			*
 		FROM emp_list_all_exc_exitstatus
 		<if test="rank != null and rank.size > 0">
-		WHERE job_type_name IN 
+		WHERE emp_rank_name IN 
 			<foreach item="item" index="idx" collection="rank" open="(" separator="," close=")">
 				#{item}
 			</foreach>

@@ -133,15 +133,15 @@ public class PersonnelService {
 	}
 	
 	public List<Map<String, Object>> getCountByMonthlyHireExit(){
-		return null; //psMapper.countByMonthlyHireExit();
+		return psMapper.countByMonthlyHireExit();
 	}
 	
 	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> hireExit){
-		return null; //psMapper.selectInfoByMonthlyHireExit(hireExit);
+		return psMapper.selectInfoByMonthlyHireExit(hireExit);
 	}
 	
 	public List<Map<String, Object>> getCountDeptListByPosition() {
-		return psMapper.countDeptByPosition();
+		return null; //psMapper.countDeptByPosition();
 	}
 	
 	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> position){
