@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deepen.domain.PayInfoDTO;
+import com.deepen.domain.PayListDTO;
 import com.deepen.domain.SalaryFormulaDTO;
 import com.deepen.entity.SalaryFormula;
 import com.deepen.service.PayInfoService;
+import com.deepen.service.PayListService;
 import com.deepen.service.SalaryFormulaService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class PayrollController {
 
     private final SalaryFormulaService salaryFormulaService;
     private final PayInfoService payInfoService;
+    private final PayListService payListService;
     
     // 급여 종류 관리 추가 GET
     @GetMapping("/pay-mng")
@@ -114,10 +117,17 @@ public class PayrollController {
         return "payroll/pay_info";
     }
     
-    // 급여 대장 관리
+ // 급여 대장 관리
     @GetMapping("/pay-list")
-    public String payList() {
+    public String payList(
+        @RequestParam(name = "viewType", required = false) String viewType,
+        @RequestParam(name = "keyword", required = false) String keyword,
+        Model model
+    ) {
+        List<PayListDTO> payListSummary = payListService.getMonthlyPayrollSummary(viewType, keyword);
+        model.addAttribute("payListSummary", payListSummary);
         return "payroll/pay_list";
     }
 
+    
 }

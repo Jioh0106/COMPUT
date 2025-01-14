@@ -16,12 +16,10 @@ import com.deepen.entity.PayInfo;
 import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Log
 public class PayInfoService {
@@ -37,7 +35,6 @@ public class PayInfoService {
     }
     
 	  // 급여 내역 저장
-	@Transactional
 	public Map<String, Object> savePayInfo(List<PayInfoDTO> payInfoDTOList) {
 	    Map<String, Object> result = new HashMap<>();
 	    List<String> errors = new ArrayList<>();
@@ -163,6 +160,18 @@ public class PayInfoService {
        }
        return payInfoMapper.getMissingPaymentEmployees(paymentDate);
    }
+   
+   public class SalaryFormulaService {
+
+       public void savePayment(PayInfoDTO payInfoDTO) {
+           try {
+               payInfoMapper.insertPayment(payInfoDTO);
+           } catch (Exception e) {
+               throw new RuntimeException("급여 지급 데이터 삽입 중 오류가 발생했습니다: " + e.getMessage());
+           }
+       }
+   }
+
 }
 
 	

@@ -31,6 +31,12 @@ public interface AbsenceMapper {
 
 	Map<String, String> getEmpSelf(String emp_id);
 
+	List<Map<String, String>> getEmpSerch(String emp_name);
+
+	String getUpdateCommon(String name);
+
+	List<Map<String, Object>> getLowAbsenceList(String emp_id);
+
 
 
 	

@@ -1,6 +1,7 @@
 package com.deepen.domain;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,6 +26,8 @@ public class AbsenceDTO {
 	
 	private Integer request_no;
 	private String absence_remark;
+	private LocalDateTime update_date;
+	private String update_emp_id;
 	
 
 }

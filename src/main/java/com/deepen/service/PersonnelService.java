@@ -13,7 +13,6 @@ import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
 import com.deepen.entity.Employees;
 import com.deepen.mapper.PersonnelMapper;
-import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,9 @@ import lombok.extern.java.Log;
 public class PersonnelService {
 	
 	private final PersonnelRepository psRepo;
-	private final CommonDetailRepository cdRepo;
+	
+	// private final CommonDetailRepository cdRepo;
+	
 	private final PersonnelMapper psMapper;
 	
 	private final PasswordEncoder passwordEncoder;
@@ -112,6 +113,55 @@ public class PersonnelService {
 		
 		return empList;
 	}
-
+	
+	public List<Map<String , Object>> getCountByEdu(){
+		return psMapper.countByEdu();
+	}
+	
+	public List<Map<String , Object>> getInfoListByEdu(List<String> edu){
+		List<Map<String , Object>> infoList = psMapper.selectInfoByEdu(edu);
+		return infoList;
+	}
+	
+	public List<Map<String, Object>> getCountByAgeGroupAndGender(){
+		return psMapper.countByAgeGroupAndGender();
+	}
+	
+	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> gender){
+		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(gender);
+		return infoList;
+	}
+	
+	public List<Map<String, Object>> getCountByMonthlyHireExit(){
+		return null; //psMapper.countByMonthlyHireExit();
+	}
+	
+	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> hireExit){
+		return null; //psMapper.selectInfoByMonthlyHireExit(hireExit);
+	}
+	
+	public List<Map<String, Object>> getCountDeptListByPosition() {
+		return psMapper.countDeptByPosition();
+	}
+	
+	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> position){
+		return null; //psMapper.selectDeptInfoByPosition(position);
+	}
+	
+	public List<Map<String, Object>> getCountListByJobType() {
+		return psMapper.countByJobType();
+	}
+	
+	public List<Map<String, Object>> getInfoListByJobType(List<String> jobType){
+		return psMapper.selectInfoByJobType(jobType);
+	}
+	
+	public List<Map<String, Object>> getCountListByRank(){
+		return psMapper.countByRank();
+	}
+	
+	public List<Map<String, Object>> getInfoListByRank(List<String> rank){
+		return psMapper.selectInfoByRank(rank);
+	}
 }
 

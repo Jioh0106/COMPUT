@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import com.deepen.entity.Employees;
 import com.deepen.entity.Request;
 import com.deepen.repository.AssignmentRepository;
 import com.deepen.repository.PersonnelRepository;
+import com.deepen.mapper.RequestMapper;
 import com.deepen.repository.RequestRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class RequestService {
 	private final RequestRepository rqRepository;
 	private final AssignmentRepository asRepository;
 	private final PersonnelRepository psRepository;
+	private final RequestMapper rqMapper;
 	
 	//로그인한 요청내역 조회
 	public List<RequestDTO> requestAllList(String emp_id){
@@ -92,6 +95,22 @@ public class RequestService {
         return requestDtos;
             
     }
+
+	public Map<String, Object> getAbsenceWithRequest(int request_no) {
+		
+		Map<String, Object> map = rqMapper.getAbsenceWithRequest(request_no);
+		log.info("RequestService -  absence" + map.toString());
+		
+		
+		return map;
+	}
+
+	public void updateAbsenceRequest(Map<String, Object> updateData) {
+		
+		rqMapper.updateStatus(updateData);
+		
+		
+	}
 
 		
 	//중간승인권자, 최종승인권자 로그인 시 -> 요청내역에서 팝업창에서 승인 업데이트 처리
