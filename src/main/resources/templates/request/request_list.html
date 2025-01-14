@@ -167,14 +167,15 @@
 </div><!-- app -->
 
 
-			<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-			<script src="assets/js/bootstrap.bundle.min.js"></script>
-			<script src="assets/js/main.js"></script>
-			<!-- TOAST UI CDN -->
-			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-			 <!-- 제이쿼리 -->
-   			<script th:src="@{/js/jquery-3.7.1.js}"></script>   
-			<script th:inline="javascript">
+		<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+		<script src="assets/js/bootstrap.bundle.min.js"></script>
+		<script src="assets/js/main.js"></script>
+		<!-- TOAST UI CDN -->
+		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+		 <!-- 제이쿼리 -->
+  		<script th:src="@{/js/jquery-3.7.1.js}"></script>   
+  			
+		<script th:inline="javascript">
 			window.empName = /*[[${emp.emp_name}]]*/ 'UNKNOWN';
 			console.log('사원이름', empName);
 			window.empId = /*[[${emp.emp_id}]]*/ 'UNKNOWN';
@@ -206,7 +207,7 @@
 
 				
 				  // 요청 내역 불러오기 (Fetch API)
-		        fetch('/api/request/request-list')
+		        fetch('/api/request/list')
 		            .then(response => {
 		                if (!response.ok) {
 		                    throw new Error('Network response was not ok ' + response.statusText);
@@ -226,20 +227,19 @@
 		
 				
 				
-		// Grid의 row 클릭 이벤트 추가
+			// Grid의 row 클릭 이벤트 추가
 		    grid.on('click', (ev) => {
 		        // 클릭된 row 데이터 가져오기
 		        const rowData = ev.instance.getRow(ev.rowKey);
 		        const request_no = rowData.request_no;
+		        
 				// 팝업 창 열기
-				   const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes";
-				   const popupUrl = `/request-assign-detail?request_no=${request_no}&userRole=${userRole}`; // 요청번호 포함한 URL 생성
 				   window.open(popupUrl, '_blank', popupOptions);
-				   const popupOptions = "width=800,height=650,scrollbars=yes,resizable=yes";
+				   let popupOptions = "width=800,height=650,scrollbars=yes,resizable=yes";
 				   let popupUrl = ''; // 요청번호 포함한 URL 생성
 				   			   
 	   				if(rowData.request_type === '발령') {
-	   					popupUrl = `/request-assign-detail?request_no=${request_no}`;
+	   					popupUrl = `/request-assign-detail?request_no=${request_no}&userRole=${userRole}`;
 	   					
 	   				} else if(rowData.request_type === '휴직') {
 	   					popupUrl = `/request-absence-detail?request_no=${request_no}`;

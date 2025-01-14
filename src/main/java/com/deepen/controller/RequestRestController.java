@@ -29,7 +29,7 @@ public class RequestRestController {
 	
 	
 	//요청내역 전체 불러오기
-	@GetMapping("/request-list")
+	@GetMapping("/list")
     public List<RequestDTO> getRequestList(@AuthenticationPrincipal User user) {
 		String emp_id = user.getUsername(); //로그인한 사원번호
 		
