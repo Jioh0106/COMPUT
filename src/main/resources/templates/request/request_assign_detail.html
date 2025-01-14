@@ -201,14 +201,14 @@
 						
 						<h6 >승인권자 사번</h6> <!-- 로그인한 팀장 이름 담기 -->
 						<div class="form-group">
-							<input type="text" class="form-control me-2" id="emp_id" readonly
-														onchange="calcDate()">
+							<input type="text" class="form-control me-2" id="rj_emp_id" readonly>
+														
 						</div>
 						
 						<h6>승인권자 성명</h6> <!-- 로그인한 팀장 이름 담기 -->
 						<div class="form-group">
-							<input type="text" class="form-control me-2" id="emp_name" readonly
-															onchange="calcDate()">
+							<input type="text" class="form-control me-2" id="rj_emp_name" readonly>
+															
 						</div>
 						
 						<h6>반려사유</h6>
@@ -225,7 +225,7 @@
                             <i class="bx bx-x d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">취소</span>
                         </button>
-                        <button type="button" class="btn btn-primary ml-1"
+                        <button type="button" class="btn btn-primary ml-1" id="rejectBtn"
                             data-bs-dismiss="modal">
                             <i class="bx bx-check d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">등록</span>
@@ -474,6 +474,56 @@
 		    document.querySelector('#approveRequestBtn').addEventListener('click', requestApproval);
 		});//DOMContentLoaded끝	
 			
+		//---------------------------------------------------------------------
+		
+		//반려사유시작
+		document.addEventListener('DOMContentLoaded', function() {
+		    const empId = window.opener.empId; // 부모창의 사원번호 가져오기
+			console.log('사원번호', empId);
+		    const empName = window.opener.empName; // 부모창의 이름 가져오기
+			console.log('사원번호', empName);
+		    // input 태그에 값 넣기
+		    document.getElementById('rj_emp_id').value = empId;
+		    document.getElementById('rj_emp_name').value = empName;
+		});
+		
+		
+		//반려사유 등록
+		document.getElementById('rejectBtn').addEventListener('click', function() {
+		    const requestNo = new URLSearchParams(window.location.search).get('request_no');
+		    const rejectReason = document.getElementById('rejectReason').value;
+
+		    if (!rejectReason.trim()) {
+		        alert('반려사유를 입력하세요.');
+		        return;
+		    }
+
+		    // Ajax 요청으로 반려사유 등록
+		    fetch('/api/reject', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		        body: `request_no=${requestNo}&request_rejection=${encodeURIComponent(rejectReason)}`
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if (data.success) {
+		            alert('반려사유가 등록되었습니다.');
+		            window.close(); // 팝업창 닫기
+		            window.opener.reloadGrid(); // 부모창 그리드 리로드
+		        } else {
+		            alert('반려사유 등록에 실패했습니다.');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('에러 발생:', error);
+		        alert('서버 오류가 발생했습니다.');
+		    });
+		});
+		
+		
+		
+		
+		
 		
 	</script>
 	

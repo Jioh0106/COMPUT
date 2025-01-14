@@ -17,7 +17,7 @@ import lombok.extern.java.Log;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/requestApi")
+@RequestMapping("/api/request")
 @Log
 public class RequestRestController {
 	

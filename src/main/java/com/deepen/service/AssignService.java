@@ -195,5 +195,16 @@ public class AssignService {
 		return asMapper.selectAssign(request_no);
 	}
 	
+	 // 반려사유 등록 및 상태 변경
+    public boolean updateRejection(Integer request_no, String request_rejection) {
+        int updatedRows = asMapper.updateRejection(request_no, request_rejection);
+        return updatedRows > 0; // 성공 여부 반환
+    }
+	
+	//반려사유 조회
+	public RequestDTO getRejection(Integer request_no) {
+		return asMapper.getRejection(request_no);
+	}
+	
 
 }
