@@ -5,18 +5,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import com.deepen.PdfGenerator;
 import com.deepen.domain.PayInfoDTO;
+import com.deepen.entity.PayInfo;
+import com.deepen.repository.PayInfoRepository;
 import com.deepen.service.PayInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +40,9 @@ import lombok.extern.java.Log;
 public class PayrollRestController {
 	
 	private final PayInfoService payInfoService;
+	private final PayInfoRepository payInfoRepository;
+	private final TemplateEngine templateEngine;
+    private final PdfGenerator pdfGenerator;
 
 	 //급여 지급 이력 저장
     @PostMapping("/pay-info/save")
@@ -121,6 +135,43 @@ public class PayrollRestController {
             return ResponseEntity.badRequest().body(Map.of("message", "조회 중 오류가 발생했습니다."));
         }
     }
+    
+ // 급여명세서 PDF 다운로드
+    @GetMapping("/pay-info/{paymentNo}/payslip")
+    public ResponseEntity<ByteArrayResource> downloadPayslip(
+    		@PathVariable("paymentNo") Long paymentNo,
+    		@RequestParam("empName") String empName) throws Exception {
+
+        try {
+            PayInfo payInfo = payInfoRepository.findById(paymentNo)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 급여 정보가 없습니다. paymentNo=" + paymentNo));
+
+            // HTML 템플릿 렌더링
+            Context context = new Context();
+            context.setVariable("payInfo", payInfo);
+            context.setVariable("empName", empName);
+
+            String html = templateEngine.process("payslip", context);
+
+            // PDF 생성
+            byte[] pdfBytes = pdfGenerator.generatePdf(html);
+
+            // 다운로드 응답
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename(payInfo.getEmpId() + "_" + payInfo.getPaymentDate() + "_급여명세서.pdf")
+                    .build());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(pdfBytes.length)
+                    .body(new ByteArrayResource(pdfBytes));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ByteArrayResource(e.getMessage().getBytes()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
-    
-    

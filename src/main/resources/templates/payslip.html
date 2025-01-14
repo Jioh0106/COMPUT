@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>급여명세서</title>
+    <style>
+        body {
+            font-family: "Malgun Gothic", Arial, sans-serif;
+        }
+        .payslip {
+            width: 700px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .payslip-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .payslip-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .payslip-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .payslip-table th, .payslip-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .payslip-table th {
+            background-color: #f0f0f0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .align-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="payslip">
+        <div class="payslip-header">
+            <h1 class="payslip-title">급여명세서</h1>
+            <p>회사명: 아이티윌</p>
+        </div>
+        
+        <table class="payslip-table">
+            <tr>
+                <th>사원번호</th>
+                <td th:text="${payInfo.empId}"></td>
+                <th>사원명</th>
+                <td th:text="${empName}"></td>
+            </tr>
+            <tr>
+                <th>부서</th>
+                <td th:text="${payInfo.departmentName}"></td>
+                <th>직급</th>
+                <td th:text="${payInfo.positionName}"></td>
+            </tr>
+            <tr>
+                <th>기본급</th>
+                <td class="align-right" th:text="${#numbers.formatInteger(payInfo.empSalary, 3, 'COMMA') + '원'}"></td>
+                <th>급여계산일</th>
+                <td th:text="${#temporals.format(payInfo.createAt, 'yyyy-MM-dd')}"></td>
+            </tr>
+        </table>
+        
+        <h2>수당내역</h2>
+        <table class="payslip-table">
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>금액</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>기술수당</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.techAllowance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>근속수당</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.tenureAllowance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>성과상여금</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.performanceBonus, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>명절수당</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.holidayAllowance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>휴가수당</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.leaveAllowance, 3, 'COMMA') + '원'}"></td>
+                </tr>        
+                <tr>
+                    <td>총수당</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.allowAmt, 3, 'COMMA') + '원'}"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>공제내역</h2>
+        <table class="payslip-table">
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>금액</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>국민연금</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.nationalPension, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>장기요양보험</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.longtermCareInsurance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>건강보험</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.healthInsurance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>고용보험</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.employmentInsurance, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>소득세</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.incomeTax, 3, 'COMMA') + '원'}"></td>
+                </tr>
+                <tr>
+                    <td>주민세</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.residentTax, 3, 'COMMA') + '원'}"></td>
+                </tr>       
+                <tr>
+                    <td>총공제</td>
+                    <td class="align-right" th:text="${#numbers.formatInteger(payInfo.deducAmt, 3, 'COMMA') + '원'}"></td>
+                </tr>        
+            </tbody>
+        </table>
+        
+        <h2>실수령액</h2>
+        <p class="payslip-total" th:text="${#numbers.formatInteger(payInfo.netSalary, 3, 'COMMA') + '원'}"></p>
+        
+        <p>위 금액을 정히 영수하고 이의 없음을 확인합니다.</p>
+        <p>영수일: <span th:text="${#temporals.format(payInfo.createAt, 'yyyy년 MM월 dd일')}"></span></p>
+    </div>
+</body>
+</html>

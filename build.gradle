@@ -60,9 +60,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
 	testImplementation 'org.springframework.security:spring-security-test'
 	
+	implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
+	
+	
 	
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+	
+tasks.withType(JavaCompile) {
+    options.compilerArgs += '-parameters'
 }

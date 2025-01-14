@@ -21,16 +21,13 @@
         .tui-grid-cell {
             background-color: #ffffff !important;
         }
-
         #grid {
             width: 100%;
             margin-bottom: 20px;
         }
-
         .tui-grid-content-area {
             overflow-x: auto !important;
         }
-
         .clickable-cell {
             cursor: pointer;
             background-color: #f8f9fa !important;
@@ -38,6 +35,21 @@
         .clickable-cell:hover {
             background-color: #e9ecef !important;
         }
+		#loadingSpinner {
+		    backdrop-filter: blur(2px);
+		}
+		.unsaved-row td {
+		    background-color: #fff3e0 !important;
+		}
+		.tui-grid-cell {
+		    background-color: white;
+		}
+		.tui-grid-cell-required {
+		    background-color: #fff9c4;
+		}
+		.tui-grid-cell-invalid {
+		    background-color: #ffebee;
+		}
     </style>
 
     <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -83,17 +95,25 @@
             data-bs-toggle="modal" data-bs-target="#missingPaymentModal">
         <i class="bi bi-exclamation-circle"></i> 미지급자 조회
     </button>
+	<button type="button" onclick="downloadPayslip()" class="btn btn-outline-primary" 
+	            sec:authorize="hasAnyRole('ATHR001', 'ATHR002', 'ATHR003')">
+	        <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
+	    </button>
 </div>
+
+
                     <!-- 메인 그리드 -->
                     <div id="grid" style="width:100%; height:100%;"></div>
 
                     <!-- 추가/저장/삭제 버튼 -->
                     <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
                         <!-- 권한 설정 -->
-                        <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-                            <button type="button" onclick="addPaymentRow()" class="btn btn-outline-secondary">추가</button>
-                            <button type="button" onclick="savePaymentData()" class="btn btn-outline-success" style="margin-left: 5px;">저장</button>
-                        </div>
+						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+						    <button type="button" onclick="addPaymentRow()" class="btn btn-outline-secondary">추가</button>
+						    <button type="button" onclick="bulkCalculateAndSave()" class="btn btn-outline-primary">
+						        <i class="bi bi-calculator"></i> 일괄 계산/저장
+						    </button>
+						</div>
                     </div>
                 </div>
             </div>
@@ -120,10 +140,12 @@
                     <!-- 사원 목록 그리드 -->
                     <div id="employeeGrid" style="width: 100%; margin-top: 15px;"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" onclick="selectEmployee()">선택</button>
-                </div>
+				<div class="modal-footer">
+				    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				    <button type="button" class="btn btn-primary" onclick="addMissingEmployees()">
+				        선택 직원 추가
+				    </button>
+				</div>
             </div>
         </div>
     </div>
@@ -143,6 +165,12 @@
                 </div>
                 <div id="missingPaymentMessage" class="alert alert-info mb-3"></div>
                 <div id="missingPaymentGrid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="addMissingEmployees()">
+                    선택 직원 추가
+                </button>
             </div>
         </div>
     </div>
