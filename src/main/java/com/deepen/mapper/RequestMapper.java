@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 public interface RequestMapper {
 
 	Map<String, Object> getAbsenceWithRequest(int request_no);
+
+	void updateStatus(Map<String, Object> updateData);
 	
 	
 
