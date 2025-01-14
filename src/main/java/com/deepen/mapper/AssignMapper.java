@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.deepen.domain.AssignmentDTO;
 import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
+import com.deepen.domain.RequestDTO;
 
 @Mapper
 @Repository
@@ -29,5 +30,12 @@ public interface AssignMapper {
 	//요청번호로 발령테이블 조회
 	AssignmentDTO selectAssign(@Param("request_no") Integer request_no);
 	
+	//반려사유 업데이트 및 상태 변경
+	 Integer updateRejection(@Param("request_no") Integer request_no,
+             @Param("request_rejection") String request_rejection);
+	
+	
+	//반려사유 조회
+	RequestDTO getRejection(@Param("request_no") Integer request_no);
 	
 }

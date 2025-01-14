@@ -4,6 +4,103 @@
 
 <mapper namespace="com.deepen.mapper.VacationMapper">
 
+	<select id="selectEmpAthr" parameterType="String" resultType="map">
+		SELECT emp_id, emp_role, emp_dept, emp_no
+		FROM employees
+		WHERE emp_id = #{value}
+	</select>
+	
+	<select id="selectUseVctnList" parameterType="hashMap" resultType="map">
+		SELECT
+			  emp.emp_id AS "empId"
+			, emp.emp_name AS "empNm"
+			, dept.common_detail_name AS "deptNm"
+			, TO_CHAR(vctn.vacation_start, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(vctn.vacation_end, 'YYYY-MM-DD') AS "useDate"
+			, se.common_detail_name AS "seNm"
+			, vctn.vacation_total AS "useDays"
+		FROM 
+			vacation vctn
+		LEFT JOIN
+			employees emp
+		ON
+			vctn.vacation_leave = emp.emp_id
+		LEFT JOIN
+			common_detail dept
+		ON
+			emp.emp_dept = dept.common_detail_code
+		LEFT JOIN
+			common_detail se
+		ON
+			vctn.vacation_type = se.common_detail_code
+		LEFT JOIN
+			request rqst
+		ON
+			vctn.request_no = rqst.request_no
+		<where>
+				<!--AND rqst.request_status = 'RQST001'-->
+			<if test='empRole == "ATHR002"'>
+			 	AND emp.emp_dept = #{empDept}
+			</if>
+			<if test='empRole == "ATHR003"'>
+			 	AND vctn.vacation_leave = #{empId}
+			</if>
+			<if test="bgnDate != null and bgnDate != '' and endDate != null and endDate != ''">
+	            AND vctn.vacation_start <![CDATA[ <= ]]> #{endDate}
+	            AND vctn.vacation_end <![CDATA[ >= ]]> #{bgnDate}
+        	</if>
+			<if test="empInfo != null and empInfo != ''">
+	            AND (emp.emp_id LIKE '%' || #{empInfo} || '%' 
+	            OR emp.emp_name LIKE '%' || #{empInfo} || '%')
+        	</if>
+		</where>
+		ORDER BY
+			vctn.vacation_start DESC
+	</select>
+	
+	<select id="selectVctnDaysList" parameterType="hashMap" resultType="map">
+		SELECT
+			  emp.emp_id AS "empId"
+			, emp.emp_name AS "empNm"
+			, dept.common_detail_name AS "deptNm"
+			, SUM(vctn.vacation_total) AS "useDays"
+			, emp.emp_no
+		FROM 
+			vacation vctn
+		LEFT JOIN
+			employees emp
+		ON
+			vctn.vacation_leave = emp.emp_id
+		LEFT JOIN
+			common_detail dept
+		ON
+			emp.emp_dept = dept.common_detail_code
+		LEFT JOIN
+			request rqst
+		ON
+			vctn.request_no = rqst.request_no
+		<where>
+				<!--AND rqst.request_status = 'RQST001'-->
+			<if test='empRole == "ATHR002"'>
+			 	AND emp.emp_dept = #{empDept}
+			</if>
+			<if test='empRole == "ATHR003"'>
+			 	AND vctn.vacation_leave = #{empId}
+			</if>
+			<if test="bgnDate != null and bgnDate != '' and endDate != null and endDate != ''">
+	            AND vctn.vacation_start <![CDATA[ <= ]]> #{endDate}
+	            AND vctn.vacation_end <![CDATA[ >= ]]> #{bgnDate}
+        	</if>
+			<if test="empInfo != null and empInfo != ''">
+	            AND (emp.emp_id LIKE '%' || #{empInfo} || '%' 
+	            OR emp.emp_name LIKE '%' || #{empInfo} || '%')
+        	</if>
+		</where>
+		GROUP BY
+			emp.emp_id, emp.emp_name, dept.common_detail_name, emp.emp_no
+		ORDER BY
+			emp.emp_no
+	</select>
+
 	<select id="selectCommonDtl" resultType="map">
 		SELECT
 			  common_detail_code AS code
@@ -20,6 +117,24 @@
 	</select>
 	
 	<select id="selectEmpInfo" resultType="map" parameterType="String">
+		SELECT 
+			  emp_id AS "empId"
+			, emp_no AS "empNo"
+			, emp_name AS "empName"
+			, emp_role AS "empRole"
+			, emp_dept AS "empDept"
+			, TO_CHAR(emp_hire_date, 'YYYYMMDD') AS "hireDate"
+			, (SELECT NVL2(SUM(vacation_total), SUM(vacation_total), 0) 
+				FROM vacation 
+				WHERE vacation_leave = #{value}
+				AND EXTRACT(YEAR FROM vacation_start) = EXTRACT(YEAR FROM SYSDATE)) AS "total"
+		FROM 
+			employees
+		WHERE 
+			emp_id = #{value}
+	</select>
+	
+	<select id="vctnDays" resultType="map" parameterType="String">
 		SELECT 
 			  emp_id AS "empId"
 			, emp_no AS "empNo"
@@ -60,6 +175,55 @@
 		ORDER BY
 			emp_no
 	</select>
+	
+	<insert id="insertRequest" parameterType="map">
+		INSERT INTO request (
+		    request_type
+		  , request_status
+		  , request_date
+		  , request_deadline
+		  , middle_approval
+		  , emp_id
+		
+		) VALUES ( 
+		    #{rqstType}
+		  , #{status}
+		  , CURRENT_DATE
+		  , CURRENT_DATE + 5
+		  , #{aprvId}
+		  , #{leaveId}
+		)
+		
+		<selectKey resultType="int" keyProperty="no" order="AFTER">
+       		SELECT "ISEQ$$_83626".currval FROM dual
+    	</selectKey>
+	</insert>
+	
+	<insert id="insertVctn" parameterType="map">
+		INSERT INTO vacation (
+		    vacation_no
+		  , vacation_type
+		  , vacation_start
+		  , vacation_end
+		  , vacation_appdate
+		  , vacation_total
+		  , vacation_leave
+		  , vacation_approve
+		  , request_no
+		
+		) VALUES ( 
+		    vacation_seq.nextval
+		  , #{vctnType}
+		  , TO_DATE(#{startDate})
+		  , TO_DATE(#{endDate})
+		  , sysdate
+		  , #{total}
+		  , #{leaveId}
+		  , #{aprvId}
+		  , #{no}
+		)
+	</insert>
+
 
 </mapper>
 

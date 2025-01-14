@@ -10,6 +10,21 @@
 		WHERE REQUEST_NO = #{request_no}
 	</select>
     
+	<update id="updateStatus" parameterType="java.util.Map">
+		UPDATE request
+		SET 
+			request_status = #{status}
+			<if test="rejection != null">
+				, REQUEST_REJECTION = #{rejection}
+			</if>		
+			<if test="high != null">
+				, HIGH_APPROVAL = #{high}
+			</if>		
+		WHERE request_no = #{request_no}
+	</update>
+	
+	
+	
 	
 </mapper>
 

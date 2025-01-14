@@ -88,7 +88,29 @@
 	</select>
 	
 	
+	<!--반려사유 업데이트-->
+	<update id="updateRejection" parameterType="map">
+		update request
+		set request_rejection = #{request_rejection},
+		request_status =  
+				CASE 
+	            WHEN request_status = 'RQST001' THEN 'RQST002'
+	            WHEN request_status = 'RQST003' THEN 'RQST004'
+	        	END
+	    WHERE request_no = #{request_no}
+	</update>
 	
+	<!--반려사유 조회-->
+	<select id="getRejection" parameterType="java.lang.Integer" resultType="com.deepen.domain.RequestDTO">
+		SELECT 
+        request_no,
+        request_rejection,
+        request_status
+   	 FROM 
+        request
+     WHERE 
+        request_no = #{request_no}
+	</select>
 	
 	
 </mapper>

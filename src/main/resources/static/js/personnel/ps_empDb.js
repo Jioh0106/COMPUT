@@ -4,34 +4,13 @@ Grid.applyTheme('clean'); // 테마 적용
 const empInfoList = new Grid({
 	el: document.getElementById('grid'),
 	  data: [], // 초기 데이터
-	  //rowHeaders: ['checkbox'],
-	  //scrollX: false,
-	  //scrollY: false,
 	  bodyHeight: 200,
 	  columns: [
-	    { 
-			header: '사원번호', 
-			name: 'EMP_ID',
-		},
-	    { 
-			header: '이름', 
-			name: 'EMP_NAME',
-		},
-	    { 
-			header: '부서명', 
-			name: 'EMP_DEPT_NAME',
-			//filter : 'select'
-		},
-	    { 
-			header: '직급명', 
-			name: 'EMP_POSITION_NAME',
-			//filter : 'select'
-		},
-	    { 
-			header: 'E-mail', 
-			name: 'EMP_EMAIL',
-			//filter : 'select'
-		}
+		{ header: '사원번호', name: 'EMP_ID'},
+	    { header: '이름', name: 'EMP_NAME'},
+	    { header: '부서명', name: 'EMP_DEPT_NAME'},
+	    { header: '직급명', name: 'EMP_POSITION_NAME'},
+	    { header: 'E-mail', name: 'EMP_EMAIL'}
 	  ],
 	  columnOptions: {
 	          resizable: true
@@ -53,11 +32,9 @@ categoryMenu.addEventListener("input",() => {
 	if(selectCategory==="학력별"){
 		empChartContainer.innerHTML = "<div id='empChart'></div>";
         countByEdu();
-		//infoListByEdu();
 	}else if(selectCategory==="연령별"){
 		empChartContainer.innerHTML = "<div id='empGroupStackBarChart'></div>";
       	countByAgeAndGender();
-		//infoListByAgeGroup();
 	}
 });
 
@@ -66,15 +43,13 @@ function initChart(){
 	const defaultCategory = categoryMenu.value;
 	
 	if(defaultCategory === "학력별"){
-		defaultCategory.innerHTML="<div id='empChart'></div>";
+		empChartContainer.innerHTML="<div id='empChart'></div>";
 		countByEdu();
-		//infoListByEdu();	
 	}
 	
 	if(defaultCategory === "연령별"){
-		defaultCategory.innerHTML = "<div id='empGroupStackBarChart'></div>";
+		empChartContainer.innerHTML = "<div id='empGroupStackBarChart'></div>";
 		countByAgeAndGender();
-		//infoListByAgeGroup();
 	}
 }
 
@@ -174,12 +149,6 @@ async function infoListByEdu(eduArray){
 	}
 }
 
-//
-function test(){
-	const checkedLegend = empPieChart.getCheckedLegend()
-	console.log(checkedLegend);
-}
-
 async function countByAgeAndGender(){
 	try{
 		const response = await fetch("http://localhost:8082/api/count-by-ageGroupAndGender");
@@ -223,8 +192,8 @@ async function countByAgeAndGender(){
 			const checkedLegend = empGroupStackBarChart.getCheckedLegend();
 			//console.log("checkedLegend",checkedLegend);
 			if(checkedLegend){
-				const ageGroupArray = checkedLegend.map(item => item.label);
-				infoListByAgeGroup(ageGroupArray);
+				const genderArray = checkedLegend.map(item => item.label);
+				infoListByAgeGroup(genderArray);
 			}
 		});
 			
@@ -234,16 +203,16 @@ async function countByAgeAndGender(){
 	
 }
 
-async function infoListByAgeGroup(ageGroupArray){
+async function infoListByAgeGroup(genderArray){
 	try{
-		if(ageGroupArray.length === 0){
+		if(genderArray.length === 0){
 				console.log("차트라벨을 선택하지 않았습니다.(groupBarChart)");
 		        empInfoList.resetData([]);
 			return;
 		}
 		
 		const param = new URLSearchParams();
-		ageGroupArray.forEach(item => param.append("ageGroupByGender",item));
+		genderArray.forEach(item => param.append("gender",item));
 		
 		const response = await fetch(`http://localhost:8082/api/infoList-by-ageGroup?${param.toString()}`);
 		if(!response.ok){

@@ -52,7 +52,7 @@ public class SecurityConfig {
 						.loginProcessingUrl("/loginPro")
 						.usernameParameter("emp_id")
 						.passwordParameter("emp_pw")
-						.defaultSuccessUrl("/")
+						.defaultSuccessUrl("/", true)
 						.failureUrl("/login")
 						)
 				.logout(logoutCustomizer

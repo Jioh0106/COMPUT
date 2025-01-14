@@ -357,26 +357,20 @@
 			        return !isNaN(absenceNo) && absenceNo > max ? absenceNo : max;
 			    }, 0);
 			    
+				// 행 추가 시 신청일 현재 시간으로 세팅
 				const now = new Date(); // 현재 날짜와 시간 가져오기
-
-				// 년, 월, 일
 				const year = now.getFullYear();
 				const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
 				const day = String(now.getDate()).padStart(2, '0');
-
-				// 시간, 분
 				const hours = String(now.getHours()).padStart(2, '0');
 				const minutes = String(now.getMinutes()).padStart(2, '0');
-				
-				// 행 추가 시 신청일은 현재 시간
 				let request_date = `${year}-${month}-${day} ${hours}:${minutes}`;
-
+				
 				let high_approval = '';
 				// 사용자가 high 권한자라면 승인 절차 생략
 				if(emp_role === 'ATHR001') {
 					high_approval = "2025010928";
 				}
-				
 				
 				// 기본값으로 새 행 데이터 생성
 				const newRow = {
@@ -624,7 +618,7 @@
 						{ 
 							header: '휴직 시작일', 
 							name: 'ABSENCE_START',
-							width: 100,
+							width: 120,
 							editor: isEditable
 								? {
 				                type: 'datePicker',
@@ -643,7 +637,7 @@
 				        { 
 							header: '휴직 종료일', 
 							name: 'ABSENCE_END',
-							width: 100,
+							width: 120,
 							editor: isEditable 
 								? {
 				                type: 'datePicker',
@@ -682,7 +676,7 @@
 				        { 
 							header: '최종 승인자', 
 							name: 'HIGH_APPROVAL', 
-							width: 150,
+							width: 160,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
 							editor: isEditable
 								? {
@@ -751,7 +745,7 @@
 			
 			// 사원 조회 모달창 표시 함수
 			function showEmpModal(rowKey, columnName) {
-			    const $modal = $('#empSerchModal'); // 모달창 요소
+			    const modal = $('#empSerchModal'); // 모달창 요소
 
 			    // Toast UI Grid 초기화 (최초 1회만 실행)
 			    if (!modalGrid) {
@@ -769,7 +763,7 @@
 			    }
 				
 				// 모달 열릴 때 입력 필드와 그리드 초기화
-				$modal.on('show.bs.modal', function () {
+				modal.on('show.bs.modal', function () {
 				    $('#new_emp_serch').val(''); // 입력 필드 초기화
 					$('#new_emp_serch').focus();
 				    modalGrid.resetData([]); // 그리드 데이터 초기화
@@ -803,7 +797,7 @@
 				        grid.setValue(rowKey, 'EMP_DEPT', selectedRow.EMP_DEPT); // EMP_DEPT 업데이트
 				        grid.setValue(rowKey, 'EMP_POSITION', selectedRow.EMP_POSITION); // EMP_POSITION 업데이트
 
-				        $modal.modal('hide'); // 모달창 닫기
+				        modal.modal('hide'); // 모달창 닫기
 				    } else if (selectedRows.length > 1) {
 				        // 선택된 행이 두 개 이상인 경우 경고 알림
 				        Swal.fire('Error', '하나의 행만 선택해주세요.', 'warning');
@@ -815,7 +809,7 @@
 
 
 			    // 모달창 표시
-			    $modal.modal('show');
+			    modal.modal('show');
 			}
 
 			// 사원 검색 API 호출 함수

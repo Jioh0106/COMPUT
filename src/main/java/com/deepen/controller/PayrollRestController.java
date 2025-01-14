@@ -30,7 +30,9 @@ import com.deepen.domain.PayInfoDTO;
 import com.deepen.entity.PayInfo;
 import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
+import com.deepen.domain.PayListDTO;
 import com.deepen.service.PayInfoService;
+import com.deepen.service.PayListService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -45,7 +47,8 @@ public class PayrollRestController {
 	private final PayInfoRepository payInfoRepository;
 	private final PayInfoMapper payInfoMapper;
 	private final TemplateEngine templateEngine;
-    private final PdfGenerator pdfGenerator;
+  private final PdfGenerator pdfGenerator;
+	private final PayListService payListService;
 
 	 //급여 지급 이력 저장
     @PostMapping("/pay-info/save")
@@ -182,6 +185,39 @@ public class PayrollRestController {
             log.severe("PDF 생성 중 오류 발생: " + e.getMessage());
             e.printStackTrace(); // 개발 중에는 상세 로그 확인용
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
+    //==============   급여 대장 이력  ===================
+    
+    // 월별 급여 대장 메인
+    @GetMapping("/pay-list/summary")
+    public ResponseEntity<?> getMonthlyPayrollSummary(
+        @RequestParam(name = "keyword", required = false) String keyword
+    ) {
+        try {
+            log.info("REST Controller - Received search request with keyword: " + keyword);
+            List<PayListDTO> summary = payListService.getMonthlyPayrollSummary(null, keyword);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            log.severe("Error in getMonthlyPayrollSummary: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "조회 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+    
+    //급여 대장 모달
+    @GetMapping("/pay-list/detail")
+    public ResponseEntity<?> getMonthlyPayrollDetail(
+        @RequestParam(name = "paymentDate") String paymentDate
+    ) {
+        try {
+            List<PayListDTO> detail = payListService.getMonthlyPayrollDetail(paymentDate, null);
+            return ResponseEntity.ok(detail);
+        } catch (Exception e) {
+            log.severe("Error in getMonthlyPayrollDetail: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "상세 정보 조회 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 }
