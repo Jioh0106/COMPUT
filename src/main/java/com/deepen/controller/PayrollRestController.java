@@ -47,7 +47,7 @@ public class PayrollRestController {
 	private final PayInfoRepository payInfoRepository;
 	private final PayInfoMapper payInfoMapper;
 	private final TemplateEngine templateEngine;
-  private final PdfGenerator pdfGenerator;
+	private final PdfGenerator pdfGenerator;
 	private final PayListService payListService;
 
 	 //급여 지급 이력 저장
@@ -187,7 +187,7 @@ public class PayrollRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-}
+
     //==============   급여 대장 이력  ===================
     
     // 월별 급여 대장 메인
