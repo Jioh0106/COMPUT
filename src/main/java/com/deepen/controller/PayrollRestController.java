@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.thymeleaf.context.Context;
 import com.deepen.PdfGenerator;
 import com.deepen.domain.PayInfoDTO;
 import com.deepen.entity.PayInfo;
+import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
 import com.deepen.service.PayInfoService;
 
@@ -41,6 +43,7 @@ public class PayrollRestController {
 	
 	private final PayInfoService payInfoService;
 	private final PayInfoRepository payInfoRepository;
+	private final PayInfoMapper payInfoMapper;
 	private final TemplateEngine templateEngine;
     private final PdfGenerator pdfGenerator;
 
@@ -139,38 +142,45 @@ public class PayrollRestController {
  // 급여명세서 PDF 다운로드
     @GetMapping("/pay-info/{paymentNo}/payslip")
     public ResponseEntity<ByteArrayResource> downloadPayslip(
-    		@PathVariable("paymentNo") Long paymentNo,
-    		@RequestParam("empName") String empName) throws Exception {
-
+            @PathVariable("paymentNo") Long paymentNo,
+            @RequestParam("empName") String empName) {
         try {
+            // PayInfo 조회 (기존 코드 유지)
             PayInfo payInfo = payInfoRepository.findById(paymentNo)
                     .orElseThrow(() -> new IllegalArgumentException("해당 급여 정보가 없습니다. paymentNo=" + paymentNo));
-
-            // HTML 템플릿 렌더링
+            
+            // PayInfoDTO로 변환하여 부서/직급 정보 포함
+            PayInfoDTO payInfoDTO = payInfoMapper.getAllPayInfo().stream()
+                    .filter(dto -> dto.getPaymentNo().equals(paymentNo))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("해당 급여 정보를 찾을 수 없습니다."));
+            
+            // Context 설정
             Context context = new Context();
             context.setVariable("payInfo", payInfo);
             context.setVariable("empName", empName);
-
-            String html = templateEngine.process("payslip", context);
-
+            context.setVariable("departmentName", payInfoDTO.getDepartmentName());
+            context.setVariable("positionName", payInfoDTO.getPositionName());
+            
             // PDF 생성
+            String html = templateEngine.process("payslip", context);
             byte[] pdfBytes = pdfGenerator.generatePdf(html);
-
-            // 다운로드 응답
+            
+            // 응답 생성
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.builder("attachment")
-                    .filename(payInfo.getEmpId() + "_" + payInfo.getPaymentDate() + "_급여명세서.pdf")
+                    .filename(payInfo.getEmpId() + "_" + payInfo.getPaymentDate() + "_급여명세서.pdf", StandardCharsets.UTF_8)
                     .build());
-
+            
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(pdfBytes.length)
                     .body(new ByteArrayResource(pdfBytes));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ByteArrayResource(e.getMessage().getBytes()));
+            
         } catch (Exception e) {
+            log.severe("PDF 생성 중 오류 발생: " + e.getMessage());
+            e.printStackTrace(); // 개발 중에는 상세 로그 확인용
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

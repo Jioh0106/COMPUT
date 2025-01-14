@@ -405,7 +405,7 @@ function updateGridWithSelectedEmployee(employee) {
     grid.addRowClassName(rowKey, 'unsaved-row');
 
     // 지급월 입력 받기
-    const paymentDate = prompt('지급월을 입력하세요 (예: 2024-01)');
+    const paymentDate = prompt('지급월을 입력하세요 (예: 2025-12)');
     if (paymentDate) {
         const formattedDate = formatPaymentMonth(paymentDate);
         if (formattedDate) {
@@ -413,9 +413,13 @@ function updateGridWithSelectedEmployee(employee) {
             // 급여 계산만 실행 (저장하지 않음)
             calculateSalary(employee.empId, formattedDate, rowKey);
         } else {
-            alert('올바른 지급월 형식으로 입력해주세요 (예: 2024-01)');
+            alert('올바른 지급월 형식으로 입력해주세요 (예: 2025-12)');
         }
     }
+	if (!paymentDate) {
+	    grid.removeRow(rowKey);
+	    return;
+	}
 
     closeEmployeeModal();
 }
@@ -780,11 +784,12 @@ function savePaymentData() {
     // 데이터 유효성 검사
     for (const row of modifiedData) {
         if (row.paymentDate) {
-            const formatted = formatPaymentMonth(row.paymentDate);
-            if (!formatted) {
-                alert('올바르지 않은 지급월 형식이 있습니다.\n예: 2025-01 또는 202501');
-                return;
-            }
+			const formattedDate = formatPaymentMonth(paymentDate);
+			if (!formattedDate || !validatePaymentDate(formattedDate)) {
+			    alert('올바른 지급월이 아니거나 미래의 지급월입니다.');
+			    grid.removeRow(rowKey);
+			    return;
+			}
             row.paymentDate = formatted;
         }
     }
@@ -872,7 +877,7 @@ function savePaymentData() {
 		function addPaymentRow() {
 		    const rowData = {};
 		    const newRowKey = grid.getRowCount();
-		    grid.appendRow(rowData);
+		    grid.prependRow(rowData);
 		    grid.addRowClassName(newRowKey, 'unsaved-row');
 		    
 		    // 새로 추가된 행 선택
@@ -995,11 +1000,12 @@ function savePaymentData() {
 		        });
 
 		        // 지급월 입력 받기
-		        const paymentDate = prompt('지급월을 입력하세요 (예: 2024-01)');
-		        if (!paymentDate) {
-		            grid.removeRow(rowKey);
-		            return;
-		        }
+				const validatedDate = handlePaymentDateInput();
+				        if (!validatedDate) {
+				            grid.removeRow(rowKey);
+				            closeEmployeeModal();
+				            return;
+				        }
 
 		        const formattedDate = formatPaymentMonth(paymentDate);
 		        if (!formattedDate) {
@@ -1009,7 +1015,7 @@ function savePaymentData() {
 		        }
 
 		        // 지급월 설정
-		        grid.setValue(rowKey, 'paymentDate', formattedDate);
+		        grid.setValue(rowKey, 'paymentDate', validatedDate);
 
 		        // 급여 계산 실행 (저장하지 않고 그리드에만 표시)
 		        await calculateSalary(employee.empId, formattedDate, rowKey);
@@ -1027,49 +1033,131 @@ function savePaymentData() {
 		
 		// 급여명세서 다운로드 요청 함수
 		async function downloadPayslip() {
-		    const checkedRows = grid.getCheckedRows();
-		    if (checkedRows.length === 0) {
-		        alert('명세서를 출력할 항목을 선택해주세요.');
-		        return;
-		    }
-		    if (checkedRows.length > 1) {
-		        alert('명세서는 한 번에 한 건만 출력할 수 있습니다.');
-		        return;
-		    }
-
-		    const paymentNo = checkedRows[0].paymentNo;
-		    const empName = checkedRows[0].empName;
-		    if (!paymentNo) {
-		        alert('저장되지 않은 데이터는 명세서를 출력할 수 없습니다.');
-		        return;
-		    }
-
 		    try {
-		        // 로딩 스피너 표시
+		        const checkedRows = grid.getCheckedRows();
+		        if (checkedRows.length === 0) {
+		            alert('명세서를 출력할 항목을 선택해주세요.');
+		            return;
+		        }
+		        if (checkedRows.length > 1) {
+		            alert('명세서는 한 번에 한 건만 출력할 수 있습니다.');
+		            return;
+		        }
+
+		        const row = checkedRows[0];
+		        if (!row.paymentNo) {
+		            alert('저장되지 않은 데이터는 명세서를 출력할 수 없습니다.');
+		            return;
+		        }
+
 		        showLoadingSpinner();
 
-		        // 서버에 PDF 다운로드 요청
-		        const url = `/api/payroll/pay-info/${paymentNo}/payslip?empName=${encodeURIComponent(empName)}`;
-		        const response = await fetch(url);
+		        const response = await fetch(
+		            `/api/payroll/pay-info/${row.paymentNo}/payslip?empName=${encodeURIComponent(row.empName)}`,
+		            {
+		                headers: {
+		                    [header]: token
+		                }
+		            }
+		        );
 
-		        if (response.ok) {
-		            const blob = await response.blob();
-		            const url = window.URL.createObjectURL(blob);
-		            const a = document.createElement('a');
-		            a.href = url;
-		            a.download = `${empName}_${checkedRows[0].paymentDate}_급여명세서.pdf`;
-		            document.body.appendChild(a);
-		            a.click();
-		            a.remove();
-		            window.URL.revokeObjectURL(url);
-		        } else {
-		            throw new Error(`${response.status} ${response.statusText}`);
+		        if (!response.ok) {
+		            throw new Error(`HTTP error! status: ${response.status}`);
 		        }
+
+		        const blob = await response.blob();
+		        const url = window.URL.createObjectURL(blob);
+		        const a = document.createElement('a');
+		        a.href = url;
+		        a.download = `${row.empName}_${row.paymentDate}_급여명세서.pdf`;
+		        document.body.appendChild(a);
+		        a.click();
+		        window.URL.revokeObjectURL(url);
+		        a.remove();
+
 		    } catch (error) {
-		        console.error('명세서 다운로드 실패:', error);
-		        alert('명세서 다운로드 중 오류가 발생했습니다.');
+		        console.error('PDF 다운로드 중 오류:', error);
+		        alert('급여명세서 다운로드 중 오류가 발생했습니다. 관리자에게 문의하세요.');
 		    } finally {
-		        // 로딩 스피너 숨김
 		        hideLoadingSpinner();
 		    }
 		}
+		
+		// 삭제 버튼
+		function deleteRows() {
+		    const checkedRows = grid.getCheckedRows();
+		    
+		    if (checkedRows.length === 0) {
+		        alert('삭제할 항목을 선택해주세요.');
+		        return;
+		    }
+
+		    // 저장된 데이터가 있는지 확인
+		    const hasSavedData = checkedRows.some(row => row.paymentNo);
+		    if (hasSavedData) {
+		        alert('이미 저장된 데이터는 삭제할 수 없습니다.');
+		        return;
+		    }
+
+		    if (confirm(`선택한 ${checkedRows.length}건을 삭제하시겠습니까?`)) {
+		        checkedRows.forEach(row => {
+		            grid.removeRow(row.rowKey);
+		        });
+		    }
+		}
+		
+		// 지급일 설정 및 검증
+		function validatePaymentDate(value) {
+			// 날짜 형식 정규식 (YYYY-MM 또는 YYYYMM)
+			    const dateRegex = /^(\d{4})-?(\d{2})$/;
+			    const match = value.match(dateRegex);
+			    
+			    if (!match) {
+			        return null;
+			    }
+			    
+			    const year = parseInt(match[1]);
+			    const month = parseInt(match[2]);
+			    
+			    // 기본 유효성 검사
+			    if (year < 2000 || year > 2100 || month < 1 || month > 12) {
+			        return null;
+			    }
+			    
+			    // 현재 날짜 가져오기
+			    const today = new Date();
+			    const currentYear = today.getFullYear();
+			    const currentMonth = today.getMonth() + 1; // JavaScript의 월은 0부터 시작
+			    
+			    // 미래 날짜 체크
+			    if (year > currentYear || (year === currentYear && month > currentMonth)) {
+			        return null;
+			    }
+			    
+			    // YYYY-MM 형식으로 반환
+			    return `${year}-${month.toString().padStart(2, '0')}`;
+			}
+			
+			// 지급월 입력 처리 함수
+			function handlePaymentDateInput() {
+			    let isValid = false;
+			    let formattedDate = null;
+			    
+			    while (!isValid) {
+			        const paymentDate = prompt('지급월을 입력하세요 (예: 2024-01 또는 202401)');
+			        
+			        if (!paymentDate) {
+			            return null; // 취소 버튼을 눌렀을 경우
+			        }
+			        
+			        formattedDate = validatePaymentDate(paymentDate);
+			        
+			        if (formattedDate) {
+			            isValid = true;
+			        } else {
+			            alert('올바른 지급월이 아니거나 미래의 지급월입니다.\n현재 월까지만 입력 가능합니다.');
+			        }
+			    }
+			    
+			    return formattedDate;
+			}

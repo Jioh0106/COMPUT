@@ -110,9 +110,11 @@
                         <!-- 권한 설정 -->
 						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
 						    <button type="button" onclick="addPaymentRow()" class="btn btn-outline-secondary">추가</button>
+						    <button type="button" onclick="deleteRows()" class="btn btn-outline-danger">삭제</button>
 						    <button type="button" onclick="bulkCalculateAndSave()" class="btn btn-outline-primary">
-						        <i class="bi bi-calculator"></i> 일괄 계산/저장
+						        저장
 						    </button>
+						    
 						</div>
                     </div>
                 </div>
