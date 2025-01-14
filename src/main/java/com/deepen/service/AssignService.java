@@ -2,7 +2,9 @@ package com.deepen.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -197,7 +199,11 @@ public class AssignService {
 	
 	 // 반려사유 등록 및 상태 변경
     public boolean updateRejection(Integer request_no, String request_rejection) {
-        int updatedRows = asMapper.updateRejection(request_no, request_rejection);
+    	Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("request_no", request_no);
+        paramMap.put("request_rejection", request_rejection);
+
+        int updatedRows = asMapper.updateRejection(paramMap);
         return updatedRows > 0; // 성공 여부 반환
     }
 	

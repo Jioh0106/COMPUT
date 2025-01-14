@@ -20,6 +20,7 @@ import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
 import com.deepen.domain.RequestDTO;
 import com.deepen.service.AssignService;
+import com.deepen.service.RequestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -31,6 +32,7 @@ import lombok.extern.java.Log;
 public class AssignRestController {
 
 	private final AssignService asService;
+	private final RequestService rqService;
 	
 	
 	//발령등록페이지 공통코드 연결
@@ -76,12 +78,16 @@ public class AssignRestController {
 		
 		RequestDTO requestDto = asService.getRequestDivision(emp_id, request_no);
 		AssignmentDTO requestAssign = asService.selectAssign(request_no);
+		 Map<String, Object> requestStatus = rqService.getRequest(request_no); // 요청 상태 가져오기
+		log.info("맵새끼ㅡㅡ"+requestStatus.toString());
 		log.info("@@해당요청번호로 발령조회"+requestAssign.toString());
 		log.info("@@요청구분!!발신수신@@"+ requestDto.getRequest_division());
+		log.info("ㅗㅗ요청상태!!제발제발"+ requestStatus.get("REQUEST_STATUS"));
 		
 		Map<String, Object> response = new HashMap<>();
 		response.put("assignment",requestAssign);
 		response.put("request", requestDto);
+		response.put("request_status", requestStatus.get("REQUEST_STATUS")); //상태추가
 		
 		return response;
 	}
@@ -89,10 +95,10 @@ public class AssignRestController {
 	
 	//반려사유 업데이트 및 상태변경
     @PostMapping("/reject")
-    public ResponseEntity<Map<String, Object>> updateRequestStatusAndReason(@RequestParam Integer request_no,
-                                                                            @RequestParam String request_rejection) {
+    public ResponseEntity<Map<String, Object>> updateRequestStatusAndReason(@RequestParam("request_no") Integer request_no,
+                                                                            @RequestParam("request_rejection") String request_rejection) {
         boolean isUpdated = asService.updateRejection(request_no, request_rejection);
-
+        
         if (isUpdated) {
             return ResponseEntity.ok(Collections.singletonMap("success", true));
         } else {
@@ -102,7 +108,7 @@ public class AssignRestController {
 
     // 반려사유 조회
     @GetMapping("/reject/reason")
-    public ResponseEntity<RequestDTO> getRejectReason(@RequestParam Integer request_no) {
+    public ResponseEntity<RequestDTO> getRejectReason(@RequestParam("request_no") Integer request_no) {
         RequestDTO rejectReason = asService.getRejection(request_no);
         if (rejectReason != null) {
             return ResponseEntity.ok(rejectReason);

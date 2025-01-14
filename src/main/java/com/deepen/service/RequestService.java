@@ -145,7 +145,11 @@ public class RequestService {
 	    
 	}
 
-
+	
+	//요청상태 가져오기
+	public Map<String, Object> getRequest(Integer request_no) {
+		return rqMapper.getRequest(request_no);
+	}
 
 
 

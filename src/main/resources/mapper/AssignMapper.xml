@@ -92,7 +92,7 @@
 	<update id="updateRejection" parameterType="map">
 		update request
 		set request_rejection = #{request_rejection},
-		request_status =  
+			request_status =  
 				CASE 
 	            WHEN request_status = 'RQST001' THEN 'RQST002'
 	            WHEN request_status = 'RQST003' THEN 'RQST004'
@@ -111,6 +111,9 @@
      WHERE 
         request_no = #{request_no}
 	</select>
+	
+	
+	
 	
 	
 </mapper>

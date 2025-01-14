@@ -1,6 +1,7 @@
 package com.deepen.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
@@ -31,8 +32,7 @@ public interface AssignMapper {
 	AssignmentDTO selectAssign(@Param("request_no") Integer request_no);
 	
 	//반려사유 업데이트 및 상태 변경
-	 Integer updateRejection(@Param("request_no") Integer request_no,
-             @Param("request_rejection") String request_rejection);
+	 Integer updateRejection(Map<String, Object> paramMap);
 	
 	
 	//반려사유 조회

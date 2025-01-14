@@ -23,7 +23,12 @@
 		WHERE request_no = #{request_no}
 	</update>
 	
-	
+	<!-- 요청내역 상태 가져오기 -->
+	<select id="getRequest" parameterType="java.lang.Integer" resultType="Map">
+	 select *
+	 from request
+	 where request_no = #{request_no}
+	</select>
 	
 	
 </mapper>
