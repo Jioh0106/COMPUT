@@ -119,23 +119,49 @@ public class PersonnelService {
 	}
 	
 	public List<Map<String , Object>> getInfoListByEdu(List<String> edu){
-		//log.info(edu.toString());
 		List<Map<String , Object>> infoList = psMapper.selectInfoByEdu(edu);
-		//log.info(infoList.toString());
-		
 		return infoList;
 	}
 	
 	public List<Map<String, Object>> getCountByAgeGroupAndGender(){
-		
 		return psMapper.countByAgeGroupAndGender();
 	}
 	
-	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> ageGroupByGender){
-		log.info(ageGroupByGender.toString());
-		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(ageGroupByGender);
-		log.info(infoList.toString());
+	public List<Map<String, Object>> getInfoListByAgeGroup(List<String> gender){
+		List<Map<String, Object>> infoList = psMapper.selectInfoByAgeGroup(gender);
 		return infoList;
+	}
+	
+	public List<Map<String, Object>> getCountByMonthlyHireExit(){
+		return null; //psMapper.countByMonthlyHireExit();
+	}
+	
+	public List<Map<String, Object>> getInfoListByMonthlyHireExit(List<String> hireExit){
+		return null; //psMapper.selectInfoByMonthlyHireExit(hireExit);
+	}
+	
+	public List<Map<String, Object>> getCountDeptListByPosition() {
+		return psMapper.countDeptByPosition();
+	}
+	
+	public List<Map<String, Object>> getInfoListByDeptAndPosition(List<String> position){
+		return null; //psMapper.selectDeptInfoByPosition(position);
+	}
+	
+	public List<Map<String, Object>> getCountListByJobType() {
+		return psMapper.countByJobType();
+	}
+	
+	public List<Map<String, Object>> getInfoListByJobType(List<String> jobType){
+		return psMapper.selectInfoByJobType(jobType);
+	}
+	
+	public List<Map<String, Object>> getCountListByRank(){
+		return psMapper.countByRank();
+	}
+	
+	public List<Map<String, Object>> getInfoListByRank(List<String> rank){
+		return psMapper.selectInfoByRank(rank);
 	}
 }
 

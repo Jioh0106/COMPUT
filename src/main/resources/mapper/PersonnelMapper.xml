@@ -98,32 +98,10 @@
 	
 	<select id="selectInfoByEdu" parameterType="java.util.List" resultType="java.util.Map">
 		SELECT 
-			emp_id, 
-			emp_role_name,
-			emp_name,
-			emp_photo,
-			emp_ssn,
-			emp_gender,
-			emp_marital_status,
-			emp_phone,
-			emp_postcode,
-			emp_address,
-			emp_address_detail,
-			emp_email,
-			emp_edu,
-			emp_status_name,
-			job_type_name,
-			emp_dept_name,
-			emp_position_name,
-			emp_hire_date,
-			emp_rank_name,
-			emp_salary,
-			emp_bank,
-			emp_account
-		FROM emp_list_all
-		WHERE emp_status_name != '퇴사'
+			*
+		FROM emp_list_all_exc_exitstatus
 		<if test="edu != null and edu.size()>0">
-			AND emp_edu IN 
+		WHERE emp_edu IN 
 			<foreach item="item" index="idx" collection="edu" open="(" separator="," close=")">
 				#{item}
 			</foreach>
@@ -223,14 +201,78 @@
 			FROM emp_list_all
 		) ela
 		ON ea.emp_id = ela.emp_id
-		<if test="ageGroupByGender != null and ageGroupByGender.size > 0">
+		<if test="gender != null and gender.size > 0">
 		WHERE ea.emp_gender IN 
-			<foreach item="item" index="idx" collection="ageGroupByGender" open="(" separator="," close=")">
+			<foreach item="item" index="idx" collection="gender" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
 	</select>
 	
+	<select id="countByMonthlyHireExit" resultType="java.util.Map">
+	
+	</select>
+	
+	<select id="selectInfoByMonthlyHireExit" parameterType="java.util.List" resultType="java.util.Map">
+	
+	</select>
+	
+	<select id="countDeptByPosition" resultType="java.util.Map">
+		SELECT 
+			emp_dept_name,
+			emp_position_name,
+			COUNT(*) AS count_position
+		FROM emp_list_all_exc_exitstatus
+		GROUP BY emp_dept_name, emp_position_name
+	</select>
+	
+	<select id="selectDeptInfoByPosition" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		WHERE emp_dept_name = '인사'
+			AND emp_position_name = '이사'
+	</select>
+	
+	<select id="countByJobType" resultType="java.util.Map">
+		SELECT 
+			emp_status_name,
+			count(emp_status_name) AS count_status
+		FROM emp_list_all_inc_exitstatus
+		GROUP BY emp_status_name
+	</select>
+	
+	<select id="selectInfoByJobType" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_inc_exitstatus
+		<if test="jobType != null and jobType.size > 0">
+		WHERE emp_status_name IN 
+			<foreach item="item" index="idx" collection="jobType" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="countByRank" resultType="java.util.Map">
+		SELECT 
+			job_type_name,
+			COUNT(job_type_name) AS count_job_type 
+		FROM emp_list_all_exc_exitstatus
+		GROUP BY job_type_name
+	</select>
+	
+	<select id="selectInfoByRank"  parameterType="java.util.List"  resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		<if test="rank != null and rank.size > 0">
+		WHERE job_type_name IN 
+			<foreach item="item" index="idx" collection="rank" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
 </mapper>
 
 
