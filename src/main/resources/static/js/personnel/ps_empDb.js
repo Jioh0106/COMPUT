@@ -158,6 +158,7 @@ async function countByAgeAndGender(){
 		const result = await response.json();
 		console.log(result);
 		
+		// 데이터 설정
    		const ageGroups = ['그 외', '60대', '50대', '40대', '30대', '20대'];
 		
 		const maleData = ageGroups.map(ageGroup => {
@@ -165,14 +166,13 @@ async function countByAgeAndGender(){
 			//console.log(match);
 		   	return match ? match.EMP_COUNT : 0;
         });
-		// console.log("maleData : ",maleData);
+		console.log("maleData : ",maleData);
 		
 		const femaleData = ageGroups.map(ageGroup => {
             const match = result.find(item => item.EMP_AGE_GROUP === ageGroup && item.EMP_GENDER === '여');
             return match ? match.EMP_COUNT : 0;
         });
 		// console.log("femaleData : ",femaleData);
-		
 		
 		const groupBarChartData = {
 			categories : ageGroups,

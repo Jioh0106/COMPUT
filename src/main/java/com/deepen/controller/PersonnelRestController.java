@@ -84,17 +84,18 @@ public class PersonnelRestController {
 	
 	@GetMapping("/count-by-monthlyHireExit")
 	public List<Map<String, Object>> countListByMonthlyHireExit(){
-		return null; //psService.getCountByMonthlyHireExit();
+		return psService.getCountByMonthlyHireExit();
 	}
 	
 	@GetMapping("/infoList-by-monthlyHireExit")
 	public List<Map<String, Object>> hrInfoListByMonthlyHireExit(@RequestParam(value = "hireExit") List<String> hireExit){
-		return null; //psService.getInfoListByMonthlyHireExit(hireExit); 
+		log.info(hireExit.toString());
+		return psService.getInfoListByMonthlyHireExit(hireExit); 
 	}
 	
 	@GetMapping("/count-by-dept-and-position")
 	public List<Map<String, Object>> countDeptListByPosition() {
-		return psService.getCountDeptListByPosition();
+		return null;//psService.getCountDeptListByPosition();
 	}
 	
 	@GetMapping("/infoList-by-dept-and-position")
@@ -109,6 +110,7 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-jobType")
 	public List<Map<String, Object>> hrInfoListByJobType(@RequestParam(value = "jobType") List<String> jobType){
+		log.info(jobType.toString());
 		return psService.getInfoListByJobType(jobType);
 	}
 	
@@ -119,6 +121,7 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-rank")
 	public List<Map<String, Object>> hrInfoListByRank(@RequestParam(value = "rank") List<String> rank){
+		log.info(rank.toString());
 		return psService.getInfoListByRank(rank);
 	}
 }
