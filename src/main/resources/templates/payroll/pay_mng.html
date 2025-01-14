@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     
     <title>급여 종류 관리</title>
 
@@ -111,7 +114,7 @@
                     </div>
                     <div class="card-body">
                         <div id="grid"></div>
-                        <div class="float-end">
+                        <div class="float-end" sec:authorize="hasRole('ATHR001')">
                             <input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
                             <input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
                             <input type="submit" class="btn btn-outline-danger" value="삭제" id="deleteBtn">
@@ -210,6 +213,10 @@
 <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 
 <script th:inline="javascript">
+
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 // 서버에서 전달받은 데이터
 const formulas = /*[[${formulas}]]*/ [];
 
@@ -400,7 +407,8 @@ document.getElementById('salaryForm').addEventListener('submit', async function(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                [csrfHeader]: csrfToken
             },
             body: JSON.stringify(formData)
         });
@@ -478,11 +486,11 @@ document.getElementById('editBtn').addEventListener('click', async function(){
 
     // hidden 필드값 설정
     document.getElementById('formulaType').value = selectedRow.formulaType;
-    document.getElementById('formulaContent').value = selectedRow.formulaContent || '';
-    document.getElementById('formulaName').value = selectedRow.formulaName || '';
-    document.getElementById('applyYear').value = selectedRow.applyYear || '';
-    document.getElementById('formulaPriority').value = selectedRow.formulaPriority || '';
-    document.getElementById('formulaComment').value = selectedRow.formulaComment || '';
+    document.getElementById('formulaContent').value = selectedRow.formulaContent;
+    document.getElementById('formulaName').value = selectedRow.formulaName;
+    document.getElementById('applyYear').value = selectedRow.applyYear;
+    document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
+    document.getElementById('formulaComment').value = selectedRow.formulaComment;
 
     // form의 ID 설정 및 모달 표시
     document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
@@ -538,6 +546,19 @@ document.getElementById('salaryModal').addEventListener('hidden.bs.modal', funct
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', function() {
     initializeYearSelect();
+    
+ // 권한 정보 가져오기 (메타 태그 추가 필요)
+    const hasAdminRole = /*[[${#authorization.expression('hasRole(''ATHR001'')')}]]*/ false;
+    
+    // 권한이 없는 경우 이벤트 리스너 제거
+    if (!hasAdminRole) {
+        document.getElementById('editBtn').removeEventListener('click', editButtonHandler);
+        document.getElementById('deleteBtn').removeEventListener('click', deleteButtonHandler);
+        
+        // 체크박스 비활성화
+        grid.setColumnValues('_checked', false);
+        grid.hideColumn('_checked');
+    }
 });
 
 </script>

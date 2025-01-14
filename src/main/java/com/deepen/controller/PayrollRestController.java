@@ -1,22 +1,35 @@
 package com.deepen.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import com.deepen.PdfGenerator;
 import com.deepen.domain.PayInfoDTO;
+import com.deepen.entity.PayInfo;
+import com.deepen.mapper.PayInfoMapper;
+import com.deepen.repository.PayInfoRepository;
 import com.deepen.domain.PayListDTO;
 import com.deepen.service.PayInfoService;
 import com.deepen.service.PayListService;
@@ -31,6 +44,10 @@ import lombok.extern.java.Log;
 public class PayrollRestController {
 	
 	private final PayInfoService payInfoService;
+	private final PayInfoRepository payInfoRepository;
+	private final PayInfoMapper payInfoMapper;
+	private final TemplateEngine templateEngine;
+  private final PdfGenerator pdfGenerator;
 	private final PayListService payListService;
 
 	 //급여 지급 이력 저장
@@ -125,6 +142,52 @@ public class PayrollRestController {
         }
     }
     
+ // 급여명세서 PDF 다운로드
+    @GetMapping("/pay-info/{paymentNo}/payslip")
+    public ResponseEntity<ByteArrayResource> downloadPayslip(
+            @PathVariable("paymentNo") Long paymentNo,
+            @RequestParam("empName") String empName) {
+        try {
+            // PayInfo 조회 (기존 코드 유지)
+            PayInfo payInfo = payInfoRepository.findById(paymentNo)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 급여 정보가 없습니다. paymentNo=" + paymentNo));
+            
+            // PayInfoDTO로 변환하여 부서/직급 정보 포함
+            PayInfoDTO payInfoDTO = payInfoMapper.getAllPayInfo().stream()
+                    .filter(dto -> dto.getPaymentNo().equals(paymentNo))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("해당 급여 정보를 찾을 수 없습니다."));
+            
+            // Context 설정
+            Context context = new Context();
+            context.setVariable("payInfo", payInfo);
+            context.setVariable("empName", empName);
+            context.setVariable("departmentName", payInfoDTO.getDepartmentName());
+            context.setVariable("positionName", payInfoDTO.getPositionName());
+            
+            // PDF 생성
+            String html = templateEngine.process("payslip", context);
+            byte[] pdfBytes = pdfGenerator.generatePdf(html);
+            
+            // 응답 생성
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename(payInfo.getEmpId() + "_" + payInfo.getPaymentDate() + "_급여명세서.pdf", StandardCharsets.UTF_8)
+                    .build());
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(pdfBytes.length)
+                    .body(new ByteArrayResource(pdfBytes));
+            
+        } catch (Exception e) {
+            log.severe("PDF 생성 중 오류 발생: " + e.getMessage());
+            e.printStackTrace(); // 개발 중에는 상세 로그 확인용
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
     //==============   급여 대장 이력  ===================
     
     // 월별 급여 대장 메인

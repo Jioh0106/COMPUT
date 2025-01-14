@@ -62,16 +62,64 @@ public class PayrollCalculatorService {
             PayInfo payInfo = calculatePayInfo(emp, paymentDate, formulas);
 
             // 5. 저장
-            PayInfo savedPayInfo = payInfoRepository.save(payInfo);
+//            PayInfo savedPayInfo = payInfoRepository.save(payInfo);
             
             log.info("급여 계산 완료 - 사원번호: {}, 지급월: {}", empId, paymentDate);
             
             // 6. DTO 변환 후 반환
-            return convertToDTO(savedPayInfo);
+            return convertToDTO(payInfo);
 
         } catch (Exception e) {
             log.error("급여 계산 중 오류 발생 - 사원번호: {}, 지급월: {}", empId, paymentDate, e);
             throw new RuntimeException("급여 계산 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 급여 저장 수행
+     */
+    @Transactional
+    public PayInfoDTO saveSalary(PayInfoDTO payInfoDTO) {
+        try {
+            // 1. 지급월 중복 체크
+            validatePaymentMonth(payInfoDTO.getEmpId(), payInfoDTO.getPaymentDate());
+
+            // 2. Entity 변환 및 저장
+            PayInfo payInfo = new PayInfo();
+            payInfo.setEmpId(payInfoDTO.getEmpId());
+            payInfo.setPaymentDate(payInfoDTO.getPaymentDate());
+            payInfo.setEmpSalary(payInfoDTO.getEmpSalary());
+            
+            // 수당 정보 설정
+            payInfo.setTechAllowance(payInfoDTO.getTechAllowance());
+            payInfo.setPerformanceBonus(payInfoDTO.getPerformanceBonus());
+            payInfo.setTenureAllowance(payInfoDTO.getTenureAllowance());
+            payInfo.setHolidayAllowance(payInfoDTO.getHolidayAllowance());
+            payInfo.setLeaveAllowance(payInfoDTO.getLeaveAllowance());
+            payInfo.setAllowAmt(payInfoDTO.getAllowAmt());
+            
+            // 공제 정보 설정
+            payInfo.setNationalPension(payInfoDTO.getNationalPension());
+            payInfo.setLongtermCareInsurance(payInfoDTO.getLongtermCareInsurance());
+            payInfo.setHealthInsurance(payInfoDTO.getHealthInsurance());
+            payInfo.setEmploymentInsurance(payInfoDTO.getEmploymentInsurance());
+            payInfo.setIncomeTax(payInfoDTO.getIncomeTax());
+            payInfo.setResidentTax(payInfoDTO.getResidentTax());
+            payInfo.setDeducAmt(payInfoDTO.getDeducAmt());
+            
+            // 최종 급여 설정
+            payInfo.setNetSalary(payInfoDTO.getNetSalary());
+            
+            // 생성 정보 설정
+            setCreationInfo(payInfo);
+            
+            // 저장
+            PayInfo savedPayInfo = payInfoRepository.save(payInfo);
+            return convertToDTO(savedPayInfo);
+
+        } catch (Exception e) {
+            log.error("급여 저장 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("급여 저장 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
