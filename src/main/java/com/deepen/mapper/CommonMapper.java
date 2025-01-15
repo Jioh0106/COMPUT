@@ -12,9 +12,9 @@ import com.deepen.domain.CommonDTO;
 @Repository
 public interface CommonMapper {
 
-	List<Map<String, Object>> commonList();
+	List<Map<String, Object>> commonList(Map<String, Object> map);
 
-	List<Map<String, Object>> commonDtlList(String commonCd);
+	List<Map<String, Object>> commonDtlList(Map<String, Object> map);
 
 	int insertCommonList(CommonDTO common);
 

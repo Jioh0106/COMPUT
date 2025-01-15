@@ -19,12 +19,12 @@ public class CommonService {
 
 	private final CommonMapper mapper;
 
-	public List<Map<String, Object>> commonList() {
-		return mapper.commonList();
+	public List<Map<String, Object>> commonList(Map<String, Object> map) {
+		return mapper.commonList(map);
 	}
 
-	public List<Map<String, Object>> commonDtlList(String commonCd) {
-		return mapper.commonDtlList(commonCd);
+	public List<Map<String, Object>> commonDtlList(Map<String, Object> map) {
+		return mapper.commonDtlList(map);
 	}
 
 	public int saveData(List<CommonDTO> commonList) {

@@ -29,9 +29,18 @@
 	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 	<style>
-		.buttons {
-			/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			float: right;
+		.top-input-group {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;  /*텍스트 입력란은 왼쪽, 버튼 그룹은 오른쪽 */
+		}
+		
+		.form-control {
+		    max-width: 300px; /* 텍스트 입력란의 최대 너비 */
+		}
+		
+		.button-group {
+		    margin-top: 8x; /* 버튼 그룹을 오른쪽으로 밀어냄 */
 		}
 
 		.table {
@@ -53,11 +62,11 @@
 		}
 
 		/* 체크박스가 있는 첫 번째 열의 너비 설정 
--> 삭제 기능 불가능으로 변경되어 체크박스 관련 전부 주석 처리
-th:first-child, td:first-child {
-	width: 40px;
-	text-align: center;
-}*/
+		-> 삭제 기능 불가능으로 변경되어 체크박스 관련 전부 주석 처리
+		th:first-child, td:first-child {
+			width: 40px;
+			text-align: center;
+		}*/
 
 		.tui-grid-cell-disabled {
 			background-color: #fff !important;
@@ -99,12 +108,16 @@ th:first-child, td:first-child {
 						<div class="card">
 							<div class="card-header">
 								<h4 class="card-title">공통코드</h4>
-								<div class="buttons">
+								<div class="top-input-group">
+									<input type="text" class="form-control" id="parentInput" 
+										placeholder="코드/코드명 검색" onkeyup="SearchCommon()">
+									<div class="button-group">
 									<button type="button" id="appendBtn" class="btn btn-outline-secondary">추가</button>
 									<button type="button" class="btn btn-outline-success" id="saveBtn"
 										onclick="save('parent')">저장</button>
-									<!-- 									<button type="button" class="btn btn-outline-danger"
+									<!-- <button type="button" class="btn btn-outline-danger"
 										onclick='deleteRow("parent")'>삭제</button> -->
+										</div>
 								</div>
 							</div>
 							<div class="card-body">
@@ -121,13 +134,16 @@ th:first-child, td:first-child {
 						<div class="card">
 							<div class="card-header">
 								<h4 class="card-title">상세공통코드</h4>
-								<div class="buttons">
-									<button type="button" class="btn btn-outline-secondary"
-										id="dtlAppendBtn">추가</button>
+								<div class="top-input-group">
+									<input type="text" class="form-control" id="childInput" 
+										placeholder="코드/코드명 검색" onkeyup="SearchCommonDtl()">
+									<div class="button-group">
+									<button type="button" class="btn btn-outline-secondary" id="dtlAppendBtn">추가</button>
 									<button type="button" class="btn btn-outline-success" id="dtlSaveBtn"
 										onclick="save('child')">저장</button>
-									<!-- 									<button type="button" class="btn btn-outline-danger"
+									<!-- <button type="button" class="btn btn-outline-danger"
 										onclick='deleteRow("child")'>삭제</button> -->
+									</div>
 								</div>
 							</div>
 							<div class="card-body">
@@ -166,11 +182,17 @@ th:first-child, td:first-child {
 		const header = $("meta[name='_csrf_header']").attr("content");
 		const name = $("#userName").val();
 
-		let parentGrid; // 전역 변수로 선언
-		let childGrid;  // 전역 변수로 선언
+		// 전역 변수
+		let parentGrid; // 공통코드 그리드 초기화를 위해
+		let childGrid;  // 상세공통코드 그리드 초기화를 위해
+		let target; // 상세공통코드 코드/코드명으로 검색 시 공통코드값을 저장하기 위해
 
 		// 화면 로드 시 공통코드 조회
 		window.onload = function () {
+			SelectCommon();
+		};
+		
+		function SelectCommon(){
 			// Thymeleaf 데이터를 JSON으로 변환하여 JS 변수에 저장
 			const gridData = /*[[${commonList}]]*/[];
 			const Grid = tui.Grid;
@@ -196,9 +218,9 @@ th:first-child, td:first-child {
 
 			// 클릭 이벤트
 			parentGrid.on('click', ev => {
-				const target = parentGrid.getValue(ev.rowKey, "COMMON_CODE");
+				target = parentGrid.getValue(ev.rowKey, "COMMON_CODE");
 				const rowType = parentGrid.getValue(ev.rowKey, "ROW_TYPE");
-				rowVal("parent", target, parentGrid.getRowCount());
+				rowVal(target);
 			});
 
 			// 더블클릭 이벤트
@@ -256,16 +278,44 @@ th:first-child, td:first-child {
 				});
 			});
 		};
+		
+		// 공통코드관리 검색어 입력 조회
+		function SearchCommon(){
+			const value = document.getElementById('parentInput').value;
+			var data = {value: value};
+			$.ajax({
+				url: "/common-mng",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					parentGrid.resetData(response);
+				} // success
+			}) // ajax
+		}
+		
+		// 상세공통코드관리 검색어 입력 조회
+		function SearchCommonDtl(){
+			// 전역번수로 선언한 target을 담아서 rowVal 함수 호출
+			rowVal(target); 
+		}
 
 		// 공통코드 행 선택 시 상세공통코드 조회 처리
-		function rowVal(tableId, target, rowCount) {
+		function rowVal(target) {
 
+			const value = document.getElementById('childInput').value;
+			
 			var data = {
-				celVal: target
+				celVal: target,
+				value: value
 			};
 
 			$.ajax({
-				url: "/api/commonCd",
+				url: "/commonCd",
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				type: 'POST',
@@ -433,7 +483,7 @@ th:first-child, td:first-child {
 
 			// 수정된 데이터를 서버로 전송
 			$.ajax({
-				url: "/api/saveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				url: "/saveData", // 변경된 데이터를 처리할 컨트롤러 URL
 				type: 'POST',
 				contentType: "application/json",
 				data: JSON.stringify(data),
