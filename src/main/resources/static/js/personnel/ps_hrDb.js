@@ -221,7 +221,7 @@ async function countByJobType(){
 		
 		// 데이터 설정
 		const pieChartData = {
-			categories: ["일반직","계약직","기술직"],
+			categories: ["고용 유형"],
 		    series: result.map(item => ({
 				name: item.JOB_TYPE_NAME,
 				data: item.COUNT_JOB_TYPE
@@ -283,7 +283,7 @@ async function countByRank(){
 		
 		// 데이터 설정
 		const pieChartData = {
-			categories: ["A","B","C","D","F"],
+			categories: ["성과 등급"],
 		    series: result.map(item => ({
 				name: item.EMP_RANK_NAME,
 				data: item.COUNT_RANK
