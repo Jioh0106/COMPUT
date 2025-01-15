@@ -19,7 +19,7 @@
 
 /* Toast UI 외부 div를 form-control 크기에 맞추기 */
 .tui-datepicker-input.tui-datetime-input {
-	width: 150px !important;
+	width: auto !important;
 	height: 37px !important; /* Bootstrap form-control 높이 */
 	padding: 0 !important; /* 내부 여백 제거 */
 	border: 1px solid #dce7f1 !important;

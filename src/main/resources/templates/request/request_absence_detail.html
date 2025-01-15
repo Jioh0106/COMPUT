@@ -278,7 +278,7 @@
 		$(function () {
 			// CSRF 토큰 가져오기
 		    let csrfToken = $('input[name="_csrf"]').val();
-		    console.log("CSRF Token:", csrfToken);
+		    console.log("CSRF Token : " + csrfToken);
 
 			let request_no = /*[[${request_no}]]*/null;
 			let user_id = /*[[${emp.emp_id}]]*/'null';
@@ -292,7 +292,9 @@
 		    console.log("user_id = " + user_id);
 		    console.log("emp_id = " + user_id);
 		    console.log("high_approval = " + high_approval);
+		    console.log("high_name = " + high_name);
 		    console.log("middle_approval = " + middle_approval);
+		    console.log("middle_name = " + middle_name);
 		    console.log("request_status = " + request_status);
 			console.log("request_no : " + request_no);
 		    
@@ -326,7 +328,7 @@
 			
 			if(request_status == 'RQST001') {
 				$('#approval_id').val(middle_approval);
-				$('#approval_name').val(middle_namel);
+				$('#approval_name').val(middle_name);
 				
 			} else if(request_status == 'RQST003') {
 				$('#approval_id').val(high_approval);
