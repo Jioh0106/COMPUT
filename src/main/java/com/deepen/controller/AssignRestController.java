@@ -79,10 +79,9 @@ public class AssignRestController {
 		RequestDTO requestDto = asService.getRequestDivision(emp_id, request_no);
 		AssignmentDTO requestAssign = asService.selectAssign(request_no);
 		 Map<String, Object> requestStatus = rqService.getRequest(request_no); // 요청 상태 가져오기
-		log.info("맵새끼ㅡㅡ"+requestStatus.toString());
 		log.info("@@해당요청번호로 발령조회"+requestAssign.toString());
-		log.info("@@요청구분!!발신수신@@"+ requestDto.getRequest_division());
-		log.info("ㅗㅗ요청상태!!제발제발"+ requestStatus.get("REQUEST_STATUS"));
+		log.info("@@요청구분!!발신or수신@@ "+ requestDto.getRequest_division());
+		log.info("요청상태 "+ requestStatus.get("REQUEST_STATUS"));
 		
 		Map<String, Object> response = new HashMap<>();
 		response.put("assignment",requestAssign);

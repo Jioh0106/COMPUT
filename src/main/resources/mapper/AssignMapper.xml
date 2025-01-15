@@ -62,9 +62,9 @@
 		    e_assign.emp_name AS assign_emp_name,
 		    a.assign_date AS assign_date,
 		    cdtype.common_detail_name AS assign_type,
-		    a.prev_dept AS prev_dept,
+		    cdprevd.common_detail_name AS prev_dept,
 		    cddept.common_detail_name AS new_dept,
-		    a.prev_pos AS prev_pos,
+		    cdprevp.common_detail_name AS prev_pos,
 		    cdpos.common_detail_name AS new_pos,
 		    a.request_no AS request_no,
 		    r.emp_id AS emp_id,
@@ -79,8 +79,12 @@
 		    employees e_request ON r.emp_id = e_request.emp_id
 		JOIN    
 		    common_detail cdtype ON a.assign_type = cdtype.common_detail_code
+		JOIN
+			common_detail cdprevd ON a.prev_dept = cdprevd.common_detail_code    
 		JOIN   
 		    common_detail cddept ON a.new_dept = cddept.common_detail_code
+		JOIN
+			common_detail cdprevp ON a.prev_pos = cdprevp.common_detail_code    
 		JOIN
 		    common_detail cdpos ON a.new_pos = cdpos.common_detail_code
 		WHERE 

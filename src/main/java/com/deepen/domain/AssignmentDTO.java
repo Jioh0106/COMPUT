@@ -1,6 +1,11 @@
 package com.deepen.domain;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -20,7 +25,9 @@ public class AssignmentDTO {
 	private String new_pos; //발령직급
 	private String prev_dept; //이전부서
 	private String new_dept; //발령부서
-	private Date registr_date; //최종승인일자
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	private LocalDateTime registr_date; //최종승인일자
 	private Integer request_no; //요청번호 FK
 	
 	
