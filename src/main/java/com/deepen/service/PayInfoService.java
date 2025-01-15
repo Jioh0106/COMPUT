@@ -16,12 +16,13 @@ import com.deepen.entity.PayInfo;
 import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Log
 public class PayInfoService {
     
 	private final PayInfoRepository payInfoRepository;
@@ -169,6 +170,29 @@ public class PayInfoService {
            } catch (Exception e) {
                throw new RuntimeException("급여 지급 데이터 삽입 중 오류가 발생했습니다: " + e.getMessage());
            }
+       }
+   }
+
+   @Transactional
+   public void deletePayInfo(List<Long> paymentNos) {
+       try {
+           // 삭제 전 데이터 존재 여부 확인
+           List<PayInfo> payInfosToDelete = payInfoRepository.findAllById(paymentNos);
+           
+           if (payInfosToDelete.isEmpty()) {
+               throw new RuntimeException("삭제할 급여 정보가 존재하지 않습니다.");
+           }
+           
+           // 일괄 삭제 실행
+           payInfoRepository.deleteAllInBatch(payInfosToDelete);
+           
+           // 로그 수정
+           log.info("급여 정보 삭제 완료 - 삭제된 건수: {}", payInfosToDelete.size());
+           
+       } catch (Exception e) {
+           // 로그 수정
+           log.error("급여 정보 삭제 중 오류 발생: {}", e.getMessage());
+           throw new RuntimeException("급여 정보 삭제 중 오류가 발생했습니다: " + e.getMessage());
        }
    }
 

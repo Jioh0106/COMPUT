@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,10 @@ import com.deepen.entity.CommonDetail;
 import com.deepen.entity.SalaryFormula;
 import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.SalaryFormulaRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -120,6 +125,42 @@ public class SalaryFormulaService {
     
     public List<SalaryFormula> findAll() {
         return salaryFormulaRepository.findAll();
+    }
+    
+ // 휴가수당 계산식 생성
+    public SalaryFormula createLeaveAllowanceFormula() {
+        SalaryFormula formula = new SalaryFormula();
+        formula.setFormulaName("휴가수당");
+        formula.setFormulaType("RWRD");
+        
+        JsonNode formulaContent = createLeaveAllowanceFormulaContent();
+        formula.setFormulaContent(formulaContent.toString());
+        
+        formula.setApplyYear(LocalDate.now().getYear());
+        formula.setFormulaPriority(5); // 우선순위 설정
+        formula.setUpdatedAt(LocalDateTime.now());
+        
+        // CommonDetail 설정
+        CommonDetail commonDetail = new CommonDetail();
+        commonDetail.setCommon_detail_code("RWRD005"); // 휴가수당 코드
+        formula.setCommonDetail(commonDetail);
+        
+        return formula;
+    }
+
+    private JsonNode createLeaveAllowanceFormulaContent() {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode content = mapper.createObjectNode();
+        
+        content.put("type", "leave");
+        content.put("rate", "1.5");
+        content.put("workingDays", "22");
+        
+        ArrayNode baseFields = mapper.createArrayNode();
+        baseFields.add("emp_salary");
+        content.set("baseFields", baseFields);
+        
+        return content;
     }
 
 }

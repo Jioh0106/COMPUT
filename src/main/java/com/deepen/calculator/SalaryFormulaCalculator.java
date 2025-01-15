@@ -59,7 +59,7 @@ public class SalaryFormulaCalculator {
                         yield amount;
                     }
                     case "leave" -> {
-                        BigDecimal amount = allowanceCalculator.calculateLeaveAllowance(formula, emp);
+                        BigDecimal amount = allowanceCalculator.calculateLeaveAllowance(formula, emp, currentMonth);
                         log.info("휴가수당 계산 결과: {}", amount);
                         yield amount;
                     }

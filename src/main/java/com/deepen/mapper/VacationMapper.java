@@ -26,5 +26,7 @@ public interface VacationMapper {
 
 	int insertVctn(Map<String, Object> map);
 
+	Map<String, Object> vctnDays(String emp_id);
+
 
 }

@@ -223,6 +223,20 @@
 		  , #{no}
 		)
 	</insert>
+	
+	<!-- 특정 월의 휴가 사용 일수 조회 -->
+	<select id="getMonthlyVacationDays" parameterType="map" resultType="int">
+	    SELECT COALESCE(SUM(vacation_total), 0)
+	    FROM vacation
+	    WHERE vacation_leave = #{empId}
+	    AND TO_CHAR(vacation_start, 'YYYY-MM') = #{paymentMonth}
+	    AND vacation_type IN ('VCTN001') -- 연차휴가만 계산
+	    AND request_no IN (
+	        SELECT request_no 
+	        FROM request 
+	        WHERE request_status = 'RQST001' -- 승인된 요청만
+	    )
+	</select>
 
 
 </mapper>
