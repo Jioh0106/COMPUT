@@ -18,7 +18,7 @@
 	<link rel="shortcut icon" href="/assets/images/favicon.svg" type="/assets/image/x-icon">
 	
 	<!--  sweetalert  -->
-	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
+	<link rel="stylesheet" href="/assets/vendors/sweetalert2/sweetalert2.min.css">
 	
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.css">
@@ -26,6 +26,18 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	
 	<style>
+		.child-input1 {
+			flex: 1;
+			width: 30%;
+			box-sizing: border-box;
+		}
+
+		.child-input2 {
+			flex: 1;
+			margin: 0px 5%;
+			width: 30%;
+			box-sizing: border-box;
+		}
 		.tui-grid-cell-content {
 		    color: #000 !important; /* 글자를 검은색으로 강제 설정 */
 		}
@@ -39,18 +51,6 @@
 		}
 		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
 			margin-left:auto
-		}
-		.child-input1 {
-		    flex:1;
-		    width:30%;
-		    box-sizing: border-box;
-		}
-
-		.child-input2{
-		    flex:1;
-		    margin: 0px 5%;
-		    width:30%;
-		    box-sizing: border-box;
 		}
 	</style>
 </head>
@@ -194,7 +194,7 @@
 				<section class="section">
 					<div class="row" id="basic-table">
 						<form>
-							<div id="absence-grid"></div>
+							<div id="absence-grid" class="mb-3 mt-2"></div>
 							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
 								<div class="float-end">
 									<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">

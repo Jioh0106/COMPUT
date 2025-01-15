@@ -51,7 +51,7 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">담당자 사번</label>
-													<input type="text" th:value="${emp.emp_id}" name="emp_id" id="emp_id"  class="form-control" readonly>
+													<input type="text" name="approval_id" id="approval_id"  class="form-control" readonly>
 													
 												</div>
 											</div>
@@ -59,7 +59,7 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">담장자 성명</label>
-													<input type="text" th:value="${emp.emp_name}" id="emp_name" name="emp_name" class="form-control" readonly>
+													<input type="text"  id="approval_name" name="approval_name" class="form-control" readonly>
 												</div>
 											</div>
 										
@@ -67,27 +67,27 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">신청자 사번</label>
-													<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control" th:value="${absence.EMP_ID}" readonly>
+													<input type="text" id="emp_id" name="emp_id" class="form-control" th:value="${absence.EMP_ID}" readonly>
 												</div>
 											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="last-name-column">신청자 성명</label>
-													<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"  th:value="${absence.EMP_NAME}" readonly>
+													<input type="text" id="emp_name" name="emp_name" class="form-control"  th:value="${absence.EMP_NAME}" readonly>
 												</div>
 											</div>
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="first-name-column">부서</label>
-													<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control" th:value="${absence.EMP_DEPT}" readonly>
+													<input type="text" id="emp_dept" name="emp_dept" class="form-control" th:value="${absence.EMP_DEPT}" readonly>
 												</div>
 											</div>
 											
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="last-name-column"> 직급</label>
-													<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"  th:value="${absence.EMP_POSITION}" readonly>
+													<input type="text" id="emp_position" name="emp_position" class="form-control"  th:value="${absence.EMP_POSITION}" readonly>
 												</div>
 											</div>
 											
@@ -111,19 +111,19 @@
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="company-column">휴직 시작일</label>
-													<input type="text" id="prev_pos" name="prev_pos" class="form-control" th:value="${absence.ABSENCE_START}" readonly>
+													<input type="text" id="absence_start" name="absence_start" class="form-control" th:value="${absence.ABSENCE_START}" readonly>
 												</div>
 											</div>
 											<div class="col-md-6 col-12">
 												<div class="form-group">
 													<label for="email-id-column">휴직 종료일</label>
-													<input type="text" id="new_pos" name="new_pos" class="form-control" th:value="${absence.ABSENCE_END}" readonly>
+													<input type="text" id="absence_end" name="absence_end" class="form-control" th:value="${absence.ABSENCE_END}" readonly>
 												</div>
 											</div>
 											<div class="col-12">
 												<div class="form-group">
 													<label for="company-column">비고</label>
-													<input type="text" id="prev_dept" class="form-control" name="prev_dept" th:value="${absence.ABSENCE_REMARK}" readonly>
+													<input type="text" id="absence_remark" class="form-control" name="absence_remark" th:value="${absence.ABSENCE_REMARK}" readonly>
 												</div>
 											</div>
 											
@@ -283,7 +283,9 @@
 			let request_no = /*[[${request_no}]]*/null;
 			let user_id = /*[[${emp.emp_id}]]*/'null';
 			let emp_id = /*[[${absence.EMP_ID}]]*/'null';
+		    let high_name = /*[[${absence.HIGH_NAME}]]*/'null';
 		    let high_approval = /*[[${absence.HIGH_APPROVAL}]]*/'null';
+		    let middle_name = /*[[${absence.MIDDLE_NAME}]]*/'null';
 		    let middle_approval = /*[[${absence.MIDDLE_APPROVAL}]]*/'null';
 		    let request_status = /*[[${absence.REQUEST_STATUS}]]*/'null';	
 		    
@@ -311,6 +313,9 @@
 			} else if(user_id == middle_approval && request_status == 'RQST001') {
 				$('#check-receiver').css('display', 'flex');
 				
+			} else if(user_id == middle_approval && request_status == 'RQST003') {
+				$('#check-sender').css('display', 'flex');
+				
 			} else if(emp_id == user_id && request_status == 'RQST001') {
 				$('#check-sender').css('display', 'flex');
 				
@@ -318,6 +323,15 @@
 				$('#check-sender').css('display', 'flex');
 				
 			}  
+			
+			if(request_status == 'RQST001') {
+				$('#approval_id').val(middle_approval);
+				$('#approval_name').val(middle_namel);
+				
+			} else if(request_status == 'RQST003') {
+				$('#approval_id').val(high_approval);
+				$('#approval_name').val(high_name);
+			}
 			
 			
 			// 승인 버튼 클릭 이벤트
@@ -403,7 +417,7 @@
 		        
 		    });
 
-			// 수정/추가 컬럼 반영
+			// 요청 테이블 업데이트
 			function updateRequest(status, rejection, high) {
 				
 				const updateData = {

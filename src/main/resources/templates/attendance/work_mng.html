@@ -17,7 +17,7 @@
 	<link rel="shortcut icon" href="/assets/images/favicon.svg" type="/assets/image/x-icon">
 		
 	<!--  sweetalert  -->
-	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
+	<link rel="stylesheet" href="/assets/vendors/sweetalert2/sweetalert2.min.css">
 
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.css">
@@ -25,31 +25,8 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
 	
-	<style>
-		.tui-grid-cell {
-			/* !important -> 우선순위 높아짐 */
-			background-color: #ffffff !important;
-		}
-		.display-flex {
-			display: flex;
-			
-		}
-		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
-			margin-left:auto
-		}
-		.child-input1 {
-		    flex:1;
-		    width:30%;
-		    box-sizing: border-box;
-		}
-
-		.child-input2{
-		    flex:1;
-		    margin: 0px 5%;
-		    width:30%;
-		    box-sizing: border-box;
-		}
-	</style>
+	<!--근무 관리 CSS -->
+	<link rel="stylesheet" href="/css/work_mng.css">
 </head>
 <body>
 		
@@ -68,39 +45,30 @@
 		        </a>
 		    </header>
 			
-			<h3>근무 관리</h3>
+			<div class="d-flex justify-content-between">
+				<h3>근무 관리</h3>
 				
-			
-<!--			<div class="card">-->
-<!--				<div class="card-body">-->
-<!--					<h5> 기술직 근무관리</h5>-->
-<!--					<div class="row" id="basic-table">-->
-<!--						<div id="grid2"></div>-->
-<!--						<div class="float-end">-->
-<!--							<input type="button" class="btn btn-outline-secondary" id="appendRow" value="추가">-->
-<!--							<input type="button" class="btn btn-outline-success" id="save"  value="저장">-->
-<!--							<input type="button" class="btn btn-outline-danger" id="deleteRow" value="삭제">-->
-							
-<!--						</div>-->
-<!--					</div>-->
-	
-<!--				</div>  card-body -->
-<!--			</div>  card -->
+				<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+					<div class="buttons">
+						<button type="button" class="btn btn-primary" onclick="openView()">근무 일정 등록</button>
+					</div>
+				</div>
+			</div>
+				
 			
 			<div class="card">
 				<div class="card-body">
 					<!-- 데이트 피커 시작 -->
-					<section class="section" style="margin-bottom: 2.2rem">
+					<section class="section  " style="margin-bottom: 2.2rem">
 						<div style="display: flex; align-items: center; gap: 1rem;">
 							<!-- 첫 번째 데이트 피커 -->
 							<div>
 								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
 									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
-										placeholder="시작일 선택" />
+										 class="form-control" placeholder="시작일 선택" />
 									<span class="tui-ico-date"></span>
 								</div>
-								<div id="tui-date-picker-container-1"
-									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+								<div id="tui-date-picker-container-1" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 							</div>
 
 							<!-- 구분자 -->
@@ -110,21 +78,43 @@
 							<div>
 								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
 									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
-										placeholder="종료일 선택" />
+										 class="form-control" placeholder="종료일 선택" />
 									<span class="tui-ico-date"></span>
 								</div>
-								<div id="tui-date-picker-container-2"
-									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+								<div id="tui-date-picker-container-2" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 							</div>
-
+							
 							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
-							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									<input type="text" id="searchEmp" placeholder="사번 또는 이름 입력" />
+							
+							<div th:if="${emp.emp_role == 'ATHR003'}">
+								<div id="searchEmpArea">
+									<input type="text" id="searchEmp2"  class="form-control" th:value="${emp.emp_id}"/>
 								</div>
 							</div>
-							<button type="button" class="btn btn-primary"
-								onclick="search(this);">검색</button>
+							
+							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+								<div id="searchEmpArea">
+									<input type="text" id="searchEmp" class="form-control" pdisabled laceholder="사번 또는 이름 입력" />
+								</div>
+							</div>
+							
+							<span style="font-size: 1rem; line-height: 2rem;"> 부서 </span>
+							<div>
+								<div th:if="${emp.emp_role == 'ATHR003'}">
+									<select class="form-select deptArea" disabled>
+										<option th:value="${emp.emp_dept}" selected></option>
+									</select>
+								</div>
+								<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+									<select class="form-select deptArea" id="deptSelect" name="deptSelect" >
+										<option value="" selected>선택하세요</option>
+									</select>
+								</div>
+							</div>
+							
+							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+								<button type="button" class="btn btn-outline-primary"onclick="search(this);">검색</button>
+							</div>	
 						</div>
 					</section>
 					<!-- 데이트 피커 끝 -->
@@ -156,98 +146,15 @@
 	<!--Axios -->
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<!-- sweet arert -->
-	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+	<script src="/assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	
 	<!-- 공통 -->
 	<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/bootstrap.bundle.min.js"></script>
 	<script src="/assets/js/main.js"></script>
-
 	
-	<script th:inline="javascript">
-		
-		
-		const gridData = [
-		      { No: '1', common_detail_name: '1조', start_time: '08:00', end_time: '16:00', work_time: '8' },
-		      { No: '2', common_detail_name: '2조', start_time: '16:00', end_time: '00:00', work_time: '8' },
-		      { No: '3', common_detail_name: '3조', start_time: '00:00', end_time: '08:00', work_time: '8' },
-		];
-
-		const grid2 = new tui.Grid({
-			el: document.getElementById('grid2'),
-			data: gridData,
-			columns: [
-				{ header: 'No', name: 'No'},  // 텍스트 편집기
-				{ header: '근무조', name: 'common_detail_name', editor: 'text' },
-				{ header: '시작시간', name: 'start_time', editor: 'text' },
-				{ header: '종료시간', name: 'end_time', editor: 'text' },
-				{ header: '근무시간', name: 'work_time', editor: 'text' }
-			],
-			editing: true  // 편집 기능 활성화
-		});
-		
-		let grid;
-		
-		grid = new Grid({
-			el: document.getElementById('grid'),
-			columns: [
-				{header: '사원번호', name: 'empId'},
-				{header: '이름', name: 'empNm'},
-				{header: '부서', name: 'deptNm'},
-				{header: '일자', name: 'cmtDate'},
-				{header: '출근시간', name: 'workBgn'},
-				{header: '퇴근시간', name: 'workEnd'}
-			],
-			data: [] // 서버에서 전달받은 데이터
-		});
-		
-		
-		// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
-		function datePickerReplace(id) {
-			$(document).ready(function () {
-				// 숫자가 아닌 정규식
-				var replaceNotInt = /[^0-9]/gi;
-
-				$(`#${id}`).on("focusout", function () {
-					var x = $(this).val();
-					if (x.length > 0) {
-						if (x.match(replaceNotInt)) {
-							x = x.replace(replaceNotInt, "");
-						}
-						$(this).val(x);
-					}
-				}).on("keyup", function () {
-					$(this).val($(this).val().replace(replaceNotInt, ""));
-				});
-			});
-		}
-
-		// 첫 번째 DatePicker 초기화
-		const container1 = document.getElementById('tui-date-picker-container-1');
-		const target1 = document.getElementById('tui-date-picker-target-1');
-		const instance1 = new tui.DatePicker(container1, {
-			//date: new Date(),
-			input: {
-				element: target1,
-				format: 'yyyy-MM-dd'
-			}
-		});
-
-		// 두 번째 DatePicker 초기화
-		const container2 = document.getElementById('tui-date-picker-container-2');
-		const target2 = document.getElementById('tui-date-picker-target-2');
-		const instance2 = new tui.DatePicker(container2, {
-			//date: new Date(),
-			input: {
-				element: target2,
-				format: 'yyyy-MM-dd'
-			}
-		});
-
-		
-		
-	</script>
-
+	<!--근무 관리 JS -->
+	<script th:inline="javascript" th:src="@{/js/work_mng.js}" ></script>
 
 </body>
 
