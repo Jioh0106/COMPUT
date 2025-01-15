@@ -181,8 +181,10 @@ function showModal(empDetailInfo) {
     modal.show();
 }
 
-// 삭제 버튼
-const deleteBtn = document.getElementById('deleteBtn');
+// 동작 버튼
+const deleteBtn = document.getElementById("deleteBtn");
+const updateBtn = document.getElementById("updateBtn");
+const updateForm = document.getElementById("updateForm");
 // 그리드에서 삭제하고싶은 key 배열로 만들어주기
 function CheckedRowValues(gridObj,jsonKey){
 	const checkedRowsIds = gridObj.getCheckedRows();
@@ -192,22 +194,62 @@ function CheckedRowValues(gridObj,jsonKey){
 	const rowValues = checkedRowsIds.map(row => row[jsonKey]);
 	return rowValues;
 }
+updateBtn.addEventListener("click",() => {
+	Swal.fire({
+	  title: "수정하시겠습니까?",
+	  icon: "info",
+	  showCancelButton: true,
+	  confirmButtonColor: "#435ebe",
+	  cancelButtonColor: "#dc3545",
+	  confirmButtonText: "확인",
+	  cancelButtonText: "취소"
+	}).then((result) => {
+	  if (result.isConfirmed) {
+		Swal.fire({
+	      title: "수정 완료",
+	      icon: "success",
+		  showConfirmButton:false
+	    });
+		setTimeout(() =>updateForm.submit(),800);
+	  }
+	});
+});
+
 deleteBtn.addEventListener("click",() => {
 	
 	const checkedRowIds = CheckedRowValues(empListGrid,"EMP_ID");
 	console.log(checkedRowIds);
 		if(checkedRowIds.length === 0){
-			alert("삭제할 정보를 선택해주세요");
+			Swal.fire({
+				title: "삭제할 정보를 선택해주세요",
+				icon:"question",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
 		}else{
-			if(confirm("삭제하시겠습니까?")){
-				empDelete("http://localhost:8082/api/emp-delete",checkedRowIds);
-				alert("삭제 완료");
-			}else{
-				alert("삭제 취소");
-			}
+			Swal.fire({
+			  title: "삭제하시겠습니까?",
+			  text: "삭제한 정보는 되돌릴 수 없습니다",
+			  icon: "warning",
+			  showCancelButton: true,
+			  confirmButtonColor: "#435ebe",
+			  cancelButtonColor: "#dc3545",
+			  confirmButtonText: "확인",
+			  cancelButtonText: "취소"
+			}).then((result) => {
+			  if (result.isConfirmed) {
+			  	empDelete("http://localhost:8082/api/emp-delete",checkedRowIds);
+				Swal.fire({
+			      title: "삭제 완료",
+			      icon: "success",
+				  showConfirmButton:false
+			    });
+			  }
+			});
 		}
 	}
 );
+
 
 //--------ajax--------------------------------------------------------------------------------------------------------------------//
 
@@ -284,10 +326,13 @@ async function empDelete(url,rowIds){
 	console.log(rowIds);
 	
 	try{
+		const csrfToken = document.getElementById("csrfToken").value;
+		console.log("csrfToken",csrfToken);
 		const response = await fetch(url,{
 			method: "POST",
 			headers:{
 				"Content-Type":"application/json",
+				"X-CSRF-Token": csrfToken
 			},
 			body:JSON.stringify(rowIds)
 		})
@@ -298,7 +343,7 @@ async function empDelete(url,rowIds){
 		console.log("result : "+result);
 		setTimeout(()=>{
 			window.location.reload();
-		},500);
+		},850);
 	}catch(error){
 		console.error("삭제 실패",error);
 	}

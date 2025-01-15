@@ -13,7 +13,7 @@
 		AND common_detail_status ='Y'
 	</select>
 	
-	<select id="selectEmpList" parameterType="Map" resultType="java.util.Map">
+	<select id="selectEmpInfoList" parameterType="Map" resultType="java.util.Map">
 	    SELECT 
 	        e.emp_id, 
 	        e.emp_no, 
@@ -85,6 +85,12 @@
         	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
     	</if>
 	    ORDER BY e.emp_no
+	</select>
+	
+	<select id="selectEmpInfoById" resultType="java.util.Map">
+		SELECT * 
+		FROM emp_list_all
+		WHERE emp_id = #{userId}
 	</select>
 	
 	<select id="countByEdu" resultType="java.util.Map">
