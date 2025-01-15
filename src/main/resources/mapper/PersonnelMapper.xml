@@ -100,6 +100,7 @@
 		FROM emp_list_all
 		WHERE emp_status_name != '퇴사'
 		GROUP BY emp_edu
+		ORDER BY emp_count_edu desc
 	</select>
 	
 	<select id="selectInfoByEdu" parameterType="java.util.List" resultType="java.util.Map">
