@@ -3,6 +3,8 @@ package com.deepen.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,13 +42,21 @@ public class PersonnelRestController {
 	public List<Map<String, Object>> empList(
 			@RequestParam(value = "startDate")String startDate,
 			@RequestParam(value = "endDate")String endDate,
-			@RequestParam(value = "search", defaultValue = "")String search) {
+			@RequestParam(value = "search", defaultValue = "")String search,
+			@AuthenticationPrincipal UserDetails userDetails) {
 		
-		//log.info("C fitter: "+startDate+", "+endDate+", "+search);
+		String role = userDetails.getAuthorities().toString().replace("ROLE_", "");
+		//log.info("role : "+role);
+		//log.info("결과 : "+role.contains("ATHR003"));
 		
-		List<Map<String, Object>> empList = psService.getEmpList(startDate,endDate,search);
-		
-		return empList;
+		if(role.contains("ATHR003")) {
+			List<Map<String, Object>> empInfo = psService.getEmpInfoById(userDetails.getUsername());
+			//log.info(empInfo.toString());
+			return empInfo;
+		}else {
+			List<Map<String, Object>> empList = psService.getEmpInfoList(startDate,endDate,search);
+			return empList;
+		}
 	}
 	
 	@PostMapping("/emp-delete")

@@ -17,7 +17,9 @@ public interface PersonnelMapper {
 	 //등록페이지 필요 공통 코드 조회
 	 List<CommonDetailDTO> selectCommonDetailCodeList();
 	 
-	 List<Map<String, Object>> selectEmpList(Map<String, Object> params);
+	 List<Map<String, Object>> selectEmpInfoList(Map<String, Object> params);
+	 
+	 List<Map<String, Object>> selectEmpInfoById(@Param("userId") String userId);
 	 
 	 List<Map<String, Object>> countByEdu();
 	 

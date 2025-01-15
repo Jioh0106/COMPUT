@@ -128,79 +128,134 @@ function validateInputs() {
 
   // 이름 유효성 검사
   if (!nameInput.value || !allowKoAndEn(nameInput.value)) {
-    alert("올바른 이름을 입력하세요.");
-    nameInput.focus();
+	nameInput.focus();
+	Swal.fire({
+		title: "올바른 이름을 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 주민등록번호 앞자리 유효성 검사
   if (!allowOnlyNumbers(ssnInput1.value) || !ssnInput1.value) {
-    alert("주민등록번호 앞자리는 숫자로 입력하세요.");
-    ssnInput1.focus();
+	ssnInput1.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 주민등록번호 뒷자리 유효성 검사
   if (!allowOnlyNumbers(ssnInput2.value) || !ssnInput2.value) {
-    alert("주민등록번호 뒷자리는 숫자로 입력하세요.");
     ssnInput2.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 전화번호 앞자리 유효성 검사
   if (!allowOnlyNumbers(phoneInput1.value) || !phoneInput1.value) {
-    alert("전화번호 앞자리를 숫자로 입력하세요.");
     phoneInput1.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 전화번호 중간자리 유효성 검사
   if (!allowOnlyNumbers(phoneInput2.value) || !phoneInput2.value) {
-    alert("전화번호 중간자리를 숫자로 입력하세요.");
     phoneInput2.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 전화번호 끝자리 유효성 검사
   if (!allowOnlyNumbers(phoneInput3.value) || !phoneInput3.value) {
-    alert("전화번호 끝자리를 숫자로 입력하세요.");
     phoneInput3.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 우편번호 유효성 검사
   if (!allowOnlyNumbers(postCodeInput.value) || !postCodeInput.value) {
-    alert("우편번호를 숫자로 입력하세요.");
     postCodeInput.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 주소 유효성 검사
   if (!addressInput.value) {
-    alert("주소를 입력하세요.");
     addressInput.focus();
+	Swal.fire({
+		title: "주소를 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 급여 유효성 검사
   const salaryPattern = /^[0-9.,]+$/; // 숫자, '.' 및 ','만 허용
   if (!salaryPattern.test(salaryInput.value) || !salaryInput.value) {
-    alert("올바른 급여를 입력하세요. (숫자, '.', ','만 허용)");
     salaryInput.focus();
+	Swal.fire({
+		title: "급여를 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 은행명 유효성 검사
   if (bankInput.value && !allowKoAndEn(bankInput.value)) {
-    alert("올바른 은행명을 입력하세요. (한글 또는 영어만 가능)");
     bankInput.focus();
+	Swal.fire({
+		title: "은행명을 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 
   // 계좌번호 유효성 검사
   if (accountInput.value && !allowOnlyNumbers(accountInput.value)) {
-    alert("계좌번호는 숫자만 입력 가능합니다.");
     accountInput.focus();
+	Swal.fire({
+		title: "숫자로 입력하세요.",
+		icon:"warning",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+	});
     return false;
   }
 

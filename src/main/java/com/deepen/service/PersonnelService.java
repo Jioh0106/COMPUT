@@ -100,7 +100,7 @@ public class PersonnelService {
 		return cdCodeList;
 	}
 	
-	public List<Map<String, Object>> getEmpList(String startDate, String endDate, String search){
+	public List<Map<String, Object>> getEmpInfoList(String startDate, String endDate, String search){
 		
 		log.info("S fitter: "+startDate+", "+endDate+", "+search);
 		
@@ -109,9 +109,14 @@ public class PersonnelService {
 		params.put("endDate", endDate);
 		params.put("search", search);
 		
-		List<Map<String, Object>> empList = psMapper.selectEmpList(params);
+		List<Map<String, Object>> empList = psMapper.selectEmpInfoList(params);
 		
 		return empList;
+	}
+	
+	public List<Map<String, Object>> getEmpInfoById(String userId){
+		log.info(userId);
+		return psMapper.selectEmpInfoById(userId);
 	}
 	
 	public List<Map<String , Object>> getCountByEdu(){
