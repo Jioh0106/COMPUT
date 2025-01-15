@@ -185,8 +185,16 @@ public class RequestController {
         	absence.put("HIGH_APPROVAL", "");
         }
         
+        if(!absence.containsKey("HIGH_NAME")) {
+        	absence.put("HIGH_NAME", "");
+        }
+        
         if(!absence.containsKey("MIDDLE_APPROVAL")) {
         	absence.put("MIDDLE_APPROVAL", "");
+        }
+        
+        if(!absence.containsKey("MIDDLE_NAME")) {
+        	absence.put("MIDDLE_NAME", "");
         }
         
         if(!absence.containsKey("")) {

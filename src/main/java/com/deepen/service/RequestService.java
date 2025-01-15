@@ -102,21 +102,20 @@ public class RequestService {
         return requestDtos;
             
     }
-
+	
+	// 요청 상세 - 휴직 
 	public Map<String, Object> getAbsenceWithRequest(int request_no) {
 		
 		Map<String, Object> map = rqMapper.getAbsenceWithRequest(request_no);
 		log.info("RequestService -  absence" + map.toString());
 		
-		
 		return map;
 	}
-
+	
+	// 요청 테이블 업데이트
 	public void updateAbsenceRequest(Map<String, Object> updateData) {
 		
 		rqMapper.updateStatus(updateData);
-		
-		
 	}
 
 		

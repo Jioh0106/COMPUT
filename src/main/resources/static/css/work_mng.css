@@ -1,0 +1,49 @@
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+.display-flex {
+	display: flex;
+	
+}
+.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left:auto
+}
+
+#searchEmpArea{
+	width: 170px !important;
+}
+.deptArea {
+	width: 130px !important;
+}
+
+/* Toast UI 외부 div를 form-control 크기에 맞추기 */
+.tui-datepicker-input.tui-datetime-input {
+	width: 150px !important;
+	height: 37px !important; /* Bootstrap form-control 높이 */
+	padding: 0 !important; /* 내부 여백 제거 */
+	border: 1px solid #dce7f1 !important;
+	border-radius: .25rem !important;
+	background: none !important; /* 배경 제거 */
+	display: flex; /* 내부 입력 필드와 아이콘 정렬 */
+	align-items: center;
+}
+
+
+/* Focus 상태에서 테두리 색 변경 */
+.tui-datepicker-input.tui-datetime-input input:focus {
+	outline: none; /* 기본 아웃라인 제거 */
+	border-color: #86b7fe; /* Focus 상태에서 Bootstrap 스타일 */
+	box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); /* 부트스트랩 포커스 효과 */
+}
+
+/* 내부 input 요소를 form-control과 동일하게 */
+.tui-datepicker-input.tui-datetime-input input {
+    width: 100%; /* 입력 필드가 컨테이너에 꽉 차게 */
+    height: 100%; /* 부모 높이에 맞춤 */
+	color: #607080;
+    font-size: 1rem; /* 글자 크기를 Bootstrap 기본 크기와 동일하게 */
+    padding: 0.375rem 0.75rem; /* form-control의 기본 내부 여백 */
+    border: none; /* 내부 입력 필드의 중복 테두리 제거 */
+    outline: none; /* 포커스 아웃라인 제거 */
+}
