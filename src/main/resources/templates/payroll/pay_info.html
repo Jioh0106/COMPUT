@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <title>급여 지급 이력</title>
 
     <!-- CSS 링크 -->
@@ -18,39 +21,45 @@
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
     <style>
-        .tui-grid-cell {
-            background-color: #ffffff !important;
-        }
-        #grid {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .tui-grid-content-area {
-            overflow-x: auto !important;
-        }
-        .clickable-cell {
-            cursor: pointer;
-            background-color: #f8f9fa !important;
-        }
-        .clickable-cell:hover {
-            background-color: #e9ecef !important;
-        }
-		#loadingSpinner {
-		    backdrop-filter: blur(2px);
-		}
-		.unsaved-row td {
-		    background-color: #fff3e0 !important;
-		}
-		.tui-grid-cell {
-		    background-color: white;
-		}
-		.tui-grid-cell-required {
-		    background-color: #fff9c4;
-		}
-		.tui-grid-cell-invalid {
-		    background-color: #ffebee;
-		}
-    </style>
+    /* 기존 스타일 */
+    .tui-grid-cell {
+        background-color: #ffffff !important;
+    }
+    #grid {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .tui-grid-content-area {
+        overflow-x: auto !important;
+    }
+    
+    /* 미저장 행 스타일 강화 */
+    .tui-grid-row.unsaved-row td {
+        background-color: #fff3e0 !important;
+    }
+    .tui-grid-row.unsaved-row .tui-grid-cell {
+        background-color: #fff3e0 !important;
+    }
+    
+    /* 클릭 가능한 셀 스타일 */
+    .clickable-cell-emp {
+        color: #0066cc !important;
+        text-decoration: underline !important;
+        cursor: pointer !important;
+    }
+
+    #loadingSpinner {
+        backdrop-filter: blur(2px);
+    }
+    
+    /* 기타 스타일 */
+    .tui-grid-cell-required {
+        background-color: #fff9c4;
+    }
+    .tui-grid-cell-invalid {
+        background-color: #ffebee;
+    }
+</style>
 
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
@@ -88,19 +97,12 @@
             <i class="bi bi-search"></i> Search
         </button>
     </div>
+						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')" style="margin-top: 5px; justify-content: flex-end;">
+							<button type="button" onclick="downloadPayslip()" class="btn btn-outline-primary">
+						        <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
+						    </button>
+						</div>
 </form>
-<!--  미지급자 조회 버튼 -->
-<div sec:authorize="hasAnyRole('ATHR001','ATHR002')" style="margin-bottom: 10px;">
-    <button type="button" class="btn btn-outline-primary" 
-            data-bs-toggle="modal" data-bs-target="#missingPaymentModal">
-        <i class="bi bi-exclamation-circle"></i> 미지급자 조회
-    </button>
-	<button type="button" onclick="downloadPayslip()" class="btn btn-outline-primary" 
-	            sec:authorize="hasAnyRole('ATHR001', 'ATHR002', 'ATHR003')">
-	        <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
-	    </button>
-</div>
-
 
                     <!-- 메인 그리드 -->
                     <div id="grid" style="width:100%; height:100%;"></div>
@@ -108,8 +110,11 @@
                     <!-- 추가/저장/삭제 버튼 -->
                     <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
                         <!-- 권한 설정 -->
-						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-						    <button type="button" onclick="addPaymentRow()" class="btn btn-outline-secondary">추가</button>
+						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')" style="margin-top: 5px;">
+						    <button type="button" class="btn btn-outline-primary" 
+						            data-bs-toggle="modal" data-bs-target="#missingPaymentModal">
+						        <i class="bi bi-exclamation-circle"></i> 미지급자 조회
+						    </button>
 						    <button type="button" onclick="deleteRows()" class="btn btn-outline-danger">삭제</button>
 						    <button type="button" onclick="bulkCalculateAndSave()" class="btn btn-outline-primary">
 						        저장

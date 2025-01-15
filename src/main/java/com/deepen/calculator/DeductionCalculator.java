@@ -52,24 +52,56 @@ public class DeductionCalculator {
     /**
      * 소득세 계산
      */
-    public BigDecimal calculateIncomeTax(JsonNode formula, PayInfo payInfo) {
-        BigDecimal monthlyIncome = calculateTaxBase(formula, payInfo);
-        BigDecimal annualIncome = monthlyIncome.multiply(new BigDecimal("12"));
-        
-        JsonNode brackets = formula.get("brackets");
-        for (JsonNode bracket : brackets) {
-            JsonNode limitNode = bracket.get("limit");
-            BigDecimal limit = limitNode != null && !limitNode.isNull() ? 
-                new BigDecimal(limitNode.asText()) : null;
-                
-            if (limit == null || annualIncome.compareTo(limit) <= 0) {
-                BigDecimal rate = new BigDecimal(bracket.get("rate").asText());
-                return monthlyIncome.multiply(rate).setScale(0, RoundingMode.DOWN);
-            }
-        }
-        
-        return BigDecimal.ZERO;
-    }
+//    public BigDecimal calculateIncomeTax(JsonNode formula, PayInfo payInfo) {
+//        BigDecimal monthlyIncome = calculateTaxBase(formula, payInfo);
+//        BigDecimal annualIncome = monthlyIncome.multiply(new BigDecimal("12"));
+//        
+//        JsonNode brackets = formula.get("brackets");
+//        for (JsonNode bracket : brackets) {
+//            JsonNode limitNode = bracket.get("limit");
+//            BigDecimal limit = limitNode != null && !limitNode.isNull() ? 
+//                new BigDecimal(limitNode.asText()) : null;
+//                
+//            if (limit == null || annualIncome.compareTo(limit) <= 0) {
+//                BigDecimal rate = new BigDecimal(bracket.get("rate").asText());
+//                return monthlyIncome.multiply(rate).setScale(0, RoundingMode.DOWN);
+//            }
+//        }
+//        
+//        return BigDecimal.ZERO;
+//    }
+    	
+	public BigDecimal calculateIncomeTax(JsonNode formula, PayInfo payInfo) {
+	    BigDecimal monthlyIncome = calculateTaxBase(formula, payInfo);
+	    BigDecimal annualIncome = monthlyIncome.multiply(new BigDecimal("12"));
+	        
+	    BigDecimal totalTax = BigDecimal.ZERO;
+	    BigDecimal prevLimit = BigDecimal.ZERO;
+	        
+	    JsonNode brackets = formula.get("brackets");
+	    for (JsonNode bracket : brackets) {
+	        JsonNode limitNode = bracket.get("limit");
+	        BigDecimal limit = limitNode != null && !limitNode.isNull() ? 
+	            new BigDecimal(limitNode.asText()) : null;
+	                
+	        BigDecimal rate = new BigDecimal(bracket.get("rate").asText());
+	            
+	        if (limit == null || annualIncome.compareTo(limit) > 0) {
+	            BigDecimal taxableAmount = limit != null ? limit.subtract(prevLimit) : annualIncome.subtract(prevLimit);
+	            BigDecimal tax = taxableAmount.multiply(rate);
+	            totalTax = totalTax.add(tax);
+	        } else {
+	            BigDecimal taxableAmount = annualIncome.subtract(prevLimit);
+	            BigDecimal tax = taxableAmount.multiply(rate);
+	            totalTax = totalTax.add(tax);
+	            break;
+	        }
+	            
+	        prevLimit = limit != null ? limit : prevLimit;
+	    }
+	        
+	    return totalTax.divide(new BigDecimal("12"), 0, RoundingMode.DOWN);
+	}
 
     /**
      * 지방소득세 계산
@@ -124,14 +156,19 @@ public class DeductionCalculator {
     private BigDecimal calculateTaxBase(JsonNode formula, PayInfo payInfo) {
         BigDecimal base = BigDecimal.ZERO;
         JsonNode baseFields = formula.get("baseFields");
-        
+            
         for (JsonNode field : baseFields) {
             switch (field.asText()) {
                 case "emp_salary" -> base = base.add(new BigDecimal(payInfo.getEmpSalary()));
                 case "allow_amt" -> base = base.add(payInfo.getAllowAmt());
             }
         }
-        
+            
+        base = base.subtract(payInfo.getNationalPension())
+                   .subtract(payInfo.getHealthInsurance())
+                   .subtract(payInfo.getLongtermCareInsurance())
+                   .subtract(payInfo.getEmploymentInsurance());
+            
         return base;
     }
 }

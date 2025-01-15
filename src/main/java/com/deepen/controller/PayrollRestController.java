@@ -12,9 +12,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -218,6 +220,29 @@ public class PayrollRestController {
             log.severe("Error in getMonthlyPayrollDetail: " + e.getMessage());
             return ResponseEntity.badRequest()
                 .body(Map.of("message", "상세 정보 조회 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+    
+    // 삭제 버튼
+    @PreAuthorize("hasRole('ATHR001')")  
+    @DeleteMapping("/pay-info")
+    public ResponseEntity<?> deletePayInfo(@RequestBody List<Long> paymentNos) {
+        try {
+            payInfoService.deletePayInfo(paymentNos);
+            
+            return ResponseEntity.ok()
+                .body(Map.of(
+                    "message", "선택한 급여 정보가 삭제되었습니다.",
+                    "status", "success"
+                ));
+                
+        } catch (Exception e) {
+//            log.error("급여 정보 삭제 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "message", "삭제 중 오류가 발생했습니다: " + e.getMessage(),
+                    "status", "error"
+                ));
         }
     }
 }

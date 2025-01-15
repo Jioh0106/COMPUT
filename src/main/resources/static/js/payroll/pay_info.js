@@ -79,51 +79,121 @@ const gridConfig = {
             netSalary: '실지급액'
         }
     },
-    getColumnDefinitions() {
-        return Object.entries(this.columns.headers).map(([key, header]) => {
-            const column = {
-                header,
-                name: key,
-                width: 110,
-                align: 'center'
-            };
-			
-			// 금액 컬럼인 경우 천단위 구분자 formatter 추가
-            if (this.columns.money.includes(key)) {
-                column.align = 'right'; // 금액은 우측 정렬
-                column.formatter = (value) => {
-                    if (!value.value && value.value !== 0) return '';
-                    return value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                };
-            }
+	
+	deptOrder: [
+        'DEPT001', // 인사팀
+        'DEPT002', // 마케팅
+        'DEPT003', // 영업
+        'DEPT004', // 개발
+        'DEPT005',  // 재무
+        'DEPT006'  // 고객관리
+    ],
 
-            switch(key) {
-                case 'empId':
-                    column.editor = false;
-                    column.className = 'clickable-cell';
-                    column.validation = { required: true };
-                    break;
-                case 'paymentDate':
-                    column.editor = {
-                        type: 'text',
-                        options: { maxLength: 7 }
-                    };
-                    column.validation = {
-                        required: true,
-                        dataType: 'string',
-                        validator: value => formatPaymentMonth(value) !== null
-                    };
-                    column.formatter = (value) => {
-                        if (!value.value) return '예시) 202501';
-                        return formatPaymentMonth(value.value) || value.value;
-                    };
-                    break;
-                default:
-                    column.editor = false;
-            }
-            return column;
-        });
-    }
+    // 직급 정렬 순서 정의
+    positionOrder: [
+        'PSTN001', // 대표이사
+        'PSTN002', // 이사
+        'PSTN004', // 부장
+        'PSTN003', // 차장
+        'PSTN005', // 팀장
+        'PSTN006', // 대리
+        'PSTN007',  // 주임
+        'PSTN008'  // 사원
+    ],
+		
+	getColumnDefinitions() {
+	   return Object.entries(this.columns.headers).map(([key, header]) => {
+	       const column = {
+	           header,
+	           name: key,
+	           width: 110,
+	           align: 'center',
+	           sortable: ['paymentDate', 'empId', 'departmentName', 'positionName'].includes(key)
+	       };
+
+	       // 금액 컬럼인 경우 천단위 구분자 formatter 추가
+	       if (this.columns.money.includes(key)) {
+	           column.align = 'right';
+	           column.formatter = (value) => {
+	               if (!value.value && value.value !== 0) return '';
+	               return value.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	           };
+	       }
+
+	       switch(key) {
+	           case 'empId':
+	               column.editor = false;
+	               column.formatter = (props) => {
+	                   const row = grid.getRow(props.rowKey);
+	                   if (row && !row.paymentNo) {
+	                       return `<div class="clickable-cell-emp">${props.value}</div>`;
+	                   }
+	                   return props.value;
+	               };
+	               column.validation = { required: true };
+	               break;
+
+	           case 'paymentDate':
+	               column.editor = {
+	                   type: 'text',
+	                   options: { maxLength: 7 }
+	               };
+	               column.validation = {
+	                   required: true,
+	                   dataType: 'string',
+	                   validator: value => formatPaymentMonth(value) !== null
+	               };
+	               column.formatter = (value) => {
+	                   if (!value.value) return '예시) 202501';
+	                   return formatPaymentMonth(value.value) || value.value;
+	               };
+	               column.sortingType = 'desc';
+	               break;
+
+	           case 'departmentName':
+	               column.editor = false;
+	               column.sortingType = 'custom';
+	               column.sortingFunction = (a, b, column) => {
+	                   const deptOrder = {
+	                       'DEPT001': 1, // 인사
+	                       'DEPT002': 2, // 마케팅 
+	                       'DEPT003': 3, // 영업
+	                       'DEPT004': 4, // 개발
+	                       'DEPT005': 5,  // 재무
+	                       'DEPT006': 6  // 고객관리
+	                   };
+					   const aCode = a.departmentCode || '';
+			           const bCode = b.departmentCode || '';
+			           return (deptOrder[aCode] || 999) - (deptOrder[bCode] || 999);
+	               };
+	               break;
+
+	           case 'positionName':
+	               column.editor = false;
+	               column.sortingType = 'custom';
+	               column.sortingFunction = (a, b, column) => {
+	                   const positionOrder = {
+	                       'PSTN001': 1, // 대표이사
+	                       'PSTN002': 2, // 이사
+	                       'PSTN004': 4, // 부장
+	                       'PSTN003': 3, // 차장
+	                       'PSTN005': 5, // 팀장
+	                       'PSTN006': 6, // 대리
+	                       'PSTN007': 7,  // 주임
+	                       'PSTN008': 8  // 사원
+	                   };
+					   const aCode = a.positionCode || '';
+			           const bCode = b.positionCode || '';
+			           return (positionOrder[aCode] || 999) - (positionOrder[bCode] || 999);
+	               };
+	               break;
+
+	           default:
+	               column.editor = false;
+	       }
+	       return column;
+	   });
+	}
 };
 
 // ================== 전역 변수 ==================
@@ -148,15 +218,33 @@ function initializeMainGrid(isRegularEmployee) {
         editingEvent: isRegularEmployee ? 'none' : 'click'
     });
 
-    // 그리드 이벤트 바인딩
+	// 클릭 이벤트 핸들링
 	if (!isRegularEmployee) {
-	    grid.on('click', (ev) => {
-	        if (ev.columnName === 'empId') {
-	            openEmployeeSearch(ev.rowKey);
-	        }
-	    });
-	}
+        grid.on('click', (ev) => {
+            if (ev.columnName === 'empId') {
+                const row = grid.getRow(ev.rowKey);
+                if (!row.paymentNo) {
+                    openEmployeeSearch(ev.rowKey);
+                }
+            }
+        });
+    }
 
+	// 행이 추가될 때마다 스타일 적용
+	grid.on('afterChange', (ev) => {
+        const rowKey = ev.changes[0]?.rowKey;
+        if (rowKey !== undefined) {
+            const row = grid.getRow(rowKey);
+            if (!row.paymentNo) {
+                grid.addRowClassName(rowKey, 'unsaved-row');
+            }
+        }
+    });
+
+    grid.on('onGridMounted', () => {
+        grid.refreshLayout();
+    });
+	
     // 편집 완료 이벤트
     grid.on('editingFinish', ({columnName, rowKey, value}) => {
         if(['empSalary','allowAmt', 'deducAmt'].includes(columnName)) {
@@ -392,36 +480,41 @@ function hideLoadingSpinner() {
 
 
 // 선택된 사원 정보로 그리드 업데이트
-function updateGridWithSelectedEmployee(employee) {
-    const rowKey = selectedRowKey;
-    
-    // 기본 정보만 설정
-    grid.setValue(rowKey, 'empId', employee.empId);
-    grid.setValue(rowKey, 'empName', employee.empName);
-    grid.setValue(rowKey, 'departmentName', employee.departmentName);
-    grid.setValue(rowKey, 'positionName', employee.positionName);
+async function updateGridWithSelectedEmployee(employee) {
+    try {
+        const rowKey = selectedRowKey;
 
-    // 미저장 행 스타일 적용
-    grid.addRowClassName(rowKey, 'unsaved-row');
+        // 기본 정보만 그리드에 표시
+        grid.setRow(rowKey, {
+            empId: employee.empId,
+            empName: employee.empName,
+            departmentName: employee.departmentName,
+            positionName: employee.positionName
+        });
 
-    // 지급월 입력 받기
-    const paymentDate = prompt('지급월을 입력하세요 (예: 2025-12)');
-    if (paymentDate) {
-        const formattedDate = formatPaymentMonth(paymentDate);
-        if (formattedDate) {
-            grid.setValue(rowKey, 'paymentDate', formattedDate);
-            // 급여 계산만 실행 (저장하지 않음)
-            calculateSalary(employee.empId, formattedDate, rowKey);
-        } else {
-            alert('올바른 지급월 형식으로 입력해주세요 (예: 2025-12)');
+        // 지급월 입력 받고 검증
+        const validatedDate = handlePaymentDateInput();
+        if (!validatedDate) {
+            grid.removeRow(rowKey);
+            closeEmployeeModal();
+            return;
         }
-    }
-	if (!paymentDate) {
-	    grid.removeRow(rowKey);
-	    return;
-	}
 
-    closeEmployeeModal();
+        // 지급월 설정
+        grid.setValue(rowKey, 'paymentDate', validatedDate);
+
+        // 급여 계산 실행 (저장하지 않고 그리드에만 표시)
+        await calculateSalary(employee.empId, validatedDate, rowKey);
+
+        // 미저장 상태 표시
+        grid.addRowClassName(rowKey, 'unsaved-row');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('처리 중 오류가 발생했습니다.');
+    } finally {
+        closeEmployeeModal();
+    }
 }
 
 // 급여 계산 함수 (저장하지 않고 화면에만 표시)
@@ -521,6 +614,17 @@ style.textContent = `
     .unsaved-row td {
         background-color: #fff3e0 !important;
     }
+    .clickable-cell {
+        color: #0066cc;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    /* 저장된 행의 사원번호 셀은 일반 텍스트처럼 보이도록 */
+    .tui-grid-cell-content span:not(.clickable-cell) {
+        color: inherit;
+        cursor: default;
+        text-decoration: none;
+    }
 `;
 document.head.appendChild(style);
 
@@ -547,19 +651,49 @@ function initializeMainGrid(isRegularEmployee) {
 
     // 행이 추가될 때마다 스타일 적용
 	grid.on('afterChange', (ev) => {
-	        const rowKey = ev.changes[0]?.rowKey;
-	        if (rowKey !== undefined) {
-	            const row = grid.getRow(rowKey);
-	            if (!row.paymentNo) {
-	                grid.addRowClassName(rowKey, 'unsaved-row');
-	            }
-	        }
+        grid.getData().forEach((row, index) => {
+            if (!row.paymentNo) {
+                grid.addRowClassName(index, 'unsaved-row');
+            } else {
+                grid.removeRowClassName(index, 'unsaved-row');
+            }
+        });
     });
 
-    // 데이터 로드 후 스타일 적용
+	// 초기 데이터 로드 후 스타일 적용
     grid.on('onGridMounted', () => {
-        grid.refreshLayout();
+        grid.getData().forEach((row, index) => {
+            if (!row.paymentNo) {
+                grid.addRowClassName(index, 'unsaved-row');
+            }
+        });
     });
+
+    // 데이터가 새로 설정될 때마다 스타일 적용
+    grid.on('beforeData', (data) => {
+        setTimeout(() => {
+            data.forEach((row, index) => {
+                if (!row.paymentNo) {
+                    grid.addRowClassName(index, 'unsaved-row');
+                }
+            });
+        }, 0);
+    });
+}
+
+// 추가 버튼 클릭시 새 행 추가 함수
+function addPaymentRow() {
+    const rowData = {};
+    const newRowKey = grid.getRowCount();
+    grid.prependRow(rowData);
+    
+    // 명시적으로 클래스 추가
+    setTimeout(() => {
+        grid.addRowClassName(newRowKey, 'unsaved-row');
+    }, 0);
+    
+    selectedRowKey = newRowKey;
+    openEmployeeSearch(newRowKey);
 }
 
 // 모달 닫기
@@ -784,13 +918,12 @@ function savePaymentData() {
     // 데이터 유효성 검사
     for (const row of modifiedData) {
         if (row.paymentDate) {
-			const formattedDate = formatPaymentMonth(paymentDate);
-			if (!formattedDate || !validatePaymentDate(formattedDate)) {
-			    alert('올바른 지급월이 아니거나 미래의 지급월입니다.');
-			    grid.removeRow(rowKey);
-			    return;
-			}
-            row.paymentDate = formatted;
+            const validatedDate = validatePaymentDate(row.paymentDate);
+            if (!validatedDate) {
+                alert('올바른 지급월이 아니거나 미래의 지급월입니다.');
+                return;
+            }
+            row.paymentDate = validatedDate;
         }
     }
 
@@ -801,46 +934,34 @@ function savePaymentData() {
         return;
     }
 
-    // 데이터 저장 요청
+    // 저장 요청
     $.ajax({
         url: '/api/payroll/pay-info/save',
-		        type: 'POST',
-		        contentType: 'application/json',
-		        data: JSON.stringify(modifiedData.map(row => ({
-		            paymentNo: row.paymentNo || null,
-		            empId: row.empId,
-		            paymentDate: row.paymentDate,
-		            empSalary: Number(row.empSalary || 0),
-		            techAllowance: Number(row.techAllowance || 0),
-		            tenureAllowance: Number(row.tenureAllowance || 0),
-		            performanceBonus: Number(row.performanceBonus || 0),
-		            holidayAllowance: Number(row.holidayAllowance || 0),
-		            leaveAllowance: Number(row.leaveAllowance || 0),
-		            allowAmt: Number(row.allowAmt || 0),
-		            nationalPension: Number(row.nationalPension || 0),
-		            longtermCareInsurance: Number(row.longtermCareInsurance || 0),
-		            healthInsurance: Number(row.healthInsurance || 0),
-		            employmentInsurance: Number(row.employmentInsurance || 0),
-		            incomeTax: Number(row.incomeTax || 0),
-		            residentTax: Number(row.residentTax || 0),
-		            deducAmt: Number(row.deducAmt || 0),
-		            netSalary: Number(row.netSalary || 0)
-		        }))),
-		        success: function(response) {
-		            if(response.status === 'success') {
-		                alert(response.message);
-		                location.reload();
-		            } else {
-		                alert(response.message || '저장 중 오류가 발생했습니다.');
-		            }
-		        },
-		        error: function(xhr, status, error) {
-		            const errorMessage = xhr.responseJSON?.message || '저장 중 오류가 발생했습니다.';
-		            alert(errorMessage);
-		            console.error('Error:', error);
-		        }
-		    });
-		}
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(modifiedData.map(row => ({
+            paymentNo: row.paymentNo || null,
+            empId: row.empId,
+            paymentDate: row.paymentDate,
+            empSalary: Number(row.empSalary || 0),
+            // ... (나머지 필드들)
+        }))),
+        success: function(response) {
+            if(response.status === 'success') {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message || '저장 중 오류가 발생했습니다.');
+            }
+        },
+        error: function(xhr, status, error) {
+            const errorMessage = xhr.responseJSON?.message || '저장 중 오류가 발생했습니다.';
+            alert(errorMessage);
+            console.error('Error:', error);
+        }
+    });
+}
+
 
 		// ================== 유틸리티 함수 ==================
 
@@ -925,12 +1046,25 @@ function savePaymentData() {
 		    }
 			
 			// 미지급자 조회 모달 이벤트 바인딩
-			   $('#missingPaymentModal').on('shown.bs.modal', function () {
-			       if (!missingPaymentGrid) {
-			           initializeMissingPaymentGrid();
-			       }
-			       missingPaymentGrid.refreshLayout();
-			 	});
+			$('#missingPaymentModal').on('shown.bs.modal', function () {
+			    // 현재 날짜를 YYYY-MM 형식으로 가져오기
+			    const today = new Date();
+			    const year = today.getFullYear();
+			    const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+			    const currentYearMonth = `${year}-${month}`;
+			    
+			    // input에 현재 월 설정
+			    $('#missingPaymentMonth').val(currentYearMonth);
+			    
+			    // 그리드 초기화
+			    if (!missingPaymentGrid) {
+			        initializeMissingPaymentGrid();
+			    }
+			    missingPaymentGrid.refreshLayout();
+			    
+			    // 자동으로 미지급자 조회 실행
+			    checkMissingPayment();
+			});
 			
 		    // 그리드 초기화
 		    initializeMainGrid(isRegularEmployee);
@@ -986,12 +1120,12 @@ function savePaymentData() {
 		    });
 		}
 		
-		// 선택된 사원 정보로 그리드 업데이트
+		// 선택된 사원 정보로 그리드 업데이트 함수 수정
 		async function updateGridWithSelectedEmployee(employee) {
 		    try {
 		        const rowKey = selectedRowKey;
 
-		        // 기본 정보만 그리드에 표시
+		        // 기본 정보 설정
 		        grid.setRow(rowKey, {
 		            empId: employee.empId,
 		            empName: employee.empName,
@@ -1000,25 +1134,18 @@ function savePaymentData() {
 		        });
 
 		        // 지급월 입력 받기
-				const validatedDate = handlePaymentDateInput();
-				        if (!validatedDate) {
-				            grid.removeRow(rowKey);
-				            closeEmployeeModal();
-				            return;
-				        }
-
-		        const formattedDate = formatPaymentMonth(paymentDate);
-		        if (!formattedDate) {
-		            alert('올바른 지급월 형식으로 입력해주세요 (예: 2024-01)');
+		        const validatedDate = handlePaymentDateInput();
+		        if (!validatedDate) {
 		            grid.removeRow(rowKey);
+		            closeEmployeeModal();
 		            return;
 		        }
 
 		        // 지급월 설정
 		        grid.setValue(rowKey, 'paymentDate', validatedDate);
 
-		        // 급여 계산 실행 (저장하지 않고 그리드에만 표시)
-		        await calculateSalary(employee.empId, formattedDate, rowKey);
+		        // 급여 계산 실행
+		        await calculateSalary(employee.empId, validatedDate, rowKey);
 
 		        // 미저장 상태 표시
 		        grid.addRowClassName(rowKey, 'unsaved-row');
@@ -1026,6 +1153,7 @@ function savePaymentData() {
 		    } catch (error) {
 		        console.error('Error:', error);
 		        alert('처리 중 오류가 발생했습니다.');
+		        grid.removeRow(rowKey);
 		    } finally {
 		        closeEmployeeModal();
 		    }
@@ -1084,25 +1212,58 @@ function savePaymentData() {
 		}
 		
 		// 삭제 버튼
-		function deleteRows() {
+		async function deleteRows() {
 		    const checkedRows = grid.getCheckedRows();
-		    
+
 		    if (checkedRows.length === 0) {
 		        alert('삭제할 항목을 선택해주세요.');
 		        return;
 		    }
 
-		    // 저장된 데이터가 있는지 확인
-		    const hasSavedData = checkedRows.some(row => row.paymentNo);
-		    if (hasSavedData) {
-		        alert('이미 저장된 데이터는 삭제할 수 없습니다.');
+		    const savedRows = checkedRows.filter(row => row.paymentNo);
+		    const unsavedRows = checkedRows.filter(row => !row.paymentNo);
+
+		    if (!confirm(`선택한 ${checkedRows.length}건을 삭제하시겠습니까?`)) {
 		        return;
 		    }
 
-		    if (confirm(`선택한 ${checkedRows.length}건을 삭제하시겠습니까?`)) {
-		        checkedRows.forEach(row => {
-		            grid.removeRow(row.rowKey);
-		        });
+		    try {
+		        if (savedRows.length > 0) {
+		            const paymentNos = savedRows.map(row => row.paymentNo);
+		            
+		            // CSRF 토큰 가져오기
+		            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+		            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+		            
+		            const response = await fetch('/api/payroll/pay-info', {
+		                method: 'DELETE',
+		                headers: {
+		                    'Content-Type': 'application/json',
+		                    [csrfHeader]: csrfToken  // CSRF 토큰 추가
+		                },
+		                body: JSON.stringify(paymentNos)
+		            });
+
+		            if (!response.ok) {
+		                const errorData = await response.json();
+		                throw new Error(errorData.message || '삭제 처리 중 오류가 발생했습니다.');
+		            }
+
+		            // 성공적으로 삭제된 경우에만 그리드에서 제거
+		            savedRows.forEach(row => {
+		                grid.removeRow(row.rowKey);
+		            });
+
+			        }
+		            // 미저장 데이터 그리드에서 제거
+		            unsavedRows.forEach(row => {
+		                grid.removeRow(row.rowKey);
+		            });
+					
+			            alert('선택한 항목이 삭제되었습니다.');
+		    } catch (error) {
+		        console.error('Error:', error);
+		        alert(error.message);
 		    }
 		}
 		
