@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,6 +42,7 @@ import com.deepen.domain.AbsenceDTO;
 import com.deepen.entity.Employees;
 import com.deepen.service.AbsenceService;
 import com.deepen.service.RequestService;
+import com.deepen.service.VacationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,6 +59,9 @@ public class RequestController {
 	
 	@Autowired
 	private AbsenceService absenceService;
+	
+	@Autowired
+	private VacationService vctnService;
 	
 	
 	//요청내역 리스트 페이지
@@ -196,6 +202,26 @@ public class RequestController {
 		
 		return "request/request_absence_detail";
 	}
+	
+	// 요청상세내용 페이지 - 휴가
+		@GetMapping("/request-vctn-detail")
+		public String requestVctnDetail(@RequestParam("request_no") int request_no, @AuthenticationPrincipal User user, Model model) {
+			String empId = user.getUsername();
+			
+			Map<String, Object> requestMap = new HashMap<>();
+			requestMap.put("empId", empId);
+			requestMap.put("requestNo", request_no);
+			
+			List<Map<String, Object>> vctnMap = vctnService.selectUseVctnList(requestMap);
+			model.addAttribute("vctnMap", vctnMap.get(0));
+			
+			// 최종승인권자 조회
+			String role = "ATHR001";
+			List<Map<String, Object>> highAprvr = vctnService.selectAprvr(role);
+			model.addAttribute("highAprvr", highAprvr);
+			
+			return "request/request_vctn_detail";
+		}
 
 	
 	

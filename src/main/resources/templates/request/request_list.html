@@ -263,7 +263,10 @@
 	   					
 	   				} else if(rowData.request_type === '휴직') {
 	   					popupUrl = `/request-absence-detail?request_no=${request_no}`;
-	   				}
+	   				
+					} else {
+						popupUrl = `/request-vctn-detail?request_no=${request_no}`;
+					}
 				   
 				   
 				   window.open(popupUrl, 'popup', popupOptions);

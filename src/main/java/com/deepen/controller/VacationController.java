@@ -115,7 +115,7 @@ public class VacationController {
 		model.addAttribute("commonDtlList", commonDtlList);
 
 		// 중간승인권자 조회
-		List<Map<String, Object>> middleAprvr = service.selectMiddleAprvr();
+		List<Map<String, Object>> middleAprvr = service.selectAprvr("ATHR002");
 		model.addAttribute("middleAprvr", middleAprvr);
 
 		return "attendance/vctn_appform";

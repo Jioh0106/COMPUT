@@ -20,7 +20,7 @@ public interface VacationMapper {
 
 	Map<String, Object> selectEmpInfo(String userId);
 
-	List<Map<String, Object>> selectMiddleAprvr();
+	List<Map<String, Object>> selectAprvr(String role);
 
 	int insertRequest(Map<String, Object> map);
 
