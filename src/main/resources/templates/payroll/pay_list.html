@@ -8,7 +8,7 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     
-    <title>급여 대장 이력</title>
+    <title>급여 대장</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -60,17 +60,55 @@
                 </a>
             </header>
             
-            <h3>급여 대장 이력</h3>
-            <!-- 메인 그리드 카드 -->
-            <div class="card">
-                <div class="card-body">           
-                  <!-- 검색 부분 수정 -->
-<div style="margin-bottom: 10px; display: flex; align-items: center;">
-   <input type="text" class="form-control" id="basicInput" style="margin-left: 5px; width:200px;" 
-        placeholder="대장명칭을 입력하세요">
-    <a href="#" class="btn btn-primary rounded-pill" style="margin-left: 5px;">Search</a>
-</div>
-<div id="mainGrid" style="width:100%; height:100%;"></div>
+            <h3>급여 대장</h3>
+              <!-- 탭 네비게이션 추가 -->
+            <ul class="nav nav-tabs" id="payrollTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" 
+                            data-bs-target="#monthly-content" type="button" role="tab">
+                        월별 급여 대장
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="annual-tab" data-bs-toggle="tab" 
+                            data-bs-target="#annual-content" type="button" role="tab">
+                        연간 급여 대장
+                    </button>
+                </li>
+            </ul>
+
+            <!-- 탭 컨텐츠 -->
+            <div class="tab-content" id="payrollTabsContent">
+                <!-- 월별 급여 대장 탭 -->
+                <div class="tab-pane fade show active" id="monthly-content" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 기존 검색 부분 -->
+                            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                                <input type="text" class="form-control" id="basicInput" 
+                                       style="margin-left: 5px; width:200px;" 
+                                       placeholder="대장명칭을 입력하세요">
+                                <a href="#" class="btn btn-primary rounded-pill" 
+                                   style="margin-left: 5px;">Search</a>
+                            </div>
+                            <div id="mainGrid" style="width:100%; height:400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 연간 급여 대장 탭 -->
+                <div class="tab-pane fade" id="annual-content" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 연도 선택 -->
+                            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                               <select class="form-select" id="yearSelect" style="width: 200px;">
+    								<option value="">연도 선택</option>
+							   </select>
+                            </div>
+                            <div id="annualGrid" style="width:100%; height:600px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             

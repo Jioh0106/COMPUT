@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.deepen.domain.PayListDTO;
 import com.deepen.mapper.PayListMapper;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -50,4 +50,16 @@ public class PayListService {
         }
         return payListMapper.getDepartmentPayrollStats(paymentDate);
     }
+    
+    //연간 급여 대장
+    @Transactional(readOnly = true)
+    public List<PayListDTO> getAnnualPayrollData(String year) {
+        return payListMapper.getAnnualPayrollData(year);
+    }
+
+    
+    
+    
+    
+    
 }

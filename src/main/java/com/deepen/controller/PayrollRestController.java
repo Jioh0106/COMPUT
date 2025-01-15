@@ -12,11 +12,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -190,7 +188,7 @@ public class PayrollRestController {
         }
     }
 
-    //==============   급여 대장 이력  ===================
+    //==============   급여 대장   =================== //
     
     // 월별 급여 대장 메인
     @GetMapping("/pay-list/summary")
@@ -223,26 +221,18 @@ public class PayrollRestController {
         }
     }
     
-    // 삭제 버튼
-    @PreAuthorize("hasRole('ATHR001')")  
-    @DeleteMapping("/pay-info")
-    public ResponseEntity<?> deletePayInfo(@RequestBody List<Long> paymentNos) {
+    //연간 급여 대장 조회
+    @GetMapping("/pay-list/annual/{year}")
+    public ResponseEntity<?> getAnnualPayroll(@PathVariable(name = "year") String year) {
         try {
-            payInfoService.deletePayInfo(paymentNos);
-            
-            return ResponseEntity.ok()
-                .body(Map.of(
-                    "message", "선택한 급여 정보가 삭제되었습니다.",
-                    "status", "success"
-                ));
-                
+            log.info("Fetching annual payroll data for year: " + year);
+            List<PayListDTO> annualData = payListService.getAnnualPayrollData(year);
+            return ResponseEntity.ok(annualData);
         } catch (Exception e) {
-//            log.error("급여 정보 삭제 중 오류 발생: {}", e.getMessage());
+            log.severe("Error in getAnnualPayroll: " + e.getMessage());
             return ResponseEntity.badRequest()
-                .body(Map.of(
-                    "message", "삭제 중 오류가 발생했습니다: " + e.getMessage(),
-                    "status", "error"
-                ));
+                .body(Map.of("message", "연간 급여 데이터 조회 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
+    
 }

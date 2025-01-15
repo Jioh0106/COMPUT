@@ -28,4 +28,7 @@ public interface PayListMapper {
     Map<String, Object> getDepartmentPayrollStats(
         @Param("paymentDate") String paymentDate
     );
+    
+ // 연간 급여 대장
+    List<PayListDTO> getAnnualPayrollData(@Param("year") String year);
 }
