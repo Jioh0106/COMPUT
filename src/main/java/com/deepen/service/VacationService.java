@@ -72,7 +72,7 @@ public class VacationService {
 				useVctn.put("vctnDays", 15 - Integer.valueOf(String.valueOf(useVctn.get("useDays"))));
 			}
 		}
-		
+		System.out.println("vctnService : " + athrMapList.toString());
 		return useVctnList;
 	}
 	
@@ -98,8 +98,8 @@ public class VacationService {
 		return map;
 	}
 
-	public List<Map<String, Object>> selectMiddleAprvr() {
-		return mapper.selectMiddleAprvr();
+	public List<Map<String, Object>> selectAprvr(String role) {
+		return mapper.selectAprvr(role);
 	}
 
 	public int insertVctn(Map<String, Object> vctnMap, Map<String, Object> rqstMap) {
