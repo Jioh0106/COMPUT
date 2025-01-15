@@ -2,9 +2,13 @@ package com.deepen.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.AssignmentDTO;
@@ -12,6 +16,7 @@ import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.EmployeesDTO;
 import com.deepen.domain.RequestDTO;
 import com.deepen.entity.Assignment;
+import com.deepen.entity.CommonDetail;
 import com.deepen.entity.Employees;
 import com.deepen.entity.Request;
 import com.deepen.mapper.AssignMapper;
@@ -23,6 +28,7 @@ import com.deepen.repository.RequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
+@EnableScheduling
 @Service
 @RequiredArgsConstructor
 @Log
@@ -34,6 +40,7 @@ public class AssignService {
 	private final RequestRepository rqRepository;
 	private final PersonnelService psService; 
 	private final PersonnelRepository personnelRepository;
+	
 	
 	
 	//JPA
@@ -92,9 +99,15 @@ public class AssignService {
 		assignment.setAssign_emp_id(assignmentDto.getAssign_emp_id()); //발령자사번
 		assignment.setAssign_type(assignmentDto.getAssign_type()); //발령구분(승진/전보)
 		assignment.setAssign_date(assignmentDto.getAssign_date()); //발령일자
-		assignment.setPrev_pos(assignmentDto.getPrev_pos()); //이전직급
+		
+		//테이블에(이전부서, 이전직급이)이름값으로 들어가서 공통코드로 바꿈
+		String commonCodeDept = cdRepo.findCommonDetailCodeByName(assignmentDto.getPrev_dept());
+		assignment.setPrev_dept(commonCodeDept); //이전부서 - 사원
+		String commonCodePos = cdRepo.findCommonDetailCodeByName(assignmentDto.getPrev_pos());
+		assignment.setPrev_pos(commonCodePos); //이전직급 - 개발
+		log.info("이전직급!!!"+commonCodePos);
+		
 		assignment.setNew_pos(assignmentDto.getNew_pos()); //발령직급
-		assignment.setPrev_dept(assignmentDto.getPrev_dept()); //이전부서
 		assignment.setNew_dept(assignmentDto.getNew_dept()); //발령부서
 		assignment.setRequest_no(request.getRequest_no()); //요청번호 FK값
 		
@@ -155,7 +168,36 @@ public class AssignService {
 	
 	
 
-
+	//발령일자에 -> 사원테이블 부서명, 직급 업데이트
+	@Scheduled(fixedRate = 600000)//10분마다 실행 
+	public void employeeUpdate() {
+		List<Assignment> assign = asRepository.findAll();
+		LocalDateTime now = LocalDateTime.now();
+		
+		for(Assignment assignment :assign) {
+			LocalDateTime registr_date = assignment.getRegistr_date();
+			
+			String emp_id = assignment.getAssign_emp_id(); //발령자사번
+			if(registr_date.toLocalDate().isEqual(now.toLocalDate())) {
+				
+				Optional<Employees> optionnalEmployees = personnelRepository.findById(emp_id);
+				Employees employees = optionnalEmployees.get();
+				employees.setEmp_position(assignment.getNew_pos());
+				employees.setEmp_dept(assignment.getNew_dept());
+				
+				personnelRepository.save(employees); //사원테이블 저장
+				log.info("해당 발령자 사번 업데이트"+ emp_id);
+				
+			}else {
+				log.info("해당 발령자사번을 찾을 수 없음"+ emp_id);
+			}
+		}
+		
+	}
+	
+	
+	
+	
 	
 	//=============================================================================
 	
@@ -192,12 +234,17 @@ public class AssignService {
 	
 	//요청번호로 발령테이블 조회
 	public AssignmentDTO selectAssign(Integer request_no){
+		
 		return asMapper.selectAssign(request_no);
 	}
 	
 	 // 반려사유 등록 및 상태 변경
     public boolean updateRejection(Integer request_no, String request_rejection) {
-        int updatedRows = asMapper.updateRejection(request_no, request_rejection);
+    	Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("request_no", request_no);
+        paramMap.put("request_rejection", request_rejection);
+
+        int updatedRows = asMapper.updateRejection(paramMap);
         return updatedRows > 0; // 성공 여부 반환
     }
 	

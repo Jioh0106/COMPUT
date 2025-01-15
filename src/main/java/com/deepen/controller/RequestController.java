@@ -80,7 +80,8 @@ public class RequestController {
 	public String requestAssignDetail() {
 		//http://localhost:8082/request-assign-detail
 		
-		return"request/request_assign_detail";
+		return "request/request_assign_detail";
+		
 	}
 	
 	

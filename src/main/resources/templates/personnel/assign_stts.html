@@ -169,14 +169,7 @@
 
 				var Grid = tui.Grid;
 
-				// 데이터 정의
-				const data = [
-					{
-					assign_type:'전보', registr_date: '2024-12-20', assign_date: '2025-01-03', emp_num: '12-123', emp_name: '홍망고', prev_pos: '사원', new_pos: '사원',
-						prev_dept: '인사팀', new_dept: '마케팅팀'
-					}
-
-				];
+				
 
 				// Grid 생성
 				const grid = new Grid({
@@ -195,9 +188,176 @@
 					data: data
 				});
 
-				// 데이터 갱신 (필요시)
-				// grid.resetData(data);
+				
+				// 그리드 초기화
+// 				mainFetchData().then(function (data) {
 
+// 				let isEditable = emp_role === 'ATHR001' || emp_role === 'ATHR002';
+					
+// 					console.log('Is Editable:', isEditable); 
+					
+// 				    grid = new tui.Grid({
+// 				    	el: document.getElementById('grid'),
+// 						data: gridData,
+// 						rowHeaders: ['checkbox'],
+// 						columns: [
+// 							{
+// 								header: '번호', 
+// 								name: 'assignment_no', 
+// 								width: 60,
+// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+// 								editor: isEditable ? 'text' : null
+// 							},
+// 							{ 
+// 								header: '발령구분', 
+// 								name: 'assign_type', 
+// 								width: 120,
+// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+// 								editor: isEditable ? 'text' : null
+// 							},  
+// 							{ 
+// 								header: '승인일자', 
+// 								name: 'registr_date', 
+// 								width: 100,
+// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+// 								editor: isEditable ? 'text' : null
+// 							},
+// 							{ 
+// 								header: '발령일자', 
+// 								name: 'assign_date',
+// 								width: 100,
+// 								editor: isEditable ? 'text' : null,
+// 								filter: 'select'
+// 							},
+// 							{ 
+// 								header: '사원번호', 
+// 								name: 'emp_num', 
+// 								width: 100,
+// 								editor: isEditable ? 'text' : null,
+// 								filter: 'select'
+// 							},
+// 							{ 
+// 								header: '성명', 
+// 								name: 'emp_name',
+// 								width: 100,
+// 								editor: isEditable
+// 									? {
+// 									type: 'select',
+// 									options: {
+// 										listItems: data.loabCommon
+// 									}
+// 							    }
+// 								: null,
+// 								filter: 'select'
+// 							},
+							
+// 							{ 
+// 								header: '이전직급', 
+// 								name: 'prev_pos',
+// 								width: 120,
+// 								editor: isEditable
+// 									? {
+// 					                type: 'datePicker',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd'
+// 					                }
+// 					            }
+// 								: null,
+// 					            filter: {
+// 					                type: 'date',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd'
+// 					                }
+// 					            }
+// 					        },
+// 					        { 
+// 								header: '발령직급', 
+// 								name: 'new_pos',
+// 								width: 120,
+// 								editor: isEditable 
+// 									? {
+// 					                type: 'datePicker',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd'
+// 					                }
+// 					            }
+// 								: null,
+// 					            filter: {
+// 					                type: 'date',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd'
+// 					                }
+// 					            }
+// 					        },
+// 					        {
+// 					            header: '이전부서', 
+// 					            name: 'prev_dept',
+// 								width: 150,
+// 					            editor: isEditable 
+// 					                ? {
+// 					                    type: 'datePicker',
+// 					                    options: {
+// 					                        format: 'yyyy-MM-dd hh:mm', 
+// 											timepicker: true
+// 					                    }
+// 					                }
+// 					                : null,
+// 					            filter: {
+// 					                type: 'date',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd hh:mm', 
+// 					                }
+// 					            }
+// 					        },
+// 					        {
+// 					            header: '발령부서', 
+// 					            name: 'new_dept',
+// 								width: 150,
+// 					            editor: isEditable 
+// 					                ? {
+// 					                    type: 'datePicker',
+// 					                    options: {
+// 					                        format: 'yyyy-MM-dd hh:mm', 
+// 											timepicker: true
+// 					                    }
+// 					                }
+// 					                : null,
+// 					            filter: {
+// 					                type: 'date',
+// 					                options: {
+// 					                    format: 'yyyy-MM-dd hh:mm', 
+// 					                }
+// 					            }
+// 					        },
+// 					        { 
+// 								header: '최종 승인자', 
+// 								name: 'HIGH_APPROVAL', 
+// 								width: 160,
+// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+// 								editor: isEditable
+// 									? {
+// 									type: 'select',
+// 									options: {
+// 										listItems: data.highList
+// 									}
+// 							    }
+// 								: null,
+// 								filter: 'select'
+// 							},
+// 							{ 
+// 								header: '비고', 
+// 								name: 'ABSENCE_REMARK',
+// 								width: 200,
+// 								editor: isEditable ? 'text' : null
+// 							}
+// 						],
+// 						editing: isEditable  // 편집 기능 활성화
+						
+// 					});
+
+				
+				
+				
 			</script>
 
 </body>

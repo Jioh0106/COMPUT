@@ -63,20 +63,20 @@
                   <!--전체/받은요청/보낸요청 탭 시작-->
                   <ul class="nav nav-tabs" id="myTab" role="tablist">
                       <li class="nav-item" role="presentation">
-                          <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab"
+                          <a class="nav-link active" id="all" data-bs-toggle="tab" href="#home" role="tab"
                               aria-controls="home" aria-selected="true">전체</a>
                       </li>
                       <li class="nav-item" role="presentation">
-                          <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
+                          <a class="nav-link" id="send" data-bs-toggle="tab" href="#profile" role="tab"
                               aria-controls="profile" aria-selected="false">받은요청</a>
                       </li>
                       <li class="nav-item" role="presentation">
-                          <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab"
+                          <a class="nav-link" id="reception" data-bs-toggle="tab" href="#contact" role="tab"
                               aria-controls="contact" aria-selected="false">보낸요청</a>
                       </li>
                   </ul>
                   <div class="tab-content" id="myTabContent">
-                      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                      <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="home-tab">
                          
 						<!-- 그리드 시작 -->
 						<section class="section">
@@ -87,15 +87,14 @@
 						<!-- 그리드 끝 -->
 								
                       </div>
-                      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                      <div class="tab-pane fade" id="send" role="tabpanel" aria-labelledby="profile-tab">
                          
-						<!--각 탭마다 그리드 id 다르게 해줘야함-->
+                         <!--각 탭마다 그리드 id 다르게 해줘야함-->
 						
                       </div>
-                      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                      <div class="tab-pane fade" id="reception" role="tabpanel" aria-labelledby="contact-tab">
                           
 						<!--각 탭마다 그리드 id 다르게 해줘야함-->
-						
 						
                       </div>
                   </div>
@@ -204,8 +203,16 @@
 					
 					data: []
 				});
-
 				
+				
+				
+				 const tabs = {
+					        전체: document.getElementById('all'),
+					        수신: document.getElementById('send'),
+					        발신: document.getElementById('reception')
+					    };
+				
+				 let allData = []; // 전체 데이터를 저장할 변수
 				  // 요청 내역 불러오기 (Fetch API)
 		        fetch('/api/request/list')
 		            .then(response => {
@@ -216,7 +223,8 @@
 		            })
 		            .then(data => {
 		                console.log('Fetched Data:', data); // 확인용
-		                grid.resetData(data); // TOAST UI Grid에 데이터 적용
+		                allData = data; // 전체 데이터를 저장
+		                grid.resetData(allData); // TOAST UI Grid에 데이터 적용
 						grid.refreshLayout(); // 레이아웃 새로고침
 						
 		            })
@@ -224,7 +232,20 @@
 		                console.error('Error fetching request list:', error);
 		            });
 		   
-		
+		     // 탭 클릭 이벤트 등록
+		        Object.keys(tabs).forEach(tabName => {
+		            tabs[tabName].addEventListener('click', () => {
+		                let filteredData;
+		                if (tabName === '전체') {
+		                    filteredData = allData; // 전체 데이터
+		                } else {
+		                    filteredData = allData.filter(item => item.request_division === tabName); // 요청구분에 따른 필터링
+		                }
+
+		                grid.resetData(filteredData); // 필터링된 데이터를 TOAST UI Grid에 적용
+		                grid.refreshLayout(); // 레이아웃 새로고침
+		            });
+		        });
 				
 				
 			// Grid의 row 클릭 이벤트 추가

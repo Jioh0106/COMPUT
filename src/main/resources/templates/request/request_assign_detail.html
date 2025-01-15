@@ -125,9 +125,27 @@
 								</div>
 							</div>
 							<div class="col-12 d-flex justify-content-end">
-								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1"
-								>승인</button>
+								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1">승인</button>
 								<button type="button" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
+								<div id="check-sender" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="ingBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>처리중</button>
+									</div>
+								</div>
+								<div id="check-complete1" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="completeBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>승인완료</button>
+									</div>
+								</div>
+
+								<div id="check-complete2" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="completeBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>반려처리</button>
+									</div>
+								</div>
 							</div>
 						</div>
 					</form>
@@ -225,7 +243,7 @@
                             <i class="bx bx-x d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">취소</span>
                         </button>
-                        <button type="button" class="btn btn-primary ml-1" id="rejectBtn"
+                        <button type="button" class="btn btn-primary ml-1" id="submitRejectBtn"
                             data-bs-dismiss="modal">
                             <i class="bx bx-check d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">등록</span>
@@ -251,12 +269,8 @@
 	 <!-- 제이쿼리 -->
    	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script>
-		
-			//반려 버튼 클릭 이벤트
-		      document.getElementById('rejectBtn').addEventListener('click', () => {
-		          const modal = new bootstrap.Modal(document.getElementById('defaultSize'));
-		          modal.show();
-		      });
+	
+	const csrfToken = $('input[name="_csrf"]').val();
 	
 		   
 		   // URL에서 쿼리 파라미터로 전달된 요청번호 추출
@@ -276,6 +290,9 @@
 			            console.log('REST API 반환 데이터:', data);
 			            const requestDivision = data.request.request_division;
 			            console.log('요청 구분:', requestDivision); // 요청 구분 값 출력
+						const request_status = data.request_status; // 요청 상태 값
+						console.log('요청 상태:', request_status);
+						
 						const assignment = data.assignment;
 			            if (data) {
 			                // 발령 테이블 데이터로 상세정보 팝업창 채우기
@@ -293,13 +310,33 @@
 							
 							const request = data.request;
 							if(request.request_division === '발신'){
-								document.getElementById('approveBtn').style.display = 'none';
-								document.getElementById('rejectBtn').style.display = 'none';
-							}else if(request.request_division === '수신'){
-								document.getElementById('approveBtn').style.display = 'inline-block';
-								document.getElementById('rejectBtn').style.display = 'inline-block';
-							}
-							
+								  // 발신일 때 승인/반려 버튼 숨기기
+			                    document.getElementById('approveBtn').style.display = 'none';
+			                    document.getElementById('rejectBtn').style.display = 'none';
+
+			                    // 발신일 때 상태에 따른 처리
+			                    if (request_status === 'RQST001' || request_status === 'RQST003') {
+			                        $('#check-sender').css('display', 'flex'); // 처리중 버튼 표시
+			                        console.log('발신 + 처리중 상태');
+			                    } else if (request_status === 'RQST002' || request_status === 'RQST004') {
+			                        $('#check-complete2').css('display', 'flex'); // 반려처리 버튼 표시
+			                        console.log('발신 + 반려처리 상태');
+			                    }else if(request_status === 'RQST005'){
+			                    	$('#check-complete1').css('display', 'flex'); // 승인완료 버튼 표시
+			                    }
+			                } else if (request.request_division === '수신') {
+			                    // 수신일 때 승인/반려 버튼 표시
+			                    document.getElementById('approveBtn').style.display = 'inline-block';
+			                    document.getElementById('rejectBtn').style.display = 'inline-block';
+
+			                    // 수신일 때 상태에 따른 처리
+			                    if (request_status === 'RQST005') {
+			                    	document.getElementById('approveBtn').style.display = 'none';
+				                    document.getElementById('rejectBtn').style.display = 'none';
+			                        $('#check-complete1').css('display', 'flex'); // 승인완료 버튼 표시
+			                        console.log('수신 + 승인완료 상태');
+			                    }
+			                }
 			           } else {
 			                alert("발령 정보를 찾을 수 없습니다.");
 			            }
@@ -316,10 +353,10 @@
 		const userRole = urlParams.get('userRole'); // userRole 값 추출
 		console.log('현재 사용자 권한:', userRole);
 		// 승인 버튼 클릭 시 최종 승인권자 선택 모달창 열기
-	    
+			   	
 		document.addEventListener('DOMContentLoaded', function () {
 			const csrfToken = document.getElementById('csrfToken').value; //토큰
-			
+		
 	    	// 승인 버튼 클릭 시 동작 시작
 	       	 document.getElementById('approveBtn').addEventListener('click', function () {
 	       		console.log('승인 버튼 클릭됨');
@@ -474,55 +511,72 @@
 		    document.querySelector('#approveRequestBtn').addEventListener('click', requestApproval);
 		});//DOMContentLoaded끝	
 			
-		//---------------------------------------------------------------------
+		//--------------------------------------------------------------------- 반려처리/반려사유 시작
 		
-		//반려사유시작
-		document.addEventListener('DOMContentLoaded', function() {
-		    const empId = window.opener.empId; // 부모창의 사원번호 가져오기
-			console.log('사원번호', empId);
-		    const empName = window.opener.empName; // 부모창의 이름 가져오기
-			console.log('사원번호', empName);
-		    // input 태그에 값 넣기
-		    document.getElementById('rj_emp_id').value = empId;
-		    document.getElementById('rj_emp_name').value = empName;
-		});
-		
-		
-		//반려사유 등록
-		document.getElementById('rejectBtn').addEventListener('click', function() {
-		    const requestNo = new URLSearchParams(window.location.search).get('request_no');
-		    const rejectReason = document.getElementById('rejectReason').value;
+	document.addEventListener('DOMContentLoaded', function () {
+    const empId = window.opener.empId; // 부모창의 사원번호 가져오기
+    console.log('사원번호', empId);
+    const empName = window.opener.empName; // 부모창의 이름 가져오기
+    console.log('사원번호', empName);
 
-		    if (!rejectReason.trim()) {
-		        alert('반려사유를 입력하세요.');
-		        return;
-		    }
+    // input 태그에 값 넣기
+    document.getElementById('rj_emp_id').value = empId;
+    document.getElementById('rj_emp_name').value = empName;
 
-		    // Ajax 요청으로 반려사유 등록
-		    fetch('/api/reject', {
-		        method: 'POST',
-		        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		        body: `request_no=${requestNo}&request_rejection=${encodeURIComponent(rejectReason)}`
-		    })
-		    .then(response => response.json())
-		    .then(data => {
-		        if (data.success) {
-		            alert('반려사유가 등록되었습니다.');
-		            window.close(); // 팝업창 닫기
-		            window.opener.reloadGrid(); // 부모창 그리드 리로드
-		        } else {
-		            alert('반려사유 등록에 실패했습니다.');
-		        }
-		    })
-		    .catch(error => {
-		        console.error('에러 발생:', error);
-		        alert('서버 오류가 발생했습니다.');
-		    });
-		});
-		
-		
-		
-		
+    // 반려 버튼 클릭 시 모달 띄우기
+    document.getElementById('rejectBtn').addEventListener('click', function () {
+        const modal = new bootstrap.Modal(document.getElementById('defaultSize'));
+        modal.show();
+    });
+
+    // 모달 안의 "반려 등록" 버튼 클릭 시 Ajax 요청
+    document.getElementById('submitRejectBtn').addEventListener('click', function () {
+    	
+        const requestNo = new URLSearchParams(window.location.search).get('request_no');
+        console.log('요청번호', requestNo);
+        
+        const rejectReason = document.getElementById('rejectReason').value;
+        console.log('반려사유', rejectReason);
+        
+        if (!rejectReason.trim()) {
+            alert('반려사유를 입력하세요.');
+            return;
+        }
+
+        // Ajax 요청으로 반려사유 등록
+        fetch('/api/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+            	 'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가
+            	},
+            body: `request_no=${requestNo}&request_rejection=${encodeURIComponent(rejectReason)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                	alert('반려사유가 등록되었습니다.');
+                	if (window.opener) {
+		                window.opener.location.reload(); // 부모창 새로고침
+		                window.close(); // 팝업창 닫기
+		            } else {
+		                console.error('부모창이 없습니다.');
+		            }
+                } else {
+                    alert('반려사유 등록에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('서버 오류가 발생했습니다.');
+            });
+    });
+
+});//돔 끝
 		
 		
 	</script>

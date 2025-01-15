@@ -1,6 +1,7 @@
 package com.deepen.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,9 @@ public interface CommonDetailRepository extends JpaRepository<CommonDetail, Stri
     @Query("SELECT c FROM CommonDetail c WHERE c.common_detail_code LIKE :prefix% ORDER BY c.common_detail_code DESC")
     List<CommonDetail> findByCommon_detail_codeStartingWithOrderByCommon_detail_codeDesc(@Param("prefix") String prefix);
     
+    //이름으로 공통코드 조회
+    @Query("SELECT c.common_detail_code FROM CommonDetail c WHERE c.common_detail_name = :commonDetailName")
+    String findCommonDetailCodeByName(@Param("commonDetailName") String commonDetailName);
 //extends JpaRepository<T(Entity), ID(기본키 형)>
 //JpaRepository 지원하는 기본 메서드 제공
 //save(Entity) : 엔티티 저장 및 수정

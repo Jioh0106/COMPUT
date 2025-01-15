@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.deepen.domain.RequestDTO;
 import com.deepen.entity.Assignment;
 import com.deepen.entity.Employees;
 import com.deepen.entity.Request;
 import com.deepen.repository.AssignmentRepository;
+import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
 import com.deepen.mapper.RequestMapper;
 import com.deepen.repository.RequestRepository;
@@ -21,6 +25,7 @@ import com.deepen.repository.RequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
+@EnableScheduling //스케줄링 기능 활성화
 @Service
 @Log
 @RequiredArgsConstructor // 객체생성
@@ -30,6 +35,7 @@ public class RequestService {
 	private final AssignmentRepository asRepository;
 	private final PersonnelRepository psRepository;
 	private final RequestMapper rqMapper;
+	private final CommonDetailRepository cdRepository;
 	
 	//로그인한 요청내역 조회
 	public List<RequestDTO> requestAllList(String emp_id){
@@ -47,15 +53,16 @@ public class RequestService {
             requestDto.setRequest_deadline(request.getRequest_deadline());
             requestDto.setMiddle_approval(request.getMiddle_approval());
             requestDto.setHigh_approval(request.getHigh_approval());
-            requestDto.setRequest_status(request.getRequest_status());
+           //요청상태 공통코드-> 이름으로 바꾸기 
+            requestDto.setRequest_status(cdRepository.findById(request.getRequest_status()).get().getCommon_detail_name());
             requestDto.setRequest_rejection(request.getRequest_rejection());
-            
             // **요청자의 사번으로 Employees 테이블에서 이름과 부서명 조회**
             Optional<Employees> employees = psRepository.findById(request.getEmp_id());
             if (employees.isPresent()) {
                 Employees employee = employees.get();
                 requestDto.setEmp_name(employee.getEmp_name());   // 요청자 이름 설정
-                requestDto.setEmp_dept(employee.getEmp_dept());   // 요청자 부서명 설정
+                //요청자부서명 공통코드 -> 이름으로바꿔서 들고옴
+                requestDto.setEmp_dept( cdRepository.findById(employee.getEmp_dept()).get().getCommon_detail_name());
             } else {
                 log.info("사원 정보를 찾을 수 없습니다. 요청자 사번: " + request.getEmp_id());
             }
@@ -145,9 +152,40 @@ public class RequestService {
 	    
 	}
 
+	
+	//요청상태 가져오기
+	public Map<String, Object> getRequest(Integer request_no) {
+		return rqMapper.getRequest(request_no);
+	}
 
-
-
+	
+	
+	//요청마감일에 - 반려사유, 요청상태 업데이트
+	@Scheduled(fixedRate = 600000) //10분마다 실행
+	@Transactional
+	public void deadlineUpdate() {
+		List<Request> requests = rqRepository.findAll();
+		LocalDateTime now = LocalDateTime.now();
+		
+		for(Request request : requests){
+			
+			LocalDateTime deadline = request.getRequest_deadline();
+			if(deadline.toLocalDate().isEqual(now.toLocalDate())){
+				request.setRequest_rejection("기간마감");
+				if(request.getRequest_status().equals("RQST001")){
+					request.setRequest_status("RQST002");
+				}else if(request.getRequest_status().equals("RQST003")) {
+					request.setRequest_status("RQST004");
+				}
+				 rqRepository.save(request); // 변경된 데이터 저장
+				 log.info("해당요청번호 업데이트"+request.getRequest_no().toString());
+			}//IF문 끝
+		}//FOR문 끝
+		
+	}
+	
+	
+	
 
 }
 	
