@@ -5,22 +5,32 @@
 <mapper namespace="com.deepen.mapper.CommonMapper">
 
 	
-	<select id="commonList" resultType="map">
+	<select id="commonList" resultType="map" parameterType="map">
 		SELECT 
 			common_code, common_name, common_content, common_status, common_display, 'select' AS row_type
 		FROM 
 			common
+		<where>
+			<if test="value != null and value != ''">
+				AND (common_code LIKE '%' || #{value} || '%' 
+	            OR common_name LIKE '%' || #{value} || '%')
+			</if>
+		</where>
 		ORDER BY
 			common_display
 	</select>
 	
-	<select id="commonDtlList" resultType="map" parameterType="string">
+	<select id="commonDtlList" resultType="map" parameterType="map">
 		SELECT 
 			common_detail_code, common_detail_name, common_detail_status, common_detail_display
 		FROM 
 			common_detail
 		WHERE 
-			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{celVal}
+			<if test="value != null and value != ''">
+				AND (common_detail_code LIKE '%' || #{value} || '%' 
+	            OR common_detail_name LIKE '%' || #{value} || '%')
+			</if>
 		ORDER BY
 			common_detail_display
 	</select>
