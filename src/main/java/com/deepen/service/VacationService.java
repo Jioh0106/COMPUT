@@ -72,7 +72,8 @@ public class VacationService {
 				useVctn.put("vctnDays", 15 - Integer.valueOf(String.valueOf(useVctn.get("useDays"))));
 			}
 		}
-		System.out.println("vctnService : " + athrMapList.toString());
+		System.out.println("useVctnList : " + useVctnList.toString());
+		System.out.println("athrMapList : " + athrMapList.toString());
 		return useVctnList;
 	}
 	
@@ -113,6 +114,7 @@ public class VacationService {
 		map.put("startDate", String.valueOf(vctnMap.get("startDate")));
 		map.put("endDate", String.valueOf(vctnMap.get("endDate")));
 		map.put("total", String.valueOf(vctnMap.get("total")));
+		map.put("rmrk", String.valueOf(vctnMap.get("rmrk")));
 		
 		// 요청내역 테이블 데이터
 		map.put("rqstType", String.valueOf(rqstMap.get("type")));

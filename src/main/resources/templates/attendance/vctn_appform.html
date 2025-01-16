@@ -118,6 +118,12 @@
 							th:text="${commonDtl.NAME}"></option>
 					</select>
 				</fieldset>
+				
+				<label>비고</label>
+				<div class="form-group">
+					<input type="text" id="rmrk" class="form-control">
+				</div>
+				
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-light-secondary" onClick='window.close()'>닫기</button>
@@ -251,7 +257,10 @@
 				, total: document.getElementById('use-days').value
 				, leaveId: document.getElementById('empId').value
 				, aprvId: selectApprover.approverEmp_id
+				, rmrk: document.getElementById('rmrk').value
 			}
+			
+			console.info(document.getElementById('rmrk').value);
 
 			const rqstDTO = {
 				type: '휴가'

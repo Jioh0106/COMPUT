@@ -212,24 +212,24 @@ public class RequestController {
 	}
 	
 	// 요청상세내용 페이지 - 휴가
-		@GetMapping("/request-vctn-detail")
-		public String requestVctnDetail(@RequestParam("request_no") int request_no, @AuthenticationPrincipal User user, Model model) {
-			String empId = user.getUsername();
-			
-			Map<String, Object> requestMap = new HashMap<>();
-			requestMap.put("empId", empId);
-			requestMap.put("requestNo", request_no);
-			
-			List<Map<String, Object>> vctnMap = vctnService.selectUseVctnList(requestMap);
-			model.addAttribute("vctnMap", vctnMap.get(0));
-			
-			// 최종승인권자 조회
-			String role = "ATHR001";
-			List<Map<String, Object>> highAprvr = vctnService.selectAprvr(role);
-			model.addAttribute("highAprvr", highAprvr);
-			
-			return "request/request_vctn_detail";
-		}
+	@GetMapping("/request-vctn-detail")
+	public String requestVctnDetail(@RequestParam("request_no") int request_no, @AuthenticationPrincipal User user, Model model) {
+		String empId = user.getUsername();
+		
+		Map<String, Object> requestMap = new HashMap<>();
+		requestMap.put("empId", empId);
+		requestMap.put("requestNo", request_no);
+		
+		List<Map<String, Object>> vctnMap = vctnService.selectUseVctnList(requestMap);
+		model.addAttribute("vctnMap", vctnMap.get(0));
+		
+		// 최종승인권자 조회
+		String role = "ATHR001";
+		List<Map<String, Object>> highAprvr = vctnService.selectAprvr(role);
+		model.addAttribute("highAprvr", highAprvr);
+		
+		return "request/request_vctn_detail";
+	}
 
 	
 	
