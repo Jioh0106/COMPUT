@@ -313,7 +313,7 @@
 				celVal: target,
 				value: value
 			};
-
+			
 			$.ajax({
 				url: "/commonCd",
 				contentType: "application/json",
@@ -355,22 +355,7 @@
 
 					});
 
-					// 추가 버튼
-					dtlAppendBtn.addEventListener('click', () => {
-						childGrid.appendRow({
-							"COMMON_DETAIL_CODE": "",
-							"COMMON_DETAIL_NAME": "",
-							"COMMON_DETAIL_CONTENT": "",
-							"COMMON_DETAIL_STATUS": "",
-							"COMMON_DETAIL_DISPLAY": "",
-							"ROW_TYPE": "insert"
-						},
-							{
-								at: 0, // 행 추가 인덱스
-								focus: true
-							});
-					});
-
+					
 					// 드롭 이벤트
 					childGrid.on('drop', () => {
 						const rowData = childGrid.getData();
@@ -389,8 +374,6 @@
 						const updatedRows = childGrid.getModifiedRows().updatedRows;
 						updatedRows.forEach((row, index) => {
 
-
-
 							childGrid.setValue(row.rowKey, "ROW_TYPE", "update")
 						});
 					});
@@ -398,6 +381,25 @@
 				} // success
 			}) // ajax
 		};
+		
+		// 상세공통코드 추가 버튼
+		// (공통코드가 클릭될 때마다 실행돼서 클릭한 공통코드만큼 행이 추가된 것이었음
+		// 그래서 rowVal 함수 안에서 실행 안 시키고 독립적으로 실행되게 밖으로 뺌)
+		dtlAppendBtn.addEventListener('click', () => {
+			childGrid.appendRow({
+				"COMMON_DETAIL_CODE": "",
+				"COMMON_DETAIL_NAME": "",
+				"COMMON_DETAIL_CONTENT": "",
+				"COMMON_DETAIL_STATUS": "",
+				"COMMON_DETAIL_DISPLAY": "",
+				"ROW_TYPE": "insert"
+			},
+				{
+					at: 0, // 행 추가 인덱스
+					focus: true
+				});
+		});
+
 
 		// 추가 및 수정된 값이 저장된 json을 들고 통신
 		function save(tableId) {
