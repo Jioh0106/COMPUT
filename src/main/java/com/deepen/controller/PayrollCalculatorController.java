@@ -1,6 +1,8 @@
 package com.deepen.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.calculator.SalaryFormulaCalculator;
 import com.deepen.domain.PayInfoDTO;
+import com.deepen.entity.PayInfo;
 import com.deepen.service.PayrollCalculatorService;
+import com.deepen.service.SalarySimulatorService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PayrollCalculatorController {
 
     private final PayrollCalculatorService calculatorService;
+    private final SalarySimulatorService simulatorService;
 
     /**
      * 단일 직원 급여 계산
@@ -131,5 +137,68 @@ public class PayrollCalculatorController {
                 "successCount", successCount,
                 "failureCount", errors.size()
             ));
+    }
+    
+    /**
+     * 예상 실수령액 계산
+     */
+    @PostMapping("/simulate/calculate")
+    public ResponseEntity<?> calculateExpectedSalary(@RequestBody Map<String, String> request) {
+        try {
+            String baseSalaryStr = request.get("baseSalary");
+            if (baseSalaryStr == null) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "message", "기본급이 입력되지 않았습니다.",
+                        "status", "error"
+                    ));
+            }
+            
+            // 기본급 파싱 및 유효성 검사
+            int baseSalary;
+            try {
+                baseSalary = Integer.parseInt(baseSalaryStr.replaceAll("[^0-9]", ""));
+                if (baseSalary <= 0) {
+                    throw new IllegalArgumentException("기본급은 0보다 커야 합니다.");
+                }
+            } catch (NumberFormatException e) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "message", "올바른 금액을 입력해주세요.",
+                        "status", "error"
+                    ));
+            }
+            
+            // 급여 시뮬레이션
+            PayInfo result = simulatorService.simulateSalary(baseSalary);
+            
+            // 응답 데이터 구성
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("baseSalary", result.getEmpSalary());
+            dataMap.put("nationalPension", result.getNationalPension());
+            dataMap.put("healthInsurance", result.getHealthInsurance());
+            dataMap.put("longTermCare", result.getLongtermCareInsurance());
+            dataMap.put("employmentInsurance", result.getEmploymentInsurance());
+            dataMap.put("incomeTax", result.getIncomeTax());
+            dataMap.put("residentTax", result.getResidentTax());
+            dataMap.put("totalDeductions", result.getDeducAmt());
+            dataMap.put("netSalary", result.getNetSalary());
+            
+            dataMap.replaceAll((k, v) -> v == null ? BigDecimal.ZERO : v);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", dataMap);
+            response.put("message", "계산이 완료되었습니다.");
+            response.put("status", "success");
+
+            return ResponseEntity.ok(response);
+                
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "message", "계산 중 오류가 발생했습니다: " + e.getMessage(),
+                    "status", "error"
+                ));
+        }
     }
 }
