@@ -1457,3 +1457,106 @@ function savePaymentData() {
 					document.getElementById('payslipPreviewModal').addEventListener('hidden.bs.modal', function () {
 					    document.getElementById('payslipPreviewContent').innerHTML = '';
 					});
+					
+					// pay_info.js에 추가할 코드
+
+					// 숫자 포맷팅 함수
+					function formatCurrency(amount) {
+					    return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+					}
+
+					// 급여 시뮬레이션 함수
+					function simulateSalary() {
+					    const salaryInput = document.getElementById('simulatedSalary');
+					    const baseSalary = salaryInput.value.replace(/[^0-9]/g, '');
+					    
+					    if (!baseSalary) {
+					        alert('급여를 입력해주세요.');
+					        return;
+					    }
+
+					    // 로딩 표시
+					    showLoadingSpinner();
+					    
+					    fetch('/api/payroll/calculator/simulate/calculate', {
+					        method: 'POST',
+					        headers: {
+					            'Content-Type': 'application/json',
+					            [header]: token
+					        },
+					        body: JSON.stringify({
+					            baseSalary: baseSalary
+					        })
+					    })
+					    .then(response => response.json())
+					    .then(result => {
+					        hideLoadingSpinner();
+					        
+					        if (result.status === 'success') {
+								console.log('Calculation result:', result.data);
+					            updateSimulationResult(result.data);
+					            document.getElementById('simulationResult').style.display = 'block';
+					        } else {
+					            alert(result.message);
+					        }
+					    })
+					    .catch(error => {
+					        hideLoadingSpinner();
+					        console.error('Error:', error);
+					        alert('계산 중 오류가 발생했습니다.');
+					    });
+					}
+
+					// 시뮬레이션 결과 업데이트 함수
+					function updateSimulationResult(data) {
+						const formatCurrency = (value) => {
+							if (value === null || value === undefined || isNaN(value)) {
+					            console.warn('Invalid value:', value);  // 디버깅용 로그
+					            return '0원';
+					        }
+					        return new Intl.NumberFormat('ko-KR').format(value) + '원';
+					    };
+						// 각 항목 업데이트
+					    document.getElementById('sim-baseSalary').textContent = formatCurrency(data.baseSalary);
+					    document.getElementById('sim-nationalPension').textContent = formatCurrency(data.nationalPension);
+					    document.getElementById('sim-healthInsurance').textContent = formatCurrency(data.healthInsurance);
+					    document.getElementById('sim-longTermCare').textContent = formatCurrency(data.longTermCare);
+					    document.getElementById('sim-employmentInsurance').textContent = formatCurrency(data.employmentInsurance);
+					    document.getElementById('sim-incomeTax').textContent = formatCurrency(data.incomeTax);
+					    document.getElementById('sim-residentTax').textContent = formatCurrency(data.residentTax);
+					    document.getElementById('sim-totalDeductions').textContent = formatCurrency(data.totalDeductions);
+					    document.getElementById('sim-netSalary').textContent = formatCurrency(data.netSalary);
+					}
+
+					// 기본급 입력 필드에 숫자 포맷팅 이벤트 추가
+					document.getElementById('simulatedSalary').addEventListener('input', function(e) {
+					    let value = e.target.value.replace(/[^0-9]/g, '');
+					    if (value) {
+					        e.target.value = new Intl.NumberFormat('ko-KR').format(parseInt(value));
+					    }
+					});
+
+					// 모달이 닫힐 때 입력값과 결과 초기화
+					document.getElementById('salarySimulationModal').addEventListener('hidden.bs.modal', function () {
+					    document.getElementById('simulatedSalary').value = '';
+					    document.getElementById('simulationResult').style.display = 'none';
+					});
+					
+					// 각 항목 업데이트
+					const fields = {
+				        'sim-baseSalary': 'baseSalary',
+				        'sim-nationalPension': 'nationalPension',
+				        'sim-healthInsurance': 'healthInsurance',
+				        'sim-longTermCare': 'longTermCare',
+				        'sim-employmentInsurance': 'employmentInsurance',
+				        'sim-incomeTax': 'incomeTax',
+				        'sim-residentTax': 'residentTax',
+				        'sim-totalDeductions': 'totalDeductions',
+				        'sim-netSalary': 'netSalary'
+				    };
+
+				    Object.entries(fields).forEach(([elementId, dataKey]) => {
+				        const value = data[dataKey];
+				        console.log(`Updating ${elementId} with value:`, value); // 각 필드 업데이트 확인
+				        document.getElementById(elementId).textContent = formatCurrency(value);
+				    });

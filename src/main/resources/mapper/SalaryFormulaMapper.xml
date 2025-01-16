@@ -15,7 +15,6 @@
         SF.formula_code
     </sql>
     
-	<!-- SalaryFormulaMapper.xml 수정 -->
 	<select id="getCurrentFormulas" resultType="com.deepen.domain.SalaryFormulaDTO">
 	    SELECT 
 	        formula_id as formulaId,
