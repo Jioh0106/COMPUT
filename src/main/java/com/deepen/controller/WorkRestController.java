@@ -60,13 +60,6 @@ public class WorkRestController {
 		log.info("appendData : "+ appendData.toString());
 		
 	    try {
-	    	
-	    	
-	    	if(workService.ckeckWork(appendData)) {
-	    		
-	    		return ResponseEntity.ok("해당 기간에 이미 등록된 직원이 있습니다.");
-	    	}
-	    	
 	    	workService.insertWork(appendData);
 	        return ResponseEntity.ok("추가가 완료되었습니다.");
 	        
@@ -75,7 +68,30 @@ public class WorkRestController {
 	    }
 			
 	    
-    }
+    } // insertWork
+	
+	// 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인
+	@PostMapping("/ckeck")
+	public ResponseEntity<?> ckeckWork(@RequestBody WorkAddDTO appendData) {
+		
+		log.info("appendData : "+ appendData.toString());
+		
+		try {
+			
+			List<WorkDTO> existWork = workService.ckeckWork(appendData);
+			
+			if(existWork != null) {
+				return ResponseEntity.ok(existWork);
+			}
+			
+			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 기간에 등록된 직원이 없습니다.");
+			
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("작업 확인 중 오류가 발생했습니다.");
+		}
+		
+		
+	} // ckeckWork
 	
 	
 	

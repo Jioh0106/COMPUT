@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.WorkAddDTO;
-import com.deepen.domain.WorkTmpDTO;
+import com.deepen.domain.WorkDTO;
 import com.deepen.entity.Employees;
 import com.deepen.entity.WorkTmp;
 import com.deepen.mapper.WorkMapper;
@@ -44,7 +44,7 @@ public class WorkService {
 	
 	
 	// 근무 일정 등록 - 일정 추가 시 해당 직원/근무일에 기존 데이터 존재 여부 체크
-	public boolean ckeckWork(WorkAddDTO appendData) {
+	public List<WorkDTO> ckeckWork(WorkAddDTO appendData) {
 		
 			
 		for(String day : appendData.getWeekdays()) {
@@ -61,7 +61,7 @@ public class WorkService {
 		
 		
 		
-		return false;
+		return null;
 		
 	} // ckeckWork
 	

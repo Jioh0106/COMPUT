@@ -32,7 +32,8 @@
 		       )
 			 </if>
     </select>
-    <select id="ckeckWork" resultType="Map">
+    
+    <select id="ckeckWork" resultType="com.deepen.domain.WorkDTO">
 		SELECT *
 		  FROM work_schd
 		 WHERE emp_id = #{emp_id}

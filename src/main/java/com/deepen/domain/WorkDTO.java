@@ -17,13 +17,15 @@ public class WorkDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate work_date;
-	private Integer work_time;
-	private Integer rest_type;
 	private String work_tmp_name;
+	
+	
 	
 	private String work_start;
 	private String work_end;
 	private String work_shift;
 	private String work_type;
+	private Integer work_time;
+	private Integer rest_time;
 
 }
