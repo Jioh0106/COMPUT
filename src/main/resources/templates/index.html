@@ -17,6 +17,33 @@
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
     <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
     <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+	<style>
+		/* 버튼 내 아이콘 중앙 정렬 */
+		button i {
+		    font-size: 16px; /* 아이콘 크기 */
+		    display: inline-block;
+		    vertical-align: middle;
+		}
+
+		/* 버튼 크기와 텍스트/아이콘 정렬 */
+		#prevBtn, #nextBtn {
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    height: 38px; /* 버튼 높이 */
+		    width: 38px; /* 버튼 높이와 동일하게 설정 */
+		    padding: 0; /* 내부 여백 제거 */
+		}
+
+		/* 제목과 날짜 수평 정렬 */
+		h4, h5 {
+		    margin: 0;
+		    line-height: 38px; /* 버튼 높이에 맞춤 */
+		}
+
+		
+		
+	</style>
 </head>
 
 <body>
