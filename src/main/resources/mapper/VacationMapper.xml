@@ -20,8 +20,8 @@
 			, vctn.vacation_total AS "useDays"
 			<if test="requestNo != null and requestNo != ''">
 				, vctn.request_no AS "requestNo"
-				, vctn.vacation_approve AS "aprvId"
-				, (SELECT emp_name FROM employees WHERE emp_id = vctn.vacation_approve) AS "aprvName"
+				, NVL2(rqst.high_approval, rqst.high_approval, rqst.middle_approval) AS "aprvId"
+				, (SELECT emp_name FROM employees WHERE emp_id = NVL2(rqst.high_approval, rqst.high_approval, rqst.middle_approval)) AS "aprvName"
 				, (SELECT common_detail_name FROM common_detail WHERE common_detail_code = emp.emp_position) AS "empPst"
 				, TO_CHAR(vctn.vacation_start, 'YYYY-MM-DD') AS "vctnStart"
 				, TO_CHAR(vctn.vacation_end, 'YYYY-MM-DD') AS "vctnEnd"

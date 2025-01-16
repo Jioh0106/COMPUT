@@ -27,4 +27,14 @@ public class CommuteService {
 		return mapper.selectCmtList(athrMapList);
 	}
 
+	public String mainCmt(Map<String, Object> searchMap) {
+		String result;
+		
+		List<Map<String, Object>> workList = mapper.selectWorkList();
+		
+		System.out.println(workList.toString());
+		
+		return null;
+	}
+
 }

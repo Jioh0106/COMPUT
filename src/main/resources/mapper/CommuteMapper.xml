@@ -69,6 +69,19 @@
 			cmt.emp_no, cmt.cmt_date DESC
 	</select>
 	
+	<select id="selectWorkList" parameterType="hashMap" resultType="map">
+		SELECT 
+			  work_no
+			, emp_id
+			, work_date
+			, work_start
+			, work_end
+		FROM 
+			work_schd
+		WHERE 
+			emp_id = #{empId}
+	</select>
+	
 	
 	
 </mapper>

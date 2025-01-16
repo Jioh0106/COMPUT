@@ -287,17 +287,15 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	<!-- 제이쿼리 -->
-	<script src="/js/jquery-3.7.1.js"></script>
-
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
+	
 	<!--Axios -->
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<!-- sweet arert -->
 	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 	<script th:inline="javascript">
-		window.onload = function () {
-			console.info("??");
-		}
 
 		$(function () {
 			// CSRF 토큰 가져오기
@@ -342,6 +340,9 @@
 				$('#check-sender').css('display', 'flex');
 
 			}
+			
+			// 최종승인권자 선택 모달창 Grid 생성
+			let grid2;
 
 			// 승인 버튼 클릭 이벤트
 			$('#approveBtn').on('click', function () {
@@ -350,6 +351,7 @@
 					// middle 단계 승인일 경우 최종 승인권자 선택 모달창
 					let modal = $('#approveModal');
 					modal.modal('show');
+					selectedAprvr();
 
 				} else {
 					// high일 경우 즉시 최종 승인으로 상태 변경
@@ -357,14 +359,11 @@
 
 				}
 			}); // approveBtn  클릭 이벤트
+			
+			let selectedEmpId;
 
-			// 최종승인권자 선택 모달창 Grid 생성
-			let grid2;
-			const role = 'ATHR001';
-
-			// approveModal 모달이 열릴 때 데이터 로드 및 그리드 업데이트
-			$('#approveModal').on('show.bs.modal', function () {
-
+			// 최종승인권자 그리드 함수
+			function selectedAprvr() {
 				const gridData = /*[[${highAprvr}]]*/[];
 				const Grid = tui.Grid;
 
@@ -384,39 +383,68 @@
 					],
 					data: gridData
 				});
-				
+
 				// 그리드에 값 미현시로 모달창 열린 후 레이아웃 새로 고침 처리
 				$('#approveModal').on('shown.bs.modal', function () {
 					grid2.refreshLayout();
 				});
-			}); // approveModal
+
+				// 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+				grid2.on('click', (ev) => {
+					if (ev.rowKey !== null) {
+						const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
+						selectedEmpId = `${row.empId}`;
+						swal(`${row.empName}` + "님이 선택되었습니다.");
+						//Approver(row);
+					}
+				});
+
+			}
 			
 			// 승인자 선택 모달창 승인버튼
 			$('#approveModalBtn').on('click', function () {
-			    // 선택된 행 가져오기
-			    const selectedRows = grid2.getCheckedRows();
-	
-			    if (selectedRows.length === 0) {
-			        // 선택된 항목이 없을 경우
-			        Swal.fire('Warning', '항목을 선택해 주세요.', 'warning');
-			        return;
-			    } else if (selectedRows.length > 1) {
-			        // 여러 항목이 선택된 경우
-			        Swal.fire('Warning', '하나의 항목만 선택해 주세요.', 'warning');
-			        return;
-			    }
-	
+				
 			    // 선택된 항목의 EMP_ID 가져오기
-			    const selectedEmpId = selectedRows[0].EMP_ID;
-	
 			    console.log("Selected EMP_ID:", selectedEmpId);
 	
 			    // updateRequest 함수 호출
 			    updateRequest("RQST003", null, selectedEmpId);
 	
 			    // 모달 닫기
-			    $('#approveModal').modal('hide');
+			   // $('#approveModal').modal('hide');
 			});
+			
+			// 요청 테이블 업데이트
+			function updateRequest(status, rejection, high) {
+				
+				const updateData = {
+					request_no: request_no,
+			        status: status,
+			        rejection: rejection,
+			        high: high
+			    };
+				
+				console.log("updateData : " + updateData);
+				
+			    axios.post('/api/request/absence/update', updateData, {
+			        headers: {
+			            'X-CSRF-TOKEN': csrfToken
+			        }
+			    })
+			    .then(function (response) {
+			        Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success');
+			        window.close();
+			        // 부모 창 새로고침
+		            if (window.opener && !window.opener.closed) {
+		                window.opener.location.reload();
+		            }
+			        
+			    })
+			    .catch(function (error) {
+			        console.error('데이터 저장 중 오류 발생:', error);
+			        Swal.fire('Error', '데이터 저장 중 문제가 발생했습니다.', 'error');
+			    }); 
+			}
 
 
 
