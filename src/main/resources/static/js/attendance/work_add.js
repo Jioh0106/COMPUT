@@ -138,7 +138,7 @@ $(function() {
 	});
 
 
-
+	// 검색 항목 값들이 바뀔 때마다 사원 검색 결과 반영
 	$('.serch-content').on('change', function() {
 		let tmp = $('#work_tmp').val();
 		let ocptSelect = $('#ocptSelect').val();
@@ -176,13 +176,14 @@ $(function() {
 	console.log("CSRF Token : " + csrfToken);
 
 	$('#appendWork').on('click', function() {
-		const tmpSelect = $('#work_tmp').val();
-		const start = instance1.getDate().toLocaleDateString('en-CA');  // 'yyyy-MM-dd' 형식
-		const end = instance2.getDate().toLocaleDateString('en-CA');   // 'yyyy-MM-dd' 형식
-		const weekdays = getWeekdaysBetweenDates(start, end);
-		const selectedRows = grid.getCheckedRows();
+		let tmp = $('#work_tmp').val();
+		let start = instance1.getDate().toLocaleDateString('en-CA');  // 'yyyy-MM-dd' 형식
+		let end = instance2.getDate().toLocaleDateString('en-CA');   // 'yyyy-MM-dd' 형식
+		let weekdays = getWeekdaysBetweenDates(start, end);
+		let selectedRows = grid.getCheckedRows();
 		
 	    
+	    console.log("tmp : " +  tmp);
 	    console.log("start : " +  start);
 	    console.log("end : " +  end);
 		for (const row of selectedRows) {
@@ -199,7 +200,7 @@ $(function() {
 	    } 
 		
 	    // 선택된 템플릿이 없을 경우
-		if (tmpSelect === null || tmpSelect === '') {
+		if (tmp === null || tmp === '') {
 	        Swal.fire('Warning', '템플릿을 선택해 주세요.', 'warning');
 	        return;
 	    } 
@@ -207,7 +208,7 @@ $(function() {
 		const appendData = {
 			rows : selectedRows,
 			weekdays: weekdays, 
-			tmp : tmpSelect
+			tmp : tmp
 		}
 		
 		// 겹치는 일정 확인
@@ -233,6 +234,8 @@ $(function() {
 	});
 	
 	function ckeckWork(appendData) {
+		console.log("ckeckWork()");
+		
 		return axios.post('/api/work/check', appendData,  {
 		    headers: {
 		        'X-CSRF-TOKEN': csrfToken
@@ -245,25 +248,23 @@ $(function() {
 		    }
 		})
 		.catch(function (error) {
-			if (error.response) {
-	           // 서버에서 반환한 에러 처리
-	           const status = error.response.status;
-	           if (status === 404) {
-				   return Promise.reject({ status, appendData });
-	           } else if (status === 500) {
-	               Swal.fire('Error', '작업 확인 중 오류가 발생했습니다.', 'error');
-	           }
-	       } else {
-	           console.error('Unexpected error:', error);
-	           Swal.fire('Error', '예기치 않은 오류가 발생했습니다.', 'error');
-	       }
-		   
+		    console.error("Error in ckeckWork:", error.response || error);
+		    if (error.response) {
+		        const status = error.response.status;
+		        if (status === 404) {
+		            console.log("Rejecting with 404 status");
+		            return Promise.reject({ status, appendData });
+		        }
+		    }
+		    return Promise.reject(error); // 다른 에러 상태 처리
 		});
 		
 		
 	}
 	
 	function insertWork(appendData) {
+		console.log("insertWork()");
+		
 		return 	axios.post('/api/work/insert', appendData,  {
 		    headers: {
 		        'X-CSRF-TOKEN': csrfToken

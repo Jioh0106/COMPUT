@@ -19,8 +19,10 @@ public class WorkDTO {
 	private LocalDate work_date;
 	private String work_tmp_name;
 	
+	// ===============================
 	
-	
+	private String emp_name;
+	private String emp_dept;
 	private String work_start;
 	private String work_end;
 	private String work_shift;

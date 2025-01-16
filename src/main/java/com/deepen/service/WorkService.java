@@ -2,6 +2,7 @@ package com.deepen.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import com.deepen.repository.PersonnelRepository;
 import com.deepen.repository.WorkRepository;
 import com.deepen.repository.WorkTmpRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -28,18 +30,17 @@ public class WorkService {
 	
 	private final PersonnelRepository personnelRepository;
 	private final WorkTmpRepository workTmpRepository;
-	private final WorkRepository workRepository;
 	private final WorkMapper workMapper;
 	
 	// 근무 관리 - 사용자 정보 조회
 	public Optional<Employees> findById(String emp_id) {
 		return personnelRepository.findById(emp_id);
-	}
+	} // findById
 	
 	// 근무 일정 등록 - 근무 템플릿 조회
-	public List<WorkTmp> findAll() {
+	public List<WorkTmp> tmpFindAll() {
 		return workTmpRepository.findAll();
-	}
+	} //  // insertWork
 	
 	
 	// 근무 일정 등록 - 직원 조회
@@ -53,27 +54,29 @@ public class WorkService {
 	// 근무 일정 등록 - 일정 추가 시 해당 직원/근무일에 기존 데이터 존재 여부 체크
 	public List<WorkDTO> ckeckWork(WorkAddDTO appendData) {
 		
-			
+		List<WorkDTO> list = new ArrayList<>();
+		WorkDTO work = new WorkDTO();
+		
 		for(String day : appendData.getWeekdays()) {
 			// 선택된 날짜 기간 조회
 				
 			for(Map<String, Object> row : appendData.getRows()) {
 				// 선택된 사원 배열 조회
-				workMapper.ckeckWork((String)row.get("EMP_ID"), day);
-				
+				work = workMapper.ckeckWork((String)row.get("EMP_ID"), day);
+				if(work != null) {
+					list.add(work);
+				}
 			}
-			
-			
 		}
 		
-		
-		
-		return null;
+		return list;
 		
 	} // ckeckWork
 	
-
+	@Transactional
 	public void insertWork(WorkAddDTO appendData) {
+		log.info("WorkService/insertWork - appendData " + appendData);
+		
 		
 		WorkDTO work = new WorkDTO();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 입력 문자열 형식
@@ -88,23 +91,39 @@ public class WorkService {
 				work.setEmp_id((String)row.get("EMP_ID"));
 				work.setWork_date(localDate);
 				work.setWork_tmp_name(appendData.getTmp());
+				log.info(work.toString());
 				
 				workMapper.insertWork(work);
 				
 			}
 			
-			
 		}
 		
 		
-		
-		
 	} // insertWork
+	
+	
+	
+	
+	public List<WorkDTO> getWorkList(Map<String, String> map) {
+		
+		return workMapper.getWorkList(map) ;
+		
+	}  // getWorkList
+
+	public List<WorkDTO> getWorkListSerch(Map<String, String> map) {
+		
+		return workMapper.getWorkListSerch(map);
+		
+	} // getWorkListSerch
+
+
+
 
 	
 
 
-}
+} // WorkService
 
 
 

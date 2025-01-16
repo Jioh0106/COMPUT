@@ -14,7 +14,6 @@
 	<link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
 	<link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
 	<link rel="stylesheet" href="/assets/css/app.css">
-	<link rel="shortcut icon" href="/assets/images/favicon.svg" type="/assets/image/x-icon">
 		
 	<!--  sweetalert  -->
 	<link rel="stylesheet" href="/assets/vendors/sweetalert2/sweetalert2.min.css">
@@ -88,20 +87,20 @@
 							
 							<div th:if="${emp.emp_role == 'ATHR003'}">
 								<div id="searchEmpArea">
-									<input type="text" id="searchEmp2"  class="form-control" th:value="${emp.emp_id}"/>
+									<input type="text" id="searchEmp2"  class="form-control" th:value="${emp.emp_id}" disabled/>
 								</div>
 							</div>
 							
 							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
 								<div id="searchEmpArea">
-									<input type="text" id="searchEmp" class="form-control" pdisabled laceholder="사번 또는 이름 입력" />
+									<input type="text" id="searchEmp" class="form-control" th:value="${emp.emp_id}"  />
 								</div>
 							</div>
 							
 							<span style="font-size: 1rem; line-height: 2rem;"> 부서 </span>
 							<div>
 								<div th:if="${emp.emp_role == 'ATHR003'}">
-									<select class="form-select deptArea" disabled>
+									<select class="form-select deptArea"  disabled>
 										<option th:value="${emp.emp_dept}" selected></option>
 									</select>
 								</div>
@@ -113,7 +112,7 @@
 							</div>
 							
 							<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
-								<button type="button" class="btn btn-outline-primary"onclick="search(this);">검색</button>
+								<button type="button" class="btn btn-outline-primary" id="serch">검색</button>
 							</div>	
 						</div>
 					</section>
@@ -143,8 +142,10 @@
 	
 	<!-- 제이쿼리 -->
 	<script src="/js/jquery-3.7.1.js"></script>	
+	
 	<!--Axios -->
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	
 	<!-- sweet arert -->
 	<script src="/assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	

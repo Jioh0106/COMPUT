@@ -35,17 +35,41 @@
     
     <select id="ckeckWork" resultType="com.deepen.domain.WorkDTO">
 		SELECT *
-		  FROM work_schd
+		  FROM work_view
 		 WHERE emp_id = #{emp_id}
 		   AND work_date = #{day}
     </select>
     
-    
-    <insert id="insertWork">
+    <insert id="insertWork" parameterType="com.deepen.domain.WorkDTO">
     	INSERT INTO work(emp_id, work_date, work_tmp_name)
-    	VALUES(#{emp_id}, #{work_date}, #{work_tmp_name})
+    	VALUES (
+				#{emp_id}, 
+				#{work_date}, 
+				#{work_tmp_name}
+				)
     </insert>
     
+	<select id="getWorkList" resultType="com.deepen.domain.WorkDTO" parameterType="map">
+	    SELECT *
+	      FROM work_view
+	     WHERE emp_id = #{emp_id}
+	       AND work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+	</select>
+	
+	<select id="getWorkListSerch" resultType="com.deepen.domain.WorkDTO" parameterType="map">
+	    SELECT *
+	      FROM work_view
+	     WHERE work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+		 <if test="dept != null and dept != ''">
+		   AND emp_dept = #{dept}
+		 </if>
+		 <if test="emp_info != null and emp_info != ''">
+		   AND (
+	           emp_name LIKE '%' || #{emp_info} || '%'
+	           OR emp_id LIKE '%' || #{emp_info} || '%'
+	       )
+		 </if>
+	</select>
 	
 </mapper>
 
