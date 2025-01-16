@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.PayInfoDTO;
-import com.deepen.service.PayInfoService;
 import com.deepen.service.PayrollCalculatorService;
 
 import lombok.RequiredArgsConstructor;
@@ -138,49 +132,4 @@ public class PayrollCalculatorController {
                 "failureCount", errors.size()
             ));
     }
-    
-    /**
-     * 급여 계산 테스트
-     */
-    @PostMapping("/test-calculate")
-    public ResponseEntity<?> testCalculateSalary(@RequestBody Map<String, String> request) {
-        try {
-            String empId = request.get("empId");
-            String paymentDate = request.get("paymentDate");
-            
-            if (empId == null || paymentDate == null) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of(
-                        "message", "사원번호와 지급월은 필수입니다.",
-                        "status", "error"
-                    ));
-            }
-            
-            Map<String, Object> result = calculatorService.testCalculateSalary(empId, paymentDate);
-            
-            if ((boolean) result.get("success")) {
-                return ResponseEntity.ok()
-                    .body(Map.of(
-                        "data", result,
-                        "message", "급여 계산 테스트가 완료되었습니다.",
-                        "status", "success"
-                    ));
-            } else {
-                return ResponseEntity.badRequest()
-                    .body(Map.of(
-                        "message", result.get("error"),
-                        "status", "error"
-                    ));
-            }
-            
-        } catch (Exception e) {
-            log.error("급여 계산 테스트 중 오류 발생", e);
-            return ResponseEntity.badRequest()
-                .body(Map.of(
-                    "message", "급여 계산 중 오류가 발생했습니다: " + e.getMessage(),
-                    "status", "error"
-                ));
-        }
-    }
-    
 }
