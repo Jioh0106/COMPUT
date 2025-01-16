@@ -370,7 +370,7 @@
 
             <div class="display-flex">
                 <h3>인사 카드 관리</h3>
-                <span sec:authentication="principal.authorities"></span><br>
+                <!-- <span sec:authentication="principal.authorities"></span><br> -->
                 <div class="buttons">
                     <!--신규 등록 버튼-->
                     <button type="button" class="btn btn-primary" onclick="popUp()" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
