@@ -1,4 +1,3 @@
-
 // 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
 function openView() {
 	var popupW = 800;
@@ -8,76 +7,10 @@ function openView() {
 	var top = (screen.availHeight / 2) - (popupH / 2);
 	window.open('/work-add', 'work_add', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
-
-
-// =========================================================================
-
-// 근무 일정 그리드
-
-let grid;
-
-grid = new tui.Grid({
-	el: document.getElementById('grid'),
-	columns: [
-		{header: 'No', name: 'work_no'},
-		{header: '사원번호', name: 'emp_id'},
-		{header: '사원명', name: 'emp_name'},
-		{header: '부서', name: 'emp_dept'},
-		{header: '근무일자', name: 'work_date'},
-		{header: '시작시간', name: 'work_start'},
-		{header: '종료시간', name: 'work_end'},
-		{header: '휴게시간', name: 'rest_time'},
-		{header: '근무시간', name: 'work_time'},
-		{header: '근무 템플릿', name: 'work_tmp_name'},
-		{header: '근무유형', name: 'work_tmp_name'}
-	],
-	data: [] // 서버에서 전달받은 데이터
-});
-
 // =========================================================================
 
 
-// 부서 셀렉트 박스 
-$('#deptSelect').on('click', function () {
-    // 이미 데이터가 로드된 경우 추가 요청 방지
-    if (this.options.length > 1) {
-        return;
-    }
-
-    const type = 'DEPT'; 
-
-    getCommonList(type).then(function (data) {
-        $('#deptSelect')
-            .empty()
-			.append('<option value="" disabled selected>선택하세요</option>');
-        data.forEach(item => {
-            if (item.common_detail_code && item.common_detail_name) {
-                $('#deptSelect').append(
-                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
-                );
-            }
-        });
-    });
-    
-}); // 부서 셀렉트 박스 
-
-// type으로 공통 코드 가져오는 함수
-function getCommonList(type) {
-    return axios.get(`/api/absence/common/list/${type}`)
-        .then(function (response) {
-            return response.data; // 데이터 반환
-        })
-        .catch(function (error) {
-            console.error('Error fetching data:', error);
-			Swal.fire(
-			        'Error',
-			        '데이터를 가져오는 중 문제가 발생했습니다.',
-			        'error'
-			      )
-            return []; // 에러 발생 시 빈 배열 반환
-        });
-}
-// =========================================================================
+		
 
 // 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
 function datePickerReplace(id) {
@@ -123,3 +56,134 @@ const instance2 = new tui.DatePicker(container2, {
 	}
 });
 
+	
+	
+	// =========================================================================
+$(function() {	
+	
+	// 부서 셀렉트 박스 
+	$('#deptSelect').on('click', function () {
+	    // 이미 데이터가 로드된 경우 추가 요청 방지
+	    if (this.options.length > 1) {
+	        return;
+	    }
+	
+	    const type = 'DEPT'; 
+	
+	    getCommonList(type).then(function (data) {
+	        $('#deptSelect')
+	            .empty()
+				.append('<option value="" disabled selected>선택하세요</option>');
+	        data.forEach(item => {
+	            if (item.common_detail_code && item.common_detail_name) {
+	                $('#deptSelect').append(
+	                    $('<option></option>').val(item.common_detail_name).text(item.common_detail_name)
+	                );
+	            }
+	        });
+	    });
+	    
+	}); // 부서 셀렉트 박스 
+	
+	// type으로 공통 코드 가져오는 함수
+	function getCommonList(type) {
+	    return axios.get(`/api/absence/common/list/${type}`)
+	        .then(function (response) {
+	            return response.data; // 데이터 반환
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
+	            return []; // 에러 발생 시 빈 배열 반환
+	        });
+	}
+
+
+	// =========================================================================
+
+	// 근무 일정 그리드
+
+	let grid;
+
+	grid = new tui.Grid({
+		el: document.getElementById('grid'),
+		columns: [
+			{header: 'No', name: 'work_no'},
+			{header: '사원번호', name: 'emp_id'},
+			{header: '사원명', name: 'emp_name'},
+			{header: '부서', name: 'emp_dept'},
+			{header: '근무일자', name: 'work_date'},
+			{header: '시작시간', name: 'work_start'},
+			{header: '종료시간', name: 'work_end'},
+			{header: '휴게시간', name: 'rest_time'},
+			{header: '근무시간', name: 'work_time'},
+			{header: '근무 템플릿', name: 'work_tmp_name'},
+			{header: '근무유형', name: 'work_shift'}
+		],
+		data: [] // 서버에서 전달받은 데이터
+	});
+
+	// ====================================== 
+	// 그리드 데이터 초기화
+	let start = instance1.getDate().toLocaleDateString('en-CA'); 
+	let end = instance2.getDate().toLocaleDateString('en-CA');
+	console.log("start : "  + start);
+	console.log("end : "  + end);
+
+	axios.get('/api/work/list', {
+		params: {
+			start: start,
+			end: end
+		},
+	})
+	.then(function (response) {
+		const data = response.data; // 데이터 로드
+		console.log('Fetched data:', data);
+	    grid.resetData(data);
+	    grid.refreshLayout(); // 레이아웃 새로고침
+	})
+	.catch(function (error) {
+	    console.error('Error fetching data:', error);
+	});
+	
+	// ============================================
+	// 검색 버튼 클릭 시 그리드 데이터 초기화
+	$('#serch').on('click', function() {
+		grid.resetData([]);
+		
+		let start = instance1.getDate().toLocaleDateString('en-CA');  
+		let end = instance2.getDate().toLocaleDateString('en-CA');
+		let dept = $('#deptSelect').val() ||'';
+		let emp_info = $('#searchEmp').val() || '';
+		console.log("start : "  + start);
+		console.log("end : "  + end);
+		console.log("dept : "  + dept);
+		console.log("emp_info : "  + emp_info);
+		
+		
+		axios.get('/api/work/list/serch', {
+			params: { start, end, dept, emp_info }
+		})
+		.then(function (response) {
+			const data = response.data; // 데이터 로드
+			console.log('Fetched data:', data);
+		    grid.resetData(data);
+		    grid.refreshLayout(); // 레이아웃 새로고침
+		})
+		.catch(function (error) {
+		    console.error('Error fetching data:', error);
+		});
+			
+		
+		
+	});
+		
+		
+		
+	
+
+});	

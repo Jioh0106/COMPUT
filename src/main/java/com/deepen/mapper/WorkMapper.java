@@ -23,6 +23,11 @@ public interface WorkMapper {
 
 	void insertWork(WorkDTO work);
 
+	List<WorkDTO> getWorkList(Map<String, String> map);
+
+	List<WorkDTO> getWorkListSerch(Map<String, String> map);
+
+
 	
 	
 

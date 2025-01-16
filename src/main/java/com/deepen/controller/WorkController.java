@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.deepen.domain.WorkDTO;
 import com.deepen.entity.Employees;
 import com.deepen.entity.WorkTmp;
 import com.deepen.service.WorkService;
@@ -55,18 +56,18 @@ public class WorkController {
 		//http://localhost:8082/work-add
 		
 		String emp_id = user.getUsername();
-		
 		Collection<GrantedAuthority> authorities = user.getAuthorities();
 		String emp_role = authorities.iterator().next().getAuthority().replace("ROLE_", "");
+		
 		log.info("emp_role : " + emp_role);
 		
 		// 사용자 정보 조회
 		Optional<Employees> emp = workService.findById(emp_id);
-		model.addAttribute("emp", emp.get());
-		
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
-	    model.addAttribute("_csrf", csrfToken);
-		List<WorkTmp> tmpList = workService.findAll();
+		List<WorkTmp> tmpList = workService.tmpFindAll();
+	    
+		model.addAttribute("emp", emp.get());
+		model.addAttribute("_csrf", csrfToken);
 		model.addAttribute("tmpList", tmpList);
 		
 		return "attendance/work_add";
