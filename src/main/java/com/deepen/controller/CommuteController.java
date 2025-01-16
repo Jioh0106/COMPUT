@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deepen.service.CommuteService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -26,7 +27,11 @@ public class CommuteController {
 
 	private final CommuteService service;
 
-	// 출퇴근 현황
+	/**
+	 * 출퇴근 현황
+	 * @view model
+	 * @return String
+	 */
 	@GetMapping("/cmt-stts")
 	public String cmtMng(Model model) {
 		// http://localhost:8082/cmt-stts
@@ -55,11 +60,16 @@ public class CommuteController {
 		List<Map<String, Object>> cmtList = service.selectCmtList(athrMapList);
 		model.addAttribute("cmtList", cmtList);
 
-		//System.out.println(cmtList.toString());
+		// System.out.println(cmtList.toString());
 
 		return "attendance/cmt_stts";
 	}
 
+	/**
+	 * 검색 조건 지정하여 조회 
+	 * @param searchMap
+	 * @return List<Map>
+	 */
 	@PostMapping("/searchCmt")
 	@ResponseBody
 	public List<Map<String, Object>> searchCmt(@RequestBody Map<String, Object> searchMap) {
@@ -75,17 +85,27 @@ public class CommuteController {
 		String dept = (String) empAthr.get("EMP_DEPT"); // 로그인 유저 부서
 		String athr = (String) empAthr.get("EMP_ROLE"); // 로그인 유저 권한
 		String no = String.valueOf(empAthr.get("EMP_NO")); // 로그인 유저 인덱스(사원번호)
-		
+
 		searchMap.put("empRole", athr);
 		searchMap.put("empDept", dept);
 		searchMap.put("empNo", no);
 
 		// 검색 조건 조회
 		List<Map<String, Object>> searchCmtList = service.selectCmtList(searchMap);
-		
+
 		System.out.println(searchCmtList.toString());
-		
+
 		return searchCmtList;
+	}
+	
+	@PostMapping("/mainCmt")
+	@ResponseBody
+	public String mainCmt(@AuthenticationPrincipal User user, @RequestBody Map<String, Object> searchMap) {
+		
+		searchMap.put("empId", user.getUsername());
+		String result = service.mainCmt(searchMap);
+		
+		return result;
 	}
 
 }
