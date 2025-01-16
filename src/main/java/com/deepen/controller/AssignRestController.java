@@ -118,6 +118,15 @@ public class AssignRestController {
     }
 	
 	
+    //인사발령현황 리스트 조회
+    @GetMapping("/assign/list")
+    public List<Map<String, Object>> assignList (@RequestParam(value="startDate") String startDate,
+    		@RequestParam(value="endDate") String endDate, 
+    		@RequestParam(value = "search",defaultValue = "") String search){
+    	List<Map<String,Object>> assignList = asService.assignList(startDate, endDate, search);
+    	
+    	return assignList;
+    }
 	
 	
 }

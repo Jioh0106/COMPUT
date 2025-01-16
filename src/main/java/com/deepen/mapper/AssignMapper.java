@@ -38,4 +38,7 @@ public interface AssignMapper {
 	//반려사유 조회
 	RequestDTO getRejection(@Param("request_no") Integer request_no);
 	
+	//인사발령현황 리스트 조회
+	List<Map<String, Object>> assignList(Map<String, Object> params);
+	
 }
