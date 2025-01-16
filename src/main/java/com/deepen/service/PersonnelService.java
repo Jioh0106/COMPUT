@@ -61,6 +61,7 @@ public class PersonnelService {
 		empDTO.setEmp_reg_date(new Timestamp(System.currentTimeMillis()));
 		
 		Employees emp = Employees.setEmployees(empDTO);
+		log.info(emp.toString());
 		psRepo.save(emp);
 	}
 	
