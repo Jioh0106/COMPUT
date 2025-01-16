@@ -100,7 +100,7 @@
 	                        <li class="submenu-item ">
 	                            <a href="/pay-info">급여 지급 이력</a>
 	                        </li>
-	                        <li class="submenu-item ">
+	                        <li class="submenu-item" sec:authorize="hasRole('ROLE_ATHR001')">
 	                            <a href="/pay-list">급여 대장</a>
 	                        </li>
 	                    </ul>
