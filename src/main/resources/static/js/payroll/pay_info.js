@@ -211,65 +211,8 @@ const gridConfig = {
 
 // ================== 전역 변수 ==================
 
-let selectedRowKey = null;
-let employeeGrid = null;
 let grid = null;
 let missingPaymentGrid = null; 
-
-// ================== 그리드 초기화 및 이벤트 바인딩 ==================
-
-// 메인 그리드 초기화
-function initializeMainGrid(isRegularEmployee) {
-    grid = new tui.Grid({
-        el: document.getElementById('grid'),
-        data: [],
-        columns: gridConfig.getColumnDefinitions(),
-        rowHeaders: isRegularEmployee ? [] : ['checkbox'],
-        scrollX: true,
-        scrollY: false,
-        bodyHeight: 400,
-        editingEvent: isRegularEmployee ? 'none' : 'click'
-    });
-
-	// 클릭 이벤트 핸들링
-	if (!isRegularEmployee) {
-        grid.on('click', (ev) => {
-            if (ev.columnName === 'empId') {
-                const row = grid.getRow(ev.rowKey);
-                if (!row.paymentNo) {
-                    openEmployeeSearch(ev.rowKey);
-                }
-            }
-        });
-    }
-
-	// 행이 추가될 때마다 스타일 적용
-	grid.on('afterChange', (ev) => {
-        const rowKey = ev.changes[0]?.rowKey;
-        if (rowKey !== undefined) {
-            const row = grid.getRow(rowKey);
-            if (!row.paymentNo) {
-                grid.addRowClassName(rowKey, 'unsaved-row');
-            }
-        }
-    });
-
-    grid.on('onGridMounted', () => {
-        grid.refreshLayout();
-    });
-	
-    // 편집 완료 이벤트
-    grid.on('editingFinish', ({columnName, rowKey, value}) => {
-        if(['empSalary','allowAmt', 'deducAmt'].includes(columnName)) {
-            const rowData = grid.getRow(rowKey);
-            const empSalary = Number(rowData.empSalary) || 0;
-            const allowAmt = Number(rowData.allowAmt) || 0;
-            const deducAmt = Number(rowData.deducAmt) || 0;
-            const netSalary = empSalary + allowAmt - deducAmt;
-            grid.setValue(rowKey, 'netSalary', netSalary);
-        }
-    });
-}
 
 // ================== 데이터 로드 및 검색 함수 ==================
 
@@ -306,8 +249,6 @@ function loadDepartments() {
 
 // 초기 데이터 로드
 function loadInitialData() {
-    const isRegularEmployee = hasRole('ROLE_ATHR003');
-    
     $.ajax({
         url: '/api/payroll/pay-info/search',  // URL 수정
         type: 'GET',
@@ -332,7 +273,8 @@ function loadInitialData() {
 function searchPayInfo() {
     const department = $('#searchDepartment').val() || '';
     const keyword = $('#searchKeyword').val() || '';
-
+	const isRegularEmployee = hasRole('ROLE_ATHR003');
+	
     $.ajax({
         url: '/api/payroll/pay-info/search',
         type: 'GET',
@@ -358,117 +300,6 @@ function searchPayInfo() {
         }
     });
 }
-// ================== 모달 관련 함수 ==================
-
-// 사원 검색 모달 열기
-function openEmployeeSearch(rowKey) {
-    selectedRowKey = rowKey;
-    const modalElement = document.getElementById('employeeSearchModal');
-    
-    const existingModal = bootstrap.Modal.getInstance(modalElement);
-    if (existingModal) {
-        existingModal.dispose();
-    }
-
-    const modal = new bootstrap.Modal(modalElement);
-    
-    modalElement.addEventListener('shown.bs.modal', function () {
-        if (!employeeGrid) {
-            initializeEmployeeGrid();
-        }
-        loadEmployees();
-    });
-
-    modal.show();
-}
-
-// 모달 내 그리드 초기화
-function initializeEmployeeGrid() {
-    employeeGrid = new tui.Grid({
-        el: document.getElementById('employeeGrid'),
-        columns: [
-            {
-                header: '사원번호',
-                name: 'empId',
-                width: 200,
-                align: 'center'
-            },
-            {
-                header: '사원명',
-                name: 'empName',
-                width: 160,
-                align: 'center'
-            },
-            {
-                header: '부서',
-                name: 'departmentName',
-                width: 170,
-                align: 'center'
-            },
-            {
-                header: '직급',
-                name: 'positionName',
-                width: 170,
-                align: 'center'
-            }
-        ],
-        rowHeaders: ['checkbox'],
-        minBodyHeight: 300,
-        bodyHeight: 'auto',
-        width: 'auto'
-    });
-}
-
-// 모달 내 사원 목록 로드
-function loadEmployees() {
-    const department = $('#empSearchDept').val() || '';
-    const keyword = $('#empSearchKeyword').val() || '';
-
-    $.ajax({
-        url: '/api/payroll/pay-info/search',
-        type: 'GET',
-        data: {
-            department: department,
-            keyword: keyword,
-            searchType: 'modal'
-        },
-        success: function(data) {
-            if (Array.isArray(data)) {
-                employeeGrid.resetData(data);
-                employeeGrid.refreshLayout();
-            }
-        },
-        error: function(error) {
-            console.error('사원 목록 로드 실패:', error);
-            employeeGrid.resetData([]);
-        }
-    });
-}
-
-// 모달에서 사원 선택
-function selectEmployee() {
-    const selectedRows = employeeGrid.getCheckedRows();
-
-    if (selectedRows.length === 0) {
-        alert('사원을 선택해주세요.');
-        return;
-    }
-
-    if (selectedRows.length > 1) {
-        alert('한 명의 사원만 선택해주세요.');
-        return;
-    }
-
-    const selectedEmployee = selectedRows[0];
-    updateGridWithSelectedEmployee(selectedEmployee);
-}
-
-document.querySelector('#employeeSearchModal .modal-footer').innerHTML = `
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-    <button type="button" class="btn btn-primary" onclick="selectEmployee()">
-        선택
-    </button>
-`;
 
 // 로딩 스피너 표시/숨김
 function showLoadingSpinner() {
@@ -655,13 +486,6 @@ function initializeMainGrid(isRegularEmployee) {
         editingEvent: isRegularEmployee ? 'none' : 'click'
     });
 
-	// 클릭 이벤트 핸들링
-    grid.on('click', (ev) => {
-        if (ev.columnName === 'empId') {
-            openEmployeeSearch(ev.rowKey);
-        }
-    });
-
     // 행이 추가될 때마다 스타일 적용
 	grid.on('afterChange', (ev) => {
         grid.getData().forEach((row, index) => {
@@ -694,26 +518,6 @@ function initializeMainGrid(isRegularEmployee) {
     });
 }
 
-// 추가 버튼 클릭시 새 행 추가 함수
-function addPaymentRow() {
-    const rowData = {};
-    const newRowKey = grid.getRowCount();
-    grid.prependRow(rowData);
-    
-    // 명시적으로 클래스 추가
-    setTimeout(() => {
-        grid.addRowClassName(newRowKey, 'unsaved-row');
-    }, 0);
-    
-    selectedRowKey = newRowKey;
-    openEmployeeSearch(newRowKey);
-}
-
-// 모달 닫기
-function closeEmployeeModal() {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('employeeSearchModal'));
-    modal.hide();
-}
 
 // ================== 미지급자 조회 관련 함수 ==================
 
@@ -788,8 +592,9 @@ function checkMissingPayment() {
 	                    empId: item.EMPID || item.empId,
 	                    empName: item.EMPNAME || item.empName,
 	                    departmentName: item.DEPARTMENTNAME || item.departmentName,
-	                    positionName: item.POSITIONNAME || item.positionName
-	                }));
+	                    positionName: item.POSITIONNAME || item.positionName,
+						empJobType: item.EMPJOBTYPE || item.empJobType
+					}));
 	                
 	                // 데이터 설정 전 로그 출력
 	                console.log('Setting grid data:', gridData);
@@ -837,10 +642,11 @@ async function addMissingEmployees() {
                 empName: employee.EMPNAME || employee.empName,
                 departmentName: employee.DEPARTMENTNAME || employee.departmentName,
                 positionName: employee.POSITIONNAME || employee.positionName,
+				empJobType: employee.EMPJOBTYPE || employee.empJobType,
                 paymentDate: paymentMonth
             };
             
-            grid.appendRow(newRow);
+            grid.prependRow(newRow);
             
             // 급여 계산하여 그리드에 표시
             try {
@@ -1008,25 +814,12 @@ function savePaymentData() {
 		    }));
 		}
 
-		// 추가 버튼 클릭시 새 행 추가 함수
-		function addPaymentRow() {
-		    const rowData = {};
-		    const newRowKey = grid.getRowCount();
-		    grid.prependRow(rowData);
-		    grid.addRowClassName(newRowKey, 'unsaved-row');
-		    
-		    // 새로 추가된 행 선택
-		    selectedRowKey = newRowKey;
-		    
-		    // 사원 검색 모달 열기
-		    openEmployeeSearch(newRowKey);
-		}
 
 		// ================== 초기화 및 이벤트 바인딩 ==================
 
 		$(document).ready(function() {
 		    const isRegularEmployee = hasRole('ROLE_ATHR003');
-		    
+			
 		    // jQuery AJAX 설정
 		    $.ajaxSetup({
 		        beforeSend: function(xhr) {
@@ -1054,9 +847,6 @@ function savePaymentData() {
 		            }
 		        });
 		        
-		        // 모달 검색 이벤트 바인딩
-		        $('#empSearchDept, #empSearchKeyword').on('change', loadEmployees);
-		        $('#empSearchBtn').on('click', loadEmployees);
 		    }
 			
 			// 미지급자 조회 모달 이벤트 바인딩
@@ -1457,3 +1247,106 @@ function savePaymentData() {
 					document.getElementById('payslipPreviewModal').addEventListener('hidden.bs.modal', function () {
 					    document.getElementById('payslipPreviewContent').innerHTML = '';
 					});
+					
+					// pay_info.js에 추가할 코드
+
+					// 숫자 포맷팅 함수
+					function formatCurrency(amount) {
+					    return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+					}
+
+					// 급여 시뮬레이션 함수
+					function simulateSalary() {
+					    const salaryInput = document.getElementById('simulatedSalary');
+					    const baseSalary = salaryInput.value.replace(/[^0-9]/g, '');
+					    
+					    if (!baseSalary) {
+					        alert('급여를 입력해주세요.');
+					        return;
+					    }
+
+					    // 로딩 표시
+					    showLoadingSpinner();
+					    
+					    fetch('/api/payroll/calculator/simulate/calculate', {
+					        method: 'POST',
+					        headers: {
+					            'Content-Type': 'application/json',
+					            [header]: token
+					        },
+					        body: JSON.stringify({
+					            baseSalary: baseSalary
+					        })
+					    })
+					    .then(response => response.json())
+					    .then(result => {
+					        hideLoadingSpinner();
+					        
+					        if (result.status === 'success') {
+								console.log('Calculation result:', result.data);
+					            updateSimulationResult(result.data);
+					            document.getElementById('simulationResult').style.display = 'block';
+					        } else {
+					            alert(result.message);
+					        }
+					    })
+					    .catch(error => {
+					        hideLoadingSpinner();
+					        console.error('Error:', error);
+					        alert('계산 중 오류가 발생했습니다.');
+					    });
+					}
+
+					// 시뮬레이션 결과 업데이트 함수
+					function updateSimulationResult(data) {
+						const formatCurrency = (value) => {
+							if (value === null || value === undefined || isNaN(value)) {
+					            console.warn('Invalid value:', value);  // 디버깅용 로그
+					            return '0원';
+					        }
+					        return new Intl.NumberFormat('ko-KR').format(value) + '원';
+					    };
+						// 각 항목 업데이트
+					    document.getElementById('sim-baseSalary').textContent = formatCurrency(data.baseSalary);
+					    document.getElementById('sim-nationalPension').textContent = formatCurrency(data.nationalPension);
+					    document.getElementById('sim-healthInsurance').textContent = formatCurrency(data.healthInsurance);
+					    document.getElementById('sim-longTermCare').textContent = formatCurrency(data.longTermCare);
+					    document.getElementById('sim-employmentInsurance').textContent = formatCurrency(data.employmentInsurance);
+					    document.getElementById('sim-incomeTax').textContent = formatCurrency(data.incomeTax);
+					    document.getElementById('sim-residentTax').textContent = formatCurrency(data.residentTax);
+					    document.getElementById('sim-totalDeductions').textContent = formatCurrency(data.totalDeductions);
+					    document.getElementById('sim-netSalary').textContent = formatCurrency(data.netSalary);
+					}
+
+					// 기본급 입력 필드에 숫자 포맷팅 이벤트 추가
+					document.getElementById('simulatedSalary').addEventListener('input', function(e) {
+					    let value = e.target.value.replace(/[^0-9]/g, '');
+					    if (value) {
+					        e.target.value = new Intl.NumberFormat('ko-KR').format(parseInt(value));
+					    }
+					});
+
+					// 모달이 닫힐 때 입력값과 결과 초기화
+					document.getElementById('salarySimulationModal').addEventListener('hidden.bs.modal', function () {
+					    document.getElementById('simulatedSalary').value = '';
+					    document.getElementById('simulationResult').style.display = 'none';
+					});
+					
+					// 각 항목 업데이트
+					const fields = {
+				        'sim-baseSalary': 'baseSalary',
+				        'sim-nationalPension': 'nationalPension',
+				        'sim-healthInsurance': 'healthInsurance',
+				        'sim-longTermCare': 'longTermCare',
+				        'sim-employmentInsurance': 'employmentInsurance',
+				        'sim-incomeTax': 'incomeTax',
+				        'sim-residentTax': 'residentTax',
+				        'sim-totalDeductions': 'totalDeductions',
+				        'sim-netSalary': 'netSalary'
+				    };
+
+				    Object.entries(fields).forEach(([elementId, dataKey]) => {
+				        const value = data[dataKey];
+				        console.log(`Updating ${elementId} with value:`, value); // 각 필드 업데이트 확인
+				        document.getElementById(elementId).textContent = formatCurrency(value);
+				    });

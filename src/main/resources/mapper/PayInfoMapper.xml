@@ -133,8 +133,20 @@
         e.emp_name AS empName,
         cd.common_detail_name AS departmentName,
         pos_cd.common_detail_name AS positionName,
-        e.emp_salary AS empSalary,
+        e.emp_job_type as empJobType,
+        p.emp_salary AS empSalary,
+        p.tech_allowance AS techAllowance,
+        p.tenure_allowance AS tenureAllowance,
+        p.performance_bonus AS performanceBonus,
+        p.holiday_allowance AS holidayAllowance,
+        p.leave_allowance AS leaveAllowance,
         p.allow_amt AS allowAmt,
+        p.national_pension AS nationalPension,
+        p.longterm_care_insurance AS longtermCareInsurance,
+        p.health_insurance AS healthInsurance,
+        p.employment_insurance AS employmentInsurance,
+        p.income_tax AS incomeTax,
+        p.resident_tax AS residentTax,
         p.deduc_amt AS deducAmt,
         p.net_salary AS netSalary,
         p.created_at AS createAt,
@@ -147,7 +159,6 @@
     AND e.emp_status LIKE 'WRST%'
     AND cd.common_detail_status = 'Y'
     ORDER BY p.payment_date DESC, p.payment_no DESC
-
 </select>
 
 <!-- 특정 월의 급여 미지급 직원 조회 -->
@@ -156,7 +167,8 @@
         e.emp_id as "EMPID",
         e.emp_name as "EMPNAME",
         cd.common_detail_name as "DEPARTMENTNAME",
-        pos_cd.common_detail_name as "POSITIONNAME"
+        pos_cd.common_detail_name as "POSITIONNAME",
+         e.emp_job_type as "EMPJOBTYPE"
     FROM employees e
     LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
     LEFT JOIN common_detail pos_cd ON e.emp_position = pos_cd.common_detail_code

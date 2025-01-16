@@ -170,6 +170,81 @@
 						
 					</div> 
 					<!-- 탭 끝 -->
+					
+					
+					<!-- 휴가신청서 상세 모달창 시작 -->
+					<!--Default size Modal -->
+					<div class="modal fade text-left" id="vctnDtl" tabindex="-1" role="dialog"
+						aria-labelledby="approveModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title" id="myModalLabel33">휴가 신청서</h4>
+								</div>
+								<div class="modal-body">
+									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사번: </label>
+											<div class="form-group">
+												<input type="text" id="empId" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>이름: </label>
+											<div class="form-group">
+												<input type="text" id="empName" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용 시작일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-start-date" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>사용 종료일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-end-date" readonly>
+											</div>
+										</div>
+									</div>
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용일수: </label>
+											<div class="form-group">
+												<input type="text" id="use-days" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>잔여일수: </label>
+											<div class="form-group">
+												<input type="text" id="vctnDays" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+
+									<label>휴가 구분</label>
+									<div class="form-group">
+										<input type="text" id="se" class="form-control" readonly>
+									</div>
+									
+									<label>비고</label>
+									<div class="form-group">
+										<input type="text" id="rmrk" class="form-control" readonly>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 휴가신청서 상세 모달창 모달창 끝 -->
+				
 
 				</div> <!-- card-body -->
 			</div> <!-- card -->
@@ -232,15 +307,21 @@
 				format: 'yyyy-MM-dd'
 			}
 		});
-
+		
 		// 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
+		var popup;
 		function openView() {
 			var popupW = 700;
 			var popupH = 550;
 			var left = (document.body.clientWidth / 2) - (popupW / 2);
 			left += window.screenLeft;	 //듀얼 모니터
 			var top = (screen.availHeight / 2) - (popupH / 2);
-			window.open('/vctn-appform', '', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+			popup = window.open('/vctn-appform', '', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+			
+			popup.addEventListener('beforeunload', function() { // 팝업창 콜백 처리
+			    window.location.href = '/request-list'; // 요청내역 페이지로 이동
+			});
+		
 		}
 
 		let useGrid = "";
@@ -285,6 +366,7 @@
 					useGrid = new Grid({
 						el: document.getElementById('useGrid'),
 						columns: [
+							{header: '휴가번호', name: 'vctnNo'},
 							{header: '사원번호', name: 'empId'},
 							{header: '이름', name: 'empNm'},
 							{header: '부서', name: 'deptNm'},
@@ -295,8 +377,51 @@
 						],
 						data: data
 					});
+					
+					// 휴가번호 숨기기
+					useGrid.hideColumn("vctnNo");
+					
+					// Grid의 row 클릭 이벤트 추가
+			    	useGrid.on('click', (ev) => {
+				        // 클릭된 row 데이터 가져오기
+				        const rowData = ev.instance.getRow(ev.rowKey);
+				        const vctnNo = rowData.vctnNo;
+				        console.info(vctnNo);
+						let modal = $('#vctnDtl');
+						modal.modal('show');
+						
+						fetch(
+							"/useVctnList",
+	
+							{
+								method: "POST"
+								, headers: {
+									'header': header,
+									"Content-Type": "application/json",
+									'X-CSRF-Token': token
+								}
+								, body: JSON.stringify({
+									vctnNo: vctnNo
+								})
+	
+							}) //fetch
+							.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+							.then(data => {
+								console.info(data[0].empId);
+								$("#empId").val(data[0].empId); // #empId 선택자로 수정
+						      	$("#empName").val(data[0].empNm); // 이름 값 설정
+						      	$("#use-start-date").val(data[0].vctnStart); // 사용 시작일
+						      	$("#use-end-date").val(data[0].vctnEnd); // 사용 종료일
+						      	$("#use-days").val(data[0].useDays); // 사용일수
+						      	$("#vctnDays").val(data[0].vctnDays); // 사용일수
+						      	$("#se").val(data[0].seNm); // 휴가 구분
+						      	$("#rmrk").val(data[0].rmrk); // 비고
+	
+							}) //then
+			   		});
 				})
 
+						
 
 			// 그리드에 값 미현시로 탭이 클릭된 후 레이아웃 새로 고침 처리
 			$('#default').on('shown.bs.tab', function () {
@@ -304,8 +429,7 @@
 			});
 		}
 
-
-		// 사용내역 조회 함수
+		// 보유현황 조회 함수
 		function holdTab() {
 			var Grid = tui.Grid;
 

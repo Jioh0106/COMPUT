@@ -95,6 +95,9 @@
 					            <i class="bi bi-search"></i> Search
 					        </button>
 					        <div class="ms-auto">
+					        	<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#salarySimulationModal">
+								    <i class="bi bi-calculator"></i> 급여 시뮬레이션
+								</button>
 					            <button type="button" onclick="previewPayslip()" class="btn btn-outline-primary" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
 					                <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
 					            </button>
@@ -121,36 +124,6 @@
 						</div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 사원 검색 모달 -->
-    <div class="modal fade" id="employeeSearchModal" tabindex="-1" aria-labelledby="employeeSearchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="max-width: 800px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="employeeSearchModalLabel">사원 검색</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="min-height: 500px; padding: 20px;">
-                    <!-- 검색 필터 -->
-                    <div class="mb-3 d-flex align-items-center">
-                        <select class="form-select me-2" id="empSearchDept" style="width: 150px;">
-                            <option value="">전체 부서</option>
-                        </select>
-                        <input type="text" class="form-control me-2" id="empSearchKeyword" style="width: 200px;" placeholder="사원명 또는 사번 검색">
-                        <button type="button" class="btn btn-primary" onclick="searchEmployees()">Search</button>
-                    </div>
-                    <!-- 사원 목록 그리드 -->
-                    <div id="employeeGrid" style="width: 100%; margin-top: 15px;"></div>
-                </div>
-				<div class="modal-footer">
-				    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-				    <button type="button" class="btn btn-primary" onclick="addMissingEmployees()">
-				        선택 직원 추가
-				    </button>
-				</div>
             </div>
         </div>
     </div>
@@ -198,6 +171,100 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- 급여 시뮬레이션 모달 -->
+<div class="modal fade" id="salarySimulationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">급여 시뮬레이션</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 입력 영역 -->
+                <div class="mb-4">
+                    <div class="form-group">
+                        <label for="simulatedSalary" class="form-label">급여(월)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="simulatedSalary" 
+                                   placeholder="급여를 입력하세요">
+                            <span class="input-group-text">원</span>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" onclick="simulateSalary()">계산하기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 결과 영역 -->
+                <div id="simulationResult" style="display: none;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-3">예상 급여 내역</h6>
+                            
+                            <!-- 지급액 -->
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">지급 항목</h6>
+                                <div class="row mb-2">
+                                    <div class="col-6">급여</div>
+                                    <div class="col-6 text-end" id="sim-baseSalary">0원</div>
+                                </div>
+                            </div>
+
+                            <!-- 공제액 -->
+                            <div class="mb-4">
+                                <h6 class="text-danger mb-3">공제 항목</h6>
+                                <div class="row mb-2">
+                                    <div class="col-6">국민연금</div>
+                                    <div class="col-6 text-end" id="sim-nationalPension">0원</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">건강보험</div>
+                                    <div class="col-6 text-end" id="sim-healthInsurance">0원</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">장기요양보험</div>
+                                    <div class="col-6 text-end" id="sim-longTermCare">0원</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">고용보험</div>
+                                    <div class="col-6 text-end" id="sim-employmentInsurance">0원</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">소득세</div>
+                                    <div class="col-6 text-end" id="sim-incomeTax">0원</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">지방소득세</div>
+                                    <div class="col-6 text-end" id="sim-residentTax">0원</div>
+                                </div>
+                                <div class="row border-top pt-2 mt-2">
+                                    <div class="col-6 text-danger">총 공제액</div>
+                                    <div class="col-6 text-end text-danger" id="sim-totalDeductions">0원</div>
+                                </div>
+                            </div>
+
+                            <!-- 실수령액 -->
+                            <div class="border-top pt-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h6 class="text-success mb-0">예상 실수령액</h6>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <h5 class="text-success mb-0" id="sim-netSalary">0원</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 

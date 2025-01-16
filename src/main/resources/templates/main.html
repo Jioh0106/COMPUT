@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
-<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
-</head>
+
 <body>
 <div th:fragment="main">
 	<!-- main.html -->
@@ -18,7 +14,7 @@
 
 		<div class="page-heading">
 			<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
-				onclick="cmtBtn(this.id)">출근하기</button>
+				onclick="cmtBtn()">출근하기</button>
 		</div>
 		<div class="card">
 		    <div class="card-body">
@@ -63,6 +59,10 @@
 <script src="/assets/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript" th:src="@{/js/main_work.js}"></script>
+
+<!-- sweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	
 
 
@@ -70,10 +70,23 @@
 
 	const header = document.querySelector('meta[name="_csrf_header"]').content;
 	const token = document.querySelector('meta[name="_csrf"]').content;
+	
+	let atndBtn;
 
 	// 화면 로드 시 공통코드 조회
 	window.onload = function () {
-			
+		
+		// 출/퇴근 확인 조회 함수
+		selectCmt();
+		
+		if(atndBtn == "end"){
+			const btn = document.getElementById("atndBtn");
+			btn.textContent = "퇴근하기"; // 버튼 텍스트 변경
+		} else {
+			const btn = document.getElementById("atndBtn");
+			btn.textContent = "출근하기"; // 버튼 텍스트 변경
+		}
+
 		  var Calendar = window.tui.Calendar;
 
 	      var cal = new Calendar('#main-calendar', {
@@ -112,10 +125,8 @@
 	      });
 	    
 	};
-
-	// 출/퇴근 버튼 처리
-	function cmtBtn(id) {
-		console.info(header);
+	
+	function selectCmt() {
 		fetch(
 			"/mainCmt",
 
@@ -126,15 +137,46 @@
 					"Content-Type": "application/json",
 					'X-CSRF-Token': token
 				}
-				/* , body: JSON.stringify({
-					btnType: id
-				}) */
+				, body: JSON.stringify({
+					btnType: "cmtBtn"
+				})
 
 			})
 			.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
 			.then(data => {
 				console.info(data);
 			})
+	};
+
+	// 출/퇴근 버튼 처리
+	function cmtBtn() {
+		console.info(header);
+		fetch(
+			"/insertCmt",
+			{
+				method: "POST"
+				, headers: {
+					'header': header,
+					"Content-Type": "application/json",
+					'X-CSRF-Token': token
+				}
+				/*, body: JSON.stringify({
+					btnType: id
+				})*/
+
+			})
+			.then(response => {
+				console.info(response);
+				Swal.fire({
+					title: "신청 완료",
+					icon: "success",
+					confirmButtonText: "확인"
+				}).then(function () { // 확인 클릭 시 실행
+					atndBtn = "end";
+					window.location.href = '/cmt-stts'; // 출퇴근 현황 페이지로 이동
+				});
+				
+            })
 	};
 
 </script>

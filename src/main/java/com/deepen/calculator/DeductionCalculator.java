@@ -14,27 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DeductionCalculator {
 
-    /**
-     * 국민연금 계산
-     */
+    // 국민연금 계산
     public BigDecimal calculateNationalPension(JsonNode formula, PayInfo payInfo) {
         return calculatePercentageDeduction(formula, payInfo);
     }
 
-    /**
-     * 건강보험 계산
-     */
+    // 건강보험 계산
     public BigDecimal calculateHealthInsurance(JsonNode formula, PayInfo payInfo) {
         return calculatePercentageDeduction(formula, payInfo);
     }
 
-    /**
-     * 장기요양보험 계산
-     */
+    // 장기요양보험 계산
     public BigDecimal calculateLongTermCare(JsonNode formula, PayInfo payInfo) {
         String baseField = formula.get("baseField").asText();
         BigDecimal baseAmount = switch (baseField) {
-            case "health_insurance" -> payInfo.getHealthInsurance();
+            case "health_insurance" -> nullToZero(payInfo.getHealthInsurance());
             default -> BigDecimal.ZERO;
         };
 
@@ -42,35 +36,12 @@ public class DeductionCalculator {
         return baseAmount.multiply(rate).setScale(0, RoundingMode.DOWN);
     }
 
-    /**
-     * 고용보험 계산
-     */
+    // 고용보험 계산
     public BigDecimal calculateEmploymentInsurance(JsonNode formula, PayInfo payInfo) {
         return calculatePercentageDeduction(formula, payInfo);
     }
 
-    /**
-     * 소득세 계산
-     */
-//    public BigDecimal calculateIncomeTax(JsonNode formula, PayInfo payInfo) {
-//        BigDecimal monthlyIncome = calculateTaxBase(formula, payInfo);
-//        BigDecimal annualIncome = monthlyIncome.multiply(new BigDecimal("12"));
-//        
-//        JsonNode brackets = formula.get("brackets");
-//        for (JsonNode bracket : brackets) {
-//            JsonNode limitNode = bracket.get("limit");
-//            BigDecimal limit = limitNode != null && !limitNode.isNull() ? 
-//                new BigDecimal(limitNode.asText()) : null;
-//                
-//            if (limit == null || annualIncome.compareTo(limit) <= 0) {
-//                BigDecimal rate = new BigDecimal(bracket.get("rate").asText());
-//                return monthlyIncome.multiply(rate).setScale(0, RoundingMode.DOWN);
-//            }
-//        }
-//        
-//        return BigDecimal.ZERO;
-//    }
-    	
+    // 소득세 계산
 	public BigDecimal calculateIncomeTax(JsonNode formula, PayInfo payInfo) {
 	    BigDecimal monthlyIncome = calculateTaxBase(formula, payInfo);
 	    BigDecimal annualIncome = monthlyIncome.multiply(new BigDecimal("12"));
@@ -103,9 +74,7 @@ public class DeductionCalculator {
 	    return totalTax.divide(new BigDecimal("12"), 0, RoundingMode.DOWN);
 	}
 
-    /**
-     * 지방소득세 계산
-     */
+    // 지방소득세 계산
     public BigDecimal calculateResidentTax(JsonNode formula, PayInfo payInfo) {
         String baseField = formula.get("baseField").asText();
         if ("income_tax".equals(baseField)) {
@@ -115,9 +84,7 @@ public class DeductionCalculator {
         return BigDecimal.ZERO;
     }
 
-    /**
-     * 비율 기반 공제 계산 (국민연금, 건강보험, 고용보험)
-     */
+    // 비율 기반 공제 계산 (국민연금, 건강보험, 고용보험)
     private BigDecimal calculatePercentageDeduction(JsonNode formula, PayInfo payInfo) {
         log.info("비율 기반 공제 계산 시작 - formula: {}", formula);
         
@@ -150,25 +117,36 @@ public class DeductionCalculator {
         return result;
     }
 
-    /**
-     * 세금 계산 기준금액 계산
-     */
+    // 세금 계산 기준금액 계산
     private BigDecimal calculateTaxBase(JsonNode formula, PayInfo payInfo) {
         BigDecimal base = BigDecimal.ZERO;
         JsonNode baseFields = formula.get("baseFields");
             
         for (JsonNode field : baseFields) {
             switch (field.asText()) {
-                case "emp_salary" -> base = base.add(new BigDecimal(payInfo.getEmpSalary()));
-                case "allow_amt" -> base = base.add(payInfo.getAllowAmt());
+                case "emp_salary" -> {
+                    if (payInfo.getEmpSalary() > 0) {
+                        base = base.add(new BigDecimal(payInfo.getEmpSalary()));
+                    }
+                }
+                case "allow_amt" -> {
+                    if (payInfo.getAllowAmt() != null) {
+                        base = base.add(payInfo.getAllowAmt());
+                    }
+                }
             }
         }
-            
+        
+        // 4대보험 공제액 계산
         base = base.subtract(payInfo.getNationalPension())
                    .subtract(payInfo.getHealthInsurance())
                    .subtract(payInfo.getLongtermCareInsurance())
                    .subtract(payInfo.getEmploymentInsurance());
             
         return base;
+    }
+    
+    private BigDecimal nullToZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
     }
 }

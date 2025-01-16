@@ -53,4 +53,12 @@ public class PayrollController {
         model.addAttribute("payListSummary", payListSummary);
         return "payroll/pay_list";
     }
+    
+    /**
+     * 연봉 시뮬레이션 페이지 반환
+     */
+    @GetMapping("/simulate")
+    public String simulatorPage() {
+        return "payroll/simulator";
+    }
 }

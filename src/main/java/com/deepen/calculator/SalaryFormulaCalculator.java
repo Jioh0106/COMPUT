@@ -40,27 +40,22 @@ public class SalaryFormulaCalculator {
                 result = switch (type) {
                     case "fixed" -> {
                         BigDecimal amount = allowanceCalculator.calculateTechAllowance(formula, emp);
-                        log.info("기술수당 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "performance" -> {
                         BigDecimal amount = allowanceCalculator.calculatePerformanceBonus(formula, emp, currentMonth);
-                        log.info("성과수당 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "tenure" -> {
                         BigDecimal amount = allowanceCalculator.calculateTenureAllowance(formula, emp);
-                        log.info("근속수당 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "holiday" -> {
                         BigDecimal amount = allowanceCalculator.calculateHolidayAllowance(formula, emp, currentMonth);
-                        log.info("명절수당 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "leave" -> {
                         BigDecimal amount = allowanceCalculator.calculateLeaveAllowance(formula, emp, currentMonth);
-                        log.info("휴가수당 계산 결과: {}", amount);
                         yield amount;
                     }
                     default -> {
@@ -76,32 +71,26 @@ public class SalaryFormulaCalculator {
                 result = switch (formulaCode) {
                     case "DDCT001" -> {
                         BigDecimal amount = deductionCalculator.calculateNationalPension(formula, payInfo);
-                        log.info("국민연금 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "DDCT002" -> {
                         BigDecimal amount = deductionCalculator.calculateHealthInsurance(formula, payInfo);
-                        log.info("건강보험 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "DDCT003" -> {
                         BigDecimal amount = deductionCalculator.calculateLongTermCare(formula, payInfo);
-                        log.info("장기요양보험 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "DDCT004" -> {
                         BigDecimal amount = deductionCalculator.calculateEmploymentInsurance(formula, payInfo);
-                        log.info("고용보험 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "DDCT005" -> {
                         BigDecimal amount = deductionCalculator.calculateIncomeTax(formula, payInfo);
-                        log.info("소득세 계산 결과: {}", amount);
                         yield amount;
                     }
                     case "DDCT006" -> {
                         BigDecimal amount = deductionCalculator.calculateResidentTax(formula, payInfo);
-                        log.info("주민세 계산 결과: {}", amount);
                         yield amount;
                     }
                     default -> {

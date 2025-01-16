@@ -1,3 +1,18 @@
+// 주민등록번호 뒷자리에서 첫번재 문자열 판별 후 동적으로 값 변경
+const secondSsn = document.getElementById("second_emp_ssn");
+const genderSelect = document.getElementById("emp_gender");
+secondSsn.addEventListener("input", ()=>{
+	const firstChar = secondSsn.value.charAt(0);
+	
+	if(firstChar === "1" || firstChar === "3" ){
+		genderSelect.value = "남";
+	}
+	
+	if(firstChar === "2" || firstChar === "4"){
+		genderSelect.value = "여";
+	}
+});
+
 // ajax fetch API - 공통상세코드 조회
 async function fetchCommonDetails() {
 	try{

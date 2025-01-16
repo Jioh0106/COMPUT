@@ -71,16 +71,49 @@
 	
 	<select id="selectWorkList" parameterType="hashMap" resultType="map">
 		SELECT 
-			  work_no
-			, emp_id
-			, work_date
-			, work_start
-			, work_end
+			  wv.work_no AS "workNo"
+			, wv.emp_id AS "empId"
+			, TO_CHAR(wv.work_date, 'YYYY-MM-DD') AS "workDate"
+			, wv.work_start AS "workStart"
+			, wv.work_end AS "workEnd"
+			, TO_CHAR(cm.cmt_date, 'YYYY-MM-DD') AS "cmtDate"
+			, cm.work_bgn AS "cmtStart"
+			, cm.work_end AS "cmtEnd"
+			, emp.emp_no AS "empNo"
+			, emp.emp_dept AS "empDept"
 		FROM 
-			work_schd
-		WHERE 
-			emp_id = #{empId}
+			WORK_VIEW wv
+		LEFT JOIN
+			CMT_MNG cm
+		ON
+			wv.emp_id = cm.emp_no
+		LEFT JOIN
+			employees emp
+		ON
+			wv.emp_id = emp.emp_id
+		WHERE
+			wv.emp_id = #{empId}
 	</select>
+	
+	<insert id="insertCmt" parameterType="hashMap">
+		INSERT INTO cmt_mng (
+			  cmt_cd
+			, emp_dept_cd
+			, cmt_date
+			, work_bgn
+			, atndn_stts_cd
+			, emp_no
+			, emp_id
+		) VALUES ( 
+			cmt_seq.nextval
+		  , #{empDept}
+		  , CURRENT_DATE
+		  , CURRENT_DATE
+		  , #{sttsCd}
+		  , #{empNo}
+		  , #{empId}
+		)
+	</insert>
 	
 	
 	
