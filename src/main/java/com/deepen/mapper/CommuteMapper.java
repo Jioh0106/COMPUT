@@ -18,6 +18,8 @@ public interface CommuteMapper {
 
 	List<Map<String, Object>> selectCmtList(Map<String, Object> athrMapList);
 
-	List<Map<String, Object>> selectWorkList();
+	List<Map<String, Object>> selectWorkList(Map<String, Object> searchMap);
+
+	int insertCmt(Map<String, Object> cmtData);
 
 }
