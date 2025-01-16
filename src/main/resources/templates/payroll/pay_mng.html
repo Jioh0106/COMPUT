@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,56 +19,8 @@
     <!-- TOAST UI CDN -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
-    <style>
-        .tui-grid-cell {
-            background-color: #ffffff !important;
-        }
-        .modal-dialog {
-            max-width: 800px;
-        }
-        .grid-wrapper {
-            margin-top: 20px;
-            height: 400px;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .help-text {
-            font-size: 0.875rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-        .btn-group .btn {
-            padding: 8px 15px;
-            font-size: 16px;
-        }
-        .btn-check:checked + .btn-outline-secondary {
-            background-color: #6c757d;
-            color: white;
-            border-color: #6c757d;
-        }
-        .btn-outline-secondary:hover {
-            background-color: #5a6268;
-            color: white;
-        }
-        .custom-tooltip {
-            position: absolute;
-            z-index: 1000;
-            background: #fff;
-            color: #000;
-            padding: 10px;
-            border-radius: 5px;
-            max-width: 300px;
-            text-align: left;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ccc;
-        }
-        .custom-text {
-            cursor: pointer;
-            text-decoration: underline;
-            color: #007bff;
-        }
-    </style>
+    <!-- 급여 종류 관리 CSS -->
+    <link rel="stylesheet" th:href="@{/css/pay_mng.css}">
 </head>
 
 <body>
@@ -114,7 +64,7 @@
                     </div>
                     <div class="card-body">
                         <div id="grid"></div>
-                        <div class="float-end" sec:authorize="hasRole('ATHR001')">
+                        <div class="float-end" sec:authorize="hasRole('ATHR001')" style="margin-top: 15px;">
                             <input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
                             <input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
                             <input type="submit" class="btn btn-outline-danger" value="삭제" id="deleteBtn">
@@ -126,441 +76,97 @@
     </div>
 
     <!-- 모달 창 -->
-<div class="modal fade" id="salaryModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">급여 항목 입력</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="salaryForm">
-                    <!-- 구분 선택 -->
-                    <div class="form-group">
-                        <label class="form-label">구분<span class="text-danger">*</span></label>
-                        <select class="form-control" id="typeSelect" required>
-                            <option value="">선택하세요</option>
-                            <option value="수당">수당</option>
-                            <option value="공제">공제</option>
-                        </select>
-                    </div>
+    <div class="modal fade" id="salaryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">급여 항목 입력</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="salaryForm">
+                        <!-- 구분 선택 -->
+                        <div class="form-group">
+                            <label class="form-label">구분<span class="text-danger">*</span></label>
+                            <select class="form-control" id="typeSelect" required>
+                                <option value="">선택하세요</option>
+                                <option value="수당">수당</option>
+                                <option value="공제">공제</option>
+                            </select>
+                        </div>
 
-                    <!-- 항목명 선택 -->
-                    <div class="form-group">
-                        <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
-                        <select class="form-control" id="formulaCode" name="formulaCode" required disabled>
-                            <option value="">선택하세요</option>
-                        </select>
-                    </div>
+                        <!-- 항목명 선택 -->
+                        <div class="form-group">
+                            <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaCode" name="formulaCode" required disabled>
+                                <option value="">선택하세요</option>
+                            </select>
+                        </div>
 
-                    <input type="hidden" id="formulaType" name="formulaType">
-                    <input type="hidden" id="formulaName" name="formulaName">
+                        <input type="hidden" id="formulaType" name="formulaType">
+                        <input type="hidden" id="formulaName" name="formulaName">
 
-                    <!-- 계산식 -->
-                    <div class="form-group">
-                        <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="formulaContent" name="formulaContent" 
-                                rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
-                    </div>
-                    
-                    <!-- 계산식 설명 -->
-				    <div class="form-group">
-				        <label for="formulaComment" class="form-label">계산식 설명</label>
-				        <textarea class="form-control" id="formulaComment" name="formulaComment" 
-				                rows="2" maxlength="500" placeholder="계산식에 대한 설명을 입력하세요"></textarea>
-				        <div class="help-text">계산식에 대한 상세 설명을 입력해주세요.</div>
-				    </div>
+                        <!-- 계산식 -->
+                        <div class="form-group">
+                            <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="formulaContent" name="formulaContent" 
+                                    rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
+                        </div>
+                        
+                        <!-- 계산식 설명 -->
+                        <div class="form-group">
+                            <label for="formulaComment" class="form-label">계산식 설명</label>
+                            <textarea class="form-control" id="formulaComment" name="formulaComment" 
+                                    rows="2" maxlength="500" placeholder="계산식에 대한 설명을 입력하세요"></textarea>
+                            <div class="help-text">계산식에 대한 상세 설명을 입력해주세요.</div>
+                        </div>
 
-                    <!-- 적용연도 -->
-                    <div class="form-group">
-                        <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
-                        <select class="form-control" id="applyYear" name="applyYear" required>
-                            <option value="">선택하세요</option>
-                        </select>
-                    </div>
+                        <!-- 적용연도 -->
+                        <div class="form-group">
+                            <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
+                            <select class="form-control" id="applyYear" name="applyYear" required>
+                                <option value="">선택하세요</option>
+                            </select>
+                        </div>
 
-                    <!-- 우선순위 -->
-                    <div class="form-group">
-                        <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
-                        <select class="form-control" id="formulaPriority" name="formulaPriority" required>
-                            <option value="">선택하세요</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="5">6</option>
-                            <option value="5">7</option>
-                        </select>
-                        <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
-                    </div>
+                        <!-- 우선순위 -->
+                        <div class="form-group">
+                            <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaPriority" name="formulaPriority" required>
+                                <option value="">선택하세요</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                            <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
+                        </div>
 
-                    <!-- 버튼 -->
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-outline-success">저장</button>
-                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
-                    </div>
-                </form>
+                        <!-- 버튼 -->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-outline-success">저장</button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Scripts -->
-<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/assets/js/main.js}"></script>
-<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-
-<script th:inline="javascript">
-
-const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-// 서버에서 전달받은 데이터
-const formulas = /*[[${formulas}]]*/ [];
-
-// 그리드 초기화
-console.log('Grid Data:', formulas); // 데이터 확인
-
-const grid = new tui.Grid({
-    el: document.getElementById('grid'),
-    data: formulas,
-    rowHeaders: ['checkbox'],
-    columns: [
-        { 
-        	header: '구분',
-            name: 'formulaType',
-            sortable: true,
-            sortingType: 'asc',
-            formatter: function(value) {
-                switch(value.value) {
-                    case 'DDCT':
-                        return '공제';
-                    case 'RWRD':
-                        return '수당';
-                    default:
-                        return value.value;
-                }
-            }
-        },
-        { 
-            header: '항목명', 
-            name: 'formulaName'
-        },
-		{
-        	header: '설명',
-            name: 'formulaComment',
-            formatter: function(value) {
-                return value.value ? '<span class="custom-text">자세히보기</span>' : '';
-            }
-        },
-        { 
-            header: '적용년도',
-            name: 'applyYear',
-            sortable: true
-        },
-        {
-            header: '우선순위',
-            name: 'formulaPriority',
-            sortable: true
-        },
-        { 
-            header: '수정일시', 
-            name: 'updatedAt',
-            sortable: true,
-            formatter: value => value.value ? new Date(value.value).toLocaleString() : ''
-        }
-    ]
-});
-
-let tooltipEl = null;
-
-function showTooltip(event, comment) {
-    if (!tooltipEl) {
-        tooltipEl = document.createElement('div');
-        tooltipEl.classList.add('custom-tooltip');
-        document.body.appendChild(tooltipEl);
-    }
-
-    tooltipEl.innerText = comment;
-    
-    const tooltipRect = tooltipEl.getBoundingClientRect();
-    
-    let posX = event.pageX + 10;
-    let posY = event.pageY + 10;
-    
-    if (posX + tooltipRect.width > window.innerWidth) {
-        posX = event.pageX - tooltipRect.width - 10;
-    }
-    
-    if (posY + tooltipRect.height > window.innerHeight) {
-        posY = event.pageY - tooltipRect.height - 10;
-    }
-    
-    tooltipEl.style.left = posX + 'px';
-    tooltipEl.style.top = posY + 'px';
-}
-
-function hideTooltip() {
-    if (tooltipEl) {
-        tooltipEl.remove();
-        tooltipEl = null;
-    }
-}
-
-grid.on('mouseover', function(event) {
-    if (event.columnName === 'formulaComment' && event.targetType === 'cell') {
-        const rowData = grid.getRow(event.rowKey);
-        showTooltip(event.nativeEvent, rowData.formulaComment);
-    }
-});
-
-grid.on('mouseout', function(event) {
-    if (event.columnName === 'formulaComment' && event.targetType === 'cell') {
-        hideTooltip();
-    }
-});
-
-// 구분 필터 이벤트 리스너
-document.querySelectorAll('input[name="typeFilter"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        const selectedType = this.value;
-        let filteredData = formulas;
-        
-        if (selectedType) {
-            const typeMap = {
-                '공제': 'DDCT',
-                '수당': 'RWRD'
-            };
-            filteredData = formulas.filter(formula => formula.formulaType === typeMap[selectedType]);
-        }
-        
-        grid.resetData(filteredData);
-    });
-});
-
-// 구분 선택 시 항목명 필터링
-document.getElementById('typeSelect').addEventListener('change', async function() {
-    const formulaCodeSelect = document.getElementById('formulaCode');
-    formulaCodeSelect.disabled = !this.value;
-    formulaCodeSelect.innerHTML = '<option value="">선택하세요</option>';
-    
-    if (this.value) {
-        try {
-            const response = await fetch('/pay-mng/formula-types');
-            const data = await response.json();
-            
-            // 선택된 구분에 해당하는 항목만 필터링
-            const filteredData = data.filter(item => item.type === this.value);
-            filteredData.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.code;
-                option.textContent = item.name;
-                option.dataset.type = item.type;
-                formulaCodeSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error('항목 데이터 로딩 중 오류:', error);
-        }
-    }
-});
-
-
-// 폼 제출 처리
-document.getElementById('salaryForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    console.log('폼 제출 시작'); // 디버깅 로그 추가
-    
-    const selectedCode = document.getElementById('formulaCode').value;
-    console.log('selectedCode:', selectedCode); // 선택된 코드 확인
-    
-    const needsDetail = ['DDCT005', 'RWRD001', 'RWRD002', 'RWRD003'].includes(selectedCode);
-    console.log('needsDetail:', needsDetail); // 상세 정보 필요 여부 확인
-
-    const formData = {
-        formulaId: this.dataset.id,
-        formulaCode: selectedCode,
-        formulaType: document.getElementById('formulaType').value,
-        formulaContent: document.getElementById('formulaContent').value,
-        formulaComment: document.getElementById('formulaComment').value,
-        applyYear: parseInt(document.getElementById('applyYear').value),
-        formulaPriority: parseInt(document.getElementById('formulaPriority').value)
-    };
-    
-    console.log('초기 formData:', formData); // 기본 데이터 확인
-
-    if (selectedCode) {
-        // 기본 데이터 설정
-        formData.formulaName = document.getElementById('formulaCode').options[
-            document.getElementById('formulaCode').selectedIndex
-        ].text;
-    }
-
-    console.log('최종 formData:', formData); // 최종 데이터 확인
-
-    try {
-        const url = formData.formulaId ? '/pay-mng/update' : '/pay-mng';
-        console.log('요청 URL:', url); // URL 확인
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        console.log('서버 응답:', response); // 응답 확인
-        
-        const result = await response.json();
-        console.log('응답 결과:', result); // 결과 확인
-        
-        if (response.ok) {
-            alert(result.message || '저장되었습니다.');
-            location.reload();
-        } else {
-            alert(result.message || '저장 중 오류가 발생했습니다');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('저장 중 오류가 발생했습니다.');
-    }
-});
-
-// 적용연도 초기화
-function initializeYearSelect() {
-    const yearSelect = document.getElementById('applyYear');
-    const currentYear = new Date().getFullYear();
-    yearSelect.innerHTML = '<option value="">선택하세요</option>';
-    for(let i = currentYear; i <= currentYear+2; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i + '년';
-        yearSelect.appendChild(option);
-    }
-}
-
-// 수정 버튼 클릭 이벤트
-document.getElementById('editBtn').addEventListener('click', async function(){
-    const checkedRows = grid.getCheckedRows();
-    if (checkedRows.length !== 1) {
-        alert('수정할 항목을 하나만 선택해주세요.');
-        return;
-    }
-    
-    const selectedRow = checkedRows[0];
-    console.log('Selected Row Data:', selectedRow);
-    
-    // 구분 설정 (RWRD -> 수당, DDCT -> 공제)
-    const displayType = selectedRow.formulaType === 'DDCT' ? '공제' : '수당';
-    document.getElementById('typeSelect').value = displayType;
-    
-    // 항목명 select box 활성화
-    const formulaCodeSelect = document.getElementById('formulaCode');
-    formulaCodeSelect.disabled = false;
-    
-    try {
-        const response = await fetch('/pay-mng/formula-types');
-        const data = await response.json();
-        
-        formulaCodeSelect.innerHTML = '<option value="">선택하세요</option>';
-        data.forEach(item => {
-            if(item.type === displayType) {
-                const option = document.createElement('option');
-                option.value = item.code;
-                option.textContent = item.name;
-                formulaCodeSelect.appendChild(option);
-            }
-        });
-
-        // formulaCode 설정 (실제 데이터와 일치하는지 확인)
-        if(selectedRow.formulaCode) {
-            formulaCodeSelect.value = selectedRow.formulaCode;
-        }
-    } catch (error) {
-        console.error('Error loading formula types:', error);
-    }
-
-    // hidden 필드값 설정
-    document.getElementById('formulaType').value = selectedRow.formulaType;
-    document.getElementById('formulaContent').value = selectedRow.formulaContent;
-    document.getElementById('formulaName').value = selectedRow.formulaName;
-    document.getElementById('applyYear').value = selectedRow.applyYear;
-    document.getElementById('formulaPriority').value = selectedRow.formulaPriority;
-    document.getElementById('formulaComment').value = selectedRow.formulaComment;
-
-    // form의 ID 설정 및 모달 표시
-    document.getElementById('salaryForm').dataset.id = selectedRow.formulaId;
-    document.querySelector('.modal-title').textContent = '급여 항목 수정';
-    new bootstrap.Modal(document.getElementById('salaryModal')).show();
-});
-
-// 삭제 버튼 클릭 이벤트
-document.getElementById('deleteBtn').addEventListener('click', async function() {
-    const checkedRows = grid.getCheckedRows();
-    if(checkedRows.length == 0) {
-        alert('삭제할 항목을 선택해주세요.')
-        return;
-    }
-    
-    if(!confirm('선택한 항목을 삭제하시겠습니까?')) {
-        return;
-    }
-    
-    try {
-        const ids = checkedRows.map(row => row.formulaId);
-        const response = await fetch('/pay-mng/delete', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(ids)
-        });
-        
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message || '삭제되었습니다.');
-            location.reload();
-        } else {
-        	alert(result.message || '삭제 중 오류가 발생했습니다.')
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('삭제 중 오류가 발생했습니다.')
-    }
-});
-
-// 모달이 닫힐 때 폼 초기화
-document.getElementById('salaryModal').addEventListener('hidden.bs.modal', function () {
-    const form = document.getElementById('salaryForm');
-    form.reset();
-    delete form.dataset.id;
-    document.querySelector('.modal-title').textContent = '급여 항목 입력';
-    document.getElementById('formulaCode').disabled = true;
-    document.getElementById('detailSection').style.display = 'none';
-});
-
-// 페이지 로드 시 실행
-document.addEventListener('DOMContentLoaded', function() {
-    initializeYearSelect();
-    
- // 권한 정보 가져오기 (메타 태그 추가 필요)
-    const hasAdminRole = /*[[${#authorization.expression('hasRole(''ATHR001'')')}]]*/ false;
-    
-    // 권한이 없는 경우 이벤트 리스너 제거
-    if (!hasAdminRole) {
-        document.getElementById('editBtn').removeEventListener('click', editButtonHandler);
-        document.getElementById('deleteBtn').removeEventListener('click', deleteButtonHandler);
-        
-        // 체크박스 비활성화
-        grid.setColumnValues('_checked', false);
-        grid.hideColumn('_checked');
-    }
-});
-
-</script>
+    <!-- Scripts -->
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script th:inline="javascript">
+        // 서버에서 전달받은 데이터
+        const formulas = /*[[${formulas}]]*/ [];
+        const hasAdminRole = /*[[${#authorization.expression('hasRole(''ATHR001'')')}]]*/ false;
+    </script>
+    <!-- Custom JavaScript -->
+    <script src="/js/payroll/pay_mng.js"></script>
 </body>
 </html>

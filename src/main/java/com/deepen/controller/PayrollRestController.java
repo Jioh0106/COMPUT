@@ -12,10 +12,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -33,6 +36,8 @@ import com.deepen.entity.PayInfo;
 import com.deepen.mapper.PayInfoMapper;
 import com.deepen.repository.PayInfoRepository;
 import com.deepen.domain.PayListDTO;
+import com.deepen.domain.SalaryFormulaDTO;
+import com.deepen.service.SalaryFormulaService;
 import com.deepen.service.PayInfoService;
 import com.deepen.service.PayListService;
 
@@ -45,13 +50,83 @@ import lombok.extern.java.Log;
 @Log
 public class PayrollRestController {
 	
+	private final SalaryFormulaService salaryFormulaService;
 	private final PayInfoService payInfoService;
+	private final PayListService payListService;
 	private final PayInfoRepository payInfoRepository;
 	private final PayInfoMapper payInfoMapper;
 	private final TemplateEngine templateEngine;
 	private final PdfGenerator pdfGenerator;
-	private final PayListService payListService;
 
+	// 급여 종류 관리 추가 POST
+    @PostMapping("/pay-mng")
+    @ResponseBody
+    public ResponseEntity<?> saveFormula(@RequestBody SalaryFormulaDTO salaryFormulaDTO) {
+    	try {
+            salaryFormulaService.save(salaryFormulaDTO);
+            return ResponseEntity.ok()
+                .body(Map.of(
+                    "message", "저장되었습니다.",
+                    "status", "success"
+                ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "message", "저장 중 오류가 발생했습니다: " + e.getMessage(),
+                    "status", "error"
+                ));
+        }
+    }
+	
+ // 급여 종류 관리 수정
+    @PostMapping("/pay-mng/update")
+    @ResponseBody
+    public ResponseEntity<?> updateFormula(@RequestBody SalaryFormulaDTO salaryFormulaDTO) {
+    	 try {
+             salaryFormulaService.update(salaryFormulaDTO);
+             return ResponseEntity.ok()
+                     .body(Map.of("message", "수정되었습니다."));
+         } catch (Exception e) {
+             return ResponseEntity.badRequest()
+                     .body(Map.of("message", "수정 중 오류가 발생했습니다: " + e.getMessage()));
+         }
+    }
+    
+    
+    // 급여 종류 관리 삭제
+    @PostMapping("/pay-mng/delete")
+    @ResponseBody
+    public ResponseEntity<?> deleteFormulas(@RequestBody List<Long> ids) {
+        try {
+            salaryFormulaService.deleteByIds(ids);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "삭제되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "삭제 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/pay-mng/formula-types")
+    @ResponseBody
+    public List<Map<String, String>> getFormulaTypes() {
+        return salaryFormulaService.getFormulaTypes();
+    }
+    
+    @GetMapping("/pay-mng/check-duplicate")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkDuplicate(
+    		 @RequestParam("name") String name  // "name"으로 파라미터 이름 명시
+	) {
+	    try {
+	        boolean isDuplicate = salaryFormulaService.existsByFormulaName(name);
+	        return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest()
+	            .body(Map.of("isDuplicate", false));
+	    }
+	}
+	
 	 //급여 지급 이력 저장
     @PostMapping("/pay-info/save")
     public ResponseEntity<?> savePayInfo(@RequestBody List<PayInfoDTO> payInfoDTOList) {
