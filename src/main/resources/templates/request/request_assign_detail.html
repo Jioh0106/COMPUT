@@ -18,6 +18,8 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!--  sweetalert  -->
+	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
 	
 	<style>
 		.tui-grid-cell {
@@ -68,7 +70,7 @@
 								<div class="form-group">
 									<label for="first-name-column">발령자 사번</label>
 									<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control"
-										>
+										readonly>
 								</div>
 							</div>
 							
@@ -76,7 +78,7 @@
 								<div class="form-group">
 									<label for="last-name-column">발령자 성명</label>
 									<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"
-										 >
+										readonly >
 								</div>
 							</div>
 							
@@ -85,7 +87,7 @@
 								<div class="form-group">
 									<label>발령일자</label>
 									<div class="form-group">
-										<input type="date" class="form-control" id="assign_date" name="assign_date">
+										<input type="date" class="form-control" id="assign_date" name="assign_date" readonly>
 									</div>
 								</div>
 							</div>
@@ -94,34 +96,37 @@
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="city-column">발령구분</label>
-									<input type="text" id="assign_type" name="assign_type" class="form-control">
+									<input type="text" id="assign_type" name="assign_type" class="form-control" readonly
+									>
 								</div>
 							</div>
 							
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="company-column">이전직급</label>
-									<input type="text" id="prev_pos" name="prev_pos" class="form-control">
+									<input type="text" id="prev_pos" name="prev_pos" class="form-control" readonly
+									>
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="email-id-column">발령직급</label>
-									<input type="text" id="new_pos" name="new_pos" class="form-control">
+									<input type="text" id="new_pos" name="new_pos" class="form-control" readonly>
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="company-column">이전부서</label>
 									<input type="text" id="prev_dept" class="form-control"
-										name="prev_dept">
+										name="prev_dept" readonly
+										>
 								</div>
 							</div>
 							<div class="col-md-6 col-12">
 								<div class="form-group">
 									<label for="email-id-column">발령부서</label>
 									<input type="text" id="new_dept" class="form-control"
-										name="new_dept">
+										name="new_dept" readonly>
 								</div>
 							</div>
 							<div class="col-12 d-flex justify-content-end">
@@ -266,6 +271,8 @@
 	<script src="assets/js/main.js"></script>
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<!-- sweet arert -->
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	 <!-- 제이쿼리 -->
    	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script>
@@ -449,21 +456,34 @@
 					
 					// 문자열 형태로 변환 (사원번호/이름/부서명/직급)
 				approverString = `${selectApprover.approverEmp_id}`;
-			        alert(`최종승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
+					Swal.fire({
+				        icon: "success",
+						title: "최종승인권자 선택",
+						text: `최종승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
+						confirmButtonText: "확인"
+				    })
 			    }
 
 
 			// 승인 요청 버튼 클릭 시 실행되는 함수(중간승인권자만 실행)
 			function requestApproval() {
 			    if (!selectApprover.approverEmp_id) {
-			        alert('최종승인권자를 선택하세요.');
+					Swal.fire({
+				       icon: "info",
+				       title: "Info",
+					   text: "최종승인권자를 선택하세요."
+							   })
 			        return;
 			    }
 			    // 유효성 검사 통과 후 모달 닫기 및 요청 처리
 			    $('#approvedefaultSize').modal('hide'); // 모달 창 닫기
 
 			    // 이후 AJAX 요청 등의 처리 로직을 여기에 추가할 수 있음
-			    alert('승인 요청이 정상적으로 처리되었습니다.');
+				Swal.fire({
+			        icon: "success",
+					title: "success",
+					text: "승인 요청이 정상적으로 처리되었습니다.",
+					confirmButtonText: "확인"    })
 					
 					const requestDTO = {
 						request_no: request_no,
@@ -488,7 +508,6 @@
 				        },
 				       
 				        success: function(response) {
-				            alert('요청내역 업데이트완료.');
 							console.log("resultDTO : " + response)
 							// 부모창 새로고침
 				            if (window.opener) {
@@ -539,7 +558,11 @@
         console.log('반려사유', rejectReason);
         
         if (!rejectReason.trim()) {
-            alert('반려사유를 입력하세요.');
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "반려사유를 입력하세요."
+					   })
             return;
         }
 
@@ -559,7 +582,11 @@
             })
             .then(data => {
                 if (data.success) {
-                	alert('반려사유가 등록되었습니다.');
+					Swal.fire({
+				        icon: "success",
+						title: "success",
+						text: "반려사유가 등록되었습니다.",
+						confirmButtonText: "확인"    })
                 	if (window.opener) {
 		                window.opener.location.reload(); // 부모창 새로고침
 		                window.close(); // 팝업창 닫기
@@ -567,7 +594,11 @@
 		                console.error('부모창이 없습니다.');
 		            }
                 } else {
-                    alert('반려사유 등록에 실패했습니다.');
+					Swal.fire({
+					       icon: "error",
+					       title: "Error",
+						   text: "반려사유 등록에 실패했습니다."
+					   })
                 }
             })
             .catch(error => {

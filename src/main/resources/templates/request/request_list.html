@@ -23,7 +23,20 @@
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */
 			background-color: #ffffff !important;
+			
 		}
+		
+		/* 요청 상태별 색상 */
+		.status-approved {
+			color: #28a745; /* 초록색 */
+			font-weight: bold; /* 강조 */
+		}
+
+		.status-rejected {
+			color: #dc3545; /* 빨간색 */
+			font-weight: bold;
+		}
+
 	</style>
 </head>
 
@@ -189,7 +202,7 @@
 					columns: [
 						{header: '요청번호', name: 'request_no'},
 						{header: '요청구분', name: 'request_division'},
-						{header: '요청유형', name: 'request_type'},
+						{header: '요청유형', name: 'request_type', filter : 'select'},
 						{header: '사원번호', name: 'emp_id'},
 						{header: '성명', name: 'emp_name'},
 						{header: '부서명', name: 'emp_dept'},
@@ -197,7 +210,17 @@
 						{header: '요청마감일', name: 'request_deadline'},
 						{header: '중간승인권자', name: 'middle_approval'},
 						{header: '최종승인권자', name: 'high_approval'},
-						{header: '요청상태', name: 'request_status'},
+						{header: '요청상태', name: 'request_status',
+						formatter: ({ value }) => {
+			               let className = '';
+			               if (value === '2차대기' || value ==='최종승인') {
+			                   className = 'status-approved';
+			               } else if (value === '1차반려' || value === '2차반려') {
+			                   className = 'status-rejected';
+			               } 
+			               return `<span class="${className}">${value}</span>`;
+			           		}
+						},
 						{header: '반려사유', name: 'request_rejection'}
 					],
 					

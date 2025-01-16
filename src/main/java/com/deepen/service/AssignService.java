@@ -178,8 +178,7 @@ public class AssignService {
 			LocalDateTime registr_date = assignment.getRegistr_date();
 			
 			String emp_id = assignment.getAssign_emp_id(); //발령자사번
-			if(registr_date.toLocalDate().isEqual(now.toLocalDate())) {
-				
+			if(registr_date != null && registr_date.toLocalDate().isEqual(now.toLocalDate())) {
 				Optional<Employees> optionnalEmployees = personnelRepository.findById(emp_id);
 				Employees employees = optionnalEmployees.get();
 				employees.setEmp_position(assignment.getNew_pos());
@@ -188,12 +187,15 @@ public class AssignService {
 				personnelRepository.save(employees); //사원테이블 저장
 				log.info("해당 발령자 사번 업데이트"+ emp_id);
 				
+			}else if(registr_date == null) {
+				log.info("최종승인이 아니라서 등록날짜없음 "+ emp_id);
 			}else {
-				log.info("해당 발령자사번을 찾을 수 없음"+ emp_id);
+				log.info("오늘 등록된 발령 항목이 아님: " + emp_id);
 			}
 		}
 		
 	}
+	
 	
 	
 	
@@ -252,6 +254,22 @@ public class AssignService {
 	public RequestDTO getRejection(Integer request_no) {
 		return asMapper.getRejection(request_no);
 	}
+	
+	
+	//인사발령 리스트 조회
+	public List<Map<String, Object>> assignList (String startDate, String endDate, String search){
+		log.info("필터로 조회: "+startDate+", "+endDate+", "+search);
+		Map<String, Object> params = new HashMap<>();
+		params.put("startDate", startDate);
+		params.put("endDate", endDate);
+		params.put("search", search);
+		
+		List<Map<String, Object>> assignList = asMapper.assignList(params);
+		return assignList;
+		
+	}
+	
+	
 	
 
 }

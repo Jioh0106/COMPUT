@@ -18,6 +18,8 @@
     <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!--  sweetalert  -->
+	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
 	
 	<style>
 		.tui-grid-cell {
@@ -274,6 +276,8 @@
 	<script src="assets/js/main.js"></script>
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<!-- sweet arert -->
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
 	 <!-- 제이쿼리 -->
    	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
 	<script src="js/assign_insert.js"></script>
@@ -374,6 +378,13 @@
 			
 			//등록버튼 클릭 시
 			document.getElementById('registBtn').addEventListener('click', function () {
+				
+				// 빈칸유효성 검사 함수 호출
+				    if (!validateForm()) {
+				        return; // 유효성 검사가 실패하면 요청 중단
+				    }
+				
+					
 			if(userRole === 'ATHR001'){
 				console.log('ATHR001 권한 승인 처리 시작'); // 디버깅 로그
        			const requestDTO = {
@@ -485,7 +496,12 @@
 				
 				// 문자열 형태로 변환 (사원번호/이름/부서명/직급)
 			approverString = `${selectApprover.approverEmp_id}`;
-	            alert(`승인권자: ${selectApprover.approverEmp_name}님이 선택되었습니다.`);
+				Swal.fire({
+				        icon: "success",
+						title: "중간승인권자 선택",
+						text: `중간승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
+						confirmButtonText: "확인"
+				    })
 	        }
 	 
 		
@@ -493,15 +509,23 @@
 		// 승인 요청 버튼 클릭 시 실행되는 함수
 	    function requestApproval() {
 	        if (!selectApprover.approverEmp_id) {
-	            alert('승인권자를 선택하세요.');
+				Swal.fire({
+			       icon: "info",
+			       title: "Info",
+				   text: "승인권자를 선택해주세요."
+						   })
 	            return;
 	        }
 	        // 유효성 검사 통과 후 모달 닫기 및 요청 처리
 	        $('#defaultSize').modal('hide'); // 모달 창 닫기
-
-	        // 이후 AJAX 요청 등의 처리 로직을 여기에 추가할 수 있음
-	        alert('승인 요청이 정상적으로 처리되었습니다.');
 					
+				Swal.fire({
+		        icon: "success",
+				title: "success",
+				text: "승인 요청이 정상적으로 처리되었습니다.",
+				confirmButtonText: "확인"   })
+			
+			
 				 const assignmentDTO = {
 					assign_emp_id : $('#assign_emp_id').val(),
 					assign_emp_name : $('#assign_emp_name').val(),
@@ -518,8 +542,6 @@
 					high_approval : approverString
 				};
 				
-				//const csrfToken = $('input[name="_csrf"]').val();
-
 		
 			// AJAX 요청
 			    $.ajax({
@@ -535,13 +557,18 @@
 			        },
 			       
 			        success: function(response) {
-			            alert('발령 등록 및 요청 내역 저장이 완료되었습니다.');
+						
 						console.log("resultDTO : " + response)
 			            window.location.href = '/request-list';
 			        },
 			        error: function(error) {
-			            alert('발령 등록 및 요청 내역 저장에 실패실패실패ㅗㅗㅗ.');
-			            console.error(error);
+						Swal.fire({
+				        icon: "error",
+						title: "Error",
+						text: "발령 등록 및 요청 내역 저장 실패.",
+						confirmButtonText: "확인" })
+										   			           
+						console.error(error);
 			        }
 			    });
 			
@@ -550,7 +577,71 @@
 	    document.querySelector('#approvalBtn').addEventListener('click', requestApproval);
 	 }); // 돔 끝
 		
-		
+	//발령등록 폼 빈칸체크 유효성검사 함수
+	function validateForm() {
+	    // 필수 필드 값 가져오기
+	    const assignEmpId = document.getElementById('assign_emp_id').value.trim();
+	    const assignEmpName = document.getElementById('assign_emp_name').value.trim();
+	    const assignDate = document.getElementById('assign_date').value.trim();
+	    const assignType = document.getElementById('assign_type').value.trim();
+	    const newPos = document.getElementById('new_pos').value.trim();
+	    const newDept = document.getElementById('new_dept').value.trim();
+
+	    // 필수 값 체크
+	    if (!assignEmpId) {
+			Swal.fire({
+			       icon: "info",
+			       title: "Info",
+				   text: "발령자 사번을 입력해주세요."
+			   })
+	        return false;
+	    }
+	    if (!assignEmpName) {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "발령자 이름을 입력해주세요."
+			 })
+	        return false;
+	    }
+	    if (!assignDate) {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "발령일자를 입력해주세요."
+		   })
+			
+	        return false;
+	    }
+	    if (!assignType || assignType === '구분 선택') {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "발령구분을 선택해주세요."
+					   })
+	        return false;
+	    }
+	    if (!newPos || newPos === '직급 선택') {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "발령직급을 선택해주세요."
+					   })
+	        return false;
+	    }
+	    if (!newDept || newDept === '부서 선택') {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "발령부서를 선택해주세요."
+					   })
+	        return false;
+	    }
+
+	    // 모든 필드가 유효하면 true 반환
+	    return true;
+	}
+	
 		
 		
 		

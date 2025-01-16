@@ -14,13 +14,11 @@ import com.deepen.entity.Request;
 public interface RequestRepository extends JpaRepository<Request, Integer> {
 	
 	//로그인한 자신의 요청내역 조회
-//	@Query("SELECT r FROM Request r WHERE r.emp_id = :empId")
-//	List<Request> findByEmp_id(@Param("empId") String empId);
-	
 	@Query("SELECT r FROM Request r WHERE " +
 		       "r.emp_id = :empId OR " +
 		       "r.middle_approval = :empId OR " +
-		       "r.high_approval = :empId")
+		       "r.high_approval = :empId " +  // 공백 추가
+		       "ORDER BY r.request_no DESC")
 	List<Request> findByEmp_id(@Param("empId") String empId);
 
 

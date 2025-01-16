@@ -18,6 +18,8 @@
 	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
+
 
 	<style>
 		.tui-grid-cell {
@@ -49,18 +51,43 @@
 			<div class="card">
 				<div class="card-body">
 					
-					<div class="col-12 d-flex justify-content-end">
-						<button type="button" class="btn btn-secondary" data-bs-toggle="modal"
-							data-bs-target="#defaultSize">그룹별 검색</button>
-							
-					</div>
+					<!-- 데이트 피커 시작 -->
+					<section class="section" style="margin-bottom: 2.2rem">
+						<div style="display: flex; align-items: center; gap: 1rem;">
+							<span style="font-size: 1rem; line-height: 2rem;">발령일</span>
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="startDate" name="startDate" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container1"
+									style="margin-top: -1px; z-index: 2000; position: relative;"></div>
+							</div>
+			
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+			
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="endDate" name="endDate" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container2"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+			
+						</div>
+					</section>
+					<!-- 데이트 피커 끝 -->
 
 					<div class="col-md-6 mb-1"><!--직원이름검색창-->
 						<div class="input-group mb-3">
-							<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-							<input type="text" class="form-control" id="nameSearch" placeholder="이름을 입력해주세요."
+							<span class="input-group-text" id="search-icon"><i class="bi bi-search"></i></span>
+							<input type="text" class="form-control" id="search" name="search" 
+							placeholder="이름 또는 사원번호를 입력해주세요."
 								aria-label="Recipient's username" aria-describedby="button-addon2">
-							<button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
 						</div>
 					</div>
 
@@ -74,84 +101,7 @@
 					<!-- 그리드 끝 -->
 
 
-<!--검색모달창 시작-->
-<!--Default size Modal -->
-<div class="modal fade text-left" id="defaultSize" tabindex="-1" role="dialog"
-	aria-labelledby="myModalLabel18" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title" id="myModalLabel18">그룹별 검색</h4>
-				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-					<i data-feather="x"></i>
-				</button>
-			</div>
-			<!--모달바디시작-->
-			<div class="modal-body">
-				<div class="col-md-6 col-4">
-					<div class="form-group ">
-						<label>기준일자별 선택</label>
-					</div>
-					<div class="form-group d-flex">
-						<input type="date" class="form-control me-2" id="assign_date"
-							onchange="calcDate()">
-						<span class="mx-2">~</span>
-						<input type="date" class="form-control ms-2" id="assign_date"
-							onchange="calcDate()">
-					</div>
-				</div>
 
-				<span
-					class="mx-2">------------------------------------------------------------------</span>
-
-				<div class="col-md-5 mb-6">
-					<div class="form-group ">
-						<label>부서별 선택</label>
-					</div>
-					<div class="input-group mb-3">
-						<label class="input-group-text" for="inputGroupSelect01">부서</label>
-						<select class="form-select" id="inputGroupSelect01">
-							<option value="">선택</option>
-							<option value="1">인사</option>
-							<option value="2">마케팅</option>
-							<option value="3">영업</option>
-							<option value="4">개발</option>
-						</select>
-					</div>
-				</div>
-
-				<span
-					class="mx-2">------------------------------------------------------------------</span>
-
-				<div class="col-md-5 mb-6">
-					<div class="form-group ">
-						<label>발령구분별 선택</label>
-					</div>
-					<div class="input-group mb-3">
-						<label class="input-group-text" for="inputGroupSelect01">발령구분</label>
-						<select class="form-select" id="inputGroupSelect01">
-							<option value="">선택</option>
-							<option value="1">승진</option>
-							<option value="2">전보</option>
-						</select>
-					</div>
-				</div>
-			</div><!--모달바디끝-->
-
-						<div class="modal-footer">
-							<button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-								<i class="bx bx-x d-block d-sm-none"></i>
-								<span class="d-none d-sm-block">취소</span>
-							</button>
-							<button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">
-								<i class="bx bx-check d-block d-sm-none"></i>
-								<span class="d-none d-sm-block">검색</span>
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!--검색모달창 끝-->
 			
 		</div> <!-- card-body -->
 	 </div> <!-- card -->
@@ -165,200 +115,141 @@
 			<script src="assets/js/main.js"></script>
 			<!-- TOAST UI CDN -->
 			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+			<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 			<script>
 
+		// datePikers
+		const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
+		const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+		//const empHireDatePicker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
+		//const empExitDatePicker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');			
 				var Grid = tui.Grid;
 
-				
-
-				// Grid 생성
 				const grid = new Grid({
-					el: document.getElementById('grid'),
-					columns: [
-						{header: '발령구분', name: 'assign_type'},
-						{header: '승인일자', name: 'registr_date'},
-						{header: '발령일자', name: 'assign_date'},
-						{header: '사원번호', name: 'emp_num'},
-						{header: '성명', name: 'emp_name'},
-						{header: '이전직급', name: 'prev_pos'},
-						{header: '발령직급', name: 'new_pos'},
-						{header: '이전부서', name: 'prev_dept'},
-						{header: '발령부서', name: 'new_dept'},
-					],
-					data: data
-				});
-
-				
-				// 그리드 초기화
-// 				mainFetchData().then(function (data) {
-
-// 				let isEditable = emp_role === 'ATHR001' || emp_role === 'ATHR002';
-					
-// 					console.log('Is Editable:', isEditable); 
-					
-// 				    grid = new tui.Grid({
-// 				    	el: document.getElementById('grid'),
-// 						data: gridData,
-// 						rowHeaders: ['checkbox'],
-// 						columns: [
-// 							{
-// 								header: '번호', 
-// 								name: 'assignment_no', 
-// 								width: 60,
-// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-// 								editor: isEditable ? 'text' : null
-// 							},
-// 							{ 
-// 								header: '발령구분', 
-// 								name: 'assign_type', 
-// 								width: 120,
-// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-// 								editor: isEditable ? 'text' : null
-// 							},  
-// 							{ 
-// 								header: '승인일자', 
-// 								name: 'registr_date', 
-// 								width: 100,
-// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-// 								editor: isEditable ? 'text' : null
-// 							},
-// 							{ 
-// 								header: '발령일자', 
-// 								name: 'assign_date',
-// 								width: 100,
-// 								editor: isEditable ? 'text' : null,
-// 								filter: 'select'
-// 							},
-// 							{ 
-// 								header: '사원번호', 
-// 								name: 'emp_num', 
-// 								width: 100,
-// 								editor: isEditable ? 'text' : null,
-// 								filter: 'select'
-// 							},
-// 							{ 
-// 								header: '성명', 
-// 								name: 'emp_name',
-// 								width: 100,
-// 								editor: isEditable
-// 									? {
-// 									type: 'select',
-// 									options: {
-// 										listItems: data.loabCommon
-// 									}
-// 							    }
-// 								: null,
-// 								filter: 'select'
-// 							},
-							
-// 							{ 
-// 								header: '이전직급', 
-// 								name: 'prev_pos',
-// 								width: 120,
-// 								editor: isEditable
-// 									? {
-// 					                type: 'datePicker',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd'
-// 					                }
-// 					            }
-// 								: null,
-// 					            filter: {
-// 					                type: 'date',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd'
-// 					                }
-// 					            }
-// 					        },
-// 					        { 
-// 								header: '발령직급', 
-// 								name: 'new_pos',
-// 								width: 120,
-// 								editor: isEditable 
-// 									? {
-// 					                type: 'datePicker',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd'
-// 					                }
-// 					            }
-// 								: null,
-// 					            filter: {
-// 					                type: 'date',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd'
-// 					                }
-// 					            }
-// 					        },
-// 					        {
-// 					            header: '이전부서', 
-// 					            name: 'prev_dept',
-// 								width: 150,
-// 					            editor: isEditable 
-// 					                ? {
-// 					                    type: 'datePicker',
-// 					                    options: {
-// 					                        format: 'yyyy-MM-dd hh:mm', 
-// 											timepicker: true
-// 					                    }
-// 					                }
-// 					                : null,
-// 					            filter: {
-// 					                type: 'date',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd hh:mm', 
-// 					                }
-// 					            }
-// 					        },
-// 					        {
-// 					            header: '발령부서', 
-// 					            name: 'new_dept',
-// 								width: 150,
-// 					            editor: isEditable 
-// 					                ? {
-// 					                    type: 'datePicker',
-// 					                    options: {
-// 					                        format: 'yyyy-MM-dd hh:mm', 
-// 											timepicker: true
-// 					                    }
-// 					                }
-// 					                : null,
-// 					            filter: {
-// 					                type: 'date',
-// 					                options: {
-// 					                    format: 'yyyy-MM-dd hh:mm', 
-// 					                }
-// 					            }
-// 					        },
-// 					        { 
-// 								header: '최종 승인자', 
-// 								name: 'HIGH_APPROVAL', 
-// 								width: 160,
-// 								filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-// 								editor: isEditable
-// 									? {
-// 									type: 'select',
-// 									options: {
-// 										listItems: data.highList
-// 									}
-// 							    }
-// 								: null,
-// 								filter: 'select'
-// 							},
-// 							{ 
-// 								header: '비고', 
-// 								name: 'ABSENCE_REMARK',
-// 								width: 200,
-// 								editor: isEditable ? 'text' : null
-// 							}
-// 						],
-// 						editing: isEditable  // 편집 기능 활성화
+				  el: document.getElementById('grid'),
+				  data: [], // 초기 데이터
+				  rowHeaders: ['checkbox'],
+				  //scrollX: false,
+				  //scrollY: false,
+				  bodyHeight: 470,
+				  columns: [
+				    { 
+						header: '번호', 
+						name: 'ASSIGNMENT_NO',
+					},
+				    { 
+						header: '발령구분', 
+						name: 'ASSIGN_TYPE',
+					},
+				    { 
+						header: '승인일자', 
+						name: 'REGISTR_DATE',
+					},
+				    { 
+						header: '발령일자', 
+						name: 'ASSIGN_DATE'
 						
-// 					});
+					},
+				    { 
+						header: '사원번호', 
+						name: 'ASSIGN_EMP_ID'
+						
+					},
+				    { 
+						header: '성명', 
+						name: 'ASSIGN_EMP_NAME'
+						
+					},
+					{ 
+						header: '이전직급', 
+						name: 'PREV_POS',
+						filter : 'select'
+					},
+					{ 
+						header: '발령직급', 
+						name: 'NEW_POS',
+						filter : 'select'
+					},
+					{ 
+						header: '이전부서', 
+						name: 'PREV_DEPT',
+						filter : 'select'
+					},
+					{ 
+						header: '발령부서', 
+						name: 'NEW_DEPT',
+						filter : 'select'
+					}
+				  ],
+				  columnOptions: {
+				          resizable: true
+				        }
+				});		
+	
+	
+	const assignFilters = {
+		startDate : '1900-01-01',
+		endDate : '2999-12-31',
+		search : '',
+		
+	}
+				
+	function updateAssignFilters() {
+		    assignFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
+		    assignFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
+		    assignFilters.search = document.getElementById('search').value || '';
+		    
+		    fetchAssignList(assignFilters);
+		}
+	
+	// 페이지가 완전히 로드된 후 함수 실행
+	window.onload = function () {
+			
+			fetchAssignList(assignFilters);
+			//fetchCommonDetails();
+			
+			startDatePicker.on('change', updateAssignFilters);
+			endDatePicker.on('change', updateAssignFilters);
+		   	document.getElementById('search').addEventListener('input', updateAssignFilters);
+			
+		}	
+		
+		
+		// 사원리스트 필터 조회
+		async function fetchAssignList(filter) {
+			try	{	
+					const params = new URLSearchParams(filter).toString();
+					console.log('요청 URL:', `http://localhost:8082/api/assign/list?${params}`);  // URL 디버깅
+			       	const response = await fetch(`http://localhost:8082/api/assign/list?${params}`);
+					
+			       	if (!response.ok) {
+			           	throw new Error("네트워크 응답 실패");
+			       	}
+			       	const assignList = await response.json();
+			       	console.log(assignList);
 
+			       	// 그리드 데이터 갱신
+			       	grid.resetData(assignList);
+					grid.refreshLayout();
+					
+			   	} catch (error) {
+			       	console.error("인사발령조회 중 오류:", error);
+			   	}
+		}
+	
+		// toast ui datepiker
+		function datePiker(containerSelector, inputSelector){
+			return new tui.DatePicker(containerSelector,{
+				date : new Date(),
+				input : {
+					element: inputSelector,
+					format: 'yyyy-MM-dd'
+				},
+				language : 'ko'
+			});
+		}						
 				
-				
-				
-			</script>
+</script>
 
 </body>
 

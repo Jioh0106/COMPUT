@@ -116,7 +116,54 @@
         request_no = #{request_no}
 	</select>
 	
-	
+	<!--인사현황 리스트 조회-->
+	<select id="assignList" parameterType="Map" resultType="java.util.Map">
+		select a.assignment_no,
+			   TO_CHAR(a.registr_date, 'YYYY-MM-DD') AS registr_date,
+			   TO_CHAR(a.assign_date, 'YYYY-MM-DD') AS assign_date,
+			   a.assign_emp_id,
+			   e.emp_name AS assign_emp_name,
+			   cdat.common_detail_name AS assign_type,
+			   cdpp.common_detail_name AS prev_pos,
+			   cdnp.common_detail_name AS new_pos,
+			   cdpd.common_detail_name AS prev_dept,
+			   cdnd.common_detail_name AS new_dept
+	   from  assignment a 
+	   	INNER JOIN request r 
+    	ON a.request_no = r.request_no 
+   		AND r.request_status = 'RQST005'
+	   LEFT JOIN EMPLOYEES e
+	   		ON e.emp_id = a.assign_emp_id
+	   LEFT JOIN COMMON_DETAIL cdat
+		    ON cdat.common_detail_code LIKE 'APNT%'
+		    AND cdat.common_detail_code = a.assign_type
+		    AND cdat.common_detail_status = 'Y'		   
+	   LEFT JOIN COMMON_DETAIL cdpp
+		    ON cdpp.common_detail_code LIKE 'PSTN%'
+		    AND cdpp.common_detail_code = a.prev_pos
+		    AND cdpp.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdnp
+		    ON cdnp.common_detail_code LIKE 'PSTN%'
+		    AND cdnp.common_detail_code = a.new_pos
+		    AND cdnp.common_detail_status = 'Y'		    		   
+	    LEFT JOIN COMMON_DETAIL cdpd
+		    ON cdpd.common_detail_code LIKE 'DEPT%'
+		    AND cdpd.common_detail_code = a.prev_dept
+		    AND cdpd.common_detail_status = 'Y'	
+	    LEFT JOIN COMMON_DETAIL cdnd
+		    ON cdnd.common_detail_code LIKE 'DEPT%'
+		    AND cdnd.common_detail_code = a.new_dept
+		    AND cdnd.common_detail_status = 'Y'
+		WHERE 1=1
+	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
+		AND a.assign_date BETWEEN #{startDate} AND #{endDate}
+	    </if>    
+ 	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">
+        	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
+    	</if>
+	    ORDER BY a.assignment_no	   
+				
+	</select>
 	
 	
 	
