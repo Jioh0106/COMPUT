@@ -54,21 +54,6 @@ public class WorkRestController {
 		
 	} // getSerchEmpList
 
-	@PostMapping("/insert")
-    public ResponseEntity<String> insertWork(@RequestBody WorkAddDTO appendData) {
-		
-		log.info("appendData : "+ appendData.toString());
-		
-	    try {
-	    	workService.insertWork(appendData);
-	        return ResponseEntity.ok("추가가 완료되었습니다.");
-	        
-		} catch (Exception e) {
-		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("추가 중 오류 발생");
-	    }
-			
-	    
-    } // insertWork
 	
 	// 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인
 	@PostMapping("/ckeck")
@@ -92,6 +77,23 @@ public class WorkRestController {
 		
 		
 	} // ckeckWork
+	
+	// 근무 테이블에 추가
+	@PostMapping("/insert")
+    public ResponseEntity<String> insertWork(@RequestBody WorkAddDTO appendData) {
+		
+		log.info("appendData : "+ appendData.toString());
+		
+	    try {
+	    	workService.insertWork(appendData);
+	        return ResponseEntity.ok("일정 등록이 완료되었습니다.");
+	        
+		} catch (Exception e) {
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("추가 중 오류 발생");
+	    }
+			
+	    
+    } // insertWork
 	
 	
 	

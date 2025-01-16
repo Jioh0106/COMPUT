@@ -172,16 +172,17 @@ $(function() {
 		
 	});
 
+	const csrfToken = $('input[name="_csrf"]').val();
+	console.log("CSRF Token : " + csrfToken);
 
 	$('#appendWork').on('click', function() {
-	    const csrfToken = $('input[name="_csrf"]').val();
 		const tmpSelect = $('#work_tmp').val();
 		const start = instance1.getDate().toLocaleDateString('en-CA');  // 'yyyy-MM-dd' 형식
 		const end = instance2.getDate().toLocaleDateString('en-CA');   // 'yyyy-MM-dd' 형식
 		const weekdays = getWeekdaysBetweenDates(start, end);
 		const selectedRows = grid.getCheckedRows();
 		
-	    console.log("CSRF Token : " + csrfToken);
+	    
 	    console.log("start : " +  start);
 	    console.log("end : " +  end);
 		for (const row of selectedRows) {

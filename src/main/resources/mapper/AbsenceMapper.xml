@@ -45,6 +45,7 @@
 		 LEFT JOIN common_detail c_position
 			    ON e.emp_position = c_position.common_detail_code
 			 WHERE emp_role = #{emp_role}
+			   AND emp_status = 'WRST001'
 	</select>
 	
 	<!-- 삭제 SQL -->

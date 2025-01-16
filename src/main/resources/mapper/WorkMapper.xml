@@ -40,6 +40,12 @@
 		   AND work_date = #{day}
     </select>
     
+    
+    <insert id="insertWork">
+    	INSERT INTO work(emp_id, work_date, work_tmp_name)
+    	VALUES(#{emp_id}, #{work_date}, #{work_tmp_name})
+    </insert>
+    
 	
 </mapper>
 
