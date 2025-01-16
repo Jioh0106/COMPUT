@@ -38,7 +38,7 @@ function formatPaymentMonth(value) {
 
 const gridConfig = {
     columns: {
-        basic: ['paymentDate', 'empId', 'empName', 'departmentName', 'positionName'],
+        basic: ['paymentDate', 'empId', 'empName', 'departmentName', 'positionName', 'empJobType'],
         money: [
             'empSalary',           // 기본급
             'techAllowance',       // 기술수당
@@ -62,6 +62,7 @@ const gridConfig = {
             empName: '사원이름',
             departmentName: '부서',
             positionName: '직급',
+			empJobType: '근무형태',
             empSalary: '기본급',
             techAllowance: '기술수당',
             tenureAllowance: '근속수당',
@@ -108,7 +109,7 @@ const gridConfig = {
 	           name: key,
 	           width: 110,
 	           align: 'center',
-	           sortable: ['paymentDate', 'empId', 'departmentName', 'positionName'].includes(key)
+	           sortable: ['paymentDate', 'empId', 'departmentName', 'positionName', 'empJobType'].includes(key)
 	       };
 
 	       // 금액 컬럼인 경우 천단위 구분자 formatter 추가
@@ -187,6 +188,18 @@ const gridConfig = {
 			           return (positionOrder[aCode] || 999) - (positionOrder[bCode] || 999);
 	               };
 	               break;
+				   
+			   case 'empJobType':
+                   column.formatter = (value) => {
+                       const jobTypeMap = {
+                           'OCPT001': '일반직',
+                           'OCPT002': '계약직',
+                           'OCPT003': '기술직'
+                       };
+                       return jobTypeMap[value.value] || value.value;
+                   };
+                   column.editor = false;
+                   break;
 
 	           default:
 	               column.editor = false;
@@ -974,6 +987,7 @@ function savePaymentData() {
 		        empName: item.empName,
 		        departmentName: item.departmentName,
 		        positionName: item.positionName,
+				empJobType: item.empJobType,
 		        empSalary: Number(item.empSalary || 0),
 		        techAllowance: Number(item.techAllowance || 0),
 		        tenureAllowance: Number(item.tenureAllowance || 0),
@@ -1322,3 +1336,124 @@ function savePaymentData() {
 			    
 			    return formattedDate;
 			}
+			
+			// 급여명세서 미리보기 
+			async function previewPayslip() {
+			    try {
+			        const checkedRows = grid.getCheckedRows();
+			        if (checkedRows.length === 0) {
+			            alert('명세서를 출력할 항목을 선택해주세요.');
+			            return;
+			        }
+			        if (checkedRows.length > 1) {
+			            alert('명세서는 한 번에 한 건만 출력할 수 있습니다.');
+			            return;
+			        }
+
+			        const row = checkedRows[0];
+			        if (!row.paymentNo) {
+			            alert('저장되지 않은 데이터는 명세서를 출력할 수 없습니다.');
+			            return;
+			        }
+
+			        showLoadingSpinner();
+
+					const response = await fetch(
+					            `/api/payroll/pay-info/${row.paymentNo}/payslip/preview?empName=${encodeURIComponent(row.empName)}`,
+					            {
+					                headers: { 
+					                    [header]: token,
+					                    'Accept': 'text/html'
+					                }
+					            }
+					        );
+
+					        if (!response.ok) {
+					            throw new Error(`HTTP error! status: ${response.status}`);
+					        }
+
+					        const htmlContent = await response.text();
+					        
+					        // 미리보기 컨텐츠 업데이트
+					        const previewContent = document.getElementById('payslipPreviewContent');
+					        previewContent.innerHTML = htmlContent;
+					        
+					        // 현재 선택된 행 정보를 데이터 속성으로 저장
+					        previewContent.dataset.paymentNo = row.paymentNo;
+					        previewContent.dataset.empName = row.empName;
+					        previewContent.dataset.paymentDate = row.paymentDate;
+
+					        // 모달 표시
+					        const modal = new bootstrap.Modal(document.getElementById('payslipPreviewModal'));
+					        modal.show();
+
+					    } catch (error) {
+					        console.error('명세서 미리보기 중 오류:', error);
+					        alert('급여명세서 미리보기 중 오류가 발생했습니다.');
+					    } finally {
+					        hideLoadingSpinner();
+					    }
+					}
+
+					async function printPayslip() {
+					    try {
+					        showLoadingSpinner();
+					        
+					        const previewContent = document.getElementById('payslipPreviewContent');
+					        const paymentNo = previewContent.dataset.paymentNo;
+					        const empName = previewContent.dataset.empName;
+					        const paymentDate = previewContent.dataset.paymentDate;
+
+					        if (!paymentNo || !empName) {
+					            throw new Error('필요한 정보가 없습니다.');
+					        }
+
+					        console.log('Downloading PDF for:', { paymentNo, empName, paymentDate }); // 디버깅용
+
+					        const response = await fetch(
+					            `/api/payroll/pay-info/${paymentNo}/payslip/download?empName=${encodeURIComponent(empName)}`,
+					            {
+					                method: 'GET',
+					                headers: {
+					                    [header]: token,
+					                    'Accept': 'application/pdf'
+					                }
+					            }
+					        );
+
+					        if (!response.ok) {
+					            const errorText = await response.text();
+					            console.error('Server response:', errorText); // 디버깅용
+					            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+					        }
+
+					        const blob = await response.blob();
+					        if (blob.size === 0) {
+					            throw new Error('PDF 파일이 비어있습니다.');
+					        }
+
+					        const url = window.URL.createObjectURL(blob);
+					        const a = document.createElement('a');
+					        a.href = url;
+					        a.download = `${empName}_${paymentDate}_급여명세서.pdf`;
+					        document.body.appendChild(a);
+					        a.click();
+					        a.remove();
+					        window.URL.revokeObjectURL(url);
+
+					        // 성공적으로 다운로드 후 모달 닫기
+					        const modal = bootstrap.Modal.getInstance(document.getElementById('payslipPreviewModal'));
+					        modal.hide();
+
+					    } catch (error) {
+					        console.error('PDF 출력 중 오류:', error);
+					        alert('급여명세서 출력 중 오류가 발생했습니다: ' + error.message);
+					    } finally {
+					        hideLoadingSpinner();
+					    }
+					}
+
+					// 모달이 닫힐 때 컨텐츠 초기화
+					document.getElementById('payslipPreviewModal').addEventListener('hidden.bs.modal', function () {
+					    document.getElementById('payslipPreviewContent').innerHTML = '';
+					});
