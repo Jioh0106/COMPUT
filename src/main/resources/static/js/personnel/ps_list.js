@@ -17,7 +17,7 @@ const empListGrid = new Grid({
   rowHeaders: ['checkbox'],
   //scrollX: false,
   //scrollY: false,
-  bodyHeight: 470,
+  bodyHeight: 600,
   columns: [
     { 
 		header: '입사일', 

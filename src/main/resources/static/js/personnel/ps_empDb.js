@@ -4,7 +4,7 @@ Grid.applyTheme('clean'); // 테마 적용
 const empInfoList = new Grid({
 	el: document.getElementById('grid'),
 	  data: [], // 초기 데이터
-	  bodyHeight: 200,
+	  bodyHeight: 260,
 	  columns: [
 		{ header: '사원번호', name: 'EMP_ID'},
 	    { header: '이름', name: 'EMP_NAME'},

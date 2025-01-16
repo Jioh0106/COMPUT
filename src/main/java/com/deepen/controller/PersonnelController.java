@@ -28,14 +28,14 @@ public class PersonnelController {
 	@GetMapping("/ps-list")
 	public String psList() {
 		
-		return "/personnel/ps_list";
+		return "personnel/ps_list";
 	}
 	
 	//http://localhost:8082/ps-reg
 	@GetMapping("/ps-reg")
 	public String psRegist() {
 		
-		return "/personnel/ps_insert";
+		return "personnel/ps_insert";
 	}
 	
 	@PostMapping("/ps-reg")
@@ -52,7 +52,7 @@ public class PersonnelController {
 	@GetMapping("/registClose")
 	public String registClose() {
 		
-		return "/personnel/registClose";
+		return "personnel/registClose";
 	}
 	
 	@PostMapping("/ps-update")
@@ -69,14 +69,14 @@ public class PersonnelController {
 	@GetMapping("/ps-empDb")
 	public String empDb() {
 		
-		return "/personnel/ps_empDb";
+		return "personnel/ps_empDb";
 	}
 	
 	//http://localhost:8082/ps-hrDb
 	@GetMapping("/ps-hrDb")
 	public String hrDb() {
 		
-		return "/personnel/ps_hrDb";
+		return "personnel/ps_hrDb";
 	}
 	
 }
