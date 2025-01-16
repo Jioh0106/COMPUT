@@ -12,24 +12,25 @@
 	
 	<select id="selectUseVctnList" parameterType="hashMap" resultType="map">
 		SELECT
-			  emp.emp_id AS "empId"
+			  vctn.vacation_no AS "vctnNo"
+			, emp.emp_id AS "empId"
 			, emp.emp_name AS "empNm"
 			, dept.common_detail_name AS "deptNm"
 			, TO_CHAR(vctn.vacation_start, 'YYYY-MM-DD') || ' ~ ' || TO_CHAR(vctn.vacation_end, 'YYYY-MM-DD') AS "useDate"
 			, se.common_detail_name AS "seNm"
 			, vctn.vacation_total AS "useDays"
+			, TO_CHAR(vctn.vacation_start, 'YYYY-MM-DD') AS "vctnStart"
+			, TO_CHAR(vctn.vacation_end, 'YYYY-MM-DD') AS "vctnEnd"
+			, NVL2(vctn.vacation_note, vctn.vacation_note, ' ') AS "rmrk"
 			<if test="requestNo != null and requestNo != ''">
 				, vctn.request_no AS "requestNo"
 				, NVL2(rqst.high_approval, rqst.high_approval, rqst.middle_approval) AS "aprvId"
 				, (SELECT emp_name FROM employees WHERE emp_id = NVL2(rqst.high_approval, rqst.high_approval, rqst.middle_approval)) AS "aprvName"
 				, (SELECT common_detail_name FROM common_detail WHERE common_detail_code = emp.emp_position) AS "empPst"
-				, TO_CHAR(vctn.vacation_start, 'YYYY-MM-DD') AS "vctnStart"
-				, TO_CHAR(vctn.vacation_end, 'YYYY-MM-DD') AS "vctnEnd"
 				, TO_CHAR(rqst.request_date, 'YYYY-MM-DD') AS "vctnApp"
 				, rqst.middle_approval AS "middleAprv"
 				, NVL2(rqst.high_approval, rqst.high_approval, ' ') AS "highAprv"
 				, rqst.request_status AS "status"
-				, NVL2(vctn.vacation_note, vctn.vacation_note, ' ') AS "rmrk"
 			</if>
 		FROM 
 			vacation vctn
@@ -50,7 +51,9 @@
 		ON
 			vctn.request_no = rqst.request_no
 		<where>
-				<!--AND rqst.request_status = 'RQST005'-->
+			<if test="requestNo == null">
+				AND rqst.request_status = 'RQST005'
+			</if>
 			<if test='empRole == "ATHR002"'>
 			 	AND emp.emp_dept = #{empDept}
 			</if>
@@ -68,7 +71,10 @@
 			<if test="requestNo != null and requestNo != '' and requestNo != 0">
 	            AND vctn.request_no = #{requestNo}
         	</if>
-		</where>
+			<if test="vctnNo != null and vctnNo != ''">
+	            AND vctn.vacation_no = #{vctnNo}
+        	</if>
+        </where>
 		ORDER BY
 			vctn.vacation_start DESC
 	</select>
@@ -78,12 +84,16 @@
 			  emp.emp_id AS "empId"
 			, emp.emp_name AS "empNm"
 			, dept.common_detail_name AS "deptNm"
-			, SUM(vctn.vacation_total) AS "useDays"
+			, SUM(CASE 
+			        WHEN rqst.request_status = 'RQST005' THEN vctn.vacation_total 
+			        ELSE 0 
+			      END) AS "useDays"
 			, emp.emp_no
 		FROM 
-			vacation vctn
-		LEFT JOIN
 			employees emp
+			
+		LEFT JOIN
+			vacation vctn
 		ON
 			vctn.vacation_leave = emp.emp_id
 		LEFT JOIN
@@ -95,7 +105,7 @@
 		ON
 			vctn.request_no = rqst.request_no
 		<where>
-				<!--AND rqst.request_status = 'RQST001'-->
+				<!--AND rqst.request_status = 'RQST005'-->
 			<if test='empRole == "ATHR002"'>
 			 	AND emp.emp_dept = #{empDept}
 			</if>
@@ -141,8 +151,11 @@
 			, emp_dept AS "empDept"
 			, TO_CHAR(emp_hire_date, 'YYYYMMDD') AS "hireDate"
 			, (SELECT NVL2(SUM(vacation_total), SUM(vacation_total), 0) 
-				FROM vacation 
+				FROM vacation v
+				LEFT JOIN request r
+				ON v.request_no = r.request_no
 				WHERE vacation_leave = #{value}
+				AND r.request_status = 'RQST005'
 				AND EXTRACT(YEAR FROM vacation_start) = EXTRACT(YEAR FROM SYSDATE)) AS "total"
 		FROM 
 			employees
@@ -185,7 +198,7 @@
 		ON
 			pstn.COMMON_DETAIL_CODE = emp.EMP_POSITION 
 		WHERE
-			emp_exit_date IS NOT NULL
+			(TO_CHAR(emp.emp_exit_date) IS NULL OR emp.emp_exit_date <![CDATA[>]]> CURRENT_DATE)
 			<choose>
 		        <when test="role == 'ATHR001'">
 		            AND emp_role = 'ATHR001'
@@ -230,8 +243,8 @@
 		  , vacation_appdate
 		  , vacation_total
 		  , vacation_leave
-		  , vacation_approve
 		  , request_no
+		  , vacation_note
 		
 		) VALUES ( 
 		    vacation_seq.nextval
@@ -241,8 +254,8 @@
 		  , sysdate
 		  , #{total}
 		  , #{leaveId}
-		  , #{aprvId}
 		  , #{no}
+		  , #{rmrk}
 		)
 	</insert>
 	
