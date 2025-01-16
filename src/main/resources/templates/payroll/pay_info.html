@@ -125,36 +125,6 @@
         </div>
     </div>
 
-    <!-- 사원 검색 모달 -->
-    <div class="modal fade" id="employeeSearchModal" tabindex="-1" aria-labelledby="employeeSearchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="max-width: 800px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="employeeSearchModalLabel">사원 검색</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="min-height: 500px; padding: 20px;">
-                    <!-- 검색 필터 -->
-                    <div class="mb-3 d-flex align-items-center">
-                        <select class="form-select me-2" id="empSearchDept" style="width: 150px;">
-                            <option value="">전체 부서</option>
-                        </select>
-                        <input type="text" class="form-control me-2" id="empSearchKeyword" style="width: 200px;" placeholder="사원명 또는 사번 검색">
-                        <button type="button" class="btn btn-primary" onclick="searchEmployees()">Search</button>
-                    </div>
-                    <!-- 사원 목록 그리드 -->
-                    <div id="employeeGrid" style="width: 100%; margin-top: 15px;"></div>
-                </div>
-				<div class="modal-footer">
-				    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-				    <button type="button" class="btn btn-primary" onclick="addMissingEmployees()">
-				        선택 직원 추가
-				    </button>
-				</div>
-            </div>
-        </div>
-    </div>
-
 <!-- 미지급자 조회 모달 -->
 <div class="modal fade" id="missingPaymentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
