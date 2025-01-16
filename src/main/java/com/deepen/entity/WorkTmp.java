@@ -29,6 +29,12 @@ public class WorkTmp {
 	@Column(name = "work_type", length = 30)
 	private String work_type;
 	
+	@Column(name = "work_time")
+	private Integer work_time;
+	
+	@Column(name = "rest_time")
+	private Integer rest_time;
+	
 	public static WorkTmp absenceDTOToEntity(WorkTmpDTO workTmpDTO) {
 		WorkTmp workTmp = new WorkTmp();
 		workTmp.setWork_tmp_name(workTmpDTO.getWork_tmp_name());
@@ -36,6 +42,8 @@ public class WorkTmp {
 		workTmp.setWork_end(workTmpDTO.getWork_end());
 		workTmp.setWork_shift(workTmpDTO.getWork_shift());
 		workTmp.setWork_type(workTmpDTO.getWork_type());
+		workTmp.setWork_time(workTmpDTO.getWork_time());
+		workTmp.setRest_time(workTmpDTO.getRest_time());
 		
 		return workTmp;
 	}

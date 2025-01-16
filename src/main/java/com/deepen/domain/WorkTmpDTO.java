@@ -10,7 +10,8 @@ public class WorkTmpDTO {
 	private String work_end;
 	private String work_shift;
 	private String work_type;
-	
+	private Integer work_time;
+	private Integer rest_time;
 	
 
 }
