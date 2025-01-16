@@ -1,5 +1,3 @@
-const emp = /*[[${emp}]]*/
-
 
 // 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
 function openView() {
@@ -10,6 +8,7 @@ function openView() {
 	var top = (screen.availHeight / 2) - (popupH / 2);
 	window.open('/work-add', 'work_add', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
+
 
 // =========================================================================
 
