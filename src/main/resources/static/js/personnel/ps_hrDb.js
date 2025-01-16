@@ -4,7 +4,7 @@ Grid.applyTheme('clean'); // 테마 적용
 const empInfoList = new Grid({
 	el: document.getElementById('grid'),
 	  data: [], // 초기 데이터
-	  bodyHeight: 200,
+	  bodyHeight: 260,
 	  columns: [
 	    { header: '사원번호', name: 'EMP_ID'},
 	    { header: '이름', name: 'EMP_NAME'},
@@ -29,7 +29,7 @@ categoryMenu.addEventListener("input",() => {
 	const selectCategory = categoryMenu.value;
 	console.log(selectCategory);
 	
-	if(selectCategory === "입/퇴사자"){
+	if(selectCategory === "입/퇴사"){
 		empChartContainer.innerHTML="<div id='lineChart'></div>";
 		countMonthlyHireExit();
 	}else if(selectCategory === "고용유형별"){
@@ -48,7 +48,7 @@ categoryMenu.addEventListener("input",() => {
 function initChart(){
 	const defaultCategory = categoryMenu.value;
 	
-	if(defaultCategory === "입/퇴사자"){
+	if(defaultCategory === "입/퇴사"){
 		empChartContainer.innerHTML="<div id='lineChart'></div>";
 		countMonthlyHireExit();
 	}else if(defaultCategory === "고용유형별"){
@@ -69,7 +69,7 @@ function createLineChart(lineChartData) {
         el: document.getElementById('lineChart'),
         data: lineChartData,
         options: {
-            chart: { title: '월별 입/퇴사자', width: 800, height: 550 },
+            chart: { title: '월별 입/퇴사 현황', width: 800, height: 550 },
             xAxis: { title: '월' },
             yAxis: { title: '인원 수' },
             series: { spline: true } // 부드러운 선
