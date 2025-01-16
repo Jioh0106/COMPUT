@@ -152,7 +152,7 @@ public class AbsenceController {
 		absenceService.insertAbsenceAndRequest(request, absence);
 		
 		
-		return "redirect:/loab-mng";
+		return "redirect:/request-list";
 		
 		
 	}
