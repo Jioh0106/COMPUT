@@ -47,7 +47,7 @@ public class AbsenceRestController {
         // 데이터를 서비스나 데이터베이스에서 가져오기
         List<CommonDetailDTO> commonList = absenceService.getCommonList(type);
         
-        log.info("AttendanceRestController / getCommonList : " + commonList.toString());
+        log.info("AbsenceRestController / getCommonList : " + commonList.toString());
         
         return ResponseEntity.ok(commonList);
         

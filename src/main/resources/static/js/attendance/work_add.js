@@ -90,10 +90,12 @@ $(function() {
 	}
 
 	const currentDate = new Date();
-	const nextMonthFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+	const nextMonthFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);	
 	const nextMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
 
-
+	console.log("Next Month First Day:", nextMonthFirstDay.toLocaleDateString('en-CA'));
+	console.log("Next Month Last Day:", nextMonthLastDay.toLocaleDateString('en-CA'));
+	
 	// 첫 번째 DatePicker 초기화
 	const container1 = document.getElementById('tui-date-picker-container-1');
 	const target1 = document.getElementById('tui-date-picker-target-1');
@@ -104,6 +106,7 @@ $(function() {
 			format: 'yyyy-MM-dd'
 		}
 	});
+	instance1.setDate(nextMonthFirstDay); // 값 강제 설정
 
 	// 두 번째 DatePicker 초기화
 	const container2 = document.getElementById('tui-date-picker-container-2');
@@ -115,7 +118,8 @@ $(function() {
 			format: 'yyyy-MM-dd'
 		}
 	});
-
+	instance2.setDate(nextMonthLastDay); // 값 강제 설정
+	
 	// ===================================================================================
 
 	let grid;
@@ -172,21 +176,19 @@ $(function() {
 	$('#appendWork').on('click', function() {
 	    const csrfToken = $('input[name="_csrf"]').val();
 		const tmpSelect = $('#work_tmp').val();
-		const start = instance1.getDate();
-		const end = instance2.getDate();
+		const start = instance1.getDate().toLocaleDateString('en-CA');  // 'yyyy-MM-dd' 형식
+		const end = instance2.getDate().toLocaleDateString('en-CA');   // 'yyyy-MM-dd' 형식
+		const weekdays = getWeekdaysBetweenDates(start, end);
 		const selectedRows = grid.getCheckedRows();
-		
-		const tmpList= /*[[${tmpList}]]*/'[]';
-		
-		for(const tmp of tmpList) {
-		    console.log("tmp : " +  tmp);
-		}
 		
 	    console.log("CSRF Token : " + csrfToken);
 	    console.log("start : " +  start);
 	    console.log("end : " +  end);
 		for (const row of selectedRows) {
 		    console.log('Row:', row);
+		}
+		for (const day of weekdays) {
+		    console.log('Day:', day);
 		}
 		
 	    // 선택된 항목이 없을 경우
@@ -201,8 +203,13 @@ $(function() {
 	        return;
 	    } 
 		
+		const appendData = {
+			rows : selectedRows,
+			weekdays: weekdays, 
+			tmp : tmpSelect
+		}
 
-		axios.post(`/api/work/insert?tmp=${encodeURIComponent(tmp)}`, selectedRows,  {
+		axios.post('/api/work/insert', appendData,  {
 		    headers: {
 		        'X-CSRF-TOKEN': csrfToken
 		    }
@@ -223,5 +230,28 @@ $(function() {
 		
 			
 	});
+	
+	
+	// startDate와 endDate 사이의 모든 날짜 중 주말 제외한 날짜 추출
+	function getWeekdaysBetweenDates(start, end) {
+	    const result = [];
+	    let currentDate = new Date(start);
+	    const finalDate = new Date(end);
+
+	    // 날짜 범위 순회
+	    while (currentDate <= finalDate) {
+	        const dayOfWeek = currentDate.getDay(); // 0: Sunday, 6: Saturday
+	        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+	            // 주말이 아닌 경우 배열에 추가
+	            result.push(new Date(currentDate).toISOString().split('T')[0]); // yyyy-MM-dd 형식
+	        }
+	        currentDate.setDate(currentDate.getDate() + 1); // 하루 증가
+	    }
+
+	    return result;
+	}
+	
+	
+	
 
 });

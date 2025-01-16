@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.domain.WorkAddDTO;
+import com.deepen.domain.WorkDTO;
+import com.deepen.domain.WorkTmpDTO;
+import com.deepen.entity.WorkTmp;
 import com.deepen.service.WorkService;
 
 import lombok.RequiredArgsConstructor;
@@ -50,15 +55,19 @@ public class WorkRestController {
 	} // getSerchEmpList
 
 	@PostMapping("/insert")
-    public ResponseEntity<String> insertWork(@RequestParam("tmp") String tmp, 
-    	    								@RequestBody List<Map<String, Object>> selectedRows) {
+    public ResponseEntity<String> insertWork(@RequestBody WorkAddDTO appendData) {
 		
-		log.info("tmp : "+ tmp);
-		log.info("selectedRows : "+selectedRows.toString());
+		log.info("appendData : "+ appendData.toString());
 		
 	    try {
-//	    	workService.ckeckWork(tmp, );
-	    	workService.insertWork(tmp, selectedRows);
+	    	
+	    	
+	    	if(workService.ckeckWork(appendData)) {
+	    		
+	    		return ResponseEntity.ok("해당 기간에 이미 등록된 직원이 있습니다.");
+	    	}
+	    	
+	    	workService.insertWork(appendData);
 	        return ResponseEntity.ok("추가가 완료되었습니다.");
 	        
 		} catch (Exception e) {

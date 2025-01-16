@@ -32,6 +32,12 @@
 		       )
 			 </if>
     </select>
+    <select id="ckeckWork" resultType="Map">
+		SELECT *
+		  FROM work_schd
+		 WHERE emp_id = #{emp_id}
+		   AND work_date = #{day}
+    </select>
     
 	
 </mapper>

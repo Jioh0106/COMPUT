@@ -21,5 +21,9 @@ public class WorkDTO {
 	private Integer rest_type;
 	private String work_tmp_name;
 	
+	private String work_start;
+	private String work_end;
+	private String work_shift;
+	private String work_type;
 
 }
