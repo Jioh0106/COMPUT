@@ -1,6 +1,7 @@
 package com.deepen.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Comparator;
@@ -41,6 +42,37 @@ public class PayrollCalculatorService {
     private final SalaryFormulaCalculator calculator;
     private final ObjectMapper objectMapper;
 
+    private PayInfoDTO convertToDTO(PayInfo payInfo) {
+        // 직원 정보 조회
+        Employees emp = personnelRepository.findById(payInfo.getEmpId())
+            .orElseThrow(() -> new RuntimeException("직원 정보를 찾을 수 없습니다."));
+
+        return PayInfoDTO.builder()
+            .paymentNo(payInfo.getPaymentNo())
+            .empId(payInfo.getEmpId())
+            .paymentDate(payInfo.getPaymentDate())
+            .empSalary(payInfo.getEmpSalary())
+            .originalEmpSalary(emp.getEmp_salary())  // 원본 기본급
+            .empJobType(emp.getEmp_job_type())       // 고용형태
+            .techAllowance(payInfo.getTechAllowance())
+            .performanceBonus(payInfo.getPerformanceBonus())
+            .tenureAllowance(payInfo.getTenureAllowance())
+            .holidayAllowance(payInfo.getHolidayAllowance())
+            .leaveAllowance(payInfo.getLeaveAllowance())
+            .allowAmt(payInfo.getAllowAmt())
+            .nationalPension(payInfo.getNationalPension())
+            .healthInsurance(payInfo.getHealthInsurance())
+            .longtermCareInsurance(payInfo.getLongtermCareInsurance())
+            .employmentInsurance(payInfo.getEmploymentInsurance())
+            .incomeTax(payInfo.getIncomeTax())
+            .residentTax(payInfo.getResidentTax())
+            .deducAmt(payInfo.getDeducAmt())
+            .netSalary(payInfo.getNetSalary())
+            .createAt(payInfo.getCreateAt())
+            .createBy(payInfo.getCreateBy())
+            .build();
+    }
+    
     /**
      * 급여 계산 수행
      */
@@ -171,36 +203,97 @@ public class PayrollCalculatorService {
         
         return formulas;
     }
+    
+    /**
+     * 고용형태별 기본급 계산
+     */
+    private BigDecimal calculateBaseSalary(Employees emp) {
+        BigDecimal baseSalary = new BigDecimal(emp.getEmp_salary());
+        
+        try {
+            String jobType = emp.getEmp_job_type();
+            
+            // 고용형태별 계산 로직
+            if ("OCPT002".equals(jobType)) {  // 계약직
+                BigDecimal adjustedSalary = baseSalary.multiply(new BigDecimal("0.9"))
+                                                     .setScale(0, RoundingMode.DOWN);
+                
+                log.info("계약직 기본급 계산 - 사원번호: {}, 성명: {}, 원본: {}, 조정: {}", 
+                    emp.getEmp_id(),
+                    emp.getEmp_name(),
+                    baseSalary,
+                    adjustedSalary);
+                
+                return adjustedSalary;
+            }
+            
+            // 정규직 등 다른 고용형태는 원본 기본급 그대로 사용
+            log.info("정규직 기본급 사용 - 사원번호: {}, 성명: {}, 기본급: {}", 
+                emp.getEmp_id(),
+                emp.getEmp_name(),
+                baseSalary);
+            
+            return baseSalary;
+            
+        } catch (Exception e) {
+            log.error("기본급 계산 중 오류 발생 - 사원번호: {}, 에러: {}", emp.getEmp_id(), e.getMessage(), e);
+            return baseSalary; // 오류 발생 시 원본 기본급 반환
+        }
+    }
 
     /**
      * 급여 정보 계산
      */
     private PayInfo calculatePayInfo(
-            Employees emp, 
-            String paymentDate, 
-            List<SalaryFormulaDTO> formulas) {
+        Employees emp, 
+        String paymentDate, 
+        List<SalaryFormulaDTO> formulas) {
+    	
+    	log.info("급여 계산 시작 - 사원: {}, 고용형태: {}, 원본기본급: {}", 
+	        emp.getEmp_id(), emp.getEmp_job_type(), emp.getEmp_salary());
         
         // 1. 기본 정보 생성
-        PayInfo payInfo = createBasicPayInfo(emp, paymentDate);
-
+//        PayInfo payInfo = createBasicPayInfo(emp, paymentDate);
+    	PayInfo payInfo = new PayInfo();
+        payInfo.setEmpId(emp.getEmp_id());
+        payInfo.setPaymentDate(paymentDate);
         try {
-            // 2. 수당 계산
+            // 2. 기본급 계산 (고용형태에 따른 차등 적용)
+            BigDecimal baseSalary;
+            String jobType = emp.getEmp_job_type();
+            
+            // 계약직 체크 및 기본급 계산
+            if (jobType != null && "OCPT002".equals(jobType.trim())) {
+                baseSalary = new BigDecimal(emp.getEmp_salary())
+                    .multiply(new BigDecimal("0.9"))
+                    .setScale(0, RoundingMode.DOWN);
+                log.info("계약직(OCPT002) 기본급 계산: {} -> {} (90% 적용)", 
+                    emp.getEmp_salary(), baseSalary);
+            } else {
+                baseSalary = new BigDecimal(emp.getEmp_salary());
+                log.info("정규직 기본급 사용: {} (job_type: {})", 
+                    baseSalary, jobType);
+            }
+            payInfo.setEmpSalary(baseSalary.intValue());
+            
+            // 3. 수당 계산
             calculateAllowances(emp, payInfo, formulas, YearMonth.parse(paymentDate));
 
-            // 3. 공제 계산
+            // 4. 공제 계산
             calculateDeductions(emp, payInfo, formulas);
 
-            // 4. 최종 급여 계산
+            // 5. 최종 급여 계산
             calculateNetSalary(payInfo);
 
-            // 5. 생성 정보 설정
-            setCreationInfo(payInfo);
-
+            log.info("급여 계산 완료 - 사원: {}, 고용형태: {}, 기본급(조정후): {}, 최종급여: {}", 
+                emp.getEmp_id(), jobType, payInfo.getEmpSalary(), payInfo.getNetSalary());
+                
             return payInfo;
-
+            
         } catch (Exception e) {
-            log.error("급여 계산 중 오류 발생 - 사원: {}, 지급월: {}", emp.getEmp_id(), paymentDate, e);
-            throw new RuntimeException("급여 계산 중 오류가 발생했습니다: " + e.getMessage());
+            log.error("급여 계산 중 오류 발생 - 사원: {}, 고용형태: {}", 
+                emp.getEmp_id(), emp.getEmp_job_type(), e);
+            throw e;
         }
     }
 
@@ -280,9 +373,9 @@ public class PayrollCalculatorService {
      * 공제 계산
      */
     private void calculateDeductions(
-            Employees emp,
-            PayInfo payInfo,
-            List<SalaryFormulaDTO> formulas) {
+        Employees emp,
+        PayInfo payInfo,
+        List<SalaryFormulaDTO> formulas) {
     	
     	log.info("공제 계산 시작 - 사원: {}", emp.getEmp_id());
             
@@ -292,10 +385,10 @@ public class PayrollCalculatorService {
 
         // 공제 공식만 필터링
         List<SalaryFormulaDTO> deductionFormulas = formulas.stream()
-        		.filter(f -> f != null && 
-                f.getFormulaCode() != null && 
-                f.getFormulaCode().startsWith("DDCT"))
-     .collect(Collectors.toList());
+			.filter(f -> f != null && 
+		        f.getFormulaCode() != null && 
+		        f.getFormulaCode().startsWith("DDCT"))
+			.collect(Collectors.toList());
 
         for (SalaryFormulaDTO formula : deductionFormulas) {
             try {
@@ -321,6 +414,8 @@ public class PayrollCalculatorService {
                 
                 // 총액에 추가
                 totalDeduction = totalDeduction.add(amount);
+                
+                log.info("공제 항목 계산 - 코드: {}, 금액: {}", formula.getFormulaCode(), amount);
 
             } catch (Exception e) {
                 log.error("공제 계산 중 오류 발생 - 공식: {}", formula.getFormulaName(), e);
@@ -329,6 +424,7 @@ public class PayrollCalculatorService {
         }
 
         payInfo.setDeducAmt(totalDeduction);
+        log.info("공제 계산 완료 - 총 공제액: {}", totalDeduction);
     }
 
     /**
@@ -375,12 +471,14 @@ public class PayrollCalculatorService {
     /**
      * Entity를 DTO로 변환
      */
-    private PayInfoDTO convertToDTO(PayInfo payInfo) {
+    private PayInfoDTO convertToDTO(PayInfo payInfo, Employees emp) {
         return PayInfoDTO.builder()
             .paymentNo(payInfo.getPaymentNo())
             .empId(payInfo.getEmpId())
             .paymentDate(payInfo.getPaymentDate())
             .empSalary(payInfo.getEmpSalary())
+            .originalEmpSalary(emp.getEmp_salary())  // 원본 기본급 추가
+            .empJobType(emp.getEmp_job_type())
             // 수당 정보
             .techAllowance(payInfo.getTechAllowance())
             .performanceBonus(payInfo.getPerformanceBonus())
@@ -548,4 +646,6 @@ public class PayrollCalculatorService {
         
         return result;
     }
+    
+    
 }

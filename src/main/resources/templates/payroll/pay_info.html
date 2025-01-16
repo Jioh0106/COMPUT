@@ -59,6 +59,7 @@
     .tui-grid-cell-invalid {
         background-color: #ffebee;
     }
+	
 </style>
 
     <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -84,25 +85,22 @@
             <div class="card">
                 <div class="card-body">
                 
-                    <!-- 검색 -->
-           <form id="searchForm" class="mb-3" onsubmit="return false;" 
-      sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
-        <select name="department" class="form-select" id="searchDepartment" style="width: 150px;">
-            <option value="">전체 부서</option>
-        </select>
-        <input type="text" name="keyword" class="form-control" id="searchKeyword" 
-               style="width: 200px;" placeholder="사원명 또는 사번 검색">
-        <button type="button" id="searchBtn" class="btn btn-primary rounded-pill">
-            <i class="bi bi-search"></i> Search
-        </button>
-    </div>
-						<div sec:authorize="hasAnyRole('ATHR001','ATHR002')" style="margin-top: 5px; justify-content: flex-end;">
-							<button type="button" onclick="downloadPayslip()" class="btn btn-outline-primary">
-						        <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
-						    </button>
-						</div>
-</form>
+					<form id="searchForm" class="mb-3" onsubmit="return false;" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+					    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+					        <select name="department" class="form-select" id="searchDepartment" style="width: 130px;">
+					            <option value="">전체 부서</option>
+					        </select>
+					        <input type="text" name="keyword" class="form-control" id="searchKeyword" style="width: 300px;" placeholder="사원명 또는 사번 검색">
+					        <button type="button" id="searchBtn" class="btn btn-primary">
+					            <i class="bi bi-search"></i> Search
+					        </button>
+					        <div class="ms-auto">
+					            <button type="button" onclick="previewPayslip()" class="btn btn-outline-primary" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+					                <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
+					            </button>
+					        </div>
+					    </div>
+					</form>
 
                     <!-- 메인 그리드 -->
                     <div id="grid" style="width:100%; height:100%;"></div>
@@ -182,6 +180,27 @@
         </div>
     </div>
 </div>
+
+<!--급여명세서 미리보기-->
+<div class="modal fade" id="payslipPreviewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg" style="max-width: 60%; max-height: 90vh;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">급여명세서 미리보기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto; padding: 50px;">
+        <div id="payslipPreviewContent" style="transform: scale(1); transform-origin: top center;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-primary" onclick="printPayslip()">출력</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
     <!-- 스크립트 -->
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>

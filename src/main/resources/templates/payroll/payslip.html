@@ -131,7 +131,7 @@
         </table>
 
         <div class="amount-table">
-    <div class="section-title">■ 지급내역</div>
+    <div class="section-title">■ 수당내역</div>
     <table class="payslip-table">
         <tr>
             <th>기본급</th>
@@ -170,7 +170,7 @@
             </td>
         </tr>
         <tr class="total-row">
-            <th>지급총액</th>
+            <th>수당총액</th>
             <td class="align-right" 
                 th:with="total=${payInfo.empSalary + payInfo.allowAmt}"
                 th:text="${total == null || total == 0 ? '0' : #numbers.formatInteger(total, 1, 'COMMA')}">
