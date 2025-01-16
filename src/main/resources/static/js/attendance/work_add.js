@@ -208,8 +208,62 @@ $(function() {
 			weekdays: weekdays, 
 			tmp : tmpSelect
 		}
-
-		axios.post('/api/work/insert', appendData,  {
+		
+		// 겹치는 일정 확인
+		ckeckWork(appendData)
+		    .then(function (data) {
+		        // 200 상태일 때 처리
+		        let exist_emp = '';
+		        data.forEach(work => {
+		            if (work.emp_name && work.emp_id) {
+		                exist_emp += ', ' + work.emp_id + '(' + work.emp_name + ')';
+		            }
+		        });
+		        Swal.fire('Warning', exist_emp, 'warning');
+		    })
+		    .catch(function (error) {
+		        if (error.status === 404) {
+		            // 404 상태일 때 insertWork 호출
+		            insertWork(appendData);
+		        }
+		    });
+			
+			
+	});
+	
+	function ckeckWork(appendData) {
+		return axios.post('/api/work/check', appendData,  {
+		    headers: {
+		        'X-CSRF-TOKEN': csrfToken
+		    }
+		})
+		.then(function (response) {
+			if (response.status === 200) {
+			    Swal.fire('Warning', '지정일에 일정이 이미 등록된 직원이 있습니다. ', 'warning');
+			    return response.data; // 데이터 반환
+		    }
+		})
+		.catch(function (error) {
+			if (error.response) {
+	           // 서버에서 반환한 에러 처리
+	           const status = error.response.status;
+	           if (status === 404) {
+				   return Promise.reject({ status, appendData });
+	           } else if (status === 500) {
+	               Swal.fire('Error', '작업 확인 중 오류가 발생했습니다.', 'error');
+	           }
+	       } else {
+	           console.error('Unexpected error:', error);
+	           Swal.fire('Error', '예기치 않은 오류가 발생했습니다.', 'error');
+	       }
+		   
+		});
+		
+		
+	}
+	
+	function insertWork(appendData) {
+		return 	axios.post('/api/work/insert', appendData,  {
 		    headers: {
 		        'X-CSRF-TOKEN': csrfToken
 		    }
@@ -221,15 +275,16 @@ $(function() {
 		    if (window.opener && !window.opener.closed) {
 		        window.opener.location.reload();
 		    }
-		    
 		})
 		.catch(function (error) {
 		    console.error('데이터 저장 중 오류 발생:', error);
 		    Swal.fire('Error', '데이터 저장 중 문제가 발생했습니다.', 'error');
-		});
-		
+		});	
+	
 			
-	});
+			
+	}
+		
 	
 	
 	// startDate와 endDate 사이의 모든 날짜 중 주말 제외한 날짜 추출
