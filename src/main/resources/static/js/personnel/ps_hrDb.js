@@ -8,8 +8,8 @@ const empInfoList = new Grid({
 	  columns: [
 	    { header: '사원번호', name: 'EMP_ID'},
 	    { header: '이름', name: 'EMP_NAME'},
-	    { header: '부서명', name: 'EMP_DEPT_NAME'},
-	    { header: '직급명', name: 'EMP_POSITION_NAME'},
+	    { header: '부서명', name: 'EMP_DEPT_NAME', filter : 'select'},
+	    { header: '직급명', name: 'EMP_POSITION_NAME', filter : 'select'},
 	    { header: 'E-mail', name: 'EMP_EMAIL'}
 	  ],
 	  columnOptions: {
