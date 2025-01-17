@@ -17,12 +17,12 @@ public class RequestDTO {
 	private String request_status; //요청상태
 	private String request_rejection; //반려사유
 	
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime request_deadline; //요청마감일자
     
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime request_date; //요청일자
     
 	private String middle_approval; //중간승인권자 사번
@@ -32,7 +32,14 @@ public class RequestDTO {
 	private String emp_dept; //요청자부서명
 	private  EmployeesDTO approver; //중간승인권자 정보 저장
 	
-	
+	 private String middle_emp_dept;
+     private String middle_emp_name;
+     private String middle_emp_position;
+
+    // 최종 승인권자 정보
+     private String high_emp_dept;
+     private String high_emp_name;
+     private String high_emp_position;
 	
 	
 }

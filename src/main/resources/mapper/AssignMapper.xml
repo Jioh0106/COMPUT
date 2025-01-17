@@ -38,7 +38,7 @@
 	    ON emp.emp_dept = dept_code.common_detail_code
 	    LEFT JOIN common_detail pos_code
 	    ON emp.emp_position = pos_code.common_detail_code
-	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST%'
+	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST001'
 	</select>
 	
 	
@@ -51,7 +51,7 @@
 	    ON emp.emp_dept = dept_code.common_detail_code
 	    LEFT JOIN common_detail pos_code
 	    ON emp.emp_position = pos_code.common_detail_code
-	    where emp_role LIKE 'ATHR001' and emp_status LIKE 'WRST%'
+	    where emp_role LIKE 'ATHR001' and emp_status LIKE 'WRST001'
 	</select>
 	
 	
@@ -163,6 +163,47 @@
     	</if>
 	    ORDER BY a.assignment_no	   
 				
+	</select>
+	
+	
+	<!--발령요청 진행중인 경우 발령등록못하게 막기 -->
+	<select id="assignStatusCount" parameterType="Map" resultType="int">
+	   SELECT COUNT(*) AS count
+	    FROM assignment a
+	    INNER JOIN request r ON a.request_no = r.request_no
+	    WHERE a.assign_emp_id = #{assign_emp_id}
+        AND r.request_status IN ('RQST001', 'RQST003', 'RQST005')
+        AND a.assign_type = #{assign_type}
+	</select>
+	
+	
+	
+	<!--최종승인권자 중간승인권자 사원번호로 사원테이블 조회-->
+	<select id="getEmployees" parameterType="java.lang.Integer" resultType="map">
+		SELECT
+		    er.emp_name AS middle_emp_name,
+		    cd_dept_er.common_detail_name AS middle_emp_dept, 
+		    cd_pos_er.common_detail_name AS middle_emp_position, 
+		    eh.emp_name AS high_emp_name,
+		    cd_dept_eh.common_detail_name AS high_emp_dept, 
+		    cd_pos_eh.common_detail_name AS high_emp_position 
+		FROM 
+		    request r
+		LEFT JOIN employees er 
+		    ON r.middle_approval = er.emp_id
+		LEFT JOIN employees eh 
+		    ON r.high_approval = eh.emp_id
+		LEFT JOIN common_detail cd_dept_er 
+		    ON er.emp_dept = cd_dept_er.common_detail_code
+		LEFT JOIN common_detail cd_pos_er 
+		    ON er.emp_position = cd_pos_er.common_detail_code 
+		LEFT JOIN common_detail cd_dept_eh 
+		    ON eh.emp_dept = cd_dept_eh.common_detail_code 
+		LEFT JOIN common_detail cd_pos_eh 
+		    ON eh.emp_position = cd_pos_eh.common_detail_code 
+		WHERE 
+		    r.request_no = #{request_no}
+
 	</select>
 	
 	
