@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.deepen.domain.AssignmentDTO;
 import com.deepen.domain.RequestDTO;
@@ -59,8 +60,8 @@ public class AssignController {
 	//발령등록, 요청내역 데이터 저장
 	@ResponseBody
 	@PostMapping("/assign-insertPOST")
-    public ResponseEntity<RequestDTO> saveAssignmentAndRequest(@RequestBody Map<String, Object> requestData,
-    		@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> saveAssignmentAndRequest(@RequestBody Map<String, Object> requestData,
+    		@AuthenticationPrincipal User user, RedirectAttributes redirect) {
         try {
         	log.info(requestData.toString());
         	
@@ -88,7 +89,23 @@ public class AssignController {
            log.info(requestDto.toString());
            log.info(assignmentDto.toString());
             
-           //서비스호출 및 요청번호 반환
+           // 요청진행중인 사원번호는 발령 등록 못 하도록
+           String assignEmpId = assignmentDto.getAssign_emp_id().trim();
+           String assignType = assignmentDto.getAssign_type().trim();
+           log.info("뭐냐고진짜"+ assignEmpId);
+           log.info("뭐냐고진짜"+ assignType);
+
+           if (assignEmpId == null || assignType == null) {
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("필수 파라미터가 누락되었습니다.");
+           }
+
+           int count = asService.assignStatusCount(assignEmpId, assignType);
+         System.out.println("@@@@@카운트값"+count);
+           if (count > 0) {
+               return ResponseEntity.status(HttpStatus.CONFLICT).body("결재 진행 중인 발령 요청이 존재합니다.");
+           }
+
+           //발령등록처리(서비스호출 및 요청번호 반환)
            Integer request_no = asService.saveAssigmentAndRequest(requestDto, assignmentDto, emp_id, role);
            
             
@@ -98,9 +115,12 @@ public class AssignController {
             log.info("요청 구분: " + resultRequestDto.getRequest_division());
             
             return ResponseEntity.ok(resultRequestDto);
-        } catch (Exception e) {
-        	log.info("무슨오류냐고"+e.toString());
+        	
+        }catch (Exception e) {
+        	log.info("무슨오류냐고"  +e.toString());
+        	e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            
         }
     }
 	

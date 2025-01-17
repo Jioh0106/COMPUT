@@ -586,19 +586,22 @@
 				        icon: "success",
 						title: "success",
 						text: "반려사유가 등록되었습니다.",
-						confirmButtonText: "확인"    })
+						confirmButtonText: "확인"    
+					}).then(() =>{
+						
                 	if (window.opener) {
 		                window.opener.location.reload(); // 부모창 새로고침
 		                window.close(); // 팝업창 닫기
 		            } else {
 		                console.error('부모창이 없습니다.');
 		            }
-                } else {
+				});
+              } else {
 					Swal.fire({
 					       icon: "error",
 					       title: "Error",
 						   text: "반려사유 등록에 실패했습니다."
-					   })
+					   });
                 }
             })
             .catch(error => {

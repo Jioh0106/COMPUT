@@ -41,4 +41,10 @@ public interface AssignMapper {
 	//인사발령현황 리스트 조회
 	List<Map<String, Object>> assignList(Map<String, Object> params);
 	
+	//발령요청 진행중인 경우 등록 막기
+	int assignStatusCount(Map<String, Object> params);
+	
+	//요청내역 중간승인권자,최종승인권자 사번 조회
+	 Map<String, Object> getEmployees(@Param("request_no") Integer request_no);
+	
 }

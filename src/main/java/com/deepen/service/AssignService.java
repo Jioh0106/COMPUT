@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -269,7 +270,32 @@ public class AssignService {
 		
 	}
 	
+	//발령요청 중에 발령등록 막기
+	public int assignStatusCount(String assignEmpId, String assignType) {
+        // Map 생성하여 매퍼에 전달
+        Map<String, Object> params = new HashMap<>();
+        params.put("assign_emp_id", assignEmpId.trim()); // 공백 제거
+        params.put("assign_type", assignType.trim());   // 공백 제거
+
+        // 매퍼 호출
+        return asMapper.assignStatusCount(params);
+    }
+		
+	
+	//요청내역 중간승인권자, 최종승인권자 사번 조회
+	public Map<String, Object> getEmployees(Integer request_no) {
+		 Map<String, Object> result = asMapper.getEmployees(request_no);
+		    return result;
+    }
+
+
+
+
+
+
+
+
+}
 	
 	
 
-}

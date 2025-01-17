@@ -26,6 +26,13 @@
 			/* !important -> 우선순위 높아짐 */
 			background-color: #ffffff !important;
 		}
+		
+		.buttons {
+		    display: flex;
+		    justify-content: flex-start; /* 왼쪽 정렬 */
+		    align-items: center; /* 세로 정렬 */
+		}
+		
 	</style>
 </head>
 
@@ -45,10 +52,18 @@
 					<i class="bi bi-justify fs-3"></i>
 				</a>
 			</header>
-
+			
+	              <div class="buttons">
+	                  <!--신규 등록 버튼-->
+	                  <button type="button" class="btn btn-primary" onclick="popUp()">
+	                      인사발령등록
+	                  </button>
+	              </div>
+	         
 			<h3>인사발령현황</h3>
 
 			<div class="card">
+				
 				<div class="card-body">
 					
 					<!-- 데이트 피커 시작 -->
@@ -247,7 +262,17 @@
 				},
 				language : 'ko'
 			});
-		}						
+		}		
+		
+		
+	//-----------------------------------------------인사발령등록 페이지로 팝업창 연결
+	
+	function popUp() {
+	      const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes"; // 팝업창 옵션
+	      const popupUrl = "/assign-insert"; // 팝업창으로 열릴 페이지 URL
+	      window.open(popupUrl, "assignInsertPopup", popupOptions);
+	  }	
+						
 				
 </script>
 

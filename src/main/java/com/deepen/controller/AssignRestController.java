@@ -128,5 +128,13 @@ public class AssignRestController {
     	return assignList;
     }
 	
+    
+    //요청내역 중간승인권자 최종승인권자 사번 조회
+    @GetMapping("/getEmployees")
+    public ResponseEntity<Map<String, Object>> getEmployees(@RequestParam("request_no") Integer request_no) {
+        Map<String, Object> employees = asService.getEmployees(request_no);
+        return ResponseEntity.ok(employees); // JSON 형태로 반환
+    }
+    
 	
 }

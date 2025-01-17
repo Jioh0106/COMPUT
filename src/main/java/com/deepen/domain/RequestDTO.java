@@ -32,7 +32,14 @@ public class RequestDTO {
 	private String emp_dept; //요청자부서명
 	private  EmployeesDTO approver; //중간승인권자 정보 저장
 	
-	
+	 private String middle_emp_dept;
+     private String middle_emp_name;
+     private String middle_emp_position;
+
+    // 최종 승인권자 정보
+     private String high_emp_dept;
+     private String high_emp_name;
+     private String high_emp_position;
 	
 	
 }
