@@ -1,6 +1,7 @@
 package com.deepen.domain;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -29,5 +30,19 @@ public class WorkDTO {
 	private String work_type;
 	private Integer work_time;
 	private Integer rest_time;
+	
+	@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkDTO workDTO = (WorkDTO) o;
+        return Objects.equals(emp_id, workDTO.emp_id) &&
+               Objects.equals(work_date, workDTO.work_date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(emp_id, work_date);
+    }
 
 }

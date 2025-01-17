@@ -3,9 +3,12 @@ package com.deepen.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -54,24 +57,23 @@ public class WorkService {
 	
 	// 근무 일정 등록 - 일정 추가 시 해당 직원/근무일에 기존 데이터 존재 여부 체크
 	public List<WorkDTO> ckeckWork(WorkAddDTO appendData) {
-		
-		List<WorkDTO> list = new ArrayList<>();
-		WorkDTO work = new WorkDTO();
-		
-		for(String day : appendData.getWeekdays()) {
-			// 선택된 날짜 기간 조회
-				
-			for(Map<String, Object> row : appendData.getRows()) {
-				// 선택된 사원 배열 조회
-				work = workMapper.ckeckWork((String)row.get("EMP_ID"), day);
-				if(work != null) {
-					list.add(work);
-				}
-			}
-		}
-		
-		return list;
-		
+	    List<WorkDTO> list = new ArrayList<>();
+	    
+	    for (String day : appendData.getWeekdays()) {
+	        // 선택된 날짜 기간 조회
+	        for (Map<String, Object> row : appendData.getRows()) {
+	            // 선택된 사원 배열 조회
+	            WorkDTO work = workMapper.ckeckWork((String) row.get("EMP_ID"), day);
+	            if (work != null) {
+	            	list.add(work); 
+	            }
+	        }
+	    }
+	    
+	    // Stream API를 활용해 중복 제거
+	    return list.stream().distinct().collect(Collectors.toList());
+                
+	    
 	} // ckeckWork
 	
 	@Transactional
@@ -136,7 +138,8 @@ public class WorkService {
 		
 		
 		return shcdList;
-	} 
+		
+	} // getSchedulesBetween
 
 
 
