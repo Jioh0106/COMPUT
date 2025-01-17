@@ -221,7 +221,8 @@ $(function() {
 		                exist_emp += ', ' + work.emp_id + '(' + work.emp_name + ')';
 		            }
 		        });
-		        Swal.fire('Warning', exist_emp, 'warning');
+//		        Swal.fire('해당 기간에 기등록 직원 있음', exist_emp, 'warning');
+		        Swal.fire('Warning', '해당 기간에 기등록 직원이 있습니다.', 'warning');
 		    })
 		    .catch(function (error) {
 		        if (error.status === 404) {
