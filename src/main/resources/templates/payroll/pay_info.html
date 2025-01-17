@@ -34,11 +34,11 @@
     }
     
     /* 미저장 행 스타일 강화 */
-    .tui-grid-row.unsaved-row td {
-        background-color: #fff3e0 !important;
-    }
+/*     .tui-grid-row.unsaved-row td { */
+/*         background-color: #000000 !important; */
+/*     } */
     .tui-grid-row.unsaved-row .tui-grid-cell {
-        background-color: #fff3e0 !important;
+        background-color: #000000 !important;
     }
     
     /* 클릭 가능한 셀 스타일 */
@@ -83,30 +83,43 @@
 
             <!-- 메인 그리드 카드 -->
             <div class="card">
-                <div class="card-body">
-                
-					<form id="searchForm" class="mb-3" onsubmit="return false;" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-					    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
-					        <select name="department" class="form-select" id="searchDepartment" style="width: 130px;">
-					            <option value="">전체 부서</option>
-					        </select>
-					        <input type="text" name="keyword" class="form-control" id="searchKeyword" style="width: 300px;" placeholder="사원명 또는 사번 검색">
-					        <button type="button" id="searchBtn" class="btn btn-primary">
-					            <i class="bi bi-search"></i> Search
-					        </button>
-					        <div class="ms-auto">
-					        	<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#salarySimulationModal">
-								    <i class="bi bi-calculator"></i> 급여 시뮬레이션
-								</button>
-					            <button type="button" onclick="previewPayslip()" class="btn btn-outline-primary" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-					                <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
-					            </button>
-					        </div>
-					    </div>
-					</form>
+    <div class="card-body">
+        <!-- 상단 영역을 감싸는 컨테이너 -->
+        <div class="d-flex align-items-center gap-2 mb-3" style="justify-content: space-between;">
+    <!-- 검색 창 (권한에 따라 표시) -->
+    <form id="searchForm" class="d-flex align-items-center gap-2" onsubmit="return false;" 
+          sec:authorize="hasAnyRole('ATHR001','ATHR002')" style="flex: 1;">
+        <select name="department" class="form-select" id="searchDepartment" style="width: 130px;">
+            <option value="">전체 부서</option>
+        </select>
+        <input type="text" name="keyword" class="form-control" id="searchKeyword" 
+               style="width: 300px;" placeholder="사원명 또는 사번 검색">
+        <button type="button" id="searchBtn" class="btn btn-primary">
+            <i class="bi bi-search"></i> Search
+        </button>
+    </form>
 
-                    <!-- 메인 그리드 -->
-                    <div id="grid" style="width:100%; height:100%;"></div>
+    <!-- 버튼 그룹 (오른쪽 정렬) -->
+    <div class="d-flex align-items-center gap-2" style="margin-left: auto;">
+        <!-- 급여 계산기 버튼 -->
+        <div>
+            <button type="button" class="btn btn-outline-primary" 
+                    data-bs-toggle="modal" data-bs-target="#salarySimulationModal">
+                <i class="bi bi-calculator"></i> 급여 계산기
+            </button>
+        </div>
+
+        <!-- 명세서 출력 버튼 -->
+        <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+            <button type="button" onclick="previewPayslip()" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-pdf"></i> 명세서 출력
+            </button>
+        </div>
+    </div>
+</div>
+
+        <!-- 메인 그리드 -->
+        <div id="grid" style="width:100%; height:100%;"></div>
 
                     <!-- 추가/저장/삭제 버튼 -->
                     <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
@@ -152,25 +165,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!--급여명세서 미리보기-->
-<div class="modal fade" id="payslipPreviewModal" tabindex="-1">
-  <div class="modal-dialog modal-lg" style="max-width: 60%; max-height: 90vh;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">급여명세서 미리보기</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto; padding: 50px;">
-        <div id="payslipPreviewContent" style="transform: scale(1); transform-origin: top center;"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-        <button type="button" class="btn btn-primary" onclick="printPayslip()">출력</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- 급여 시뮬레이션 모달 -->
