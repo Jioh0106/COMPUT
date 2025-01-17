@@ -253,7 +253,7 @@ deleteBtn.addEventListener("click",() => {
 			  cancelButtonText: "취소"
 			}).then((result) => {
 			  if (result.isConfirmed) {
-			  	empDelete("http://localhost:8082/api/emp-delete",checkedRowIds);
+			  	empDelete("/api/emp-delete",checkedRowIds);
 				Swal.fire({
 			      title: "삭제 완료",
 			      icon: "success",
@@ -272,7 +272,7 @@ deleteBtn.addEventListener("click",() => {
 async function fetchEmpList(filter) {
 	try	{	
 			const params = new URLSearchParams(filter).toString();
-	       	const response = await fetch(`http://localhost:8082/api/emp-list?${params}`);
+	       	const response = await fetch(`/api/emp-list?${params}`);
 			
 	       	if (!response.ok) {
 	           	throw new Error("네트워크 응답 실패");
@@ -291,7 +291,7 @@ async function fetchEmpList(filter) {
 // 필요한 공통 코드 상세 조회	
 async function fetchCommonDetails() {
 	try{
-	  	const response = await fetch("http://localhost:8082/api/commonDetail");
+	  	const response = await fetch("/api/commonDetail");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

@@ -16,7 +16,7 @@ secondSsn.addEventListener("input", ()=>{
 // ajax fetch API - 공통상세코드 조회
 async function fetchCommonDetails() {
 	try{
-	  	const response = await fetch("http://localhost:8082/api/commonDetail");
+	  	const response = await fetch("/api/commonDetail");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

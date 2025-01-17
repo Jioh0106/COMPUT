@@ -133,7 +133,7 @@ function createGroupBarChart(groupBarChartData){
 // ajax
 async function countMonthlyHireExit(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-monthlyHireExit");
+		const response = await fetch("/api/count-by-monthlyHireExit");
 		
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
@@ -197,7 +197,7 @@ async function infoListByMonthlyHireExit(hireExitArray){
   	 	const param = new URLSearchParams();
  		hireExitArray.forEach(item => param.append("hireExit",item)); 
 		  
-		const response = await fetch(`http://localhost:8082/api/infoList-by-monthlyHireExit?${param.toString()}`);
+		const response = await fetch(`/api/infoList-by-monthlyHireExit?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -212,7 +212,7 @@ async function infoListByMonthlyHireExit(hireExitArray){
 
 async function countByJobType(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-jobType");
+		const response = await fetch("/api/count-by-jobType");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -259,7 +259,7 @@ async function infoListByJobType(jobTypeArray){
 	   	const param = new URLSearchParams();
    		jobTypeArray.forEach(item => param.append("jobType",item));
    		   
-   		const response = await fetch(`http://localhost:8082/api/infoList-by-jobType?${param.toString()}`);
+   		const response = await fetch(`/api/infoList-by-jobType?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -274,7 +274,7 @@ async function infoListByJobType(jobTypeArray){
 
 async function countByRank(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-rank");
+		const response = await fetch("/api/count-by-rank");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -321,7 +321,7 @@ async function infoListByRank(rankArray){
   	 	const param = new URLSearchParams();
 		rankArray.forEach(item => param.append("rank",item));
 		   
-		const response = await fetch(`http://localhost:8082/api/infoList-by-rank?${param.toString()}`);
+		const response = await fetch(`/api/infoList-by-rank?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -336,7 +336,7 @@ async function infoListByRank(rankArray){
 
 async function countDeptByPosition(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-dept-and-position");
+		const response = await fetch("/api/count-by-dept-and-position");
 		
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
@@ -379,7 +379,7 @@ async function deptInfoListByPosition(positionArray){
 	   	const param = new URLSearchParams();
   		positionArray.forEach(item => param.append("position",item));
   		   
-  		const response = await fetch(`http://localhost:8082/api/infoList-by-dept-and-position?${param.toString()}`);
+  		const response = await fetch(`/api/infoList-by-dept-and-position?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

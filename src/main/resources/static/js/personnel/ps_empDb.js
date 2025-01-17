@@ -90,7 +90,7 @@ function createEmpGroupBarChart(groupBarChartData){
 // ajax
 async function countByEdu(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-edu");
+		const response = await fetch("/api/count-by-edu");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -136,7 +136,7 @@ async function infoListByEdu(eduArray){
 		eduArray.forEach(item => param.append("edu",item));
 		//console.log(param.toString());
 		
-		const response = await fetch(`http://localhost:8082/api/infoList-by-edu?${param.toString()}`);
+		const response = await fetch(`/api/infoList-by-edu?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -151,7 +151,7 @@ async function infoListByEdu(eduArray){
 
 async function countByAgeAndGender(){
 	try{
-		const response = await fetch("http://localhost:8082/api/count-by-ageGroupAndGender");
+		const response = await fetch("/api/count-by-ageGroupAndGender");
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -214,7 +214,7 @@ async function infoListByAgeGroup(genderArray){
 		const param = new URLSearchParams();
 		genderArray.forEach(item => param.append("gender",item));
 		
-		const response = await fetch(`http://localhost:8082/api/infoList-by-ageGroup?${param.toString()}`);
+		const response = await fetch(`/api/infoList-by-ageGroup?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}

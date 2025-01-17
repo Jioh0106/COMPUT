@@ -38,7 +38,6 @@ document.querySelector('.sidebar-hide').addEventListener('click', () => {
 
 })
 
-
 // Perfect Scrollbar Init
 if(typeof PerfectScrollbar == 'function') {
     const container = document.querySelector(".sidebar-wrapper");
@@ -49,7 +48,6 @@ if(typeof PerfectScrollbar == 'function') {
 
 // Scroll into active sidebar
 //document.querySelector('.sidebar-item.active').scrollIntoView(false)
-
 
 
 document.querySelectorAll('.sidebar-item').forEach(item => {
