@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deepen.calculator.SalaryFormulaCalculator;
 import com.deepen.domain.PayInfoDTO;
 import com.deepen.entity.PayInfo;
 import com.deepen.service.PayrollCalculatorService;
