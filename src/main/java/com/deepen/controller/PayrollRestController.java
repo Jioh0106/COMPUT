@@ -256,7 +256,7 @@ public class PayrollRestController {
         }
     }
     
- // 급여명세서 PDF 다운로드
+	// 급여명세서 PDF 다운로드
     @GetMapping("/pay-info/{paymentNo}/payslip/download")
     public ResponseEntity<ByteArrayResource> downloadPayslip(
             @PathVariable("paymentNo") Long paymentNo,
