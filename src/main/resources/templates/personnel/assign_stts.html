@@ -27,11 +27,12 @@
 			background-color: #ffffff !important;
 		}
 		
-		.buttons {
-		    display: flex;
-		    justify-content: flex-start; /* 왼쪽 정렬 */
-		    align-items: center; /* 세로 정렬 */
-		}
+		.display-flex {
+            display: flex;
+        }
+        .buttons {
+            margin-left: auto;
+        }
 		
 	</style>
 </head>
@@ -53,14 +54,15 @@
 				</a>
 			</header>
 			
-	              <div class="buttons">
-	                  <!--신규 등록 버튼-->
+	               
+	            <div class="display-flex">       
+	                 <h3>인사발령현황</h3>
+	         	<div class="buttons">
 	                  <button type="button" class="btn btn-primary" onclick="popUp()">
 	                      인사발령등록
 	                  </button>
+	              </div> 
 	              </div>
-	         
-			<h3>인사발령현황</h3>
 
 			<div class="card">
 				
