@@ -39,7 +39,7 @@ public class SalarySimulatorService {
             // 가상의 직원 정보 생성
             Employees simulatedEmployee = new Employees();
             simulatedEmployee.setEmp_salary(baseSalary);
-            simulatedEmployee.setEmp_job_type("OCPT001"); // 일반직으로 가정
+            simulatedEmployee.setEmp_job_type("OCPT001");
             
             // 현재 년도의 급여 계산식 조회
             int currentYear = YearMonth.now().getYear();

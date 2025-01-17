@@ -192,8 +192,8 @@ const gridConfig = {
 			   case 'empJobType':
                    column.formatter = (value) => {
                        const jobTypeMap = {
-                           'OCPT001': '일반직',
-                           'OCPT002': '계약직',
+                           'OCPT001': '계약직',
+                           'OCPT002': '일반직',
                            'OCPT003': '기술직'
                        };
                        return jobTypeMap[value.value] || value.value;
