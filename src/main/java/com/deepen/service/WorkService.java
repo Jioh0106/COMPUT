@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
 import com.deepen.entity.Employees;
@@ -104,18 +105,38 @@ public class WorkService {
 	
 	
 	
-	
+	// 근무관리 근무뷰 초기 데이터
 	public List<WorkDTO> getWorkList(Map<String, String> map) {
 		
 		return workMapper.getWorkList(map) ;
 		
 	}  // getWorkList
-
+	
+	
+	// 근무관리 근무뷰 검색결과
 	public List<WorkDTO> getWorkListSerch(Map<String, String> map) {
 		
 		return workMapper.getWorkListSerch(map);
 		
 	} // getWorkListSerch
+	
+	
+	
+	// 근무일정 캘린더 일정 가져오기
+	public List<ScheduleDTO> getSchedulesBetween(Map<String, String> map) {
+		
+		List<WorkDTO> workList = workMapper.getWorkList(map);
+		List<ScheduleDTO> shcdList = new ArrayList<>();
+		
+		for(int i = 0; i < workList.size(); i++) {
+			WorkDTO work = workList.get(i);
+			ScheduleDTO schd = ScheduleDTO.workToSchd(work, String.valueOf(i+1));
+			shcdList.add(schd);
+		}
+		
+		
+		return shcdList;
+	} 
 
 
 

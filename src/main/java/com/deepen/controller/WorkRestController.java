@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
 import com.deepen.service.WorkService;
@@ -130,14 +131,25 @@ public class WorkRestController {
 	}
 	
 	
-//	@GetMapping("/select")
-//	public ResponseEntity<List<WorkDTO>> getWorkSchd() {
-//		
-//		
-//		
-//		
-//		return ResponseEntity.ok();
-//	}
+	@GetMapping("/schedules")
+	public ResponseEntity<List<ScheduleDTO>> getSchedules( @RequestParam("startDate") String startDate,
+	        											@RequestParam("endDate") String endDate,
+	        											@AuthenticationPrincipal User user) {
+		String emp_id = user.getUsername();
+		log.info("startDate : " + startDate);
+		log.info("endDate : " + endDate);
+		log.info("emp_id : " + emp_id);
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("start", startDate);
+		map.put("end", endDate);
+		map.put("emp_id", emp_id);
+		
+		List<ScheduleDTO> schedules = workService.getSchedulesBetween(map);
+		
+		
+		return ResponseEntity.ok(schedules);
+	}
 	
 	
 	
