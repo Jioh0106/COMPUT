@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.CommuteMapper">
+
+
+	<select id="selectEmpAthr" parameterType="String" resultType="map">
+		SELECT emp_id, emp_role, emp_dept, emp_no
+		FROM employees
+		WHERE emp_id = #{value}
+	</select>
+	
+	<select id="selectAthrList" parameterType="String" resultType="map">
+		SELECT 
+		  	common_detail_code AS code
+		  , LOWER(common_detail_name) AS name
+		  , common_detail_status AS status
+		  , common_detail_display AS display
+		FROM 
+			common_detail
+		WHERE 
+			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{value}
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<select id="selectCmtList" parameterType="hashMap" resultType="map">
+		SELECT
+			  emp.emp_id AS "empId"
+			, emp.emp_name AS "empNm"
+			, dept.common_detail_name AS "deptNm"
+			, TO_CHAR(cmt.cmt_date, 'YYYY-MM-DD') AS "cmtDate"
+			, TO_CHAR(cmt.work_bgn, 'HH24:MI') AS "workBgn"
+			, TO_CHAR(cmt.work_end, 'HH24:MI') AS "workEnd"
+			, stts.common_detail_name AS "sttsNm"
+			, cmt.rmrk AS "rmrk"
+			, cmt.emp_no AS "empNo"
+		FROM 
+			cmt_mng cmt
+		LEFT JOIN
+			employees emp
+		ON
+			cmt.emp_no = emp.emp_no
+		LEFT JOIN
+			common_detail dept
+		ON
+			CMT.emp_dept_cd = dept.common_detail_code
+		LEFT JOIN
+			common_detail stts
+		ON
+			cmt.atndn_stts_cd = stts.common_detail_code
+		<where>
+			<if test='empRole == "ATHR002"'>
+			 	AND cmt.emp_dept_cd = #{empDept}
+			</if>
+			<if test='empRole == "ATHR003"'>
+			 	AND cmt.emp_no = #{empNo}
+			</if>
+			<if test="bgnDate != null and bgnDate != '' and endDate != null and endDate != ''">
+	            AND cmt.cmt_date BETWEEN #{bgnDate} AND #{endDate}
+        	</if>
+			<if test="empInfo != null and empInfo != ''">
+	            AND (emp.emp_id LIKE '%' || #{empInfo} || '%' 
+	            OR emp.emp_name LIKE '%' || #{empInfo} || '%')
+        	</if>
+		</where>
+		ORDER BY
+			cmt.emp_no, cmt.cmt_date DESC
+	</select>
+	
+	<select id="selectWorkList" parameterType="hashMap" resultType="map">
+		SELECT 
+			  wv.work_no AS "workNo"
+			, wv.emp_id AS "empId"
+			, TO_CHAR(wv.work_date, 'YYYY-MM-DD') AS "workDate"
+			, wv.work_start AS "workStart"
+			, wv.work_end AS "workEnd"
+			, TO_CHAR(cm.cmt_date, 'YYYY-MM-DD') AS "cmtDate"
+			, cm.work_bgn AS "cmtStart"
+			, cm.work_end AS "cmtEnd"
+			, emp.emp_no AS "empNo"
+			, emp.emp_dept AS "empDept"
+		FROM 
+			WORK_VIEW wv
+		LEFT JOIN
+			CMT_MNG cm
+		ON
+			wv.emp_id = cm.emp_no
+		LEFT JOIN
+			employees emp
+		ON
+			wv.emp_id = emp.emp_id
+		WHERE
+			wv.emp_id = #{empId}
+	</select>
+	
+	<insert id="insertCmt" parameterType="hashMap">
+		INSERT INTO cmt_mng (
+			  cmt_cd
+			, emp_dept_cd
+			, cmt_date
+			, work_bgn
+			, atndn_stts_cd
+			, emp_no
+			, emp_id
+		) VALUES ( 
+			cmt_seq.nextval
+		  , #{empDept}
+		  , CURRENT_DATE
+		  , CURRENT_DATE
+		  , #{sttsCd}
+		  , #{empNo}
+		  , #{empId}
+		)
+	</insert>
+	
+	
+	
+</mapper>
+
+
+

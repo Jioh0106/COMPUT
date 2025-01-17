@@ -1,0 +1,116 @@
+.tui-grid-cell {
+    background-color: #ffffff !important;
+}
+
+.modal-dialog {
+    max-width: 800px;
+}
+
+.grid-wrapper {
+    margin-top: 20px;
+    height: 400px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.help-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.btn-group .btn {
+    padding: 8px 15px;
+    font-size: 16px;
+}
+
+.btn-check:checked + .btn-outline-secondary {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #5a6268;
+    color: white;
+}
+
+.custom-tooltip {
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+    color: #000;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 300px;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+}
+
+.custom-text {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #007bff;
+}
+
+/* Grid specific styles */
+.tui-grid-cell-header {
+    background-color: #f8f9fa !important;
+    font-weight: bold;
+}
+
+.tui-grid-cell-editable {
+    background-color: #fff3cd !important;
+}
+
+.tui-grid-cell-required {
+    background-color: #f8d7da !important;
+}
+
+/* Modal specific styles */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Form specific styles */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+/* Button styles */
+.btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-outline-success:hover {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-outline-danger:hover {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}

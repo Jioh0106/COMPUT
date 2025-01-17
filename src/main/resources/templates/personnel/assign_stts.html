@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>화면명</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
+
+
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+		
+		.display-flex {
+            display: flex;
+        }
+        .buttons {
+            margin-left: auto;
+        }
+		
+	</style>
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+			
+	               
+	            <div class="display-flex">       
+	                 <h3>인사발령현황</h3>
+	         	<div class="buttons">
+	                  <button type="button" class="btn btn-primary" onclick="popUp()">
+	                      인사발령등록
+	                  </button>
+	              </div> 
+	              </div>
+
+			<div class="card">
+				
+				<div class="card-body">
+					
+					<!-- 데이트 피커 시작 -->
+					<section class="section" style="margin-bottom: 2.2rem">
+						<div style="display: flex; align-items: center; gap: 1rem;">
+							<span style="font-size: 1rem; line-height: 2rem;">발령일</span>
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="startDate" name="startDate" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container1"
+									style="margin-top: -1px; z-index: 2000; position: relative;"></div>
+							</div>
+			
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+			
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="endDate" name="endDate" aria-label="Date-Time" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container2"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+			
+						</div>
+					</section>
+					<!-- 데이트 피커 끝 -->
+
+					<div class="col-md-6 mb-1"><!--직원이름검색창-->
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="search-icon"><i class="bi bi-search"></i></span>
+							<input type="text" class="form-control" id="search" name="search" 
+							placeholder="이름 또는 사원번호를 입력해주세요."
+								aria-label="Recipient's username" aria-describedby="button-addon2">
+						</div>
+					</div>
+
+
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<div id="grid"></div>
+						</div>
+					</section>
+					<!-- 그리드 끝 -->
+
+
+
+			
+		</div> <!-- card-body -->
+	 </div> <!-- card -->
+	</div><!--main-->
+
+</div><!-- app -->
+
+
+			<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+			<script src="assets/js/bootstrap.bundle.min.js"></script>
+			<script src="assets/js/main.js"></script>
+			<!-- TOAST UI CDN -->
+			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+			<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+			<script>
+
+		// datePikers
+		const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
+		const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+		//const empHireDatePicker = datePiker('#emp-hire-date-wrapper','#emp_hire_date');
+		//const empExitDatePicker = datePiker('#emp-exit-date-wrapper','#emp_exit_date');			
+				var Grid = tui.Grid;
+
+				const grid = new Grid({
+				  el: document.getElementById('grid'),
+				  data: [], // 초기 데이터
+				  rowHeaders: ['checkbox'],
+				  //scrollX: false,
+				  //scrollY: false,
+				  bodyHeight: 470,
+				  columns: [
+				    { 
+						header: '번호', 
+						name: 'ASSIGNMENT_NO',
+					},
+				    { 
+						header: '발령구분', 
+						name: 'ASSIGN_TYPE',
+					},
+				    { 
+						header: '승인일자', 
+						name: 'REGISTR_DATE',
+					},
+				    { 
+						header: '발령일자', 
+						name: 'ASSIGN_DATE'
+						
+					},
+				    { 
+						header: '사원번호', 
+						name: 'ASSIGN_EMP_ID'
+						
+					},
+				    { 
+						header: '성명', 
+						name: 'ASSIGN_EMP_NAME'
+						
+					},
+					{ 
+						header: '이전직급', 
+						name: 'PREV_POS',
+						filter : 'select'
+					},
+					{ 
+						header: '발령직급', 
+						name: 'NEW_POS',
+						filter : 'select'
+					},
+					{ 
+						header: '이전부서', 
+						name: 'PREV_DEPT',
+						filter : 'select'
+					},
+					{ 
+						header: '발령부서', 
+						name: 'NEW_DEPT',
+						filter : 'select'
+					}
+				  ],
+				  columnOptions: {
+				          resizable: true
+				        }
+				});		
+	
+	
+	const assignFilters = {
+		startDate : '1900-01-01',
+		endDate : '2999-12-31',
+		search : '',
+		
+	}
+				
+	function updateAssignFilters() {
+		    assignFilters.startDate = document.getElementById('startDate').value || '1900-01-01';  
+		    assignFilters.endDate = document.getElementById('endDate').value || '2999-12-31';      
+		    assignFilters.search = document.getElementById('search').value || '';
+		    
+		    fetchAssignList(assignFilters);
+		}
+	
+	// 페이지가 완전히 로드된 후 함수 실행
+	window.onload = function () {
+			
+			fetchAssignList(assignFilters);
+			//fetchCommonDetails();
+			
+			startDatePicker.on('change', updateAssignFilters);
+			endDatePicker.on('change', updateAssignFilters);
+		   	document.getElementById('search').addEventListener('input', updateAssignFilters);
+			
+		}	
+		
+		
+		// 사원리스트 필터 조회
+		async function fetchAssignList(filter) {
+			try	{	
+					const params = new URLSearchParams(filter).toString();
+					console.log('요청 URL:', `/api/assign/list?${params}`);  // URL 디버깅
+			       	const response = await fetch(`/api/assign/list?${params}`);
+					
+			       	if (!response.ok) {
+			           	throw new Error("네트워크 응답 실패");
+			       	}
+			       	const assignList = await response.json();
+			       	console.log(assignList);
+
+			       	// 그리드 데이터 갱신
+			       	grid.resetData(assignList);
+					grid.refreshLayout();
+					
+			   	} catch (error) {
+			       	console.error("인사발령조회 중 오류:", error);
+			   	}
+		}
+	
+		// toast ui datepiker
+		function datePiker(containerSelector, inputSelector){
+			return new tui.DatePicker(containerSelector,{
+				date : new Date(),
+				input : {
+					element: inputSelector,
+					format: 'yyyy-MM-dd'
+				},
+				language : 'ko'
+			});
+		}		
+		
+		
+	//-----------------------------------------------인사발령등록 페이지로 팝업창 연결
+	
+	function popUp() {
+	      const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes"; // 팝업창 옵션
+	      const popupUrl = "/assign-insert"; // 팝업창으로 열릴 페이지 URL
+	      window.open(popupUrl, "assignInsertPopup", popupOptions);
+	  }	
+						
+				
+</script>
+
+</body>
+
+</html>

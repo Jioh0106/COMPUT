@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.AbsenceMapper">
+
+	
+	<select id="getAbsenceList" resultType="Map">
+		SELECT av.*
+		FROM ABSENCE_VIEW av
+		LEFT JOIN request r
+		ON av.request_no = r.request_no
+		WHERE r.request_status = 'RQST005'
+		ORDER BY ABSENCE_NO DESC
+	</select>
+	
+	<select id="getLowAbsenceList" resultType="Map">
+		SELECT av.*
+		FROM ABSENCE_VIEW av
+		LEFT JOIN request r
+		ON av.request_no = r.request_no
+		WHERE r.request_status = 'RQST005'
+		AND av.emp_id = #{emp_id}
+		ORDER BY ABSENCE_NO DESC
+	</select>
+	
+	<select id="getCommonList" resultType="com.deepen.domain.CommonDetailDTO">
+		SELECT common_detail_code, common_detail_name
+		FROM common_detail
+		WHERE common_detail_status = 'Y'
+		<if test="code != null">
+			AND REGEXP_LIKE(common_detail_code, '^${code}')
+		</if>
+	</select>
+	
+	<select id="getEmpList" resultType="Map">
+			SELECT e.emp_id,
+				   e.emp_name,
+				   e.emp_role,
+				   c_dept.common_detail_name AS emp_dept_name,
+				   c_position.common_detail_name AS emp_position_name
+			  FROM employees e
+		 LEFT JOIN common_detail c_dept
+	            ON e.emp_dept = c_dept.common_detail_code
+		 LEFT JOIN common_detail c_position
+			    ON e.emp_position = c_position.common_detail_code
+			 WHERE emp_role = #{emp_role}
+			   AND emp_status = 'WRST001'
+	</select>
+	
+	<!-- 삭제 SQL -->
+	<delete id="deleteAbsences" parameterType="java.util.List">
+	    DELETE FROM ABSENCE
+	    WHERE ABSENCE_NO IN
+	    <foreach item="ABSENCE_NO" collection="list" open="(" separator="," close=")">
+	        #{ABSENCE_NO}
+	    </foreach>
+	</delete>
+	
+	
+	<select id="getUpdateCommon" resultType="String">
+		SELECT common_detail_code
+		  FROM common_detail
+		 WHERE common_detail_name = #{name}
+		   AND REGEXP_LIKE(common_detail_code, '^LOAB')
+	</select>
+	
+	
+	<!-- 업데이트 SQL -->
+    <update id="updateAbsence" parameterType="java.util.Map">
+        UPDATE ABSENCE
+	       SET 
+	           EMP_ID = #{EMP_ID},
+	           ABSENCE_TYPE = #{ABSENCE_TYPE},
+	           ABSENCE_START = #{ABSENCE_START},
+	           ABSENCE_END = #{ABSENCE_END},
+	           <if test="ABSENCE_REMARK != null">
+					ABSENCE_REMARK = #{ABSENCE_REMARK},
+				</if>
+	           HIGH_APPROVAL = #{HIGH_APPROVAL},
+	           UPDATE_DATE = SYSTIMESTAMP,
+	           UPDATE_EMP_ID = #{UPDATE_EMP_ID}
+         WHERE ABSENCE_NO = #{ABSENCE_NO}
+    </update>
+    
+    
+    <select id="getEmpSelf" resultType="Map">
+	    	SELECT e.emp_id, 
+	    		   e.emp_name, 
+	    		   e.emp_role,
+	    		   ddept.common_detail_name AS emp_dept_name, 
+	    		   dpos.common_detail_name AS emp_position_name
+			  FROM employees e
+		 LEFT JOIN common_detail ddept
+			    ON e.emp_dept = ddept.common_detail_code
+		 LEFT JOIN common_detail dpos
+			    ON e.emp_position = dpos.common_detail_code
+			 WHERE e.emp_id = #{emp_id}
+    </select>
+    
+    <select id="getEmpSerch" resultType="Map">
+			SELECT e.emp_id, 
+				   e.emp_name, 
+				   ddept.common_detail_name AS emp_dept, 
+				   dpos.common_detail_name AS emp_position
+			  FROM employees e
+		 LEFT JOIN common_detail ddept
+			    ON e.emp_dept = ddept.common_detail_code
+		 LEFT JOIN common_detail dpos
+			    ON e.emp_position = dpos.common_detail_code
+			 WHERE e.emp_name LIKE '%' || #{emp_name} || '%'
+    </select>
+    
+	
+</mapper>
+
+

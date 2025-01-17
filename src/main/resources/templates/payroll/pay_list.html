@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF 토큰 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    
+    <title>급여 대장</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+<style>
+    .tui-grid-cell {
+        background-color: #ffffff !important;
+    }
+    .clickable {
+        cursor: pointer;
+        color: blue;
+        text-decoration: underline;
+    }
+    .department-summary {
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+    }
+    .tui-grid-summary-area {
+    background-color: #f0f0f0 !important;
+}
+
+.tui-grid-summary-area td {
+    background-color: #f0f0f0 !important;
+    border-right: 1px solid #e1e1e1 !important;
+}
+
+.tui-grid-summary-area .tui-grid-cell {
+    border-bottom: none !important;
+}
+.tui-grid-cell {
+    padding-right: 0 !important;
+}
+</style>
+</head>
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+            <h3>급여 대장</h3>
+              <!-- 탭 네비게이션 추가 -->
+            <ul class="nav nav-tabs" id="payrollTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" 
+                            data-bs-target="#monthly-content" type="button" role="tab">
+                        월별 급여 대장
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="annual-tab" data-bs-toggle="tab" 
+                            data-bs-target="#annual-content" type="button" role="tab">
+                        연간 급여 대장
+                    </button>
+                </li>
+            </ul>
+
+            <!-- 탭 컨텐츠 -->
+            <div class="tab-content" id="payrollTabsContent">
+                <!-- 월별 급여 대장 탭 -->
+                <div class="tab-pane fade show active" id="monthly-content" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 기존 검색 부분 -->
+                            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                                <input type="text" class="form-control" id="basicInput" 
+                                       style="margin-left: 5px; width:200px;" 
+                                       placeholder="대장명칭을 입력하세요">
+                                <a href="#" class="btn btn-primary rounded-pill" 
+                                   style="margin-left: 5px;">Search</a>
+                            </div>
+                            <div id="mainGrid" style="width:100%; height:400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 연간 급여 대장 탭 -->
+                <div class="tab-pane fade" id="annual-content" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 연도 선택 -->
+                            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                               <select class="form-select" id="yearSelect" style="width: 200px;">
+    								<option value="">연도 선택</option>
+							   </select>
+                            </div>
+                            <div id="annualGrid" style="width:100%; height:600px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 급여 대장 모달 시작-->
+        <div class="modal fade text-left w-100" id="payrollDetailModal" tabindex="-1" role="dialog" 
+    aria-labelledby="payrollDetailModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-full" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="payrollDetailModalTitle">급여대장조회</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+    <!-- 그리드들이 여기에 동적으로 생성됩니다 -->
+			</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div> 
+ <!-- 급여 대장 모달 끝 -->
+ 
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="assets/js/main.js"></script>
+<!--     <script src="/js/payroll/pay_list.js"></script> -->
+   
+    <script th:inline="javascript">
+    
+    // 초기 데이터 설정
+    const payListSummary = /*[[${payListSummary}]]*/ [];
+    
+</script>
+
+<!-- pay_list.js는 마지막에 로드 -->
+<script src="/js/payroll/pay_list.js"></script>
+    
+</body>
+</html>

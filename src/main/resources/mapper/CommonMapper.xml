@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.CommonMapper">
+
+	
+	<select id="commonList" resultType="map" parameterType="map">
+		SELECT 
+			common_code, common_name, common_content, common_status, common_display, 'select' AS row_type
+		FROM 
+			common
+		<where>
+			<if test="value != null and value != ''">
+				AND (common_code LIKE '%' || #{value} || '%' 
+	            OR common_name LIKE '%' || #{value} || '%')
+			</if>
+		</where>
+		ORDER BY
+			common_display
+	</select>
+	
+	<select id="commonDtlList" resultType="map" parameterType="map">
+		SELECT 
+			common_detail_code, common_detail_name, common_detail_status, common_detail_display
+		FROM 
+			common_detail
+		WHERE 
+			REGEXP_REPLACE(common_detail_code, '[0-9]') = #{celVal}
+			<if test="value != null and value != ''">
+				AND (common_detail_code LIKE '%' || #{value} || '%' 
+	            OR common_detail_name LIKE '%' || #{value} || '%')
+			</if>
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<insert id="insertCommonList" parameterType="com.deepen.domain.CommonDTO">
+		INSERT INTO common (
+			common_code
+		  , common_name
+		  , common_content
+		  , common_status
+		
+		) VALUES ( 
+			#{commonCode}
+		  , #{commonName}
+		  , #{commonContent}
+		  , #{commonStatus}
+		)
+	</insert>
+	
+	<insert id="insertDetailList" parameterType="com.deepen.domain.CommonDTO">
+		INSERT INTO common_detail (
+			common_detail_code
+		  , common_detail_name
+		  , common_detail_status
+		
+		) VALUES ( 
+			#{commonCode}
+		  , #{commonName}
+		  , #{commonStatus}
+		)
+	</insert>
+	
+	<update id="updateCommonList" parameterType="com.deepen.domain.CommonDTO">
+			UPDATE common
+			SET common_code = #{commonCode}
+				, common_name = #{commonName}
+				, common_status = #{commonStatus}
+				, common_display = #{commonDisplay}
+			WHERE common_code = #{commonCode}
+	</update>
+	
+	<update id="updateDetailList" parameterType="com.deepen.domain.CommonDTO">
+			UPDATE common_detail
+			SET common_detail_code = #{commonCode}
+				, common_detail_name = #{commonName}
+				, common_detail_status = #{commonStatus}
+				, common_detail_display = #{commonDisplay}
+			WHERE common_detail_code = #{commonCode}
+	</update>
+	
+	
+	
+</mapper>
+
+
+

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.AssignMapper">
+	
+	
+	<!--발령등록페이지 공통코드 연결-->
+	<select id="selectAssignCommonDetail" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('APNT','DEPT','PSTN')
+		AND common_detail_status ='Y'
+	</select>
+
+	
+	<!--직원검색 (공통상세코드랑 조인해서 코드값 실제 이름보여주기)-->
+	<!--별칭을 employeeDTO필드명과 같아야 담을 수 있음-->
+	<select id="empSearch" resultType="com.deepen.domain.EmployeesDTO" parameterType="String">
+	    SELECT emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+	    pos_code.common_detail_name AS emp_position
+	    FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    WHERE emp_status LIKE 'WRST%'
+	    AND emp_name LIKE '%' || #{keyword, jdbcType=VARCHAR} || '%'
+	</select>
+	
+	<!--중간 승인권자 조회 모달창-->
+	<select id="middleRoleSearch" resultType="com.deepen.domain.EmployeesDTO">
+		select emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+		pos_code.common_detail_name AS emp_position
+		FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    where emp_role LIKE 'ATHR002' and emp_status LIKE 'WRST001'
+	</select>
+	
+	
+	<!--최종 승인권자 조회 모달창-->
+	<select id="highRoleSearch" resultType="com.deepen.domain.EmployeesDTO">
+		select emp.emp_id, emp.emp_name, dept_code.common_detail_name AS emp_dept, 
+		pos_code.common_detail_name AS emp_position
+		FROM employees emp
+	    LEFT JOIN common_detail dept_code
+	    ON emp.emp_dept = dept_code.common_detail_code
+	    LEFT JOIN common_detail pos_code
+	    ON emp.emp_position = pos_code.common_detail_code
+	    where emp_role LIKE 'ATHR001' and emp_status LIKE 'WRST001'
+	</select>
+	
+	
+	<!-- 요청테이블 요청번호로 발령테이블 조인 -->
+	<select id="selectAssign" parameterType="java.lang.Integer" resultType="com.deepen.domain.AssignmentDTO">
+	   SELECT 
+		    a.assign_emp_id AS assign_emp_id,
+		    e_assign.emp_name AS assign_emp_name,
+		    a.assign_date AS assign_date,
+		    cdtype.common_detail_name AS assign_type,
+		    cdprevd.common_detail_name AS prev_dept,
+		    cddept.common_detail_name AS new_dept,
+		    cdprevp.common_detail_name AS prev_pos,
+		    cdpos.common_detail_name AS new_pos,
+		    a.request_no AS request_no,
+		    r.emp_id AS emp_id,
+		    e_request.emp_name AS emp_name
+		FROM 
+		    assignment a
+		JOIN 
+		    employees e_assign ON a.assign_emp_id = e_assign.emp_id
+		JOIN 
+		    request r ON a.request_no = r.request_no
+		JOIN 
+		    employees e_request ON r.emp_id = e_request.emp_id
+		JOIN    
+		    common_detail cdtype ON a.assign_type = cdtype.common_detail_code
+		JOIN
+			common_detail cdprevd ON a.prev_dept = cdprevd.common_detail_code    
+		JOIN   
+		    common_detail cddept ON a.new_dept = cddept.common_detail_code
+		JOIN
+			common_detail cdprevp ON a.prev_pos = cdprevp.common_detail_code    
+		JOIN
+		    common_detail cdpos ON a.new_pos = cdpos.common_detail_code
+		WHERE 
+		    a.request_no = #{request_no}
+	</select>
+	
+	
+	<!--반려사유 업데이트-->
+	<update id="updateRejection" parameterType="map">
+		update request
+		set request_rejection = #{request_rejection},
+			request_status =  
+				CASE 
+	            WHEN request_status = 'RQST001' THEN 'RQST002'
+	            WHEN request_status = 'RQST003' THEN 'RQST004'
+	        	END
+	    WHERE request_no = #{request_no}
+	</update>
+	
+	<!--반려사유 조회-->
+	<select id="getRejection" parameterType="java.lang.Integer" resultType="com.deepen.domain.RequestDTO">
+		SELECT 
+        request_no,
+        request_rejection,
+        request_status
+   	 FROM 
+        request
+     WHERE 
+        request_no = #{request_no}
+	</select>
+	
+	<!--인사현황 리스트 조회-->
+	<select id="assignList" parameterType="Map" resultType="java.util.Map">
+		select a.assignment_no,
+			   TO_CHAR(a.registr_date, 'YYYY-MM-DD') AS registr_date,
+			   TO_CHAR(a.assign_date, 'YYYY-MM-DD') AS assign_date,
+			   a.assign_emp_id,
+			   e.emp_name AS assign_emp_name,
+			   cdat.common_detail_name AS assign_type,
+			   cdpp.common_detail_name AS prev_pos,
+			   cdnp.common_detail_name AS new_pos,
+			   cdpd.common_detail_name AS prev_dept,
+			   cdnd.common_detail_name AS new_dept
+	   from  assignment a 
+	   	INNER JOIN request r 
+    	ON a.request_no = r.request_no 
+   		AND r.request_status = 'RQST005'
+	   LEFT JOIN EMPLOYEES e
+	   		ON e.emp_id = a.assign_emp_id
+	   LEFT JOIN COMMON_DETAIL cdat
+		    ON cdat.common_detail_code LIKE 'APNT%'
+		    AND cdat.common_detail_code = a.assign_type
+		    AND cdat.common_detail_status = 'Y'		   
+	   LEFT JOIN COMMON_DETAIL cdpp
+		    ON cdpp.common_detail_code LIKE 'PSTN%'
+		    AND cdpp.common_detail_code = a.prev_pos
+		    AND cdpp.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdnp
+		    ON cdnp.common_detail_code LIKE 'PSTN%'
+		    AND cdnp.common_detail_code = a.new_pos
+		    AND cdnp.common_detail_status = 'Y'		    		   
+	    LEFT JOIN COMMON_DETAIL cdpd
+		    ON cdpd.common_detail_code LIKE 'DEPT%'
+		    AND cdpd.common_detail_code = a.prev_dept
+		    AND cdpd.common_detail_status = 'Y'	
+	    LEFT JOIN COMMON_DETAIL cdnd
+		    ON cdnd.common_detail_code LIKE 'DEPT%'
+		    AND cdnd.common_detail_code = a.new_dept
+		    AND cdnd.common_detail_status = 'Y'
+		WHERE 1=1
+	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
+		AND a.assign_date BETWEEN #{startDate} AND #{endDate}
+	    </if>    
+ 	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">
+        	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
+    	</if>
+	    ORDER BY a.assignment_no	   
+				
+	</select>
+	
+	
+	<!--발령요청 진행중인 경우 발령등록못하게 막기 -->
+	<select id="assignStatusCount" parameterType="Map" resultType="int">
+	   SELECT COUNT(*) AS count
+	    FROM assignment a
+	    INNER JOIN request r ON a.request_no = r.request_no
+	    WHERE a.assign_emp_id = #{assign_emp_id}
+        AND r.request_status IN ('RQST001', 'RQST003', 'RQST005')
+        AND a.assign_type = #{assign_type}
+	</select>
+	
+	
+	
+	<!--최종승인권자 중간승인권자 사원번호로 사원테이블 조회-->
+	<select id="getEmployees" parameterType="java.lang.Integer" resultType="map">
+		SELECT
+		    er.emp_name AS middle_emp_name,
+		    cd_dept_er.common_detail_name AS middle_emp_dept, 
+		    cd_pos_er.common_detail_name AS middle_emp_position, 
+		    eh.emp_name AS high_emp_name,
+		    cd_dept_eh.common_detail_name AS high_emp_dept, 
+		    cd_pos_eh.common_detail_name AS high_emp_position 
+		FROM 
+		    request r
+		LEFT JOIN employees er 
+		    ON r.middle_approval = er.emp_id
+		LEFT JOIN employees eh 
+		    ON r.high_approval = eh.emp_id
+		LEFT JOIN common_detail cd_dept_er 
+		    ON er.emp_dept = cd_dept_er.common_detail_code
+		LEFT JOIN common_detail cd_pos_er 
+		    ON er.emp_position = cd_pos_er.common_detail_code 
+		LEFT JOIN common_detail cd_dept_eh 
+		    ON eh.emp_dept = cd_dept_eh.common_detail_code 
+		LEFT JOIN common_detail cd_pos_eh 
+		    ON eh.emp_position = cd_pos_eh.common_detail_code 
+		WHERE 
+		    r.request_no = #{request_no}
+
+	</select>
+	
+	
+	
+</mapper>
+
+    
+    

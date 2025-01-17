@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>요청내역 상세내용</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!--  sweetalert  -->
+	<link rel="stylesheet" href="assets/vendors/sweetalert2/sweetalert2.min.css">
+	
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+	</style>
+	
+</head>
+<body>
+		
+	<div id="app">
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<h3>인사발령 상세내용</h3>
+			
+ 	<!--인사발령 상세내용 폼 시작-->			
+<!-- // Basic multiple Column Form section start -->
+<section id="multiple-column-form">
+	<div class="row match-height">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-content">
+					<div class="card-body">
+						
+						<form class="form" action="/request-assign-detail" method="post" enctype="multipart/form-data">
+							<input type="hidden" id="csrfToken" name="_csrf" th:value="${_csrf.token}" />	
+						<div class="row">
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="first-name-column">담당자 사번</label>
+									<input type="text" name="emp_id" id="emp_id"  class="form-control" 
+									readonly>
+								</div>
+							</div>
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="first-name-column">담당자 성명</label>
+									<input type="text" id="emp_name" name="emp_name" class="form-control" 
+									readonly>
+								</div>
+							</div>
+						
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="first-name-column">발령자 사번</label>
+									<input type="text" id="assign_emp_id" name="assign_emp_id" class="form-control"
+										readonly>
+								</div>
+							</div>
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="last-name-column">발령자 성명</label>
+									<input type="text" id="assign_emp_name" name="assign_emp_name" class="form-control"
+										readonly >
+								</div>
+							</div>
+							
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label>발령일자</label>
+									<div class="form-group">
+										<input type="date" class="form-control" id="assign_date" name="assign_date" readonly>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="city-column">발령구분</label>
+									<input type="text" id="assign_type" name="assign_type" class="form-control" readonly
+									>
+								</div>
+							</div>
+							
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="company-column">이전직급</label>
+									<input type="text" id="prev_pos" name="prev_pos" class="form-control" readonly
+									>
+								</div>
+							</div>
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="email-id-column">발령직급</label>
+									<input type="text" id="new_pos" name="new_pos" class="form-control" readonly>
+								</div>
+							</div>
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="company-column">이전부서</label>
+									<input type="text" id="prev_dept" class="form-control"
+										name="prev_dept" readonly
+										>
+								</div>
+							</div>
+							<div class="col-md-6 col-12">
+								<div class="form-group">
+									<label for="email-id-column">발령부서</label>
+									<input type="text" id="new_dept" class="form-control"
+										name="new_dept" readonly>
+								</div>
+							</div>
+							<div class="col-12 d-flex justify-content-end">
+								<button type="button" id="approveBtn" class="btn btn-primary me-1 mb-1">승인</button>
+								<button type="button" id="rejectBtn" class="btn btn-outline-danger me-1 mb-1" data-bs-target="#defaultSize">반려</button>
+								<div id="check-sender" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="ingBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>처리중</button>
+									</div>
+								</div>
+								<div id="check-complete1" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="completeBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>승인완료</button>
+									</div>
+								</div>
+
+								<div id="check-complete2" style="display: none;">
+									<div class="col-12 d-flex justify-content-end">
+										<button type="button" id="completeBtn"
+											class="btn btn-secondary me-1 mb-1" disabled>반려처리</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+	<!-- // Basic multiple Column Form section end -->
+	<!--인사발령 상세내용 폼 끝-->
+			
+			
+			<!-- 승인버튼 클릭 시 최종승인권자 모달창 시작 -->
+			<!--Default size Modal -->
+        <div class="modal fade text-left" id="approvedefaultSize" tabindex="-1"
+            role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel18">최종승인권자 선택</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+						
+						<!-- 그리드 시작 -->
+						<section class="section">
+							<div class="row" id="basic-table">
+								<div id="grid2"></div>
+							</div>
+						</section>
+						<!-- 그리드 끝 -->
+						
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary"
+                            data-bs-dismiss="modal">
+                            <i class="bx bx-x d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">취소</span>
+                        </button>
+                        <button type="button" id="approveRequestBtn" class="btn btn-primary ml-1" >
+                            <i class="bx bx-check d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">승인요청</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+			<!-- 승인버튼 클릭 시 최종승인권자 모달창 끝 -->
+			
+			
+			<!--반려사유 모달창 시작-->
+			<!--Default size Modal -->
+        <div class="modal fade text-left" id="defaultSize" tabindex="-1"
+            role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel18">반려사유</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+						
+						<h6 >승인권자 사번</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="rj_emp_id" readonly>
+														
+						</div>
+						
+						<h6>승인권자 성명</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="rj_emp_name" readonly>
+															
+						</div>
+						
+						<h6>반려사유</h6>
+						<div class="content">
+							<div class="form-group">
+								 <textarea class="form-control me-2" id="rejectReason" rows="4"></textarea>
+							</div>
+						
+						</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary"
+                            data-bs-dismiss="modal">
+                            <i class="bx bx-x d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">취소</span>
+                        </button>
+                        <button type="button" class="btn btn-primary ml-1" id="submitRejectBtn"
+                            data-bs-dismiss="modal">
+                            <i class="bx bx-check d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">등록</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+			<!--반려사유 모달창 끝-->
+			
+			
+			
+		</div><!--main--> 
+
+	</div><!-- app -->
+		
+		
+	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/main.js"></script>
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<!-- sweet arert -->
+	<script src="assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+	 <!-- 제이쿼리 -->
+   	<script th:src="@{/js/jquery-3.7.1.js}"></script>   
+	<script>
+	
+	const csrfToken = $('input[name="_csrf"]').val();
+	
+		   
+		   // URL에서 쿼리 파라미터로 전달된 요청번호 추출
+			const urlParams = new URLSearchParams(window.location.search);
+			const request_no = urlParams.get('request_no'); // request_no 추출
+			console.log('요청번호!!!!:', request_no); // 요청번호 출력
+			
+			if (request_no) {
+			    fetch(`/api/selectAssign/${request_no}`)
+			        .then(response => {
+			            if (!response.ok) {
+			                throw new Error(`HTTP error! status: ${response.status}`);
+			            }
+			            return response.json();
+			        })
+			        .then(data => {
+			            console.log('REST API 반환 데이터:', data);
+			            const requestDivision = data.request.request_division;
+			            console.log('요청 구분:', requestDivision); // 요청 구분 값 출력
+						const request_status = data.request_status; // 요청 상태 값
+						console.log('요청 상태:', request_status);
+						
+						const assignment = data.assignment;
+			            if (data) {
+			                // 발령 테이블 데이터로 상세정보 팝업창 채우기
+							$('#emp_id').val(assignment.emp_id);
+							$('#emp_name').val(assignment.emp_name);
+			                $('#assign_emp_id').val(assignment.assign_emp_id);
+			                $('#assign_emp_name').val(assignment.assign_emp_name);
+			                $('#assign_date').val(assignment.assign_date);
+			                $('#assign_type').val(assignment.assign_type);
+			                $('#prev_pos').val(assignment.prev_pos);
+			                $('#new_pos').val(assignment.new_pos);
+			                $('#prev_dept').val(assignment.prev_dept);
+			                $('#new_dept').val(assignment.new_dept);
+							
+							
+							const request = data.request;
+							if(request.request_division === '발신'){
+								  // 발신일 때 승인/반려 버튼 숨기기
+			                    document.getElementById('approveBtn').style.display = 'none';
+			                    document.getElementById('rejectBtn').style.display = 'none';
+
+			                    // 발신일 때 상태에 따른 처리
+			                    if (request_status === 'RQST001' || request_status === 'RQST003') {
+			                        $('#check-sender').css('display', 'flex'); // 처리중 버튼 표시
+			                        console.log('발신 + 처리중 상태');
+			                    } else if (request_status === 'RQST002' || request_status === 'RQST004') {
+			                        $('#check-complete2').css('display', 'flex'); // 반려처리 버튼 표시
+			                        console.log('발신 + 반려처리 상태');
+			                    }else if(request_status === 'RQST005'){
+			                    	$('#check-complete1').css('display', 'flex'); // 승인완료 버튼 표시
+			                    }
+			                } else if (request.request_division === '수신') {
+			                    // 수신일 때 승인/반려 버튼 표시
+			                    document.getElementById('approveBtn').style.display = 'inline-block';
+			                    document.getElementById('rejectBtn').style.display = 'inline-block';
+
+			                    // 수신일 때 상태에 따른 처리
+			                    if (request_status === 'RQST005') {
+			                    	document.getElementById('approveBtn').style.display = 'none';
+				                    document.getElementById('rejectBtn').style.display = 'none';
+			                        $('#check-complete1').css('display', 'flex'); // 승인완료 버튼 표시
+			                        console.log('수신 + 승인완료 상태');
+			                    }
+			                }
+			           } else {
+			                alert("발령 정보를 찾을 수 없습니다.");
+			            }
+			        })
+			        .catch(error => {
+			            alert('발령 정보를 불러오는 데 실패했습니다.');
+			            console.error('Error:', error);
+			        });
+			}
+
+		//-----------------------------------------------------------------최종승인권자 모달창시작
+		
+		// URL에서 userRole 파라미터 추출
+		const userRole = urlParams.get('userRole'); // userRole 값 추출
+		console.log('현재 사용자 권한:', userRole);
+		// 승인 버튼 클릭 시 최종 승인권자 선택 모달창 열기
+			   	
+		document.addEventListener('DOMContentLoaded', function () {
+			const csrfToken = document.getElementById('csrfToken').value; //토큰
+		
+	    	// 승인 버튼 클릭 시 동작 시작
+	       	 document.getElementById('approveBtn').addEventListener('click', function () {
+	       		console.log('승인 버튼 클릭됨');
+	       		 if(userRole.trim() === 'ATHR001'){
+	       			console.log('ATHR001 권한 승인 처리 시작'); // 디버깅 로그
+	       			const requestDTO = {
+	       					request_no: request_no,
+	       					request_status: 'RQST005'
+	       				};
+	       			console.log('리퀘스트디티오:', requestDTO);
+	       		 $.ajax({
+	                 url: '/request-update',
+	                 type: 'POST',
+	                 contentType: 'application/json',
+	                 data: JSON.stringify({ requestDto: requestDTO }),
+	                 beforeSend: function (xhr) {
+	                     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+	                 },
+	                 success: function (response) {
+	                     alert('최종 승인 처리가 완료되었습니다.');
+	                     window.opener.location.reload(); // 부모창 새로고침
+	                     window.close(); // 팝업창 닫기
+	                 },
+	                 error: function (error) {
+	                     alert('최종 승인 처리에 실패했습니다.');
+	                     console.error(error);
+	                 }
+	             });
+	       			
+	       	}else if(userRole.trim() === 'ATHR002'){
+	       	 // 중간 승인자 권한: 최종 승인자를 선택하는 모달 창 열기
+	            const modal = new bootstrap.Modal(document.getElementById('approvedefaultSize'), {
+	                backdrop: 'static' // 모달 바깥 클릭 시 닫히지 않도록 설정
+	            });
+	            modal.show();
+	       		
+	         }else{
+	        	 alert("승인권한없음");
+	         }
+	    
+	    });//승인버튼 클릭시 동작 끝
+	    
+	    
+	    var Grid = tui.Grid;
+		  // 최종승인권자 선택 모달창 Grid 생성
+	        const grid2 = new Grid({
+	            el: document.getElementById('grid2'),
+	            columns: [
+	                { header: '사원번호', name: 'emp_id' },
+	                { header: '성명', name: 'emp_name' },
+	                { header: '부서명', name: 'emp_dept' },
+	                { header: '직급', name: 'emp_position' }
+	            ],
+	            data: []
+	        });
+	    
+			    // 최종승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+	       		 const defaultModal = document.getElementById('approvedefaultSize');
+				 defaultModal.addEventListener('shown.bs.modal', function () {
+			        // ajax로 데이터 가져오기
+			        fetch('/api/highRole')
+			            .then(response => response.json()) // json 형태로 파싱
+			            .then(data => {
+							console.log('받아온 데이터:', data); // 응답 데이터 출력
+			                grid2.resetData(data); // grid2에 새로운 데이터 바인딩
+			                grid2.refreshLayout();
+			            })
+			            .catch(error => {
+			                console.error('Error fetching middle role data:', error);
+							alert('승인권자 데이터를 가져오는 중 오류가 발생했습니다.');
+			            });
+			   		 });
+				 
+				let selectApprover = {};
+				let approverString ={};
+			    grid2.on('click', (ev) => {
+			        if (ev.rowKey !== null) {
+			            const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
+			            Approver(row); // Approver(row) 함수 호출
+			        }
+			    });
+
+			    function Approver(row) {
+			        selectApprover = {
+			            approverEmp_id: row.emp_id,
+			            approverEmp_name: row.emp_name,
+			            approverEmp_dept: row.emp_dept,
+			            approverEmp_position: row.emp_position
+			        };
+					
+					// 문자열 형태로 변환 (사원번호/이름/부서명/직급)
+				approverString = `${selectApprover.approverEmp_id}`;
+					Swal.fire({
+				        icon: "success",
+						title: "최종승인권자 선택",
+						text: `최종승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
+						confirmButtonText: "확인"
+				    })
+			    }
+
+
+			// 승인 요청 버튼 클릭 시 실행되는 함수(중간승인권자만 실행)
+			function requestApproval() {
+			    if (!selectApprover.approverEmp_id) {
+					Swal.fire({
+				       icon: "info",
+				       title: "Info",
+					   text: "최종승인권자를 선택하세요."
+							   })
+			        return;
+			    }
+			    // 유효성 검사 통과 후 모달 닫기 및 요청 처리
+			    $('#approvedefaultSize').modal('hide'); // 모달 창 닫기
+
+			    // 이후 AJAX 요청 등의 처리 로직을 여기에 추가할 수 있음
+				Swal.fire({
+			        icon: "success",
+					title: "success",
+					text: "승인 요청이 정상적으로 처리되었습니다.",
+					confirmButtonText: "확인"    })
+					
+					const requestDTO = {
+						request_no: request_no,
+						request_status: 'RQST003',
+						high_approval : approverString
+					};
+					
+					const csrfToken = $('input[name="_csrf"]').val();
+
+
+				// AJAX 요청
+				    $.ajax({//승인버튼 클릭 시 요청내역 업데이트
+				        url: '/request-update',
+				        type: 'POST',
+				        contentType: 'application/json',
+				        data: JSON.stringify({
+				        	requestDto : requestDTO
+				        	
+				        }),
+				        beforeSend: function(xhr) {
+				            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // CSRF 토큰 추가
+				        },
+				       
+				        success: function(response) {
+							console.log("resultDTO : " + response)
+							// 부모창 새로고침
+				            if (window.opener) {
+				                window.opener.location.reload(); // 부모창 새로고침
+				                window.close(); // 팝업창 닫기
+				            } else {
+				                console.error('부모창이 없습니다.');
+				            }
+				        },
+						
+				        error: function(error) {
+				            alert('요청내역 업데이트 실패실패실패ㅗㅗㅗ.');
+				            console.error(error);
+				        }
+				    });
+				
+				
+			} // requestApproval() 함수 끝
+			 // 승인 요청 버튼에 이벤트 핸들러 연결
+		    document.querySelector('#approveRequestBtn').addEventListener('click', requestApproval);
+		});//DOMContentLoaded끝	
+			
+		//--------------------------------------------------------------------- 반려처리/반려사유 시작
+		
+	document.addEventListener('DOMContentLoaded', function () {
+    const empId = window.opener.empId; // 부모창의 사원번호 가져오기
+    console.log('사원번호', empId);
+    const empName = window.opener.empName; // 부모창의 이름 가져오기
+    console.log('사원번호', empName);
+
+    // input 태그에 값 넣기
+    document.getElementById('rj_emp_id').value = empId;
+    document.getElementById('rj_emp_name').value = empName;
+
+    // 반려 버튼 클릭 시 모달 띄우기
+    document.getElementById('rejectBtn').addEventListener('click', function () {
+        const modal = new bootstrap.Modal(document.getElementById('defaultSize'));
+        modal.show();
+    });
+
+    // 모달 안의 "반려 등록" 버튼 클릭 시 Ajax 요청
+    document.getElementById('submitRejectBtn').addEventListener('click', function () {
+    	
+        const requestNo = new URLSearchParams(window.location.search).get('request_no');
+        console.log('요청번호', requestNo);
+        
+        const rejectReason = document.getElementById('rejectReason').value;
+        console.log('반려사유', rejectReason);
+        
+        if (!rejectReason.trim()) {
+			Swal.fire({
+		       icon: "info",
+		       title: "Info",
+			   text: "반려사유를 입력하세요."
+					   })
+            return;
+        }
+
+        // Ajax 요청으로 반려사유 등록
+        fetch('/api/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+            	 'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가
+            	},
+            body: `request_no=${requestNo}&request_rejection=${encodeURIComponent(rejectReason)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+					Swal.fire({
+				        icon: "success",
+						title: "success",
+						text: "반려사유가 등록되었습니다.",
+						confirmButtonText: "확인"    
+					}).then(() =>{
+						
+                	if (window.opener) {
+		                window.opener.location.reload(); // 부모창 새로고침
+		                window.close(); // 팝업창 닫기
+		            } else {
+		                console.error('부모창이 없습니다.');
+		            }
+				});
+              } else {
+					Swal.fire({
+					       icon: "error",
+					       title: "Error",
+						   text: "반려사유 등록에 실패했습니다."
+					   });
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('서버 오류가 발생했습니다.');
+            });
+    });
+
+});//돔 끝
+		
+		
+	</script>
+	
+</body>
+
+</html>

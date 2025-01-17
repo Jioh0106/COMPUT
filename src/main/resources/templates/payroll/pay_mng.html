@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <title>급여 종류 관리</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" type="image/x-icon">
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+    <!-- 급여 종류 관리 CSS -->
+    <link rel="stylesheet" th:href="@{/css/pay_mng.css}">
+</head>
+
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>급여 종류 관리</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="급여 구분 필터">
+                                    <input type="radio" class="btn-check" name="typeFilter" id="all" value="" checked>
+                                    <label class="btn btn-outline-secondary" for="all">전체</label>
+                                    
+                                    <input type="radio" class="btn-check" name="typeFilter" id="allowance" value="수당">
+                                    <label class="btn btn-outline-secondary" for="allowance">수당</label>
+                                    
+                                    <input type="radio" class="btn-check" name="typeFilter" id="deduction" value="공제">
+                                    <label class="btn btn-outline-secondary" for="deduction">공제</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="grid"></div>
+                        <div class="float-end" sec:authorize="hasRole('ATHR001')" style="margin-top: 15px;">
+                            <input type="submit" class="btn btn-outline-secondary" value="추가" data-bs-toggle="modal" data-bs-target="#salaryModal">
+                            <input type="submit" class="btn btn-outline-primary" value="수정" id="editBtn">
+                            <input type="submit" class="btn btn-outline-danger" value="삭제" id="deleteBtn">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 모달 창 -->
+    <div class="modal fade" id="salaryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">급여 항목 입력</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="salaryForm">
+                        <!-- 구분 선택 -->
+                        <div class="form-group">
+                            <label class="form-label">구분<span class="text-danger">*</span></label>
+                            <select class="form-control" id="typeSelect" required>
+                                <option value="">선택하세요</option>
+                                <option value="수당">수당</option>
+                                <option value="공제">공제</option>
+                            </select>
+                        </div>
+
+                        <!-- 항목명 선택 -->
+                        <div class="form-group">
+                            <label for="formulaCode" class="form-label">항목명<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaCode" name="formulaCode" required disabled>
+                                <option value="">선택하세요</option>
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="formulaType" name="formulaType">
+                        <input type="hidden" id="formulaName" name="formulaName">
+
+                        <!-- 계산식 -->
+                        <div class="form-group">
+                            <label for="formulaContent" class="form-label">계산식<span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="formulaContent" name="formulaContent" 
+                                    rows="3" maxlength="1000" required placeholder="계산식을 입력하세요"></textarea>
+                        </div>
+                        
+                        <!-- 계산식 설명 -->
+                        <div class="form-group">
+                            <label for="formulaComment" class="form-label">계산식 설명</label>
+                            <textarea class="form-control" id="formulaComment" name="formulaComment" 
+                                    rows="2" maxlength="500" placeholder="계산식에 대한 설명을 입력하세요"></textarea>
+                            <div class="help-text">계산식에 대한 상세 설명을 입력해주세요.</div>
+                        </div>
+
+                        <!-- 적용연도 -->
+                        <div class="form-group">
+                            <label for="applyYear" class="form-label">적용년도<span class="text-danger">*</span></label>
+                            <select class="form-control" id="applyYear" name="applyYear" required>
+                                <option value="">선택하세요</option>
+                            </select>
+                        </div>
+
+                        <!-- 우선순위 -->
+                        <div class="form-group">
+                            <label for="formulaPriority" class="form-label">우선순위<span class="text-danger">*</span></label>
+                            <select class="form-control" id="formulaPriority" name="formulaPriority" required>
+                                <option value="">선택하세요</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                            <div class="help-text">낮은 숫자가 높은 우선순위입니다.</div>
+                        </div>
+
+                        <!-- 버튼 -->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-outline-success">저장</button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script th:inline="javascript">
+        // 서버에서 전달받은 데이터
+        const formulas = /*[[${formulas}]]*/ [];
+        const hasAdminRole = /*[[${#authorization.expression('hasRole(''ATHR001'')')}]]*/ false;
+    </script>
+    <!-- Custom JavaScript -->
+    <script src="/js/payroll/pay_mng.js"></script>
+</body>
+</html>

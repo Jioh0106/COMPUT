@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>공통코드관리</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+
+	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+	<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
+	<link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+	<!-- sweetAlert CDN -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+
+	<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+	<style>
+		.top-input-group {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;  /*텍스트 입력란은 왼쪽, 버튼 그룹은 오른쪽 */
+		}
+		
+		.form-control {
+		    max-width: 300px; /* 텍스트 입력란의 최대 너비 */
+		}
+		
+		.button-group {
+		    margin-top: 8x; /* 버튼 그룹을 오른쪽으로 밀어냄 */
+		}
+
+		.table {
+			/* 열 너비를 고정 */
+			table-layout: fixed;
+			/* 테이블을 부모 너비에 맞춤 */
+			width: 100%;
+		}
+
+		.full-width-input {
+			width: 100%;
+		}
+
+		/* 테이블 스크롤 */
+		.table-responsive {
+			height: 500px;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		/* 체크박스가 있는 첫 번째 열의 너비 설정 
+		-> 삭제 기능 불가능으로 변경되어 체크박스 관련 전부 주석 처리
+		th:first-child, td:first-child {
+			width: 40px;
+			text-align: center;
+		}*/
+
+		.tui-grid-cell-disabled {
+			background-color: #fff !important;
+			;
+			color: #212529 !important;
+			;
+		}
+	</style>
+
+</head>
+
+<!-- 2025.01.08. 나온 내용
+ - 삭제 불가
+ - pk 걸린 구분코드는 수정 불가
+ - 사용여부 default -> N  -->
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none"> <i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<h3>공통코드관리</h3>
+
+			<section class="section">
+				<div class="row" id="basic-table">
+					<!-- 대분류 공통코드 -->
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-title">공통코드</h4>
+								<div class="top-input-group">
+									<input type="text" class="form-control" id="parentInput" 
+										placeholder="코드/코드명 검색" onkeyup="SearchCommon()">
+									<div class="button-group">
+									<button type="button" id="appendBtn" class="btn btn-outline-secondary">추가</button>
+									<button type="button" class="btn btn-outline-success" id="saveBtn"
+										onclick="save('parent')">저장</button>
+									<!-- <button type="button" class="btn btn-outline-danger"
+										onclick='deleteRow("parent")'>삭제</button> -->
+										</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive" id="parent">
+
+								</div>
+								<!-- 스크롤 -->
+							</div>
+						</div>
+					</div>
+
+					<!-- 소분류 상세공통코드 -->
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">
+								<h4 class="card-title">상세공통코드</h4>
+								<div class="top-input-group">
+									<input type="text" class="form-control" id="childInput" 
+										placeholder="코드/코드명 검색" onkeyup="SearchCommonDtl()">
+									<div class="button-group">
+									<button type="button" class="btn btn-outline-secondary" id="dtlAppendBtn">추가</button>
+									<button type="button" class="btn btn-outline-success" id="dtlSaveBtn"
+										onclick="save('child')">저장</button>
+									<!-- <button type="button" class="btn btn-outline-danger"
+										onclick='deleteRow("child")'>삭제</button> -->
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive" id="child">
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+		</div>
+		<!--main-->
+
+	</div>
+	<!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+
+	<!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+	<script th:inline="javascript">
+
+		const token = $("meta[name='_csrf']").attr("content")
+		const header = $("meta[name='_csrf_header']").attr("content");
+		const name = $("#userName").val();
+
+		// 전역 변수
+		let parentGrid; // 공통코드 그리드 초기화를 위해
+		let childGrid;  // 상세공통코드 그리드 초기화를 위해
+		let target; // 상세공통코드 코드/코드명으로 검색 시 공통코드값을 저장하기 위해
+
+		// 화면 로드 시 공통코드 조회
+		window.onload = function () {
+			SelectCommon();
+		};
+		
+		function SelectCommon(){
+			// Thymeleaf 데이터를 JSON으로 변환하여 JS 변수에 저장
+			const gridData = /*[[${commonList}]]*/[];
+			const Grid = tui.Grid;
+
+			// Toast Grid 생성
+			parentGrid = new Grid({
+				el: document.getElementById('parent'),
+				columns: [
+					{header: '구분코드', name: 'COMMON_CODE', editor: 'text'},
+					{header: '구분명', name: 'COMMON_NAME', editor: 'text'},
+					{header: '내용', name: 'COMMON_CONTENT', editor: 'text'},
+					{header: '사용여부', name: 'COMMON_STATUS', editor: 'text'},
+					{header: '순번', name: 'COMMON_DISPLAY', editor: 'text'},
+					{header: '타입', name: 'ROW_TYPE'} // 조회 / 추가를 구분하기 위함
+				],
+				data: gridData, // 서버에서 전달받은 데이터
+				draggable: true,
+			});
+
+			//rowType 숨기기
+			parentGrid.hideColumn("ROW_TYPE");
+			parentGrid.hideColumn("COMMON_DISPLAY");
+
+			// 클릭 이벤트
+			parentGrid.on('click', ev => {
+				target = parentGrid.getValue(ev.rowKey, "COMMON_CODE");
+				const rowType = parentGrid.getValue(ev.rowKey, "ROW_TYPE");
+				rowVal(target);
+			});
+
+			// 더블클릭 이벤트
+			parentGrid.on('dblclick', ev => {
+				const rowType = parentGrid.getValue(ev.rowKey, "ROW_TYPE");
+
+				if (rowType == "select") { // 조회해 온 데이터일 경우 코드 수정 비활성화
+					parentGrid.disableCell(ev.rowKey, "COMMON_CODE");
+				} else { // 새 행 추가로 값을 입력해야 할 경우 코드 입력 활성화
+					parentGrid.enableRow("COMMON_CODE");
+				}
+
+			});
+
+			// 추가 버튼 이벤트
+			appendBtn.addEventListener('click', () => {
+				parentGrid.appendRow({
+					"COMMON_CODE": "",
+					"COMMON_NAME": "",
+					"COMMON_CONTENT": "",
+					"COMMON_STATUS": "",
+					"COMMON_DISPLAY": "",
+					"ROW_TYPE": "insert",
+				},
+					{
+						at: 0, // 행 추가 인덱스
+						focus: true
+					});
+				//grid.enableColumn("COMMON_CODE");
+				// 방금 추가한 행의 첫 번째 셀을 편집 모드로 설정
+				const rowKey = 0; // prependRow로 추가된 행의 rowKey는 0번 인덱스
+				const createdRows = parentGrid.getModifiedRows().createdRows.length;
+				const updatedRows = parentGrid.getModifiedRows().updatedRows.length;
+			});
+
+			// 드롭 이벤트
+			parentGrid.on('drop', () => {
+				const rowData = parentGrid.getData();
+				rowData.forEach((row, index) => {
+					// 드래그 앤 드롭으로 인한 순서 변경 시 
+					// index에 따라 COMMON_DISPLAY 값을 재정렬
+					parentGrid.setValue(row.rowKey, 'COMMON_DISPLAY', index + 1);
+				});
+			});
+
+			// 마우스다운 이벤트
+			saveBtn.addEventListener('mousedown', () => {
+				// 마지막으로 입력한 셀에 대한 값이 인식 안 돼서 그리드 포커스 해제 처리
+				parentGrid.blur();
+
+				// 업데이트 된 행일 경우 ROW_TYPE을 update로 변경
+				const updatedRows = parentGrid.getModifiedRows().updatedRows;
+				updatedRows.forEach((row, index) => {
+					parentGrid.setValue(row.rowKey, "ROW_TYPE", "update")
+				});
+			});
+		};
+		
+		// 공통코드관리 검색어 입력 조회
+		function SearchCommon(){
+			const value = document.getElementById('parentInput').value;
+			var data = {value: value};
+			$.ajax({
+				url: "/common-mng",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					parentGrid.resetData(response);
+				} // success
+			}) // ajax
+		}
+		
+		// 상세공통코드관리 검색어 입력 조회
+		function SearchCommonDtl(){
+			// 전역번수로 선언한 target을 담아서 rowVal 함수 호출
+			rowVal(target); 
+		}
+
+		// 공통코드 행 선택 시 상세공통코드 조회 처리
+		function rowVal(target) {
+
+			const value = document.getElementById('childInput').value;
+			
+			var data = {
+				celVal: target,
+				value: value
+			};
+			
+			$.ajax({
+				url: "/commonCd",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					$('#child').empty(); // div 초기화
+					// Toast Grid 생성
+					const Grid = tui.Grid;
+					childGrid = new Grid({
+						el: document.getElementById('child'),
+						columns: [
+							{header: '구분코드', name: 'COMMON_DETAIL_CODE', editor: 'text'},
+							{header: '구분명', name: 'COMMON_DETAIL_NAME', editor: 'text'},
+							{header: '사용여부', name: 'COMMON_DETAIL_STATUS', editor: 'text'},
+							{header: '순번', name: 'COMMON_DETAIL_DISPLAY'},
+							{header: '타입', name: 'ROW_TYPE'} // 조회 / 추가를 구분하기 위함
+						],
+						data: response, // 서버에서 전달받은 데이터
+						draggable: true,
+					});
+
+					//rowType 숨기기
+					childGrid.hideColumn("ROW_TYPE");
+					childGrid.hideColumn("COMMON_DETAIL_DISPLAY");
+
+					childGrid.on('dblclick', ev => {
+						const rowType = childGrid.getValue(ev.rowKey, "ROW_TYPE");
+
+						if (rowType == "select") { // 조회해 온 데이터일 경우 코드 수정 비활성화
+							childGrid.disableCell(ev.rowKey, "COMMON_DETAIL_CODE");
+						} else { // 새 행 추가로 값을 입력해야 할 경우 코드 입력 활성화
+							childGrid.enableRow("COMMON_DETAIL_CODE");
+						}
+
+					});
+
+					
+					// 드롭 이벤트
+					childGrid.on('drop', () => {
+						const rowData = childGrid.getData();
+						rowData.forEach((row, index) => {
+							// 드래그 앤 드롭으로 인한 순서 변경 시 
+							// index에 따라 COMMON_DISPLAY 값을 재정렬
+							childGrid.setValue(row.rowKey, 'COMMON_DETAIL_DISPLAY', index + 1);
+						});
+					});
+
+					// 마지막으로 입력한 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
+					dtlSaveBtn.addEventListener('mousedown', () => {
+						childGrid.blur();
+
+						// 업데이트 된 행일 경우 ROW_TYPE을 update로 변경
+						const updatedRows = childGrid.getModifiedRows().updatedRows;
+						updatedRows.forEach((row, index) => {
+
+							childGrid.setValue(row.rowKey, "ROW_TYPE", "update")
+						});
+					});
+
+				} // success
+			}) // ajax
+		};
+		
+		// 상세공통코드 추가 버튼
+		// (공통코드가 클릭될 때마다 실행돼서 클릭한 공통코드만큼 행이 추가된 것이었음
+		// 그래서 rowVal 함수 안에서 실행 안 시키고 독립적으로 실행되게 밖으로 뺌)
+		dtlAppendBtn.addEventListener('click', () => {
+			childGrid.appendRow({
+				"COMMON_DETAIL_CODE": "",
+				"COMMON_DETAIL_NAME": "",
+				"COMMON_DETAIL_CONTENT": "",
+				"COMMON_DETAIL_STATUS": "",
+				"COMMON_DETAIL_DISPLAY": "",
+				"ROW_TYPE": "insert"
+			},
+				{
+					at: 0, // 행 추가 인덱스
+					focus: true
+				});
+		});
+
+
+		// 추가 및 수정된 값이 저장된 json을 들고 통신
+		function save(tableId) {
+			const grid = tableId === "parent" ? parentGrid : childGrid; // parentGrid와 childGrid는 Toast Grid 인스턴스
+			const modifiedRows = grid.getModifiedRows(); // 수정된 데이터 가져오기
+
+			const createdRows = modifiedRows.createdRows; // 추가된 행
+			const updatedRows = modifiedRows.updatedRows; // 수정된 행
+
+			// 모든 수정된 데이터 배열로 합치기
+			const modifiedData = [...createdRows, ...updatedRows];
+			const data = [];
+
+			let code = "";		// 코드
+			let name = "";		// 코드명
+			let content = "";	// 내용
+			let status = "";	// 사용여부
+			let display = "";	//순번
+
+			modifiedData.forEach(row => {
+				const rowData = {};
+
+				code = tableId === "parent" ? row.COMMON_CODE : row.COMMON_DETAIL_CODE;				// 코드
+				name = tableId === "parent" ? row.COMMON_NAME : row.COMMON_DETAIL_NAME;				// 코드명
+				content = tableId === "parent" ? row.COMMON_CONTENT : "none";						// 내용
+				status = tableId === "parent" ? row.COMMON_STATUS : row.COMMON_DETAIL_STATUS;		// 사용여부
+				display = tableId === "parent" ? row.COMMON_DISPLAY : row.COMMON_DETAIL_DISPLAY;	//순번
+
+				// 각 행의 데이터를 꺼냄
+				rowData.tableSe = tableId;
+				rowData.commonCode = code;
+				rowData.commonName = name;
+				rowData.commonContent = content;
+				rowData.commonStatus = status;
+				rowData.commonDisplay = display;
+				rowData.action = row.ROW_TYPE;
+
+				data.push(rowData);
+			});
+
+			if (modifiedData.length === 0) {
+				Swal.fire({
+					title: "수정된 내용이 없습니다.",
+					icon: "warning",
+					confirmButtonText: "확인"
+				});
+				return;
+
+			} else if (code == null || code == "") {
+				Swal.fire({
+					title: "구분코드를 입력해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+
+			} else if (name == null || name == "") {
+				Swal.fire({
+					title: "구분명을 입력해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+
+
+			} else if (content == null || content == "") {
+				Swal.fire({
+					title: "내용을 입력해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+
+
+			} else if (status == null || status == "") {
+				Swal.fire({
+					title: "사용여부를 입력해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
+
+			// 수정된 데이터를 서버로 전송
+			$.ajax({
+				url: "/saveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (res) {
+					if (res == 1) {
+						Swal.fire({
+							title: "저장 성공",
+							icon: "success",
+							confirmButtonText: "확인"
+						}).then(function () { // 확인 클릭 시 실행
+							// ajax인데 새로고침하는 이유
+							// - 저장을 성공했다는 알럿이 표시되지만 확실한 완료를 보여 주기 위해
+							// - 상세공통코드를 저장 후 비동기 방식으로 데이터를 가져오려면
+							//   어떤 공통코드에 대한 상세공통코드인지 알아야 하는데
+							//   그 방법을 어떻게 해야 될지 모르겠어서 시간상 고민 없이 reload 처리
+							location.reload(true); // 페이지 새로고침
+						});
+					} else {
+						Swal.fire({
+							title: "저장 실패",
+							icon: "error",
+							confirmButtonText: "확인"
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
+		};
+
+		// 전체 선택 처리
+		/*function selectAll(obj, objNm) {
+			console.info(obj);
+			const checkboxes = document.getElementsByName(objNm);
+
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = obj.checked;
+			})
+		};*/
+
+		// 삭제 버튼 클릭 시 선택된 행만 삭제 -> 삭제 기능 철회
+		/*function deleteRow(tableId) {
+			// @Param : tableId로 테이블 찾기 
+			const table = document.getElementById(tableId);
+
+			// 선택된 체크박스 개수 확인
+			const checkbox = `input[name=${tableId}]:checked`; //체크된 체크박스
+			const selectedCheckbox = document.querySelectorAll(checkbox); //체크된 체크박스 전체
+			const cnt = selectedCheckbox.length; //selectedCheckbox의 개수
+
+			// 선택된 행이 없을 경우 경고창 표시
+			if (cnt === 0) {
+				Swal.fire({
+					title: "삭제할 행을 선택해 주세요",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
+
+			// 선택된 행 삭제
+			for (let i = 1; i < table.rows.length; i++) { // 테이블 row 전체 반복
+				const checkbox = table.rows[i].cells[0].querySelector("input[type='checkbox']");
+				if (checkbox && checkbox.checked) {
+					table.deleteRow(i);
+					i--; // 삭제 후 인덱스 조정
+				}
+			}
+
+		};*/
+
+	</script>
+
+</body>
+
+</html>

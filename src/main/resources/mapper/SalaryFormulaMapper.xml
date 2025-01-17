@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deepen.mapper.SalaryFormulaMapper">
+    
+    <!-- 공통 SELECT 절 -->
+    <sql id="formulaColumns">
+        SF.formula_id,
+        SF.formula_name,
+        SF.formula_type,
+        SF.formula_content,
+        SF.formula_comment,
+        SF.apply_year,
+        SF.formula_priority,
+        SF.updated_at,
+        SF.formula_code
+    </sql>
+    
+	<select id="getCurrentFormulas" resultType="com.deepen.domain.SalaryFormulaDTO">
+	    SELECT 
+	        formula_id as formulaId,
+	        formula_name as formulaName,
+	        formula_type as formulaType,
+	        formula_content as formulaContent,
+	        formula_code as formulaCode,
+	        apply_year as applyYear,
+	        formula_priority as formulaPriority,
+	        updated_at as updatedAt
+	    FROM salary_formula 
+	    WHERE apply_year = #{year}
+	    AND formula_code IS NOT NULL
+	    AND formula_content IS NOT NULL
+	    ORDER BY formula_priority ASC
+	</select>
+    
+    <!-- 특정 코드의 급여 공식 조회 -->
+    <select id="getFormulaByCode" resultType="com.deepen.domain.SalaryFormulaDTO">
+        SELECT 
+            <include refid="formulaColumns"/>
+        FROM 
+            salary_formula SF
+        WHERE 
+            SF.formula_code = #{code}
+            AND SF.apply_year = #{year}
+    </select>
+    
+    <!-- 특정 유형의 급여 공식 목록 조회 -->
+    <select id="getFormulasByType" resultType="com.deepen.domain.SalaryFormulaDTO">
+        SELECT 
+            <include refid="formulaColumns"/>
+        FROM 
+            salary_formula SF
+        WHERE 
+            SF.formula_type = #{type}
+            AND SF.apply_year = #{year}
+        ORDER BY 
+            SF.formula_priority ASC
+    </select>
+    
+</mapper>

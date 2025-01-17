@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.WorkMapper">
+
+    
+    <select id="getEmpSerch" resultType="Map">
+			SELECT e.emp_id, 
+				   e.emp_name, 
+				   ddept.common_detail_name AS emp_dept, 
+				   dpos.common_detail_name AS emp_position,
+				   djop.common_detail_name AS emp_job_type
+			  FROM employees e
+		 LEFT JOIN common_detail ddept
+			    ON e.emp_dept = ddept.common_detail_code
+		 LEFT JOIN common_detail dpos
+			    ON e.emp_position = dpos.common_detail_code
+		 LEFT JOIN common_detail djop
+			    ON e.emp_job_type = djop.common_detail_code
+			 WHERE 1=1
+			 <if test="ocpt != null and ocpt != ''">
+			   AND e.emp_job_type = #{ocpt}
+			 </if>
+			 <if test="dept != null and dept != ''">
+			   AND e.emp_dept = #{dept}
+			 </if>
+			 <if test="emp_info != null and emp_info != ''">
+			   AND (
+		           e.emp_name LIKE '%' || #{emp_info} || '%'
+		           OR e.emp_id LIKE '%' || #{emp_info} || '%'
+		       )
+			 </if>
+    </select>
+    
+    <select id="ckeckWork" resultType="com.deepen.domain.WorkDTO">
+		SELECT *
+		  FROM work_view
+		 WHERE emp_id = #{emp_id}
+		   AND work_date = #{day}
+    </select>
+    
+    <insert id="insertWork" parameterType="com.deepen.domain.WorkDTO">
+    	INSERT INTO work(emp_id, work_date, work_tmp_name)
+    	VALUES (
+				#{emp_id}, 
+				#{work_date}, 
+				#{work_tmp_name}
+				)
+    </insert>
+    
+	<select id="getWorkList" resultType="com.deepen.domain.WorkDTO" parameterType="map">
+	    SELECT *
+	      FROM work_view
+	     WHERE emp_id = #{emp_id}
+	       AND work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+	</select>
+	
+	<select id="getWorkListSerch" resultType="com.deepen.domain.WorkDTO" parameterType="map">
+	    SELECT *
+	      FROM work_view
+	     WHERE work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+		 <if test="dept != null and dept != ''">
+		   AND emp_dept = #{dept}
+		 </if>
+		 <if test="emp_info != null and emp_info != ''">
+		   AND (
+	           emp_name LIKE '%' || #{emp_info} || '%'
+	           OR emp_id LIKE '%' || #{emp_info} || '%'
+	       )
+		 </if>
+	</select>
+	
+	
+</mapper>
+
+

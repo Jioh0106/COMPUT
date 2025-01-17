@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+				xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인사 카드 관리</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+    <style>
+        .display-flex {
+            display: flex;
+        }
+        .buttons {
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 사이드 메뉴바-->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <!-- 메인 content -->
+        <div id="main">
+            <!-- 반응형 사이드 메뉴 버튼-->
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+			
+			<!-- 수정폼 시작  -->
+            <form id="updateForm" action="/ps-update" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" id="emp_id" name="emp_id">
+            <input type="hidden" id="emp_pw" name="emp_pw">
+            <input type="hidden" id="emp_no" name="emp_no">
+            <input type="hidden" id="emp_reg_date" name="emp_reg_date">
+            
+            <!--사원 상세 모달-->
+            <div class="modal fade" id="empDatailModal" tabindex="-1" role="dialog"
+                aria-labelledby="psDatailModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+								사원 상세 정보
+							</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal"
+                                aria-label="Close">
+                                <i data-feather="X"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 모달 바디 시작 -->
+                        <div class="modal-body">
+							<div class="card-body">
+								
+								<div class="row">
+									<div class="col">
+										<div class="col-md-6">
+			                                <div class="form-group">
+			                                    <label for="emp_photo">사진</label>
+			                                    <!-- <input type="file" id="emp_photo" class="form-control" name="emp_photo"> -->
+			                                </div>
+			                            </div>
+									</div>
+								</div>
+									 
+                                <div class="row">
+                                	<div class="col">
+		                               	<div class="col-md-5">
+	                                       <div class="form-group">
+	                                           <label for="emp_role">사원 권한</label>
+	                                           <select id="emp_role" class="form-control" name="emp_role">
+	                                           </select>
+	                                       </div>
+	                                   </div>
+                                	</div>
+                                	
+                                	<div class="col"></div>
+                                </div>
+                                
+                                <div class="row">
+	                               	<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_name">이름</label>
+	                                            <input type="text" id="emp_name" class="form-control" name="emp_name" placeholder="이름">
+	                                        </div>
+	                                    </div>
+									</div>
+									
+                                	<div class="col">
+									   <div class="col-md-12">
+									       <div class="form-group">
+									           <label for="emp_ssn">주민등록번호</label>
+									           	<div class="d-flex">
+									               <input type="text" id="first_emp_ssn" class="form-control" name="first_emp_ssn" placeholder="앞자리" style="width: 83%; margin-right: 5px;">
+									               <span><b>-</b></span>
+									               <input type="text" id="second_emp_ssn" class="form-control" name="second_emp_ssn" placeholder="뒷자리" style="width: 100%; margin-left: 5px;">
+									            </div>
+									       </div>
+									   </div>
+								  	</div>  
+								</div>
+
+                                <div class="row">
+                                	<div class="col">
+										<div class="col-md-12">
+	                                       <div class="form-group">
+	                                           <label for="emp_gender">성별</label>
+	                                           <select id="emp_gender" class="form-control" name="emp_gender">
+	                                               <option value="남">남</option>
+	                                               <option value="여">여</option>
+	                                           </select>
+	                                       </div>
+                                   	 	</div>
+									</div>
+									
+									<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_marital_status">결혼여부</label>
+	                                            <select id="emp_marital_status" class="form-control" name="emp_marital_status">
+	                                                <option value="미혼">미혼</option>
+	                                                <option value="기혼">기혼</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="firstEmpPhoneNo">전화번호</label>
+	                                           <!--  <input type="text" id="emp_phone" class="form-control " name="emp_phone" placeholder="-생략"> -->
+	                                            <div class="d-flex">
+									               <input type="text" id="firstEmpPhoneNo" class="form-control" name="firstEmpPhoneNo" style="width: 90%; margin-right: 5px;">
+									               <span><b>-</b></span>
+									               <input type="text" id="middleEmpPhoneNo" class="form-control" name="middleEmpPhoneNo" style="width: 100%; margin-left: 5px;">
+									               <span><b>-</b></span>
+									               <input type="text" id="lastEmpPhoneNo" class="form-control" name="lastEmpPhoneNo" style="width: 100%; margin-left: 5px;">
+									            </div>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_email">이메일</label>
+	                                            <input type="email" id="emp_email" class="form-control" name="emp_email" placeholder="이메일">
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                               	<div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-5">
+	                                    	<div class="form-group" >
+	                                            <div><label>주소</label></div>
+		                                        <div class ="d-flex align-items-center">
+		                                            <input type="text" class="form-control" id="postCode" name="emp_postcode" placeholder="우편번호">
+													<input type="button" id="daumAPI" class="btn-primary mx-2"  value="주소 찾기"><br>
+		                                        </div>
+	                                    	</div>
+	                                    </div>
+									</div>
+                                </div>
+                                
+                                <div class="row">
+                                	<div class="col-md-8">
+                                    	<div class="form-group my-0">
+                                    		<input type="text" class="form-control my-0" id="emp_address" name="emp_address" placeholder="주소"><br>
+                                    	</div>	
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                	<div class="col-md-10">
+                                    	<div class="form-group">
+											<input type="text" class="form-control" id="emp_address_detail" name="emp_address_detail" placeholder="상세주소">
+                                    	</div>	
+                                    </div>
+                                </div>
+
+								<hr>	
+									
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <div><label for="emp_hire_date">입사일</label></div> 
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus form-control">
+										            <input type="text" id="emp_hire_date" name="emp_hire_date" aria-label="Date-Time">
+										            <span class="tui-ico-date"></span>
+										        </div>
+										        <div id="emp-hire-date-wrapper" style="margin-top: -1px;"></div>
+	                                        </div>
+	                                    </div>
+									</div>
+                                	<div class="col">
+	                                    <div class="col-md-5">
+	                                        <div class="form-group">
+	                                            <label for="emp_edu">학력</label>
+	                                            <select id="emp_edu" class="form-control" name="emp_edu">
+	                                                <option value="고졸">고졸</option>
+	                                                <option value="학사">학사</option>
+	                                                <option value="석사">석사</option>
+	                                                <option value="박사">박사</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_status">재직 상태</label>
+	                                            <select id="emp_status" class="form-control" name="emp_status">
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_job_type">고용 유형</label>
+	                                            <select id="emp_job_type" class="form-control" name="emp_job_type">
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_dept">부서</label>
+	                                            <select id="emp_dept" class="form-control" name="emp_dept">
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_position">직급</label>
+	                                            <select id="emp_position" class="form-control" name="emp_position">
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <div><label for="emp_exit_date">퇴사일</label></div>
+												<div class="tui-datepicker-input tui-datetime-input tui-has-focus form-control">
+										            <input type="text" id="emp_exit_date" name="emp_exit_date" aria-label="Date-Time">
+										            <span class="tui-ico-date"></span>
+										        </div>
+										        <div id="emp-exit-date-wrapper" style="margin-top: -1px;"></div>
+	                                        </div>
+	                                    </div>
+									</div>
+									
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_exit_type">퇴사 유형</label>
+	                                            <select id="emp_exit_type" class="form-control" name="emp_exit_type">
+	                                                <option value="">퇴사유형을 선택해주세요</option>
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+                                <div class="row">
+                                	<div class="col">
+										<div class="col-md-12">
+	                                       <div class="form-group">
+	                                           <label for="emp_salary">기본 급여</label>
+	                                           <input type="number" id="emp_salary" class="form-control" name="emp_salary" placeholder="기본급여">
+	                                       </div>
+	                                   </div>
+									</div>
+									
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_perf_rank">성과 등급</label>
+	                                            <select id="emp_perf_rank" class="form-control" name="emp_perf_rank" >
+	                                            </select>
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+
+								
+                                <div class="row">
+                                	<div class="col">
+										<div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_bank">계좌 은행</label>
+	                                            <input type="text" id="emp_bank" class="form-control" name="emp_bank" placeholder="급여 통장 은행명">
+	                                        </div>
+	                                    </div>
+									</div>
+									 
+									<div class="col">
+	                                    <div class="col-md-12">
+	                                        <div class="form-group">
+	                                            <label for="emp_account">계좌 번호</label>
+	                                            <input type="text" id="emp_account" class="form-control" name="emp_account" placeholder="-제외 입력">
+	                                        </div>
+	                                    </div>
+									</div>
+                                </div>
+                        	</div>
+                        </div>
+                        <!-- 모달 바디 끝 -->
+                        
+                        <div class="modal-footer">
+                            <button type="button" id="updateBtn" class="btn btn-outline-success ml-1" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                                <i class="bx bx-check d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">수정</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger"
+                                data-bs-dismiss="modal">
+                                <i class="bx bx-x d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">취소</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--사원 상세 모달 끝-->
+            </form>
+            <!-- 수정폼 끝  -->
+
+            <div class="display-flex">
+                <h3>인사 카드 관리</h3>
+                <!-- <span sec:authentication="principal.authorities"></span><br> -->
+                <div class="buttons">
+                    <!--신규 등록 버튼-->
+                    <button type="button" class="btn btn-primary" onclick="popUp()" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                        신규 등록
+                    </button>
+                </div>
+            </div>
+			
+            <!--사원 조회 내용-->
+            <div class="col-md-12 col-12">
+                <div class="card">
+                    <!--<div class="card-header">
+                        <h4 class="card-title">사원 조회</h4>
+                    </div>-->
+                    <div class="card-content">
+                        <div class="card-body">
+                        
+                        	<!-- 데이트 피커 시작 -->
+							<section class="section" style="margin-bottom: 2.2rem">
+								<div style="display: flex; align-items: center; gap: 1rem;">
+									<span style="font-size: 1rem; line-height: 2rem;">입사일</span>
+									<!-- 첫 번째 데이트 피커 -->
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="startDate" name="startDate" aria-label="Date-Time" />
+											<span class="tui-ico-date"></span>
+										</div>
+										<div id="tui-date-picker-container1"
+											style="margin-top: -1px; z-index: 2000; position: relative;"></div>
+									</div>
+					
+									<!-- 구분자 -->
+									<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+					
+									<!-- 두 번째 데이트 피커 -->
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="endDate" name="endDate" aria-label="Date-Time" />
+											<span class="tui-ico-date"></span>
+										</div>
+										<div id="tui-date-picker-container2"
+											style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+									</div>
+					
+									<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+									<div>
+										<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+											<input type="text" id="search" name="search"/>
+										</div>
+									</div>
+								</div>
+							</section>
+							<!-- 데이트 피커 끝 -->
+							
+                            <!--회원 정보 리스트 시작-->
+							<section class="section">
+								<div class="row" id="basic-table">
+                            		<div id="grid"></div>
+								</div>
+							</section>
+                            <!--회원 정보 리스트 끝-->
+							
+							<div class="float-end mt-2">
+								<button type="button" id="deleteBtn" name="deleteBtn" class="btn btn-outline-danger" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+									삭제
+								</button>
+							</div>							
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<!--사원 조회 내용-->
+        </div>
+    </div>
+
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- TOAST UI CDN -->
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- daumAPI -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="/js/personnel/ps_list.js"></script>
+    <script>
+        /* TOAST UI , 기타 자바스크립트 코드 작성 */
+    </script>
+</body>
+
+</html>

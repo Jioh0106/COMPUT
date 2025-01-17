@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.PersonnelMapper">
+
+	
+	<select id="selectCommonDetailCodeList" resultType="com.deepen.domain.CommonDetailDTO" >
+		SELECT common_detail_code, common_detail_name 
+		FROM common_detail
+		WHERE SUBSTR(common_detail_code,1,4) 
+		IN('ATHR','WRST','DEPT','PSTN','OCPT','RANK','RTRM')
+		AND common_detail_status ='Y'
+	</select>
+	
+	<select id="selectEmpInfoList" parameterType="Map" resultType="java.util.Map">
+	    SELECT 
+	        e.emp_id, 
+	        e.emp_no, 
+	        e.emp_pw, 
+	        e.emp_role,
+	        cdr.common_detail_name AS emp_role_name,
+	        e.emp_name,
+	        e.emp_photo, 
+	        e.emp_ssn, 
+	        e.emp_gender,
+	        e.emp_marital_status,
+	        e.emp_phone,
+	        e.emp_postcode,
+	        e.emp_address,
+	        e.emp_address_detail,
+	        e.emp_email,
+	        e.emp_edu,
+	        e.emp_status,
+	        cds.common_detail_name AS emp_status_name,
+	        e.emp_job_type,
+	        cdjt.common_detail_name AS job_type_name,
+	        e.emp_dept,
+	        cdd.common_detail_name AS emp_dept_name,
+	        e.emp_position,
+	        cdp.common_detail_name AS emp_position_name,
+	        TO_CHAR(e.emp_hire_date, 'YYYY-MM-DD') AS emp_hire_date,
+	        e.emp_perf_rank,
+	        cdrk.common_detail_name AS emp_rank_name,
+	        TO_CHAR(e.emp_exit_date, 'YYYY-MM-DD') AS emp_exit_date,
+	        e.emp_exit_type,
+	        cdet.common_detail_name AS exit_type_name,
+	        e.emp_salary,
+	        e.emp_bank,
+	        e.emp_account,
+	        TO_CHAR(e.emp_reg_date, 'YYYY-MM-DD HH24:MI:SS.FF3') AS emp_reg_date
+	    FROM EMPLOYEES e
+	    LEFT JOIN COMMON_DETAIL cdr
+		    ON cdr.common_detail_code LIKE 'ATHR%'
+		    AND cdr.common_detail_code = e.emp_role
+		    AND cdr.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cds
+		    ON cds.common_detail_code LIKE 'WRST%'
+		    AND cds.common_detail_code = e.emp_status
+		    AND cds.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdjt 
+		    ON cdjt.common_detail_code LIKE 'OCPT%'
+		    AND cdjt.common_detail_code = e.emp_job_type
+		    AND cdjt.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdd 
+		    ON cdd.common_detail_code LIKE 'DEPT%'
+		    AND cdd.common_detail_code = e.emp_dept
+		    AND cdd.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdp
+		    ON cdp.common_detail_code LIKE 'PSTN%'
+		    AND cdp.common_detail_code = e.emp_position
+		    AND cdp.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdrk
+		    ON cdrk.common_detail_code LIKE 'RANK%'
+		    AND cdrk.common_detail_code = e.emp_perf_rank
+		    AND cdrk.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdet
+		    ON cdet.common_detail_code LIKE 'RTRM%'
+		    AND cdet.common_detail_code = e.emp_exit_type
+		    AND cdet.common_detail_status = 'Y'
+	    <if test="(startDate != null and startDate !='') and (endDate != null and endDate !='')">
+			WHERE e.emp_hire_date BETWEEN #{startDate} AND #{endDate}
+	    </if>    
+ 	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">
+        	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
+    	</if>
+	    ORDER BY e.emp_no
+	</select>
+	
+	<select id="selectEmpInfoById" resultType="java.util.Map">
+		SELECT * 
+		FROM emp_list_all
+		WHERE emp_id = #{userId}
+	</select>
+	
+	<select id="countByEdu" resultType="java.util.Map">
+		SELECT 
+			emp_edu,
+			count(emp_edu) AS emp_count_edu
+		FROM emp_list_all
+		WHERE emp_status_name != '퇴사'
+		GROUP BY emp_edu
+		ORDER BY emp_count_edu desc
+	</select>
+	
+	<select id="selectInfoByEdu" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		<if test="edu != null and edu.size()>0">
+		WHERE emp_edu IN 
+			<foreach item="item" index="idx" collection="edu" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="countByAgeGroupAndGender" resultType="java.util.Map">
+		SELECT 
+		    emp_age_group,
+		    emp_gender,
+		    COUNT(*) AS emp_count
+		FROM (
+		    SELECT 
+		        CASE 
+		            WHEN emp_age BETWEEN 20 AND 29 THEN '20대'
+		            WHEN emp_age BETWEEN 30 AND 39 THEN '30대'
+		            WHEN emp_age BETWEEN 40 AND 49 THEN '40대'
+		            WHEN emp_age BETWEEN 50 AND 59 THEN '50대'
+		            WHEN emp_age BETWEEN 60 AND 69 THEN '60대'
+		            ELSE '그 외'
+		        END AS emp_age_group,
+		        emp_gender
+		    FROM employee_age_group
+		) grouped_data
+		GROUP BY emp_age_group, emp_gender
+		ORDER BY 
+		    CASE 
+		        WHEN emp_age_group = '20대' THEN 6
+		        WHEN emp_age_group = '30대' THEN 5
+		        WHEN emp_age_group = '40대' THEN 4
+		        WHEN emp_age_group = '50대' THEN 3
+		        WHEN emp_age_group = '60대' THEN 2
+		        ELSE 1
+		    END,
+		    emp_gender
+	</select>
+	
+	<select id="selectInfoByAgeGroup" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			ea.emp_id,
+			ea.emp_name,
+			ea.emp_gender,
+			ela.emp_role_name,
+			ela.emp_photo,
+			ela.emp_ssn,
+			ea.emp_age_group,
+			ela.emp_marital_status,
+			ela.emp_phone,
+			ela.emp_postcode,
+			ela.emp_address,
+			ela.emp_address_detail,
+			ela.emp_email,
+			ela.emp_edu,
+			ela.emp_status_name,
+			ela.job_type_name,
+			ela.emp_dept_name,
+			ela.emp_position_name,
+			ela.emp_hire_date,
+			ela.emp_rank_name,
+			ela.emp_exit_date,
+			ela.exit_type_name,
+			ela.emp_bank,
+			ela.emp_account
+		FROM (
+		    SELECT
+		        emp_no,
+		        emp_id, 
+		        emp_name,  
+		        emp_age_group,
+		        emp_gender
+		    FROM employee_age_group
+		) ea
+		LEFT JOIN (
+			SELECT
+				emp_id,
+			    emp_role_name,
+			    emp_photo, 
+			    emp_ssn, 
+			    emp_marital_status,
+			    emp_phone,
+			    emp_postcode,
+			    emp_address,
+			    emp_address_detail,
+			    emp_email,
+			    emp_edu,
+			    emp_status_name,
+			    job_type_name,
+			    emp_dept_name,
+			    emp_position_name,
+			    emp_hire_date,
+			    emp_rank_name,
+			    emp_exit_date,
+			    emp_exit_type,
+			    exit_type_name,
+			    emp_bank,
+			    emp_account
+			FROM emp_list_all
+		) ela
+		ON ea.emp_id = ela.emp_id
+		<if test="gender != null and gender.size > 0">
+		WHERE ea.emp_gender IN 
+			<foreach item="item" index="idx" collection="gender" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="countByMonthlyHireExit" resultType="java.util.Map">
+		SELECT 
+		    TO_NUMBER(month) || '월' AS month,
+		    SUM(hire_count) AS hire_count,
+		    SUM(exit_count) AS exit_count
+		FROM (SELECT
+				NVL(SUBSTR(emp_hire_date, 6, 2), '0') AS month,
+		    	1 AS hire_count,
+		    	0 AS exit_count
+		    FROM emp_list_all 
+		    WHERE emp_hire_date IS NOT NULL 
+		    	AND SUBSTR(emp_hire_date, 1, 4) = TO_CHAR(SYSDATE, 'YYYY')
+			UNION ALL
+			SELECT
+				NVL(SUBSTR(emp_exit_date, 6, 2), '0') AS month,
+		        0 AS hire_count,
+		        1 AS exit_count
+		    FROM emp_list_all
+		   	WHERE emp_exit_date IS NOT NULL
+		   		AND SUBSTR(emp_exit_date, 1, 4) = TO_CHAR(SYSDATE, 'YYYY')
+			) actions
+		GROUP BY month
+		ORDER BY LPAD(month, 2, '0')
+	</select>
+	
+	<select id="selectInfoByMonthlyHireExit" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT *
+		FROM (
+		    SELECT 
+		        SUBSTR(emp_hire_date, 1, 4) AS hire_year,
+		        SUBSTR(emp_hire_date, 6, 2) AS hire_month,
+		        SUBSTR(emp_exit_date, 1, 4) AS exit_year,
+		        SUBSTR(emp_exit_date, 6, 2) AS exit_month,
+		        emp_id,
+		        emp_name,
+		        emp_gender,
+		        emp_role_name,
+		        emp_photo,
+		        emp_ssn,
+		        emp_marital_status,
+		        emp_phone,
+		        emp_postcode,
+		        emp_address,
+		        emp_address_detail,
+		        emp_email,
+		        emp_edu,
+		        emp_status_name,
+		        job_type_name,
+		        emp_dept_name,
+		        emp_position_name,
+		        emp_hire_date,
+		        emp_rank_name,
+		        emp_exit_date,
+		        exit_type_name,
+		        emp_bank,
+		        emp_account,
+		        CASE 
+		            WHEN emp_exit_date IS NOT NULL THEN '퇴사'
+		            ELSE '입사'
+		        END AS action_type
+		    FROM emp_list_all
+		    WHERE emp_hire_date IS NOT NULL 
+		       OR emp_exit_date IS NOT NULL
+		) actions
+		WHERE (hire_year = TO_CHAR(SYSDATE, 'YYYY') 
+			OR exit_year = TO_CHAR(SYSDATE, 'YYYY'))
+			<if test="hireExit != null and hireExit.size > 0">
+			AND action_type IN
+				<foreach item="item" index="idx" collection="hireExit" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		ORDER BY hire_year, hire_month, exit_year, exit_month
+	</select>
+	
+	<select id="countDeptByPosition" resultType="java.util.Map">
+		SELECT 
+			emp_dept_name,
+			emp_position_name,
+			COUNT(*) AS count_position
+		FROM emp_list_all_exc_exitstatus
+		GROUP BY emp_dept_name, emp_position_name
+	</select>
+	
+	<select id="selectDeptInfoByPosition" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		WHERE emp_dept_name = '인사'
+			AND emp_position_name = '이사'
+	</select>
+	
+	<select id="countByJobType" resultType="java.util.Map">
+		SELECT 
+			job_type_name,
+			COUNT(job_type_name) AS count_job_type 
+		FROM emp_list_all_exc_exitstatus
+		GROUP BY job_type_name
+		ORDER BY count_job_type desc
+	</select>
+	
+	<select id="selectInfoByJobType" parameterType="java.util.List" resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		<if test="jobType != null and jobType.size > 0">
+		WHERE job_type_name IN 
+			<foreach item="item" index="idx" collection="jobType" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="countByRank" resultType="java.util.Map">
+		SELECT 
+			emp_rank_name,
+			COUNT(emp_rank_name) AS count_rank
+		FROM emp_list_all_exc_exitstatus
+		WHERE emp_rank_name IS NOT NULL
+		GROUP BY emp_rank_name
+		ORDER BY emp_rank_name
+	</select>
+	
+	<select id="selectInfoByRank"  parameterType="java.util.List"  resultType="java.util.Map">
+		SELECT 
+			*
+		FROM emp_list_all_exc_exitstatus
+		<if test="rank != null and rank.size > 0">
+		WHERE emp_rank_name IN 
+			<foreach item="item" index="idx" collection="rank" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+</mapper>
+
+
+

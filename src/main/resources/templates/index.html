@@ -1,44 +1,75 @@
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팀 프로젝트</title>
+    <title>deepen_team1_project</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
 
-    <link rel="stylesheet" href="vendors/iconly/bold.css">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
 
-    <link rel="stylesheet" href="vendors/perfect-scrollbar/perfect-scrollbar.css">
-    <link rel="stylesheet" href="vendors/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="shortcut icon" href="images/favicon.svg" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/assets/images/favicon.svg}" th:type="@{/assets/image/x-icon}">
+    <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+	<style>
+		/* 버튼 내 아이콘 중앙 정렬 */
+		button i {
+		    font-size: 16px; /* 아이콘 크기 */
+		    display: inline-block;
+		    vertical-align: middle;
+		}
+
+		/* 버튼 크기와 텍스트/아이콘 정렬 */
+		#prevBtn, #nextBtn {
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    height: 38px; /* 버튼 높이 */
+		    width: 38px; /* 버튼 높이와 동일하게 설정 */
+		    padding: 0; /* 내부 여백 제거 */
+		}
+
+		/* 제목과 날짜 수평 정렬 */
+		h4, h5 {
+		    margin: 0;
+		    line-height: 38px; /* 버튼 높이에 맞춤 */
+		}
+
+		
+		
+	</style>
+	
+	<meta charset="UTF-8">
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body>
     <div id="app">
 		
 		<!-- 사이드 메뉴바-->
-		<div th:replace="~{sidebar :: sidebar}"></div>
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 		
+	
 		<!-- 메인 content -->
 		<div th:replace="~{main :: main}"></div>
+	
 		
 
-    </div>
+    </div> <!--app 끝 -->
 	
-	
-    <script src="vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 
-    <script src="vendors/apexcharts/apexcharts.js"></script>
-    <script src="js/pages/dashboard.js"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+   
 
-    <script src="js/main.js"></script>
 </body>
 
 </html>

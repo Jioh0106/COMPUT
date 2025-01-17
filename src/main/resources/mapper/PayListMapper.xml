@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.PayListMapper">
+    
+   <!-- 월별 급여 대장  -->
+<select id="getMonthlyPayrollSummary" resultType="com.deepen.domain.PayListDTO">
+    SELECT 
+        p.payment_date as paymentDate,
+        SUBSTR(p.payment_date, 1, 4) || '/' || SUBSTR(p.payment_date, 6, 2) as formattedDate,
+        SUBSTR(p.payment_date, 1, 4) || '/' || SUBSTR(p.payment_date, 6, 2) || ' 급여' as payrollName,
+        COUNT(DISTINCT p.emp_id) as headcount,
+        SUM(p.net_salary) as totalAmount,
+        SUM(p.allow_amt) as totalAllowance,
+        SUM(p.deduc_amt) as totalDeduction
+    FROM payment p
+    JOIN employees e ON p.emp_id = e.emp_id
+    LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
+    WHERE e.emp_status LIKE 'WRST%'
+    AND cd.common_detail_status = 'Y'
+    <if test="keyword != null and keyword != ''">
+        AND (SUBSTR(p.payment_date, 1, 4) || '/' || SUBSTR(p.payment_date, 6, 2) || ' 급여') LIKE '%' || #{keyword} || '%'
+    </if>
+    GROUP BY p.payment_date
+    ORDER BY p.payment_date DESC
+</select>
+    
+<!-- 특정 월 급여 대장 상세 정보 조회 -->
+<select id="getMonthlyPayrollDetail" resultType="com.deepen.domain.PayListDTO">
+    WITH PaymentSummary AS (
+        SELECT 
+            payment_date,
+            COUNT(*) as headcount,
+            SUM(allow_amt) as total_allowance,
+            SUM(deduc_amt) as total_deduction,
+            SUM(net_salary) as total_amount
+        FROM payment
+        WHERE payment_date = #{paymentDate}
+        GROUP BY payment_date
+    )
+    SELECT 
+        /* 기본 정보 */
+        p.payment_date as paymentDate,
+        SUBSTR(p.payment_date, 1, 4) || '년 ' || SUBSTR(p.payment_date, 6, 2) || '월' as formattedDate,
+        p.emp_id || ' - ' || e.emp_name as payrollName,
+        p.emp_id as empId,
+        e.emp_name as empName,
+        
+        /* 부서/직급 정보 */
+        cd.common_detail_name as departmentName,
+        pos_cd.common_detail_name as positionName,
+        
+        /* 급여 정보 */
+        COALESCE(p.emp_salary, 0) as empSalary,            
+        COALESCE(p.tech_allowance, 0) as techAllowance,    
+        COALESCE(p.tenure_allowance, 0) as tenureAllowance,
+        COALESCE(p.performance_bonus, 0) as performanceBonus, 
+        COALESCE(p.holiday_allowance, 0) as holidayAllowance, 
+        COALESCE(p.leave_allowance, 0) as leaveAllowance,  
+        COALESCE(p.allow_amt, 0) as allowAmt,              
+        
+        /* 공제 항목 */
+        COALESCE(p.national_pension, 0) as nationalPension,     
+        COALESCE(p.longterm_care_insurance, 0) as longtermCareInsurance, 
+        COALESCE(p.health_insurance, 0) as healthInsurance,     
+        COALESCE(p.employment_insurance, 0) as employmentInsurance, 
+        COALESCE(p.income_tax, 0) as incomeTax,            
+        COALESCE(p.resident_tax, 0) as residentTax,          
+        COALESCE(p.deduc_amt, 0) as deducAmt,             
+        
+        /* 최종 금액 */
+        COALESCE(p.net_salary, 0) as netSalary,          
+        
+        /* 요약 정보 */
+        ps.headcount as headcount,
+        ps.total_amount as totalAmount,
+        ps.total_allowance as totalAllowance,
+        ps.total_deduction as totalDeduction,
+        
+        /* 작성일 */
+        p.created_at as createdAt
+        
+    FROM payment p
+    JOIN employees e ON p.emp_id = e.emp_id
+    LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
+    LEFT JOIN common_detail pos_cd ON e.emp_position = pos_cd.common_detail_code
+    CROSS JOIN PaymentSummary ps
+    WHERE p.payment_date = #{paymentDate}
+    AND e.emp_status LIKE 'WRST%'
+    AND cd.common_detail_status = 'Y'
+    <if test="department != null and department != ''">
+        AND cd.common_detail_code = #{department}
+    </if>
+    ORDER BY p.emp_id
+</select>
+
+    
+
+    <!-- 부서별 급여 통계 -->
+    <select id="getDepartmentPayrollStats" resultType="java.util.Map">
+        SELECT 
+            cd.common_detail_name as departmentName,
+            COUNT(DISTINCT p.emp_id) as employeeCount,
+            SUM(p.net_salary) as totalSalary,
+            AVG(p.net_salary) as avgSalary,
+            MIN(p.net_salary) as minSalary,
+            MAX(p.net_salary) as maxSalary
+        FROM payment p
+        JOIN employees e ON p.emp_id = e.emp_id
+        LEFT JOIN common_detail cd ON e.emp_dept = cd.common_detail_code
+        WHERE p.payment_date = #{paymentDate}
+        AND e.emp_status LIKE 'WRST%'
+        AND cd.common_detail_status = 'Y'
+        GROUP BY cd.common_detail_code, cd.common_detail_name
+        ORDER BY cd.common_detail_code
+    </select>
+    
+<!--     연간 급여 대장 -->
+<select id="getAnnualPayrollData" resultType="com.deepen.domain.PayListDTO">
+    SELECT 
+        SUBSTR(p.payment_date, 1, 7) as paymentDate,  
+        SUM(p.emp_salary) as empSalary,
+        SUM(p.tech_allowance) as techAllowance,
+        SUM(p.tenure_allowance) as tenureAllowance,
+        SUM(p.performance_bonus) as performanceBonus,
+        SUM(p.holiday_allowance) as holidayAllowance,
+        SUM(p.leave_allowance) as leaveAllowance,
+        SUM(p.allow_amt) as allowAmt,
+        SUM(p.national_pension) as nationalPension,
+        SUM(p.longterm_care_insurance) as longtermCareInsurance,
+        SUM(p.health_insurance) as healthInsurance,
+        SUM(p.employment_insurance) as employmentInsurance,
+        SUM(p.income_tax) as incomeTax,
+        SUM(p.resident_tax) as residentTax,
+        SUM(p.deduc_amt) as deducAmt,
+        SUM(p.net_salary) as netSalary
+    FROM payment p
+    JOIN employees e ON p.emp_id = e.emp_id
+    WHERE SUBSTR(p.payment_date, 1, 4) = #{year}
+    AND e.emp_status LIKE 'WRST%'
+    GROUP BY SUBSTR(p.payment_date, 1, 7)
+    ORDER BY paymentDate
+</select>
+    
+    
+    
+    
+    
+</mapper>

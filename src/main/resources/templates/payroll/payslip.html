@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta charset="UTF-8" />
+	<meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}" />
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}" />
+	
+    <title>급여명세서</title>
+    <style>
+        /* 기본 스타일 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "Malgun Gothic", Arial, sans-serif;
+            font-size: 10pt;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        /* 명세서 스타일 */
+        .payslip {
+            width: 100%;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 2cm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* 기존 명세서 스타일 유지 */
+        .payslip-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+        }
+        .payslip-title {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 10px;
+        }
+        .company-info {
+            font-size: 11pt;
+            margin-bottom: 15px;
+        }
+        .payslip-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            table-layout: fixed;
+        }
+        .payslip-table, .payslip-table th, .payslip-table td {
+            border: 1px solid #000;
+        }
+        .payslip-table th {
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 5px;
+            font-weight: normal;
+            width: 25%;
+        }
+        .payslip-table td {
+            padding: 5px 8px;
+        }
+        .align-right {
+            text-align: right;
+        }
+        .section-title {
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            font-size: 11pt;
+        }
+        .total-row {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .final-amount {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .signature {
+            text-align: center;
+            margin-top: 40px;
+            line-height: 1.8;
+        }
+
+        /* 버튼 컨테이너 스타일 - 미리보기일 때만 표시 */
+        .action-buttons {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .preview-mode .action-buttons {
+            display: block;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 인쇄 설정 */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .payslip {
+                box-shadow: none;
+                padding: 0;
+            }
+            .action-buttons {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+        }
+    </style>
+</head>
+<body th:class="${preview != null and preview} ? 'preview-mode' : ''">
+<!-- 버튼 영역 (미리보기에서만 표시) -->
+    <div class="action-buttons" th:if="${preview != null and preview}">
+        <button onclick="downloadPdf()" class="btn btn-primary">PDF 다운로드</button>
+        <button onclick="window.close()" class="btn btn-secondary">닫기</button>
+    </div>
+    
+    <!-- 명세서 -->
+    <div class="payslip">
+        <!-- 헤더 -->
+        <div class="payslip-header">
+	    <h1 class="payslip-title" 
+		    th:text="${#strings.substring(payInfo.paymentDate,0,4)} + '년 ' + 
+		             ${#strings.substring(payInfo.paymentDate,5,7)} + '월 급여명세서'">
+		    급여명세서
+		</h1>
+	    <div class="company-info">
+	        <p>주식회사 COMPUT.</p>
+		    </div>
+		</div>
+
+        <!-- 기본 정보 -->
+        <table class="payslip-table">
+            <tr>
+                <th>성명</th>
+                <td th:text="${empName}"></td>
+                <th>사원번호</th>
+                <td th:text="${payInfo.empId}"></td>
+            </tr>
+            <tr>
+                <th>부서</th>
+                <td th:text="${departmentName}"></td>
+                <th>직위</th>
+                <td th:text="${positionName}"></td>
+            </tr>
+            <tr>
+                <th>지급년월</th>
+                <td th:text="${payInfo.paymentDate} + ' 월분'"></td>
+                <th>지급일자</th>
+                <td th:text="${#temporals.format(payInfo.createAt, 'yyyy-MM-dd')}"></td>
+            </tr>
+        </table>
+
+        <div class="amount-table">
+    <div class="section-title">■ 수당내역</div>
+    <table class="payslip-table">
+        <tr>
+            <th>기본급</th>
+            <td class="align-right" 
+                th:text="${payInfo.empSalary == null || payInfo.empSalary == 0 ? '0' : #numbers.formatInteger(payInfo.empSalary, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>기술수당</th>
+            <td class="align-right" 
+                th:text="${payInfo.techAllowance == null || payInfo.techAllowance == 0 ? '0' : #numbers.formatInteger(payInfo.techAllowance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>근속수당</th>
+            <td class="align-right" 
+                th:text="${payInfo.tenureAllowance == null || payInfo.tenureAllowance == 0 ? '0' : #numbers.formatInteger(payInfo.tenureAllowance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>성과상여금</th>
+            <td class="align-right" 
+                th:text="${payInfo.performanceBonus == null || payInfo.performanceBonus == 0 ? '0' : #numbers.formatInteger(payInfo.performanceBonus, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>명절수당</th>
+            <td class="align-right" 
+                th:text="${payInfo.holidayAllowance == null || payInfo.holidayAllowance == 0 ? '0' : #numbers.formatInteger(payInfo.holidayAllowance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>휴가수당</th>
+            <td class="align-right" 
+                th:text="${payInfo.leaveAllowance == null || payInfo.leaveAllowance == 0 ? '0' : #numbers.formatInteger(payInfo.leaveAllowance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr class="total-row">
+            <th>수당총액</th>
+            <td class="align-right" 
+                th:with="total=${payInfo.empSalary + payInfo.allowAmt}"
+                th:text="${total == null || total == 0 ? '0' : #numbers.formatInteger(total, 1, 'COMMA')}">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- 공제 내역 부분 -->
+<div class="amount-table">
+    <div class="section-title">■ 공제내역</div>
+    <table class="payslip-table">
+        <tr>
+            <th>국민연금</th>
+            <td class="align-right" 
+                th:text="${payInfo.nationalPension == null || payInfo.nationalPension == 0 ? '0' : #numbers.formatInteger(payInfo.nationalPension, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>건강보험</th>
+            <td class="align-right" 
+                th:text="${payInfo.healthInsurance == null || payInfo.healthInsurance == 0 ? '0' : #numbers.formatInteger(payInfo.healthInsurance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>장기요양보험</th>
+            <td class="align-right" 
+                th:text="${payInfo.longtermCareInsurance == null || payInfo.longtermCareInsurance == 0 ? '0' : #numbers.formatInteger(payInfo.longtermCareInsurance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>고용보험</th>
+            <td class="align-right" 
+                th:text="${payInfo.employmentInsurance == null || payInfo.employmentInsurance == 0 ? '0' : #numbers.formatInteger(payInfo.employmentInsurance, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>소득세</th>
+            <td class="align-right" 
+                th:text="${payInfo.incomeTax == null || payInfo.incomeTax == 0 ? '0' : #numbers.formatInteger(payInfo.incomeTax, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr>
+            <th>지방소득세</th>
+            <td class="align-right" 
+                th:text="${payInfo.residentTax == null || payInfo.residentTax == 0 ? '0' : #numbers.formatInteger(payInfo.residentTax, 1, 'COMMA')}">
+            </td>
+        </tr>
+        <tr class="total-row">
+            <th>공제총액</th>
+            <td class="align-right" 
+                th:text="${payInfo.deducAmt == null || payInfo.deducAmt == 0 ? '0' : #numbers.formatInteger(payInfo.deducAmt, 1, 'COMMA')}">
+            </td>
+        </tr>
+    </table>
+</div>
+
+        <!-- 실지급액 -->
+        <div class="final-amount">
+            <table class="payslip-table">
+                <tr class="total-row">
+                    <th>실지급액</th>
+                    <td class="align-right" colspan="3" 
+                		th:text="${payInfo.netSalary == null || payInfo.netSalary == 0 ? '0' : #numbers.formatInteger(payInfo.netSalary, 1, 'COMMA')} + ' 원'">
+            		</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 서명 -->
+        <div class="signature">
+            <p>위 금액을 정히 영수합니다.</p>
+            <p th:text="${#temporals.format(payInfo.createAt, 'yyyy년 MM월 dd일')}"></p>
+            <p>주식회사 COMPUT.</p>
+        </div>
+    </div>
+    <th:block th:if="${preview != null and preview}">
+        <script th:inline="javascript">
+    /*<![CDATA[*/
+    const paymentNo = /*[[${payInfo.paymentNo}]]*/ '';
+    const empName = /*[[${empName}]]*/ '';
+    const paymentDate = /*[[${payInfo.paymentDate}]]*/ '';
+
+    async function downloadPdf() {
+        try {
+            // 먼저 CSRF 토큰이 있는지 확인
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+            if (!csrfToken || !csrfHeader) {
+                throw new Error('CSRF 토큰을 찾을 수 없습니다.');
+            }
+
+            const response = await fetch(
+                `/api/payroll/pay-info/${paymentNo}/payslip/download?empName=${encodeURIComponent(empName)}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        [csrfHeader]: csrfToken,
+                        'Accept': 'application/pdf'
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('PDF 다운로드 실패');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${empName}_${paymentDate}_급여명세서.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+
+        } catch (error) {
+            console.error('PDF 다운로드 중 오류:', error);
+            alert('PDF 다운로드 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+    /*]]>*/
+</script>
+    </th:block>
+</body>
+</html>

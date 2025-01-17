@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>휴가 관리</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta charset="UTF-8">
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.child-input1 {
+	flex: 1;
+	width: 30%;
+	box-sizing: border-box;
+}
+
+.child-input2 {
+	flex: 1;
+	margin: 0px 5%;
+	width: 30%;
+	box-sizing: border-box;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none"> <i
+					class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<div class="display-flex">
+				<h3>휴가 관리</h3>
+				<div class="buttons">
+					<button type="button" class="btn btn-primary" onclick="openView()">휴가 신청</button>
+				</div>
+				<!-- buttons -->
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+
+					<!-- 데이트 피커 시작 -->
+					<section class="section" style="margin-bottom: 2.2rem">
+						<div style="display: flex; align-items: center; gap: 1rem;">
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"/> 
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-1"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"/> 
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-2"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+							<!-- 데이트 피커 끝 -->
+							<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+							<div>
+								<div
+									class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="searchEmp" placeholder="사번 또는 이름 입력"/>
+								</div>
+							</div>
+							<button type="button" class="btn btn-primary"
+								onclick="search(this);">검색</button>
+						</div>
+					</section>
+
+
+					<!-- 탭 시작 -->
+					<ul class="nav nav-tabs" id="tabHead" role="tablist">
+						<li class="nav-item" role="presentation"><a class="nav-link active" 
+							id="useTab" data-bs-toggle="tab" onclick="useTab()"
+							href="#use" role="tab" aria-controls="use" aria-selected="true">사용내역</a>
+						</li>
+						<li class="nav-item" role="presentation"><a class="nav-link"
+							id="holdTab" data-bs-toggle="tab" onclick="holdTab()"
+							href="#hold" role="tab" aria-controls="hold" aria-selected="false">보유현황</a>
+						</li>
+					</ul>
+					<div class="tab-content" id="tabContent">
+						<!-- 사용내역 탭 시작 -->
+						<div class="tab-pane fade show active" id="use" role="tabpanel"
+							aria-labelledby="useTab">
+
+							<!-- 그리드 시작 -->
+							<section class="section">
+								<div class="row" id="basic-table">
+									<div id="useGrid"></div>
+								</div>
+							</section> 
+							<!-- 그리드 끝 -->
+
+						</div> 
+						<!-- 사용내역 탭 끝 -->
+						
+						<!-- 보유현황 탭 시작 -->
+						<div class="tab-pane fade" id="hold" role="tabpanel"
+							aria-labelledby="holdTab">
+							
+							<!-- 그리드 시작 -->
+							<section class="section">
+								<div class="row" id="basic-table">
+									<div id="holdGrid"></div>
+								</div>
+							</section>
+							<!-- 그리드 끝 -->
+							
+						</div>
+						<!-- 보유현황 탭 끝 -->
+						
+					</div> 
+					<!-- 탭 끝 -->
+					
+					
+					<!-- 휴가신청서 상세 모달창 시작 -->
+					<!--Default size Modal -->
+					<div class="modal fade text-left" id="vctnDtl" tabindex="-1" role="dialog"
+						aria-labelledby="approveModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title" id="myModalLabel33">휴가 신청서</h4>
+								</div>
+								<div class="modal-body">
+									<!-- placeholder=사용자가 값을 입력하기 전에 입력값에 도움을 줄 수 있는 짧은 힌트를 입력 상자에 표시 -->
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사번: </label>
+											<div class="form-group">
+												<input type="text" id="empId" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>이름: </label>
+											<div class="form-group">
+												<input type="text" id="empName" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용 시작일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-start-date" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>사용 종료일: </label>
+											<div class="form-group">
+												<input type="date" class="form-control" id="use-end-date" readonly>
+											</div>
+										</div>
+									</div>
+
+									<div class="display-flex">
+										<div class="child-input1">
+											<label>사용일수: </label>
+											<div class="form-group">
+												<input type="text" id="use-days" class="form-control" readonly>
+											</div>
+										</div>
+										<div class="child-input2">
+											<label>잔여일수: </label>
+											<div class="form-group">
+												<input type="text" id="vctnDays" class="form-control" readonly>
+											</div>
+										</div>
+									</div>
+
+									<label>휴가 구분</label>
+									<div class="form-group">
+										<input type="text" id="se" class="form-control" readonly>
+									</div>
+									
+									<label>비고</label>
+									<div class="form-group">
+										<input type="text" id="rmrk" class="form-control" readonly>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 휴가신청서 상세 모달창 모달창 끝 -->
+				
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+		// 데이트피커에 숫자만 입력되게 정규식 처리
+		function datePickerReplace(id) {
+			$(document).ready(function () {
+				// 숫자가 아닌 정규식
+				var replaceNotInt = /[^0-9]/gi;
+
+				$(`#${id}`).on("focusout", function () {
+					var x = $(this).val();
+					if (x.length > 0) {
+						if (x.match(replaceNotInt)) {
+							x = x.replace(replaceNotInt, "");
+						}
+						$(this).val(x);
+					}
+				}).on("keyup", function () {
+					$(this).val($(this).val().replace(replaceNotInt, ""));
+				});
+			});
+		}
+
+		// 첫 번째 DatePicker 초기화
+		const container1 = document.getElementById('tui-date-picker-container-1');
+		const target1 = document.getElementById('tui-date-picker-target-1');
+		const instance1 = new tui.DatePicker(container1, {
+			date: new Date(),
+			input: {
+				element: target1,
+				format: 'yyyy-MM-dd'
+			}
+		});
+
+		// 두 번째 DatePicker 초기화
+		const container2 = document.getElementById('tui-date-picker-container-2');
+		const target2 = document.getElementById('tui-date-picker-target-2');
+		const instance2 = new tui.DatePicker(container2, {
+			date: new Date(),
+			input: {
+				element: target2,
+				format: 'yyyy-MM-dd'
+			}
+		});
+		
+		// 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
+		var popup;
+		function openView() {
+			var popupW = 700;
+			var popupH = 550;
+			var left = (document.body.clientWidth / 2) - (popupW / 2);
+			left += window.screenLeft;	 //듀얼 모니터
+			var top = (screen.availHeight / 2) - (popupH / 2);
+			popup = window.open('/vctn-appform', '', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+			
+			popup.addEventListener('beforeunload', function() { // 팝업창 콜백 처리
+			    window.location.href = '/request-list'; // 요청내역 페이지로 이동
+			});
+		
+		}
+
+		let useGrid = "";
+		let holdGrid = "";
+
+		// 페이지 로드 시 사용내역 조회하는 함수 호출
+		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
+			useTab();
+		};
+
+		// 사용내역 조회 함수
+		function useTab() {
+			var Grid = tui.Grid;
+
+			const bgnDate = document.getElementById('tui-date-picker-target-1').value;
+			const endDate = document.getElementById('tui-date-picker-target-2').value;
+
+			if (useGrid) {
+				// 이미 생성된 경우 destroy하지 않고 재사용
+				useGrid.refreshLayout();
+				return;
+			}
+
+			fetch(
+				"/useVctnList",
+
+				{
+					method: "POST"
+					, headers: {
+						'header': header,
+						"Content-Type": "application/json",
+						'X-CSRF-Token': token
+					}
+					, body: JSON.stringify({
+						bgnDate: bgnDate
+						, endDate: endDate
+					})
+
+				})
+				.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+				.then(data => {
+					useGrid = new Grid({
+						el: document.getElementById('useGrid'),
+						columns: [
+							{header: '휴가번호', name: 'vctnNo'},
+							{header: '사원번호', name: 'empId'},
+							{header: '이름', name: 'empNm'},
+							{header: '부서', name: 'deptNm'},
+							{header: '사용일', name: 'useDate'},
+							{header: '구분', name: 'seNm'},
+							{header: '사용일수', name: 'useDays'},
+							{header: '잔여일수', name: 'vctnDays'}
+						],
+						data: data
+					});
+					
+					// 휴가번호 숨기기
+					useGrid.hideColumn("vctnNo");
+					
+					// Grid의 row 클릭 이벤트 추가
+			    	useGrid.on('click', (ev) => {
+				        // 클릭된 row 데이터 가져오기
+				        const rowData = ev.instance.getRow(ev.rowKey);
+				        const vctnNo = rowData.vctnNo;
+				        console.info(vctnNo);
+						let modal = $('#vctnDtl');
+						modal.modal('show');
+						
+						fetch(
+							"/useVctnList",
+	
+							{
+								method: "POST"
+								, headers: {
+									'header': header,
+									"Content-Type": "application/json",
+									'X-CSRF-Token': token
+								}
+								, body: JSON.stringify({
+									vctnNo: vctnNo
+								})
+	
+							}) //fetch
+							.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+							.then(data => {
+								console.info(data[0].empId);
+								$("#empId").val(data[0].empId); // #empId 선택자로 수정
+						      	$("#empName").val(data[0].empNm); // 이름 값 설정
+						      	$("#use-start-date").val(data[0].vctnStart); // 사용 시작일
+						      	$("#use-end-date").val(data[0].vctnEnd); // 사용 종료일
+						      	$("#use-days").val(data[0].useDays); // 사용일수
+						      	$("#vctnDays").val(data[0].vctnDays); // 사용일수
+						      	$("#se").val(data[0].seNm); // 휴가 구분
+						      	$("#rmrk").val(data[0].rmrk); // 비고
+	
+							}) //then
+			   		});
+				})
+
+						
+
+			// 그리드에 값 미현시로 탭이 클릭된 후 레이아웃 새로 고침 처리
+			$('#default').on('shown.bs.tab', function () {
+				useGrid.refreshLayout();
+			});
+		}
+
+		// 보유현황 조회 함수
+		function holdTab() {
+			var Grid = tui.Grid;
+
+			if (holdGrid) {
+				// 이미 생성된 경우 destroy하지 않고 재사용
+				holdGrid.refreshLayout();
+				return;
+			}
+
+			const data = /*[[${vctnDaysList}]]*/[];
+
+			holdGrid = new Grid({
+				el: document.getElementById('holdGrid'),
+				columns: [
+					{header: '사원번호', name: 'empId'},
+					{header: '이름', name: 'empNm'},
+					{header: '부서', name: 'deptNm'},
+					{header: '총 사용일수', name: 'useDays'},
+					{header: '잔여일수', name: 'vctnDays'}
+				],
+				data: data
+
+			});
+
+			// 그리드에 값 미현시로 모달창 열린 후 레이아웃 새로 고침 처리
+			$('#default').on('shown.bs.tab', function () {
+				holdGrid.refreshLayout();
+			});
+		}
+
+		// 검색 조건으로 조회 처리
+		function search() {
+			const empInfo = document.getElementById('searchEmp').value;
+			const bgnDate = document.getElementById('tui-date-picker-target-1').value;
+			const endDate = document.getElementById('tui-date-picker-target-2').value;
+			const activeTab = document.querySelector('.nav-link.active');
+
+			fetch(
+				"/searchVcnt",
+
+				{
+					method: "POST"
+					, headers: {
+						'header': header,
+						"Content-Type": "application/json",
+						'X-CSRF-Token': token
+					}
+					, body: JSON.stringify({
+						empInfo: empInfo
+						, bgnDate: bgnDate
+						, endDate: endDate
+						, activeTab: activeTab.id
+					})
+
+				})
+				.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+				.then(data => {
+					console.info(activeTab.id);
+					if (activeTab.id == 'useTab') {
+						useGrid.resetData(data);
+
+					} else {
+						holdGrid.resetData(data);
+
+					}
+				})
+		};
+
+	</script>
+
+
+</body>
+
+</html>

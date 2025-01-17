@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>화면명</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+			
+		}
+		
+		/* 요청 상태별 색상 */
+		.status-approved {
+			color: #28a745; /* 초록색 */
+			font-weight: bold; /* 강조 */
+		}
+
+		.status-rejected {
+			color: #dc3545; /* 빨간색 */
+			font-weight: bold;
+		}
+		
+		#tooltip {
+		    display: none; /* 기본적으로 숨김 */
+		    position: absolute;
+		    background-color: #333; /* 어두운 배경 */
+		    color: #fff; /* 흰색 텍스트 */
+		    padding: 8px 12px; /* 내부 여백 */
+		    border-radius: 6px; /* 둥근 모서리 */
+		    font-size: 18px; /* 텍스트 크기 */
+		    line-height: 1.5; /* 텍스트 줄 간격 */
+		    white-space: nowrap; /* 한 줄로 표시 */
+		    z-index: 1000; /* 다른 요소 위로 표시 */
+		    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+		    max-width: 350px; /* 최대 너비 설정 */
+		    overflow: hidden; /* 텍스트가 넘칠 경우 숨김 */
+		    text-overflow: ellipsis; /* 넘치는 텍스트 생략 */
+		}
+
+
+
+	</style>
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<!-- 반응형 사이드 메뉴 버튼-->
+			<header class="mb-3">
+				<a href="#" class="burger-btn d-block d-xl-none">
+					<i class="bi bi-justify fs-3"></i>
+				</a>
+			</header>
+
+			<h3>요청내역</h3>
+			<h2 th:text="'권한: ' + ${emp.emp_role}"></h2>
+			<div class="card">
+				<div class="card-body">
+					
+					<!--검색창-->
+				 	<div class="col-md-6 mb-1">
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+							<input type="text" class="form-control" id="nameSearch" placeholder="검색"
+								aria-label="Recipient's username" aria-describedby="button-addon2">
+							<button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+						</div>
+					</div>
+	
+
+                  <!--전체/받은요청/보낸요청 탭 시작-->
+                  <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link active" id="all" data-bs-toggle="tab" href="#home" role="tab"
+                              aria-controls="home" aria-selected="true">전체</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="send" data-bs-toggle="tab" href="#profile" role="tab"
+                              aria-controls="profile" aria-selected="false">받은요청</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="reception" data-bs-toggle="tab" href="#contact" role="tab"
+                              aria-controls="contact" aria-selected="false">보낸요청</a>
+                      </li>
+                  </ul>
+                  <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="home-tab">
+                         
+						<!-- 그리드 시작 -->
+						<section class="section">
+							<div class="row" id="basic-table">
+								<div id="grid"></div>
+							</div>
+						</section>
+						<!-- 그리드 끝 -->
+						
+						<!-- 툴팁 추가 -->
+						<div id="tooltip" style="display: none; position: absolute; background: #333; color: white; padding: 5px; border-radius: 4px; font-size: 12px;"></div>
+								
+                      </div>
+                      <div class="tab-pane fade" id="send" role="tabpanel" aria-labelledby="profile-tab">
+                         
+                         <!--각 탭마다 그리드 id 다르게 해줘야함-->
+						
+                      </div>
+                      <div class="tab-pane fade" id="reception" role="tabpanel" aria-labelledby="contact-tab">
+                          
+						<!--각 탭마다 그리드 id 다르게 해줘야함-->
+						
+                      </div>
+                  </div>
+				  <!--전체/받은요청/보낸요청 탭 끝-->
+				  
+				  
+				  
+	<!--반려사유 가져오는 모달창 시작-->
+			<!--Default size Modal -->
+	    <div class="modal fade text-left" id="defaultSize" tabindex="-1"
+	        role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+	        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+	            role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="myModalLabel18">반려사유</h4>
+	                    <button type="button" class="close" data-bs-dismiss="modal"
+	                        aria-label="Close">
+	                        <i data-feather="x"></i>
+	                    </button>
+	                </div>
+	                <div class="modal-body">
+						
+						<h6 >승인권자 사번</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="emp_id" readonly
+														onchange="calcDate()">
+							<p id="rejectNameText"></p> <!--ajax사용해서 response에 담아오기-->
+						</div>
+						
+						<h6>승인권자 성명</h6> <!-- 로그인한 팀장 이름 담기 -->
+						<div class="form-group">
+							<input type="text" class="form-control me-2" id="emp_name" readonly
+															onchange="calcDate()">
+							<p id="rejectNameText"></p> <!--ajax사용해서 response에 담아오기-->
+						</div>
+						
+						<h6>반려사유</h6>
+						<div class="content">
+							<div class="form-group">
+								 <textarea class="form-control me-2" id="rejectReason" rows="4"></textarea>
+								<p id="rejectReasonText"></p> <!--ajax사용해서 response에 담아오기-->
+							</div>
+						
+						</div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-primary"
+	                        data-bs-dismiss="modal">
+	                        <i class="bx bx-check d-block d-sm-none"></i>
+	                        <span class="d-none d-sm-block">확인</span>
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+				  
+	<!--반려사유 가져오는 모달창 끝-->			  
+				  
+				  
+
+
+
+			
+		</div> <!-- card-body -->
+	 </div> <!-- card -->
+	</div><!--main-->
+
+</div><!-- app -->
+
+
+		<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+		<script src="assets/js/bootstrap.bundle.min.js"></script>
+		<script src="assets/js/main.js"></script>
+		<!-- TOAST UI CDN -->
+		<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+		 <!-- 제이쿼리 -->
+  		<script th:src="@{/js/jquery-3.7.1.js}"></script>   
+  			
+		<script th:inline="javascript">
+			window.empName = /*[[${emp.emp_name}]]*/ 'UNKNOWN';
+			console.log('사원이름', empName);
+			window.empId = /*[[${emp.emp_id}]]*/ 'UNKNOWN';
+			const userRole = /*[[${emp.emp_role}]]*/ 'UNKNOWN';
+			document.addEventListener('DOMContentLoaded', function () {
+				var Grid = tui.Grid;
+
+				// Grid 생성
+				const grid = new Grid({
+					el: document.getElementById('grid'),
+					rowKey: 'request_no', // rowKey에 request_no를 설정
+					columns: [
+						{header: '요청번호', name: 'request_no', width : 60},
+						{header: '요청구분', name: 'request_division', width: 100},
+						{header: '요청유형', name: 'request_type', filter : 'select', width: 100},
+						{header: '사원번호', name: 'emp_id', width: 100},
+						{header: '성명', name: 'emp_name', width: 100},
+						{header: '부서명', name: 'emp_dept', width: 100},
+						{header: '요청일', name: 'request_date', width: 150},
+						{header: '요청마감일', name: 'request_deadline', width: 150},
+						{header: '중간승인권자', name: 'middle_approval', width: 100},
+						{header: '최종승인권자', name: 'high_approval', width: 100},
+						{header: '요청상태', name: 'request_status',
+						formatter: ({ value }) => {
+			               let className = '';
+			               if (value === '2차대기' || value ==='최종승인') {
+			                   className = 'status-approved';
+			               } else if (value === '1차반려' || value === '2차반려') {
+			                   className = 'status-rejected';
+			               } 
+			               return `<span class="${className}">${value}</span>`;
+			           		}, width: 100
+						},
+						{header: '반려사유', name: 'request_rejection'}
+					],
+					
+					data: []
+				});
+				
+				
+				
+				 const tabs = {
+					        전체: document.getElementById('all'),
+					        수신: document.getElementById('send'),
+					        발신: document.getElementById('reception')
+					    };
+				
+				 let allData = []; // 전체 데이터를 저장할 변수
+				  // 요청 내역 불러오기 (Fetch API)
+		        fetch('/api/request/list')
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error('Network response was not ok ' + response.statusText);
+		                }
+		                return response.json();
+		            })
+		            .then(data => {
+		                console.log('Fetched Data:', data); // 확인용
+		                allData = data; // 전체 데이터를 저장
+		                grid.resetData(allData); // TOAST UI Grid에 데이터 적용
+						grid.refreshLayout(); // 레이아웃 새로고침
+						
+		            })
+		            .catch(error => {
+		                console.error('Error fetching request list:', error);
+		            });
+		   
+		     // 탭 클릭 이벤트 등록
+		        Object.keys(tabs).forEach(tabName => {
+		            tabs[tabName].addEventListener('click', () => {
+		                let filteredData;
+		                if (tabName === '전체') {
+		                    filteredData = allData; // 전체 데이터
+		                } else {
+		                    filteredData = allData.filter(item => item.request_division === tabName); // 요청구분에 따른 필터링
+		                }
+
+		                grid.resetData(filteredData); // 필터링된 데이터를 TOAST UI Grid에 적용
+		                grid.refreshLayout(); // 레이아웃 새로고침
+		            });
+		        });
+				
+				
+			// Grid의 row 클릭 이벤트 추가
+		    grid.on('click', (ev) => {
+		        // 클릭된 row 데이터 가져오기
+		        const rowData = ev.instance.getRow(ev.rowKey);
+		        const request_no = rowData.request_no;
+		        
+				// 팝업 창 열기
+				   let popupOptions = "width=800,height=650,scrollbars=yes,resizable=yes";
+				   let popupUrl = ''; // 요청번호 포함한 URL 생성
+				   			   
+	   				if(rowData.request_type === '발령') {
+	   					popupUrl = `/request-assign-detail?request_no=${request_no}&userRole=${userRole}`;
+	   					
+	   				} else if(rowData.request_type === '휴직') {
+	   					popupUrl = `/request-absence-detail?request_no=${request_no}`;
+	   				
+					} else {
+						popupUrl = `/request-vctn-detail?request_no=${request_no}`;
+					}
+				   
+				   
+				   window.open(popupUrl, 'popup', popupOptions);
+		      
+		    });//디테일 페이지에서 ajax로 폼 정보 보내기  
+			
+			
+			//반려사유 확인하는 버튼 생성
+			function reloadGrid() {
+			    // 그리드 데이터를 다시 로드하는 함수
+			    grid.reloadData();
+			}
+
+			function renderReasonButton(rowData) {
+			    const { request_status, request_no } = rowData;
+
+			    // 상태가 RQST002 또는 RQST004일 경우 사유확인 버튼 추가
+			    if (request_status === 'RQST002' || request_status === 'RQST004') {
+			        return `<button onclick="openRejectReasonModal(${request_no})">사유확인</button>`;
+			    }
+			    return '';
+			}
+			
+			
+			
+			//----------------------- 툴팁 데이터 가져오기 (requestNo로 서버 API 호출)-----------
+			async function fetchEmployees(request_no) {
+			    try {
+			        const response = await fetch(`/api/getEmployees?request_no=${request_no}`);
+					console.log('Request URL:', `/api/getEmployees?request_no=${request_no}`); // 디버깅 로그
+					 if (!response.ok) {
+			            throw new Error(`Failed to fetch employees: ${response.statusText}`);
+			        }
+					const data = await response.json();
+					       console.log("임플로이 데이터값 콘솔임 ㅋ:", data); // 서버 응답 데이터 확인
+					       return data;
+			    } catch (error) {
+			        console.error('Error fetching employee data:', error);
+			        return null; // 에러 발생 시 null 반환
+			    }
+			}
+
+			// 툴팁 표시 함수
+			function showTooltip(event, content) {
+				 const tooltip = document.getElementById('tooltip');
+				    if (!tooltip) {
+				        console.error('Tooltip element with ID "tooltip" not found.');
+				        return;
+				    }
+
+				    // 툴팁 내용 설정
+				    tooltip.style.display = 'block'; // 툴팁 표시
+				    tooltip.innerText = content;
+
+				    // 툴팁 크기 계산
+				    const tooltipRect = tooltip.getBoundingClientRect();
+
+				    // 툴팁 위치 계산 (마우스 커서 기준)
+				    const posX = event.pageX + 10; // 마우스 X 위치에서 왼쪽으로 이동 
+				    const posY = event.pageY + 10; // 마우스 Y 위치 + 10px 여백
+
+				    // 툴팁 위치 설정 및 화면 경계 보정
+				    tooltip.style.left = Math.min(posX, window.innerWidth - tooltipRect.width - 900) + 'px';
+				    tooltip.style.top = Math.min(posY, window.innerHeight - tooltipRect.height - 550) + 'px';
+			}
+
+			// 툴팁 숨기기 함수
+			function hideTooltip() {
+			    const tooltip = document.getElementById('tooltip');
+			    tooltip.style.display = 'none'; // 툴팁 숨기기
+			}
+
+			// TOAST Grid에서 마우스 오버 이벤트 처리
+			grid.on('mouseover', async (ev) => {
+			    const { rowKey, columnName, nativeEvent } = ev;
+
+			    // 이벤트가 데이터 셀에서 발생하지 않은 경우 처리
+			    if (!rowKey || !columnName) {
+			        console.warn('Mouseover event occurred outside of a valid data cell.');
+			        return;
+			    }
+
+			    // 행 데이터 가져오기
+			    const rowData = ev.instance.getRow(rowKey);
+
+			    // 행 데이터가 없는 경우 처리
+			    if (!rowData) {
+			        console.warn(`No row data found for rowKey: ${rowKey}`);
+			        return;
+			    }
+
+			    // 요청 번호 가져오기
+			    const request_no = rowData.request_no;
+			    if (!request_no) {
+			        console.warn(`Request number is missing for rowKey: ${rowKey}`);
+			        return;
+			    }
+
+			    // 중간승인권자 또는 최종승인권자 컬럼에서만 동작
+			    if (columnName === 'middle_approval' || columnName === 'high_approval') {
+			        try {
+			            console.log('Request No:', request_no); // 디버깅용
+
+			            // 서버에서 승인권자 정보 가져오기
+			            const employees = await fetchEmployees(request_no);
+			            if (!employees) {
+			                console.warn(`No employee data found for request_no: ${request_no}`);
+			                return;
+			            }
+
+			            // 툴팁 내용 구성
+			            const tooltipContent =
+			                columnName === 'middle_approval'
+							? `${employees.MIDDLE_EMP_NAME || "이름없음"} / ${employees.MIDDLE_EMP_POSITION || "직급없음"} / ${employees.MIDDLE_EMP_DEPT || "부서없음"}`
+							      : `${employees.HIGH_EMP_NAME || "이름없음"} / ${employees.HIGH_EMP_POSITION || "직급없음"} / ${employees.HIGH_EMP_DEPT || "부서없음"}`;
+							
+								
+								console.log('툴팁컨텐트!!!:', tooltipContent); // 디버깅 추가
+			            // 툴팁 표시
+			            showTooltip(nativeEvent, tooltipContent);
+			        } catch (error) {
+			            console.error('Error displaying tooltip:', error);
+			        }
+			    }
+			});
+
+
+			// 마우스 아웃 이벤트 처리
+			grid.on('mouseout', () => {
+			    hideTooltip(); // 툴팁 숨기기
+			});
+       //-----------------------------------툴팁 끝 
+			
+			
+	});	//돔 끝
+				
+			</script>
+
+</body>
+
+</html>

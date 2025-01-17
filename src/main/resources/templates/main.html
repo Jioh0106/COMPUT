@@ -1,288 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<div th:fragment="main" id="main">
+<body>
+<div th:fragment="main">
+	<!-- main.html -->
+	<div id="main">
+
+		<header class="mb-3">
+			<a href="#" class="burger-btn d-block d-xl-none">
+				<i class="bi bi-justify fs-3"></i>
+			</a>
+		</header>
+
+		<div class="page-heading">
+			<div class="d-flex align-items-center">
+	            <h3 id="todayDate" class="me-3" >날짜</h3>
+				<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
+					onclick="cmtBtn()">출근하기</button>
+			</div>
+		</div>
+		<div class="card">
+		    <div class="card-body">
+		        <section >
+		            <div class="d-flex align-items-center justify-content-start mb-5">
+		                <!-- 제목과 날짜 -->
+		                <div class="d-flex align-items-center">
+		                    <h4>근무 일정</h4>
+		                </div>
+		                <!-- 버튼들 -->
+		                <div class="d-flex align-items-center ms-3">
+		                    <button type="button" id="todayBtn" class="btn btn-outline-secondary rounded-pill mx-3">
+		                        Today
+		                    </button>
+		                    <button type="button" id="prevBtn" class="btn btn-outline-secondary rounded-pill me-2">
+		                        <i class="bi bi-chevron-left"></i>
+		                    </button>
+		                    <button type="button" id="nextBtn" class="btn btn-outline-secondary rounded-pill">
+		                        <i class="bi bi-chevron-right"></i>
+		                    </button>
+		                    <h5 id="today" class="ms-4"></h5>
+		                </div>
+		            </div>
+		        </section>
+
+		        <section>
+		            <div id="calendar" style="height: 600px;"></div>
+		        </section>
+		    </div>
+		</div>
+
+     
+	</div>
+	<!-- main.html 끝-->
+
+
+<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
+<!-- 제이쿼리 -->
+<script src="/js/jquery-3.7.1.js"></script>
+<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript" th:src="@{/js/main_work.js}"></script>
+
+<!-- sweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	
-    <header class="mb-3">
-        <a href="#" class="burger-btn d-block d-xl-none">
-            <i class="bi bi-justify fs-3"></i>
-        </a>
-    </header>
+
+
+<script th:inline="javascript">
+
+	const header = document.querySelector('meta[name="_csrf_header"]').content;
+	const token = document.querySelector('meta[name="_csrf"]').content;
 	
-    <div class="page-heading">
-        <button type="button" class="btn btn-danger btn-lg">출근하기</button>
-    </div>
+	let atndBtn;
+
+	// 화면 로드 시 공통코드 조회
+	window.onload = function () {
+		
+		// 출/퇴근 확인 조회 함수
+		selectCmt();
+		
+		if(atndBtn == "end"){
+			const btn = document.getElementById("atndBtn");
+			btn.textContent = "퇴근하기"; // 버튼 텍스트 변경
+		} else {
+			const btn = document.getElementById("atndBtn");
+			btn.textContent = "출근하기"; // 버튼 텍스트 변경
+		}
+	}
 	
-    <div class="page-content">
-        <section class="row">
-            <div class="col-12 col-lg-9">
-                <div class="row">
-                    <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stats-icon purple">
-                                            <i class="iconly-boldShow"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Profile Views</h6>
-                                        <h6 class="font-extrabold mb-0">112.000</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stats-icon blue">
-                                            <i class="iconly-boldProfile"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Followers</h6>
-                                        <h6 class="font-extrabold mb-0">183.000</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stats-icon green">
-                                            <i class="iconly-boldAdd-User"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Following</h6>
-                                        <h6 class="font-extrabold mb-0">80.000</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3 col-md-6">
-                        <div class="card">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stats-icon red">
-                                            <i class="iconly-boldBookmark"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h6 class="text-muted font-semibold">Saved Post</h6>
-                                        <h6 class="font-extrabold mb-0">112</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Profile Visit</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="chart-profile-visit"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-xl-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Profile Visit</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center">
-                                            <svg class="bi text-primary" width="32" height="32" fill="blue"
-                                                style="width:10px">
-                                                <use
-                                                    xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                            </svg>
-                                            <h5 class="mb-0 ms-3">Europe</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <h5 class="mb-0">862</h5>
-                                    </div>
-                                    <div class="col-12">
-                                        <div id="chart-europe"></div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center">
-                                            <svg class="bi text-success" width="32" height="32" fill="blue"
-                                                style="width:10px">
-                                                <use
-                                                    xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                            </svg>
-                                            <h5 class="mb-0 ms-3">America</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <h5 class="mb-0">375</h5>
-                                    </div>
-                                    <div class="col-12">
-                                        <div id="chart-america"></div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center">
-                                            <svg class="bi text-danger" width="32" height="32" fill="blue"
-                                                style="width:10px">
-                                                <use
-                                                    xlink:href="assets/vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" />
-                                            </svg>
-                                            <h5 class="mb-0 ms-3">Indonesia</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <h5 class="mb-0">1025</h5>
-                                    </div>
-                                    <div class="col-12">
-                                        <div id="chart-indonesia"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-xl-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Latest Comments</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-lg">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Comment</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar avatar-md">
-                                                            <img src="assets/images/faces/5.jpg">
-                                                        </div>
-                                                        <p class="font-bold ms-3 mb-0">Si Cantik</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class=" mb-0">Congratulations on your graduation!</p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar avatar-md">
-                                                            <img src="assets/images/faces/2.jpg">
-                                                        </div>
-                                                        <p class="font-bold ms-3 mb-0">Si Ganteng</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class=" mb-0">Wow amazing design! Can you make another
-                                                        tutorial for
-                                                        this design?</p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-3">
-                <div class="card">
-                    <div class="card-body py-4 px-5">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar avatar-xl">
-                                <img src="assets/images/faces/1.jpg" alt="Face 1">
-                            </div>
-                            <div class="ms-3 name">
-                                <h5 class="font-bold">John Duck</h5>
-                                <h6 class="text-muted mb-0">@johnducky</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Recent Messages</h4>
-                    </div>
-                    <div class="card-content pb-4">
-                        <div class="recent-message d-flex px-4 py-3">
-                            <div class="avatar avatar-lg">
-                                <img src="assets/images/faces/4.jpg">
-                            </div>
-                            <div class="name ms-4">
-                                <h5 class="mb-1">Hank Schrader</h5>
-                                <h6 class="text-muted mb-0">@johnducky</h6>
-                            </div>
-                        </div>
-                        <div class="recent-message d-flex px-4 py-3">
-                            <div class="avatar avatar-lg">
-                                <img src="assets/images/faces/5.jpg">
-                            </div>
-                            <div class="name ms-4">
-                                <h5 class="mb-1">Dean Winchester</h5>
-                                <h6 class="text-muted mb-0">@imdean</h6>
-                            </div>
-                        </div>
-                        <div class="recent-message d-flex px-4 py-3">
-                            <div class="avatar avatar-lg">
-                                <img src="assets/images/faces/1.jpg">
-                            </div>
-                            <div class="name ms-4">
-                                <h5 class="mb-1">John Dodol</h5>
-                                <h6 class="text-muted mb-0">@dodoljohn</h6>
-                            </div>
-                        </div>
-                        <div class="px-4">
-                            <button class='btn btn-block btn-xl btn-light-primary font-bold mt-3'>Start
-                                Conversation</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Visitors Profile</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart-visitors-profile"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-	<!--            <footer>-->
-	<!--                <div class="footer clearfix mb-0 text-muted">-->
-	<!--                    <div class="float-start">-->
-	<!--                        <p>2021 &copy; Mazer</p>-->
-	<!--                    </div>-->
-	<!--                    <div class="float-end">-->
-	<!--                        <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a-->
-	<!--                                href="http://ahmadsaugi.com">A. Saugi</a></p>-->
-	<!--                    </div>-->
-	<!--                </div>-->
-	<!--            </footer>-->
+	function selectCmt() {
+		fetch(
+			"/mainCmt",
+
+			{
+				method: "POST"
+				, headers: {
+					'header': header,
+					"Content-Type": "application/json",
+					'X-CSRF-Token': token
+				}
+				, body: JSON.stringify({
+					btnType: "cmtBtn"
+				})
+
+			})
+			.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
+			.then(data => {
+				console.info(data);
+			})
+	};
+
+	// 출/퇴근 버튼 처리
+	function cmtBtn() {
+		console.info(header);
+		fetch(
+			"/insertCmt",
+			{
+				method: "POST"
+				, headers: {
+					'header': header,
+					"Content-Type": "application/json",
+					'X-CSRF-Token': token
+				}
+				/*, body: JSON.stringify({
+					btnType: id
+				})*/
+
+			})
+			.then(response => {
+				console.info(response);
+				Swal.fire({
+					title: "신청 완료",
+					icon: "success",
+					confirmButtonText: "확인"
+				}).then(function () { // 확인 클릭 시 실행
+					atndBtn = "end";
+					window.location.href = '/cmt-stts'; // 출퇴근 현황 페이지로 이동
+				});
+				
+            })
+	};
+
+</script>
 </div>
+</body>
+
+</html>
