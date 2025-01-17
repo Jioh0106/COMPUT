@@ -602,7 +602,12 @@ async function addMissingEmployees() {
         alert('지급월을 선택해주세요.');
         return;
     }
-
+	
+	if (!isCurrentMonth(paymentMonth)) {
+	        alert('현재 월의 데이터만 추가할 수 있습니다.');
+	        return;
+	    }
+	
     showLoadingSpinner();
 
     try {
@@ -667,8 +672,15 @@ async function addMissingEmployees() {
         console.error('Error:', error);
         alert('처리 중 오류가 발생했습니다.');
     }
+	
 }
-
+// 현재 월 체크 함수 추가
+function isCurrentMonth(dateStr) {
+    const selectedDate = new Date(dateStr);
+    const currentDate = new Date();
+    return selectedDate.getFullYear() === currentDate.getFullYear() && 
+           selectedDate.getMonth() === currentDate.getMonth();
+}
 
 
 // ================== 데이터 저장 관련 함수 ==================
