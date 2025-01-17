@@ -13,21 +13,22 @@
 		</header>
 
 		<div class="page-heading">
-			<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
-				onclick="cmtBtn()">출근하기</button>
+			<div class="d-flex align-items-center">
+	            <h3 id="todayDate" class="me-3" >날짜</h3>
+				<button type="button" class="btn btn-primary btn-lg" id="atndBtn"
+					onclick="cmtBtn()">출근하기</button>
+			</div>
 		</div>
 		<div class="card">
 		    <div class="card-body">
-		        <section class="mb-4">
-		            <div class="d-flex align-items-center justify-content-between">
+		        <section >
+		            <div class="d-flex align-items-center justify-content-start mb-5">
 		                <!-- 제목과 날짜 -->
 		                <div class="d-flex align-items-center">
-		                    <h4 id="todayDate" >날짜</h4>
-		                    <h4 class="ms-4">근무 일정</h4>
+		                    <h4>근무 일정</h4>
 		                </div>
 		                <!-- 버튼들 -->
-		                <div class="d-flex align-items-center">
-		                    <h5 id="today" class="me-4"></h5>
+		                <div class="d-flex align-items-center ms-3">
 		                    <button type="button" id="todayBtn" class="btn btn-outline-secondary rounded-pill mx-3">
 		                        Today
 		                    </button>
@@ -37,6 +38,7 @@
 		                    <button type="button" id="nextBtn" class="btn btn-outline-secondary rounded-pill">
 		                        <i class="bi bi-chevron-right"></i>
 		                    </button>
+		                    <h5 id="today" class="ms-4"></h5>
 		                </div>
 		            </div>
 		        </section>
@@ -86,45 +88,7 @@
 			const btn = document.getElementById("atndBtn");
 			btn.textContent = "출근하기"; // 버튼 텍스트 변경
 		}
-
-		  var Calendar = window.tui.Calendar;
-
-	      var cal = new Calendar('#main-calendar', {
-	        defaultView: 'month',
-	        calendars: MOCK_CALENDARS,
-	        template: {
-	          monthGridHeader: function (data) {
-	            var date = parseInt(data.date.split('-')[2], 10);
-
-	            return (
-	              '<span class="calendar-month-header" style="margin-left: 4px;">' +
-	              (data.month + 1) +
-	              '/' +
-	              date +
-	              '</span>'
-	            );
-	          },
-	          monthGridHeaderExceed: function (hiddenEvents) {
-	            return (
-	              '<span class="calendar-month-header-exceed" style="font-size: 0.8rem">' +
-	              '+' +
-	              hiddenEvents +
-	              '</span>'
-	            );
-	          },
-	          monthDayName: function (data) {
-	            var label = data.label;
-
-	            if (data.day === 5) {
-	              label = '🎉 TGIF';
-	            }
-
-	            return '<span class="calendar-month-day-name">' + label + '</span>';
-	          },
-	        },
-	      });
-	    
-	};
+	}
 	
 	function selectCmt() {
 		fetch(
