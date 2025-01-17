@@ -236,8 +236,8 @@
 		async function fetchAssignList(filter) {
 			try	{	
 					const params = new URLSearchParams(filter).toString();
-					console.log('요청 URL:', `http://localhost:8082/api/assign/list?${params}`);  // URL 디버깅
-			       	const response = await fetch(`http://localhost:8082/api/assign/list?${params}`);
+					console.log('요청 URL:', `/api/assign/list?${params}`);  // URL 디버깅
+			       	const response = await fetch(`/api/assign/list?${params}`);
 					
 			       	if (!response.ok) {
 			           	throw new Error("네트워크 응답 실패");
