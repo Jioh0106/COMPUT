@@ -42,6 +42,8 @@ public class CommuteService {
 		LocalDate now = LocalDate.now();
 		String today = String.valueOf(now);
 		
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		
 
 		try {
             
@@ -57,24 +59,36 @@ public class CommuteService {
             	String empNo = String.valueOf(work.get("empNo"));
             	String empDept = String.valueOf(work.get("empDept"));
             	
-            	if(workDate.equals(today)) {
-            		if(cmtDate == null) { // 출근일이 없으면
-            			if(cmtStart == null) {
-            				cmtData.put("result", "strNull");
-            				cmtData.put("empDept", empDept);
-            				cmtData.put("cmtStart", parseTime(workStart));
-            				cmtData.put("sttsCd", "CMTN001");
-            				cmtData.put("empNo", empNo);
-            				cmtData.put("empId", empId);
+            	if(workDate.equals(today)) { // 근무일자가 오늘 날짜와 같으며
+            		if(cmtDate.equals("null")) { // 출근일이 없고
+            			System.out.println(cmtDate + " 출근일");
+            			if(cmtStart.equals("null")) { // 찍힌 출근 시간이 없고
+            				if(timestamp.equals(parseTime(workStart)) 
+            						|| timestamp.before(parseTime(workStart))) { // 현재 일시가 출근 시간이랑 같거나 이전일 경우
+	            				cmtData.put("result", "strNull"); // 버튼 활성화
+	            				cmtData.put("empDept", empDept);
+	            				cmtData.put("cmtStart", parseTime(workStart));
+	            				cmtData.put("sttsCd", "CMTN001");
+	            				cmtData.put("empNo", empNo);
+	            				cmtData.put("empId", empId);
+            				} else {
+            					cmtData.put("result", "strNn"); // 버튼 비활성화
+            				}
             				
             			} else {
             				cmtData.put("result", "strNn");
             			}
             			
-            		} else { // 출근일이 있으면
-            			if(cmtEnd == null) {
-            				cmtData.put("result", "endNull");
-            				cmtData.put("cmtEnd", parseTime(workEnd));
+            		} else { // 출근일이 있고
+            			System.out.println(work.get("cmtDate")==null + " 출근일 있");
+            			if(cmtEnd.equals("null")) { // 찍힌 퇴근 시간이 없고
+            				if(timestamp.equals(parseTime(workEnd)) 
+            						|| timestamp.after(parseTime(workEnd))) { // 현재 일시가 퇴근 시간이랑 같거나 이후일 경우
+	            				cmtData.put("result", "endNull"); // 버튼 활성화
+	            				cmtData.put("cmtEnd", parseTime(workEnd));
+            				} else {
+            					cmtData.put("result", "endNn"); // 버튼 비활성화
+            				}
             				
             			} else {
             				cmtData.put("result", "endNn");
@@ -105,19 +119,18 @@ public class CommuteService {
 
         // 최종적으로 현재 날짜와 결합된 시간 출력
         Date currentDateWithTime = calendar.getTime();
-        System.out.println("현재 날짜와 시간: " + currentDateWithTime);
         
         // Timestamp로 변환
         Timestamp timestamp = new Timestamp(currentDateWithTime.getTime());
-        System.out.println("Timestamp 형태: " + timestamp);
         
 		return timestamp;
 	}
 
 	public int insertCmt(Map<String, Object> searchMap) {
 		searchMap.put("sttsCd", "CMTN001");
-		int result = mapper.insertCmt(searchMap);
-		return result;
+		System.out.println(searchMap.toString());
+		//int result = mapper.insertCmt(searchMap);
+		return 1;
 	}
 
 }

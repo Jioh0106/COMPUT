@@ -93,6 +93,8 @@
 			wv.emp_id = emp.emp_id
 		WHERE
 			wv.emp_id = #{empId}
+<!--		AND
+			AND wv.work_date <![CDATA[<=]]> CURRENT_DATE-->
 	</select>
 	
 	<insert id="insertCmt" parameterType="hashMap">
