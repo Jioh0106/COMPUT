@@ -76,26 +76,29 @@
 			, TO_CHAR(wv.work_date, 'YYYY-MM-DD') AS "workDate"
 			, wv.work_start AS "workStart"
 			, wv.work_end AS "workEnd"
+			, cm.cmt_cd AS "cmtCd"
 			, TO_CHAR(cm.cmt_date, 'YYYY-MM-DD') AS "cmtDate"
 			, cm.work_bgn AS "cmtStart"
 			, cm.work_end AS "cmtEnd"
 			, emp.emp_no AS "empNo"
 			, emp.emp_dept AS "empDept"
-			, v.vacation_type AS vctnType
+		<!--	, v.vacation_type AS vctnType-->
 		FROM 
 			WORK_VIEW wv
 		LEFT JOIN
 			CMT_MNG cm
 		ON
-			wv.emp_id = cm.emp_no
+			wv.emp_id = cm.emp_id
+		AND
+			TO_CHAR(wv.work_date, 'YYYY-MM-DD') = TO_CHAR(cm.cmt_date, 'YYYY-MM-DD')
 		LEFT JOIN
 			employees emp
 		ON
 			wv.emp_id = emp.emp_id
-		LEFT JOIN
+		<!--LEFT JOIN
 			vacation v
 		ON
-			wv.emp_id = v.vacation_leave
+			wv.emp_id = v.vacation_leave-->
 		WHERE
 			wv.emp_id = #{empId}
 <!--		AND
@@ -115,12 +118,19 @@
 			cmt_seq.nextval
 		  , #{empDept}
 		  , CURRENT_DATE
-		  , CURRENT_DATE
+		  , #{cmtTime}
 		  , #{sttsCd}
 		  , #{empNo}
 		  , #{empId}
 		)
 	</insert>
+	
+	<update id="updateCmt" parameterType="hashMap">
+		UPDATE cmt_mng SET 
+			work_end = #{cmtTime}
+		WHERE
+			cmt_cd = #{cmtCd}
+	</update>
 	
 	
 	
