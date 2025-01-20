@@ -214,7 +214,7 @@ public class PayrollCalculatorService {
             String jobType = emp.getEmp_job_type();
             
             // 고용형태별 계산 로직
-            if ("OCPT002".equals(jobType)) {  // 계약직
+            if ("OCPT001".equals(jobType)) {  // 계약직
                 BigDecimal adjustedSalary = baseSalary.multiply(new BigDecimal("0.9"))
                                                      .setScale(0, RoundingMode.DOWN);
                 
@@ -263,7 +263,7 @@ public class PayrollCalculatorService {
             String jobType = emp.getEmp_job_type();
             
             // 계약직 체크 및 기본급 계산
-            if (jobType != null && "OCPT002".equals(jobType.trim())) {
+            if (jobType != null && "OCPT001".equals(jobType.trim())) {
                 baseSalary = new BigDecimal(emp.getEmp_salary())
                     .multiply(new BigDecimal("0.9"))
                     .setScale(0, RoundingMode.DOWN);

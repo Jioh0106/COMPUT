@@ -81,13 +81,7 @@
 		// 출/퇴근 확인 조회 함수
 		selectCmt();
 		
-		if(atndBtn == "end"){
-			const btn = document.getElementById("atndBtn");
-			btn.textContent = "퇴근하기"; // 버튼 텍스트 변경
-		} else {
-			const btn = document.getElementById("atndBtn");
-			btn.textContent = "출근하기"; // 버튼 텍스트 변경
-		}
+	
 	}
 	
 	function selectCmt() {
@@ -108,7 +102,27 @@
 			})
 			.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
 			.then(data => {
-				console.info(data);
+				atndBtn = data.result;
+				console.info(atndBtn);
+				
+				const btn = document.getElementById("atndBtn");
+					
+					if(atndBtn == "strNull"){
+						btn.disabled = false;
+						btn.textContent = "출근하기"; // 버튼 텍스트 변경
+					}
+					else if(atndBtn == "strNn"){
+						btn.disabled = true;
+						btn.textContent = "출근하기"; // 버튼 텍스트 변경
+					}
+					else if(atndBtn == "endNull"){
+						btn.disabled = false;
+						btn.textContent = "퇴근하기"; // 버튼 텍스트 변경
+					} 
+					else {
+						btn.disabled = true;
+						btn.textContent = "퇴근하기"; // 버튼 텍스트 변경
+					}
 			})
 	};
 
@@ -132,7 +146,7 @@
 			.then(response => {
 				console.info(response);
 				Swal.fire({
-					title: "신청 완료",
+					title: "출근 완료",
 					icon: "success",
 					confirmButtonText: "확인"
 				}).then(function () { // 확인 클릭 시 실행
