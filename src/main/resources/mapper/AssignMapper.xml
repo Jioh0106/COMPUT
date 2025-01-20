@@ -172,7 +172,7 @@
 	    FROM assignment a
 	    INNER JOIN request r ON a.request_no = r.request_no
 	    WHERE a.assign_emp_id = #{assign_emp_id}
-        AND r.request_status IN ('RQST001', 'RQST003', 'RQST005')
+        AND r.request_status IN ('RQST001', 'RQST003')
         AND a.assign_type = #{assign_type}
 	</select>
 	

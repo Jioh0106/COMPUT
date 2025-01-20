@@ -137,27 +137,23 @@ public class AssignService {
 	    RequestDTO requestDto = new RequestDTO();
 
 	    // 요청자가 본인인 경우 항상 발신으로 간주
-	    // 1. 최종 승인자가 "RQST005" 상태일 때 수신으로 간주
-//	    if (emp_id.equals(finalApprovalEmpId) && "RQST005".equals(requestStatus)) {
-//	        requestDto.setRequest_division("수신");
-//	    } 
-	    // 2. 최종 승인자가 "RQST003" 상태일 때 수신으로 간주
-	    if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus))) {
+	
+	    if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus) || "RQST004".equals(requestStatus))) {
 	        requestDto.setRequest_division("수신");
 	    } 
-	    // 3. 중간 승인자가 "RQST001" 상태일 때 수신으로 간주
+	    
 	    else if (emp_id.equals(middleApprovalEmpId) && "RQST001".equals(requestStatus)) {
 	        requestDto.setRequest_division("수신");
 	    } 
-	    // 4. 중간 승인자가 "RQST003" 상태일 때 발신으로 간주
+	   
 	    else if (emp_id.equals(middleApprovalEmpId) && "RQST003".equals(requestStatus)) {
 	        requestDto.setRequest_division("발신");
 	    } 
-	    // 5. 요청자가 본인인 경우 항상 발신으로 간주
+	   
 	    else if (emp_id.equals(request.getEmp_id())) { 
 	        requestDto.setRequest_division("발신");
 	    } 
-	    // 6. 그 외의 경우 발신으로 간주
+	   
 	    else {
 	        requestDto.setRequest_division("발신");
 	    }

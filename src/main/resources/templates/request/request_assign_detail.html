@@ -286,7 +286,7 @@
 			console.log('요청번호!!!!:', request_no); // 요청번호 출력
 			
 			if (request_no) {
-			    fetch(`/api/selectAssign/${request_no}`)
+			    fetch(`/api/assign/select/${request_no}`)
 			        .then(response => {
 			            if (!response.ok) {
 			                throw new Error(`HTTP error! status: ${response.status}`);
@@ -424,7 +424,7 @@
 	       		 const defaultModal = document.getElementById('approvedefaultSize');
 				 defaultModal.addEventListener('shown.bs.modal', function () {
 			        // ajax로 데이터 가져오기
-			        fetch('/api/highRole')
+			        fetch('/api/assign/highrole')
 			            .then(response => response.json()) // json 형태로 파싱
 			            .then(data => {
 							console.log('받아온 데이터:', data); // 응답 데이터 출력
@@ -567,7 +567,7 @@
         }
 
         // Ajax 요청으로 반려사유 등록
-        fetch('/api/reject', {
+        fetch('/api/assign/reject', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded',
             	 'X-CSRF-TOKEN': csrfToken // CSRF 토큰 추가

@@ -110,7 +110,7 @@ public class AssignController {
            
             
            //반환된 요청번호를 통해 요청 구분 정보 조회
-           RequestDTO resultRequestDto = asService.getRequestDivision(emp_id, request_no);
+          RequestDTO resultRequestDto = asService.getRequestDivision(emp_id, request_no);
 
             log.info("요청 구분: " + resultRequestDto.getRequest_division());
             

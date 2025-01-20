@@ -76,7 +76,8 @@ public class RequestService {
             String requestStatus = request.getRequest_status();
 
             // 요청 구분 설정 (발신/수신)
-            if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus))) {
+            //최종권한자는 상태가 2차대기/2차반려/최종승인일때 수신으로 처리한다.
+            if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus) || "RQST004".equals(requestStatus))) {
     	        requestDto.setRequest_division("수신");
     	    } 
     	   
