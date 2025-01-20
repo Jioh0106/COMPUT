@@ -355,8 +355,7 @@
                                 <i class="bx bx-check d-block d-sm-none"></i>
                                 <span class="d-none d-sm-block">수정</span>
                             </button>
-                            <button type="button" class="btn btn-outline-danger"
-                                data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
                                 <i class="bx bx-x d-block d-sm-none"></i>
                                 <span class="d-none d-sm-block">취소</span>
                             </button>

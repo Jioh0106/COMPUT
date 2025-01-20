@@ -21,7 +21,6 @@ async function fetchCommonDetails() {
 			throw new Error("네트워크 응답 실패");
 		}
 		const cdCodeData = await response.json();
-		console.log(cdCodeData);
 		
 		// ATHR(권한),WRST(재직상태),DEPT(부서),PSTN(직급),OCPT(직종),RANK(평가등급),RTRM(퇴사유형)
 		const athrSelect = document.getElementById('emp_role');

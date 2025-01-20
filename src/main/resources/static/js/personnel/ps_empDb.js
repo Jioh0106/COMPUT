@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", initChart);
 
 categoryMenu.addEventListener("input",() => {
 	const selectCategory = categoryMenu.value;
-	console.log(selectCategory);
 	
 	if(selectCategory==="학력별"){
 		empChartContainer.innerHTML = "<div id='empChart'></div>";
@@ -95,7 +94,6 @@ async function countByEdu(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
 		
 		const pieChartData = {
 			categories: ["학력"],
@@ -114,7 +112,6 @@ async function countByEdu(){
 			const checkedLegend = empPieChart.getCheckedLegend();
 				if(checkedLegend){
 					const eduArray = checkedLegend.map(item =>item.label);
-					console.log(eduArray);
 					infoListByEdu(eduArray);
 				}
 		});
@@ -134,14 +131,12 @@ async function infoListByEdu(eduArray){
 		
 		const param = new URLSearchParams();
 		eduArray.forEach(item => param.append("edu",item));
-		//console.log(param.toString());
 		
 		const response = await fetch(`/api/infoList-by-edu?${param.toString()}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
 		
 		empInfoList.resetData(result);
 	}catch(error){
@@ -156,23 +151,19 @@ async function countByAgeAndGender(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
 		
 		// 데이터 설정
    		const ageGroups = ['그 외', '60대', '50대', '40대', '30대', '20대'];
 		
 		const maleData = ageGroups.map(ageGroup => {
 		   	const match = result.find(item => item.EMP_AGE_GROUP === ageGroup && item.EMP_GENDER === '남');
-			//console.log(match);
 		   	return match ? match.EMP_COUNT : 0;
         });
-		console.log("maleData : ",maleData);
 		
 		const femaleData = ageGroups.map(ageGroup => {
             const match = result.find(item => item.EMP_AGE_GROUP === ageGroup && item.EMP_GENDER === '여');
             return match ? match.EMP_COUNT : 0;
         });
-		// console.log("femaleData : ",femaleData);
 		
 		const groupBarChartData = {
 			categories : ageGroups,
@@ -190,7 +181,6 @@ async function countByAgeAndGender(){
 		
 		empGroupStackBarChart.on("clickLegendCheckbox",() => {
 			const checkedLegend = empGroupStackBarChart.getCheckedLegend();
-			//console.log("checkedLegend",checkedLegend);
 			if(checkedLegend){
 				const genderArray = checkedLegend.map(item => item.label);
 				infoListByAgeGroup(genderArray);

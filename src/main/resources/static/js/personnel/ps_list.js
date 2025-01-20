@@ -97,7 +97,6 @@ window.onload = function () {
 empListGrid.on('click', function (ev) {
 	
 	const target = ev.nativeEvent.target;
-	//console.log(target);
 	const columnName = ev.columnName;
 	
 	if(target.type === 'checkbox' || columnName === '_checked'){
@@ -105,8 +104,6 @@ empListGrid.on('click', function (ev) {
 	}
     const rowKey = ev.rowKey; // 클릭된 로우의 인덱스
    	const clickedRowData = empListGrid.getData()[rowKey];  // 해당 로우 데이터 가져오기
-	
-	console.log(clickedRowData);
 
     // 모달에 데이터 설정
     showModal(clickedRowData);
@@ -161,7 +158,6 @@ function showModal(empDetailInfo) {
 	empPw.value = empDetailInfo.EMP_PW;
 	empNo.value = empDetailInfo.EMP_NO;
 	empRegDate.value = empDetailInfo.EMP_REG_DATE;
-	//console.log(typeof(empRegDate.value));
 	//empModDate.value = empDetailInfo.EMP_MOD_DATE || null;
 	empRole.value = empDetailInfo.EMP_ROLE;
 	empName.value = empDetailInfo.EMP_NAME;
@@ -233,7 +229,6 @@ updateBtn.addEventListener("click",() => {
 deleteBtn.addEventListener("click",() => {
 	
 	const checkedRowIds = CheckedRowValues(empListGrid,"EMP_ID");
-	console.log(checkedRowIds);
 		if(checkedRowIds.length === 0){
 			Swal.fire({
 				title: "삭제할 정보를 선택해주세요",
@@ -278,7 +273,6 @@ async function fetchEmpList(filter) {
 	           	throw new Error("네트워크 응답 실패");
 	       	}
 	       	const empList = await response.json();
-	       	console.log(empList);
 
 	       	// 그리드 데이터 갱신
 	       	empListGrid.resetData(empList);
@@ -296,7 +290,6 @@ async function fetchCommonDetails() {
 			throw new Error("네트워크 응답 실패");
 		}
 		const cdCodeData = await response.json();
-		console.log(cdCodeData);
 		
 		// ATHR(권한),WRST(재직상태),DEPT(부서),PSTN(직급),OCPT(직종),RANK(평가등급),RTRM(퇴사유형)
 		const athrSelect = document.getElementById('emp_role');
@@ -306,8 +299,6 @@ async function fetchCommonDetails() {
 		const ocptSelect = document.getElementById('emp_job_type');
 		const rankSelect = document.getElementById('emp_perf_rank');
 		const rtrmSelect = document.getElementById('emp_exit_type');
-		
-		// console.log('공통코드'+athrSelect);
 		
 		cdCodeData.forEach(item => {
 			const option = document.createElement('option');
@@ -338,11 +329,9 @@ async function fetchCommonDetails() {
 
 // 선택 삭제
 async function empDelete(url,rowIds){
-	console.log(rowIds);
 	
 	try{
 		const csrfToken = document.getElementById("csrfToken").value;
-		console.log("csrfToken",csrfToken);
 		const response = await fetch(url,{
 			method: "POST",
 			headers:{
@@ -355,7 +344,6 @@ async function empDelete(url,rowIds){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.text();
-		console.log("result : "+result);
 		setTimeout(()=>{
 			window.location.reload();
 		},850);

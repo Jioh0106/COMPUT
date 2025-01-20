@@ -54,10 +54,10 @@
 	                            <a href="/ps-list">인사 카드 관리</a>
 	                        </li>
 	                        <li class="submenu-item ">
-	                            <a href="/ps-empDb">사원 정보 현황 </a>
+	                            <a href="/ps-empDb" sec:authorize="hasAnyRole('ATHR001','ATHR002')">사원 정보 현황 </a>
 	                        </li>
 	                        <li class="submenu-item ">
-	                            <a href="/ps-hrDb">인사 정보 현황 </a>
+	                            <a href="/ps-hrDb" sec:authorize="hasAnyRole('ATHR001','ATHR002')">인사 정보 현황 </a>
 	                        </li>
 	                        <li class="submenu-item ">
 	                            <a href="/assign-stts">인사 발령 현황 </a>

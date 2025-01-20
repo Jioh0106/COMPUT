@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", initChart);
 
 categoryMenu.addEventListener("input",() => {
 	const selectCategory = categoryMenu.value;
-	console.log(selectCategory);
 	
 	if(selectCategory === "입/퇴사"){
 		empChartContainer.innerHTML="<div id='lineChart'></div>";
@@ -139,7 +138,6 @@ async function countMonthlyHireExit(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log("hireExit",result);
 		
 		// 데이터 설정
 		const monthData = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
@@ -149,13 +147,11 @@ async function countMonthlyHireExit(){
 		   	return match ? match.HIRE_COUNT : 0;
         });
 		
-		console.log("hireData :",hireData);
 		
 		const exitData = monthData.map(monthData => {
             const match = result.find(item => item.MONTH === monthData);
             return match ? match.EXIT_COUNT : 0;
         });
-		console.log("exitData :",exitData);
 		
 		const lineChartData = {
 			categories : monthData,
@@ -174,7 +170,6 @@ async function countMonthlyHireExit(){
 		
 		hrLineChart.on("clickLegendCheckbox",() => {
 			const checkedLegend = hrLineChart.getCheckedLegend();
-			//console.log(checkedLegend)
 			if(checkedLegend){
 				const hireExitArray = checkedLegend.map(item => item.label);
 				infoListByMonthlyHireExit(hireExitArray);
@@ -202,7 +197,6 @@ async function infoListByMonthlyHireExit(hireExitArray){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log("입/퇴사자 정보:",result);
 		empInfoList.resetData(result);
 		
 	}catch(error){
@@ -217,7 +211,6 @@ async function countByJobType(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log("jobType",result);
 		
 		// 데이터 설정
 		const pieChartData = {
@@ -237,7 +230,6 @@ async function countByJobType(){
 		
 		hrJobTypePieChart.on("clickLegendCheckbox",() => {
 			const checkedLegend = hrJobTypePieChart.getCheckedLegend();
-			console.log(checkedLegend)
 			if(checkedLegend){
 				const jobTypeArray = checkedLegend.map(item => item.label);
 				infoListByJobType(jobTypeArray);
@@ -279,7 +271,6 @@ async function countByRank(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log("rank",result);
 		
 		// 데이터 설정
 		const pieChartData = {
@@ -299,7 +290,6 @@ async function countByRank(){
 		
 		hrRankPieChart.on("clickLegendCheckbox",() => {
 			const checkedLegend = hrRankPieChart.getCheckedLegend();
-			console.log(checkedLegend)
 			if(checkedLegend){
 				const rankArray = checkedLegend.map(item => item.label);
 				infoListByRank(rankArray);
@@ -342,7 +332,6 @@ async function countDeptByPosition(){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log("position",result);
 		
 		/*
 		const pieChartData = {
@@ -384,7 +373,6 @@ async function deptInfoListByPosition(positionArray){
 			throw new Error("네트워크 응답 실패");
 		}
 		const result = await response.json();
-		console.log(result);
 		
 		// 차트 생성 및 데이터 설정
 		

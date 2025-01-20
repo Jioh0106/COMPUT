@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+				xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="icon" href="images/favicon.png" type="images/png">
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+    <style>
+        .display-flex {
+            display: flex;
+        }
+        .buttons {
+            margin-left: auto;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 사이드 메뉴바-->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <!-- 메인 content -->
+        <div id="main">
+            <!-- 반응형 사이드 메뉴 버튼-->
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+			
+			<!-- 글쓰기폼 시작  -->
+            <form id="insertForm" action="/notice-write" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            
+            <!--사원 상세 모달-->
+            <div class="modal fade" id="noticeModal" tabindex="-1" role="dialog"
+                aria-labelledby="psDatailModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+								공지사항 글쓰기
+							</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal"
+                                aria-label="Close">
+                                <i data-feather="X"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 모달 바디 시작 -->
+                        <div class="modal-body mx-3">
+                        	<div class="row">
+                        		<input type="text"  name="subject" placeholder="제목을 입력하세요" class="my-2"> 
+                        	</div>
+                        	<div class="row">
+                           		<textarea id="dark" name="content" cols="30" rows="10"></textarea>
+                            </div>
+                            <div class="row">
+                            	<input type="file" name="file" class="my-2 px-0">
+                            </div> 
+                        </div>
+                        <!-- 모달 바디 끝 -->
+                        
+                        <div class="modal-footer">
+                            <button type="submit" id="insertBtn" class="btn btn-outline-success ml-1" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                                <i class="bx bx-check d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">글쓰기</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                                <i class="bx bx-x d-block d-sm-none"></i>
+                                <span class="d-none d-sm-block">취소</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--사원 상세 모달 끝-->
+            </form>
+            <!-- 글쓰기폼 끝  -->
+
+            <div class="display-flex">
+                <h3>공지사항 모달 버튼</h3>
+                <!-- <span sec:authentication="principal.authorities"></span><br> -->
+                <div class="buttons">
+                    <!--신규 등록 버튼-->
+                    <button type="button" class="btn btn-primary" onclick="popUp()"  data-bs-toggle="modal" data-bs-target="#noticeModal"
+                    	sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                        더 보기 모달 버튼
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendors/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendors/tinymce/plugins/code/plugin.min.js"></script>
+    <script>
+        tinymce.init({ selector: '#default' });
+        tinymce.init({ selector: '#dark', toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent code', plugins: 'code' });
+    </script>
+    <script src="assets/js/main.js"></script>
+    <!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        /* TOAST UI , 기타 자바스크립트 코드 작성 */
+    </script>
+</body>
+
+</html>

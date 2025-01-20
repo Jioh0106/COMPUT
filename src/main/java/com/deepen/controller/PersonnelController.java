@@ -18,12 +18,6 @@ public class PersonnelController {
 	
 	private final PersonnelService psService; 
 	
-	//http://localhost:8082/ex
-	@GetMapping("/ex")
-	public String exPage() {
-		return "/ex/index";
-	}
-	
 	//http://localhost:8082/ps-list
 	@GetMapping("/ps-list")
 	public String psList() {
@@ -41,8 +35,6 @@ public class PersonnelController {
 	@PostMapping("/ps-reg")
 	public String psInsert(EmployeesDTO empDTO) {
 		
-		log.info(empDTO.toString());
-		
 		psService.regEmployees(empDTO);
 		
 		return "redirect:/registClose";
@@ -57,8 +49,6 @@ public class PersonnelController {
 	
 	@PostMapping("/ps-update")
 	public String psUpdate(EmployeesDTO empDTO) {
-		
-		log.info("C-update : "+empDTO.toString());
 		
 		psService.updateEmpInfo(empDTO);
 		

@@ -61,7 +61,6 @@ public class PersonnelService {
 		empDTO.setEmp_reg_date(new Timestamp(System.currentTimeMillis()));
 		
 		Employees emp = Employees.setEmployees(empDTO);
-		log.info(emp.toString());
 		psRepo.save(emp);
 	}
 	
@@ -82,13 +81,11 @@ public class PersonnelService {
 		empDTO.setEmp_mod_date(new Timestamp(System.currentTimeMillis()));
 		
 		Employees emp = Employees.setEmployees(empDTO);
-		log.info("Service 수정 할 데이터 : "+emp.toString());
 		psRepo.save(emp);
 	}
 	
 	public void deleteAllEmpById(List<String> ids) {
 		psRepo.deleteAllById(ids);
-		log.info("삭제한 데이터 Ids : "+ids);
 	}
 	
 	
@@ -116,7 +113,6 @@ public class PersonnelService {
 	}
 	
 	public List<Map<String, Object>> getEmpInfoById(String userId){
-		log.info(userId);
 		return psMapper.selectEmpInfoById(userId);
 	}
 	

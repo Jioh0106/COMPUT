@@ -46,12 +46,9 @@ public class PersonnelRestController {
 			@AuthenticationPrincipal UserDetails userDetails) {
 		
 		String role = userDetails.getAuthorities().toString().replace("ROLE_", "");
-		//log.info("role : "+role);
-		//log.info("결과 : "+role.contains("ATHR003"));
 		
 		if(role.contains("ATHR003")) {
 			List<Map<String, Object>> empInfo = psService.getEmpInfoById(userDetails.getUsername());
-			//log.info(empInfo.toString());
 			return empInfo;
 		}else {
 			List<Map<String, Object>> empList = psService.getEmpInfoList(startDate,endDate,search);
@@ -61,7 +58,6 @@ public class PersonnelRestController {
 	
 	@PostMapping("/emp-delete")
 	public String postMethodName(@RequestBody List<String> ids) {
-		log.info("삭제할 ids - "+ids);
 		psService.deleteAllEmpById(ids);
 		return "서버 : 삭제 성공";
 	}
@@ -74,21 +70,17 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-edu")
 	public List<Map<String, Object>> empInfoListByEdu(@RequestParam(value = "edu") List<String> edu){
-		log.info(edu.toString());
 		
 		return psService.getInfoListByEdu(edu);
 	}
 	
 	@GetMapping("/count-by-ageGroupAndGender")
 	public List<Map<String, Object>> countListByAgeAndGender(){
-		log.info(psService.getCountByAgeGroupAndGender().toString());
-		
 		return psService.getCountByAgeGroupAndGender();
 	}
 	
 	@GetMapping("/infoList-by-ageGroup")
 	public List<Map<String, Object>> empInfoListAgeGroup(@RequestParam(value = "gender") List<String> gender){
-		log.info(gender.toString());
 		return psService.getInfoListByAgeGroup(gender);
 	}
 	
@@ -99,7 +91,6 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-monthlyHireExit")
 	public List<Map<String, Object>> hrInfoListByMonthlyHireExit(@RequestParam(value = "hireExit") List<String> hireExit){
-		log.info(hireExit.toString());
 		return psService.getInfoListByMonthlyHireExit(hireExit); 
 	}
 	
@@ -120,7 +111,6 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-jobType")
 	public List<Map<String, Object>> hrInfoListByJobType(@RequestParam(value = "jobType") List<String> jobType){
-		log.info(jobType.toString());
 		return psService.getInfoListByJobType(jobType);
 	}
 	
@@ -131,7 +121,6 @@ public class PersonnelRestController {
 	
 	@GetMapping("/infoList-by-rank")
 	public List<Map<String, Object>> hrInfoListByRank(@RequestParam(value = "rank") List<String> rank){
-		log.info(rank.toString());
 		return psService.getInfoListByRank(rank);
 	}
 }
