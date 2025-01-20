@@ -14,6 +14,11 @@
 	        	<div class="d-flex align-items-center">
 	        		<h4 id="todayDate" class="me-3" >날짜</h4>
 	        		<button type="button" class="btn btn-primary btn" id="atndBtn" onclick="cmtBtn()">출근하기</button>
+	        		<!-- data로 담아 갈 input -->
+	        		<input type="hidden" id="deptCd">
+					<input type="hidden" id="sttsCd">
+					<input type="hidden" id="empNo">
+					<input type="hidden" id="empId">
 				</div>        	
 	        
 	        </div>
@@ -210,5 +215,12 @@
 		        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
 		    </div>
 		</div> <!-- sidebar -->
+		
+		<!-- 제이쿼리 -->
+		<script src="/js/jquery-3.7.1.js"></script>
+		<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+		<script src="/assets/js/bootstrap.bundle.min.js"></script>
+		<script th:inline="javascript" th:src="@{/js/main_cmt.js}"></script>
+		
 	</div> <!-- th:fragment -->
 </html>

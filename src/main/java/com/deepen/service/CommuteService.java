@@ -43,7 +43,7 @@ public class CommuteService {
 		String today = String.valueOf(now);
 		
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		
+		System.out.println(timestamp);
 
 		try {
             
@@ -61,37 +61,40 @@ public class CommuteService {
             	
             	if(workDate.equals(today)) { // 근무일자가 오늘 날짜와 같으며
             		if(cmtDate.equals("null")) { // 출근일이 없고
-            			System.out.println(cmtDate + " 출근일");
             			if(cmtStart.equals("null")) { // 찍힌 출근 시간이 없고
             				if(timestamp.equals(parseTime(workStart)) 
             						|| timestamp.before(parseTime(workStart))) { // 현재 일시가 출근 시간이랑 같거나 이전일 경우
-	            				cmtData.put("result", "strNull"); // 버튼 활성화
+	            				cmtData.put("result", "start"); 
 	            				cmtData.put("empDept", empDept);
 	            				cmtData.put("cmtStart", parseTime(workStart));
 	            				cmtData.put("sttsCd", "CMTN001");
 	            				cmtData.put("empNo", empNo);
 	            				cmtData.put("empId", empId);
-            				} else {
-            					cmtData.put("result", "strNn"); // 버튼 비활성화
+            				} else { // 이후일 경우
+            					cmtData.put("result", "start"); 
+	            				cmtData.put("empDept", empDept);
+	            				cmtData.put("cmtStart", timestamp);
+	            				cmtData.put("empNo", empNo);
+	            				cmtData.put("empId", empId);
             				}
             				
             			} else {
-            				cmtData.put("result", "strNn");
+            				cmtData.put("result", "startDs");
             			}
             			
             		} else { // 출근일이 있고
-            			System.out.println(work.get("cmtDate")==null + " 출근일 있");
             			if(cmtEnd.equals("null")) { // 찍힌 퇴근 시간이 없고
             				if(timestamp.equals(parseTime(workEnd)) 
             						|| timestamp.after(parseTime(workEnd))) { // 현재 일시가 퇴근 시간이랑 같거나 이후일 경우
-	            				cmtData.put("result", "endNull"); // 버튼 활성화
+	            				cmtData.put("result", "end"); 
 	            				cmtData.put("cmtEnd", parseTime(workEnd));
             				} else {
-            					cmtData.put("result", "endNn"); // 버튼 비활성화
+            					cmtData.put("result", "end"); 
+	            				cmtData.put("cmtEnd", timestamp);
             				}
             				
             			} else {
-            				cmtData.put("result", "endNn");
+            				cmtData.put("result", "endDs");
             			}
             		}
             	}
