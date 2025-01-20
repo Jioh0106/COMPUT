@@ -38,6 +38,7 @@
 		}
 		
 		#tooltip {
+		 	position: absolute;
 		    display: none; /* 기본적으로 숨김 */
 		    position: absolute;
 		    background-color: #333; /* 어두운 배경 */
@@ -52,7 +53,11 @@
 		    max-width: 350px; /* 최대 너비 설정 */
 		    overflow: hidden; /* 텍스트가 넘칠 경우 숨김 */
 		    text-overflow: ellipsis; /* 넘치는 텍스트 생략 */
-		}
+		    }
+		    
+	
+		    
+		
 
 
 
@@ -77,7 +82,6 @@
 			</header>
 
 			<h3>요청내역</h3>
-			<h2 th:text="'권한: ' + ${emp.emp_role}"></h2>
 			<div class="card">
 				<div class="card-body">
 					
@@ -119,7 +123,7 @@
 						<!-- 그리드 끝 -->
 						
 						<!-- 툴팁 추가 -->
-						<div id="tooltip" style="display: none; position: absolute; background: #333; color: white; padding: 5px; border-radius: 4px; font-size: 12px;"></div>
+						<div id="tooltip"></div>
 								
                       </div>
                       <div class="tab-pane fade" id="send" role="tabpanel" aria-labelledby="profile-tab">
@@ -243,7 +247,7 @@
 			               return `<span class="${className}">${value}</span>`;
 			           		}, width: 100
 						},
-						{header: '반려사유', name: 'request_rejection'}
+						{header: '반려사유', name: 'request_rejection', width: 200}
 					],
 					
 					data: []
@@ -340,8 +344,8 @@
 			//----------------------- 툴팁 데이터 가져오기 (requestNo로 서버 API 호출)-----------
 			async function fetchEmployees(request_no) {
 			    try {
-			        const response = await fetch(`/api/getEmployees?request_no=${request_no}`);
-					console.log('Request URL:', `/api/getEmployees?request_no=${request_no}`); // 디버깅 로그
+			        const response = await fetch(`/api/assign/get-employees?request_no=${request_no}`);
+					console.log('Request URL:', `/api/assign/get-employees?request_no=${request_no}`); // 디버깅 로그
 					 if (!response.ok) {
 			            throw new Error(`Failed to fetch employees: ${response.statusText}`);
 			        }
@@ -370,12 +374,12 @@
 				    const tooltipRect = tooltip.getBoundingClientRect();
 
 				    // 툴팁 위치 계산 (마우스 커서 기준)
-				    const posX = event.pageX + 10; // 마우스 X 위치에서 왼쪽으로 이동 
-				    const posY = event.pageY + 10; // 마우스 Y 위치 + 10px 여백
+				    const posX = event.pageX - 300; // 마우스 X 위치에서 왼쪽으로 이동 
+				    const posY = event.pageY - 100; // 마우스 Y 위치 + 10px 여백
 
 				    // 툴팁 위치 설정 및 화면 경계 보정
-				    tooltip.style.left = Math.min(posX, window.innerWidth - tooltipRect.width - 900) + 'px';
-				    tooltip.style.top = Math.min(posY, window.innerHeight - tooltipRect.height - 550) + 'px';
+				    tooltip.style.left = Math.min(posX, window.innerWidth - tooltipRect.width -10) + 'px';
+				    tooltip.style.top = Math.min(posY, window.innerHeight - tooltipRect.height -10) + 'px';
 			}
 
 			// 툴팁 숨기기 함수
@@ -448,7 +452,7 @@
 			
 	});	//돔 끝
 				
-			</script>
+</script>
 
 </body>
 

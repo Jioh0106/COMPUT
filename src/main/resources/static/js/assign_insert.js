@@ -1,7 +1,7 @@
 // ajax fetch API
 async function fetchCommonDetails() {
 	try{
-	  	const response = await fetch("/api/assignCommonDetail");
+	  	const response = await fetch("/api/assign/commondetail");
 		if(!response.ok){
 			throw new Error("Network response was not ok");
 		}
