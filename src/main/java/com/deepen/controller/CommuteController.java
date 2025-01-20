@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,21 +112,7 @@ public class CommuteController {
 	
 	@PostMapping("/insertCmt")
 	@ResponseBody
-	public int insertCmt(@AuthenticationPrincipal User user/*, @RequestBody Map<String, Object> searchMap*/) {
-		
-		// 로그인한 유저 아이디 값으로 사원 테이블에서 권한 조회
-		Map<String, Object> empAthr = service.selectEmpAthr(user.getUsername());
-		
-		Map<String, Object> searchMap = new HashMap<>();
-		
-		// 로그인 유저에 대한 정보를 담은 변수 선언
-		String id = user.getUsername(); // 로그인 유저 사원번호
-		String dept = (String) empAthr.get("EMP_DEPT"); // 로그인 유저 부서
-		String no = String.valueOf(empAthr.get("EMP_NO")); // 로그인 유저 인덱스(사원번호)
-		
-		searchMap.put("empId", String.valueOf(user.getUsername()));
-		searchMap.put("empDept", dept);
-		searchMap.put("empNo", no);
+	public int insertCmt(@AuthenticationPrincipal User user, @RequestBody Map<String, Object> searchMap) throws ParseException {
 		
 		int result = service.insertCmt(searchMap);
 		

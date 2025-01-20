@@ -13,8 +13,10 @@
 		        <!-- 날짜 -->
 	        	<div class="d-flex align-items-center">
 	        		<h4 id="todayDate" class="me-3" >날짜</h4>
-	        		<button type="button" class="btn btn-primary btn" id="atndBtn" onclick="cmtBtn()">출근하기</button>
+	        		<button type="button" class="btn btn-primary btn" id="atndBtn">출근하기</button>
 	        		<!-- data로 담아 갈 input -->
+	        		<input type="hidden" id="cmtCd">
+	        		<input type="hidden" id="cmtTime">
 	        		<input type="hidden" id="deptCd">
 					<input type="hidden" id="sttsCd">
 					<input type="hidden" id="empNo">
@@ -221,6 +223,9 @@
 		<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 		<script src="/assets/js/bootstrap.bundle.min.js"></script>
 		<script th:inline="javascript" th:src="@{/js/main_cmt.js}"></script>
+		
+		<!-- sweetAlert CDN -->
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 	</div> <!-- th:fragment -->
 </html>
