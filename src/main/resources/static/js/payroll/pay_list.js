@@ -129,11 +129,11 @@ function initializeMainGrid() {
         el: document.getElementById('mainGrid'),
         data: [],
         rowHeaders: [],
-        bodyHeight: 400,
+        bodyHeight: 550,
         columns: [
             {
                 header: '지급월',
-                name: 'formattedDate',
+                name: 'paymentDate',
                 align: 'center',
             },
             {
@@ -180,14 +180,13 @@ function initializeMainGrid() {
 //@param {string} keyword - 검색 키워드
 async function loadMainGrid(keyword = '') {
     try {
-        const data = await fetchAPI('/api/payroll/pay-list/summary', { keyword });
+        const data = await fetchAPI('/api/payroll/pay-list/summary',{keyword});
         const formattedData = data.map(item => ({
-            formattedDate: item.formattedDate,
+            paymentDate: item.paymentDate,
             payrollName: item.payrollName,
             headcount: parseInt(item.headcount) || 0,
             payrollDetail: 'view',
-            totalAmount: parseInt(item.totalAmount) || 0,
-            paymentDate: item.paymentDate
+            totalAmount: parseInt(item.totalAmount) || 0
         }));
         
         mainGrid.resetData(formattedData);
@@ -267,27 +266,16 @@ const CATEGORY_NAMES = {
 //연간 급여 데이터 로드 함수
 //@param {number} year - 조회할 연도
 async function loadAnnualData(year) {
-    if (!year) {
-        console.warn('연도가 선택되지 않았습니다.');
-        return;
-    }
-
-    try {
-        const data = await fetchAPI(`/api/payroll/pay-list/annual/${year}`);
-        if (!data || data.length === 0) {
+        const data = await fetchAPI(`/api/payroll/pay-list/annual/${year}`,{year});
+        if (!data) {
             annualGrid.resetData([]);
-            alert('선택한 연도의 급여 데이터가 없습니다.');
             return;
         }
 
         const gridData = processAnnualData(data);
         annualGrid.resetData(gridData);
-        
-        setTimeout(() => annualGrid.refreshLayout(), 100);
-    } catch (error) {
-        alert('연간 데이터 로드 중 오류가 발생했습니다.');
-        annualGrid.resetData([]);
-    }
+        //시간 지연을 통해 안정적인 렌더링 보장(50ms)
+        setTimeout(() => annualGrid.refreshLayout(), 50);
 }
 
 //연간 급여 데이터 처리 함수
@@ -505,7 +493,7 @@ async function loadDetailGrid(paymentDate) {
         
         // 모달 제목 업데이트
         $('#payrollDetailModalTitle').text(
-            `${paymentDate.replace('-', '/')} 급여대장`
+            `${paymentDate} 급여대장`
         );
     } catch (error) {
         console.error('Error:', error);

@@ -20,15 +20,15 @@ public interface PayListMapper {
     
     // 특정 월 급여 대장 상세 정보 조회
     List<PayListDTO> getMonthlyPayrollDetail(
-            @Param("paymentDate") String paymentDate,
-            @Param("department") String department
-        );
+        @Param("paymentDate") String paymentDate,
+        @Param("department") String department
+    );
 
     // 부서별 급여 통계
     Map<String, Object> getDepartmentPayrollStats(
         @Param("paymentDate") String paymentDate
     );
     
- // 연간 급여 대장
+    // 연간 급여 대장
     List<PayListDTO> getAnnualPayrollData(@Param("year") String year);
-}
+	}

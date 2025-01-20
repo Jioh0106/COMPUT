@@ -53,10 +53,7 @@ public class PayrollController {
     // 급여 대장 관리
     @GetMapping("/pay-list")
     public String payList(
-        @RequestParam(name = "viewType", required = false) String viewType,
-        @RequestParam(name = "keyword", required = false) String keyword,
-        Model model
-    ) {
+        @RequestParam(name="viewType",required=false) String viewType,@RequestParam(name="keyword",required=false) String keyword,Model model){
         List<PayListDTO> payListSummary = payListService.getMonthlyPayrollSummary(viewType, keyword);
         model.addAttribute("payListSummary", payListSummary);
         return "payroll/pay_list";
