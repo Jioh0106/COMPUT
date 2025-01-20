@@ -2,7 +2,6 @@ package com.deepen.controller;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -146,15 +144,9 @@ public class PayrollRestController {
                     "message", "저장되었습니다.",
                     "status", "success"
                 ));
-        } else {
-            return ResponseEntity.badRequest()
-                .body(Map.of(
-                    "message", String.join("\n", (List<String>) result.get("errors")),
-                    "status", "error"
-                ));
         }
+		return null; 
     }
-
     //급여 지급 이력 - 부서 목록
     @GetMapping("/pay-info/departments")
     public ResponseEntity<?> getDepartments() {
@@ -201,22 +193,15 @@ public class PayrollRestController {
     }
     
     
-    //특정 월의 급여 미지급 직원 목록
     @GetMapping("/pay-info/missing")
     public ResponseEntity<?> getMissingPaymentEmployees(@RequestParam("paymentDate") String paymentDate) {
-        try {
-            List<Map<String, Object>> missingEmployees = payInfoService.getMissingPaymentEmployees(paymentDate);
-                
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", missingEmployees.isEmpty() ? 
+        List<Map<String, Object>> missingEmployees = payInfoService.getMissingPaymentEmployees(paymentDate);
+        return ResponseEntity.ok(Map.of(                             
+            "message", missingEmployees.isEmpty() ? 
                 "해당 월의 모든 직원에게 급여가 지급되었습니다." : 
-                String.format("%d명의 미지급 직원이 있습니다.", missingEmployees.size()));
-            response.put("data", missingEmployees);
-                
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "조회 중 오류가 발생했습니다."));
-        }
+                String.format("%d명의 미지급 직원이 있습니다.", missingEmployees.size()),
+            "data", missingEmployees
+        ));
     }
     
     // 급여명세서 PDF 미리보기	
@@ -301,53 +286,6 @@ public class PayrollRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    //==============   급여 대장   =================== //
-    
-    // 월별 급여 대장 메인
-    @GetMapping("/pay-list/summary")
-    public ResponseEntity<?> getMonthlyPayrollSummary(
-        @RequestParam(name = "keyword", required = false) String keyword
-    ) {
-        try {
-            log.info("REST Controller - Received search request with keyword: " + keyword);
-            List<PayListDTO> summary = payListService.getMonthlyPayrollSummary(null, keyword);
-            return ResponseEntity.ok(summary);
-        } catch (Exception e) {
-            log.severe("Error in getMonthlyPayrollSummary: " + e.getMessage());
-            return ResponseEntity.badRequest()
-                .body(Map.of("message", "조회 중 오류가 발생했습니다: " + e.getMessage()));
-        }
-    }
-    
-    //급여 대장 모달
-    @GetMapping("/pay-list/detail")
-    public ResponseEntity<?> getMonthlyPayrollDetail(
-        @RequestParam(name = "paymentDate") String paymentDate
-    ) {
-        try {
-            List<PayListDTO> detail = payListService.getMonthlyPayrollDetail(paymentDate, null);
-            return ResponseEntity.ok(detail);
-        } catch (Exception e) {
-            log.severe("Error in getMonthlyPayrollDetail: " + e.getMessage());
-            return ResponseEntity.badRequest()
-                .body(Map.of("message", "상세 정보 조회 중 오류가 발생했습니다: " + e.getMessage()));
-        }
-    }
-    
-    //연간 급여 대장 조회
-    @GetMapping("/pay-list/annual/{year}")
-    public ResponseEntity<?> getAnnualPayroll(@PathVariable(name = "year") String year) {
-        try {
-            log.info("Fetching annual payroll data for year: " + year);
-            List<PayListDTO> annualData = payListService.getAnnualPayrollData(year);
-            return ResponseEntity.ok(annualData);
-        } catch (Exception e) {
-            log.severe("Error in getAnnualPayroll: " + e.getMessage());
-            return ResponseEntity.badRequest()
-                .body(Map.of("message", "연간 급여 데이터 조회 중 오류가 발생했습니다: " + e.getMessage()));
-        }
-    }
     
     @PreAuthorize("hasRole('ATHR001')")  
     @DeleteMapping("/pay-info")
@@ -368,6 +306,26 @@ public class PayrollRestController {
                     "status", "error"
                 ));
         }
+    }
+
+    //==============   급여 대장   =================== //
+    
+    // 월별 급여 대장 메인
+    @GetMapping("/pay-list/summary")
+    public List<PayListDTO> getMonthlyPayrollSummary(@RequestParam("keyword") String keyword){
+     return payListService.getMonthlyPayrollSummary(null, keyword);
+    }    
+    
+    //급여 대장 모달
+    @GetMapping("/pay-list/detail")
+    public List<PayListDTO> getMonthlyPayrollDetail(@RequestParam("paymentDate") String paymentDate){
+    return payListService.getMonthlyPayrollDetail(paymentDate, "");
+    }
+    
+    //연간 급여 대장 조회
+    @GetMapping("/pay-list/annual/{year}")
+    public List<PayListDTO> getAnnualPayroll(@RequestParam("year") String year) {
+    return payListService.getAnnualPayrollData(year);
     }
     
 }

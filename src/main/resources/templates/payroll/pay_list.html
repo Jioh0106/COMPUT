@@ -8,7 +8,7 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     
-    <title>COMPUT.</title>
+    <title>급여 대장</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
     <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/app.css">
-    <link rel="icon" href="images/favicon.png" type="images/png">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="assets/image/x-icon">
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
 <style>
@@ -91,7 +91,7 @@
                                 <a href="#" class="btn btn-primary rounded-pill" 
                                    style="margin-left: 5px;">Search</a>
                             </div>
-                            <div id="mainGrid" style="width:100%; height:400px;"></div>
+                            <div id="mainGrid" style="width:100%;"></div>
                         </div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-    <!-- 그리드들이 여기에 동적으로 생성됩니다 -->
+    <!-- 그리드 동적 생성 -->
 			</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal">닫기</button>
@@ -150,7 +150,6 @@
     
 </script>
 
-<!-- pay_list.js는 마지막에 로드 -->
 <script src="/js/payroll/pay_list.js"></script>
     
 </body>
