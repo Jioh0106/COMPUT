@@ -21,6 +21,22 @@ function j(t,e,o,i){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+	// 오늘 날짜를 "yyyy년 MM월 dd일 (요일)" 형식으로 포맷
+	function formatDateWithDay(date) {
+	    const year = date.getFullYear();
+	    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1 필요)
+	    const day = String(date.getDate()).padStart(2, '0'); // 날짜를 두 자리로
+	    const dayNames = ['일', '월', '화', '수', '목', '금', '토']; // 요일 배열
+	    const dayName = dayNames[date.getDay()]; // 요일 가져오기
+	    return `${year}년 ${month}월 ${day}일 (${dayName})`;
+	}
+
+	// 오늘 날짜 가져오기 및 todayDate에 출력
+	const today = new Date();
+	const formattedToday = formatDateWithDay(today);
+	$('#todayDate').text(formattedToday); // 오늘 날짜 출력
+	
+	
     // 현재 경로에 해당하는 메뉴 활성화 및 서브메뉴 표시
     function activateCurrentMenu() {
         const currentPath = window.location.pathname;
