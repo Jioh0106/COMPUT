@@ -70,7 +70,7 @@
                         		<input type="text"  name="subject" placeholder="제목을 입력하세요" class="my-2"> 
                         	</div>
                         	<div class="row">
-                           		<textarea id="dark" name="content" cols="30" rows="10"></textarea>
+                           		<textarea id="content" name="content" cols="30" rows="10"></textarea>
                             </div>
                             <div class="row">
                             	<input type="file" name="file" class="my-2 px-0">
@@ -115,7 +115,7 @@
     <script src="assets/vendors/tinymce/plugins/code/plugin.min.js"></script>
     <script>
         tinymce.init({ selector: '#default' });
-        tinymce.init({ selector: '#dark', toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent code', plugins: 'code' });
+        tinymce.init({ selector: '#content', toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent code', plugins: 'code' });
     </script>
     <script src="assets/js/main.js"></script>
     <!-- sweetAlert CDN -->

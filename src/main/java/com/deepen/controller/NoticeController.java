@@ -41,8 +41,10 @@ public class NoticeController {
 	@PostMapping("/notice-write")
 	public String writeNoticePost(@RequestParam("subject") String subject,
 			@RequestParam("content") String content,
-			@RequestParam("file") MultipartFile file) {
-		log.info(subject+", "+content+", "+file);
+			@RequestParam("file") MultipartFile file,
+			NoticeDTO noticeDTO) {
+		//log.info(subject+", "+content+", "+file);
+		log.info(noticeDTO.toString());
 		
 		return "redirect:/notice-write";
 	}
