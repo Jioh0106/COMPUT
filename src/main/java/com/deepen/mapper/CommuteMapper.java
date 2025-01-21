@@ -22,4 +22,6 @@ public interface CommuteMapper {
 
 	int insertCmt(Map<String, Object> cmtData);
 
+	int updateCmt(Map<String, Object> searchMap);
+
 }
