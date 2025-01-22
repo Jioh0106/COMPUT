@@ -56,7 +56,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-								공지사항 글목록
+								공지사항 글쓰기
 							</h5>
                             <button type="button" class="close" data-bs-dismiss="modal"
                                 aria-label="Close">
@@ -70,7 +70,7 @@
                         		<input type="text"  name="subject" placeholder="제목을 입력하세요" class="my-2"> 
                         	</div>
                         	<div class="row">
-                           		<textarea id="dark" name="content" cols="30" rows="10"></textarea>
+                           		<textarea id="content" name="content" cols="30" rows="10"></textarea>
                             </div>
                             <div class="row">
                             	<input type="file" name="file" class="my-2 px-0">
@@ -96,16 +96,38 @@
             <!-- 글쓰기폼 끝  -->
 
             <div class="display-flex">
-                <h3>공지사항 모달 버튼</h3>
+                <h3>공지사항 게시판</h3>
                 <!-- <span sec:authentication="principal.authorities"></span><br> -->
                 <div class="buttons">
                     <!--신규 등록 버튼-->
-                    <button type="button" class="btn btn-primary" onclick="popUp()"  data-bs-toggle="modal" data-bs-target="#noticeModal"
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#noticeModal"
                     	sec:authorize="hasAnyRole('ATHR001','ATHR002')">
-                        더 보기 모달 버튼
+                        글쓰기 모달 버튼
                     </button>
                 </div>
             </div>
+            
+            <hr>
+            
+            <div class="col-md-12 col-12">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                        	<table>
+                        		<tbody>
+	                        		<tr>
+	                        			<td id="bno">글번호</td>
+	                        			<td id="subject">글제목</td>
+	                        			<td id="name">작성자</td>
+	                        			<td id="readCount">조회수</td>
+	                        			<td id="writeDate">게시일</td>
+	                        		</tr>
+                        		</tbody>
+                        	</table>
+                        </div>
+                    </div>
+                 </div>
+             </div>
         </div>
     </div>
 
@@ -115,7 +137,7 @@
     <script src="assets/vendors/tinymce/plugins/code/plugin.min.js"></script>
     <script>
         tinymce.init({ selector: '#default' });
-        tinymce.init({ selector: '#dark', toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent code', plugins: 'code' });
+        tinymce.init({ selector: '#content', toolbar: 'undo redo styleselect bold italic alignleft aligncenter alignright bullist numlist outdent indent code', plugins: 'code' });
     </script>
     <script src="assets/js/main.js"></script>
     <!-- sweetAlert CDN -->
