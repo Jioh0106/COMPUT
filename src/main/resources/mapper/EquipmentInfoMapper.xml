@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.EquipmentInfoMapper">
+
+	<select id="yearMonthList" resultType="map">
+		SELECT 
+		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') AS "yearMonth"
+		FROM 
+		    DUAL
+		CONNECT BY 
+		    LEVEL <![CDATA[<=]]> MONTHS_BETWEEN(TRUNC(SYSDATE, 'MM'), DATE '2024-12-01') + 1
+		ORDER BY 
+		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') desc
+	</select>
+	
+	<select id="equipmentInfo" resultType="map" parameterType="map">
+		 SELECT *
+		 FROM
+			 (SELECT 
+						  '573829' AS "no"
+						, '그냥기계' AS "name"
+						, '절단' AS "type"
+						, '설비의 모든 것' AS "mnfct"
+						, '2025-01-12' AS "buy"
+						, '2025-01-20' AS "set"
+						, 'Y' AS "useYn"
+						, 'select' AS  "rowType"
+					FROM
+						dual
+					UNION ALL
+					SELECT 
+						  '754903' AS "no"
+						, '비싼기계' AS "name"
+						, '절삭' AS "type"
+						, '사장님이 미쳤어요' AS "mnfct"
+						, '2025-01-12' AS "buy"
+						, '2025-01-20' AS "set"
+						, 'Y' AS "useYn"
+						, 'select' AS  "rowType"
+					FROM
+						dual
+					UNION ALL
+					SELECT 
+						  '66042' AS "no"
+						, '저렴한기계' AS "name"
+						, '조립' AS "type"
+						, '조림말고조립' AS "mnfct"
+						, '2025-01-12' AS "buy"
+						, '2025-01-20' AS "set"
+						, 'Y' AS "useYn"
+						, 'select' AS  "rowType"
+					FROM
+						dual)
+				<where>
+					<if test="yearMonth != null and yearMonth != ''">
+						 AND TO_CHAR(TO_DATE("buy", 'YYYY-MM-DD'), 'YYYY-MM') = #{yearMonth}
+				 	</if>
+					<if test="value != null and value != ''">
+						 AND (TO_CHAR(TO_DATE("buy", 'YYYY-MM-DD'), 'YYYY-MM') = #{value}
+						 	  OR "name" LIKE '%' || #{value} || '%')
+				 	</if>
+				</where>
+	</select>
+	
+	
+	
+	
+</mapper>
+
+
+
