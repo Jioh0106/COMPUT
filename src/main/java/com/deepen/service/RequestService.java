@@ -171,11 +171,13 @@ public class RequestService {
 			
 			LocalDateTime deadline = request.getRequest_deadline();
 			if(deadline.toLocalDate().isEqual(now.toLocalDate())){
-				request.setRequest_rejection("기간마감");
+				
 				if(request.getRequest_status().equals("RQST001")){
 					request.setRequest_status("RQST002");
+					request.setRequest_rejection("기간마감");
 				}else if(request.getRequest_status().equals("RQST003")) {
 					request.setRequest_status("RQST004");
+					request.setRequest_rejection("기간마감");
 				}
 				 rqRepository.save(request); // 변경된 데이터 저장
 				 log.info("해당요청번호 업데이트"+request.getRequest_no().toString());
