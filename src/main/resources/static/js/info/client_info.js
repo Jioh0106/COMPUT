@@ -13,11 +13,30 @@ $(function() {
 		data: data, 
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '자재번호', name: 'mtr_no', editor: isEditable ? 'text' : null},
-			{header: '자재명', name: 'mtr_name', editor: isEditable ? 'text' : null},
-			{header: '최소단위', name: 'ress_unit', editor: isEditable ? 'text' : null},
-			{header: '사용 단위', name: 'use_unit', editor: isEditable ? 'text' : null},
-			{header: '사용여부', name: 'mtr_status', editor: isEditable ? 'text' : null},
+			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},
+			{ header: '거래처명', name: 'client_name', width: 150, editor: isEditable ? 'text' : null},
+			{ header: '연락처', name: 'client_tel', width: 100, editor: isEditable ? 'text' : null},
+			{ header: '대표자명', name: 'client_boss', width: 80, editor: isEditable ? 'text' : null},
+			{ header: '담당자명', name: 'client_emp', width: 80, editor: isEditable ? 'text' : null},
+			{ header: '우편번호', name: 'client_postcode', width: 80, editor: isEditable ? 'text' : null},
+			{ header: '주소', name: 'client_adrress', width: 250, editor: isEditable ? 'text' : null},
+			{
+				header: '구분', 
+				name: 'client_type', 
+				width: 100, 
+				editor: isEditable
+					? {
+					type: 'select',
+					options: {
+                        listItems: [
+                            { text: '수주', value: '수주' },
+                            { text: '발주', value: '발주' }
+                        ]
+                    }
+			    } : null,
+				filter: 'select'
+			},
+			{ header: '메모', name: 'client_memo', width: 150, editor: isEditable ? 'text' : null},
 		],
 		editing: isEditable  // 편집 기능 활성화
 	});
@@ -26,20 +45,24 @@ $(function() {
 	$('#append').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
-		// 현재 그리드 데이터를 가져와 ABSENCE_NO의 최대값 계산
+		// 현재 그리드 데이터를 가져와 client_no의 최대값 계산
 	    const gridData = grid.getData();
 	    const maxNo = gridData.reduce((max, row) => {
-	        const mtr_no = parseInt(row.mtr_no, 10); // ABSENCE_NO를 숫자로 변환
-	        return !isNaN(mtr_no) && mtr_no > max ? mtr_no : max;
+	        const client_no = parseInt(row.client_no, 10);
+	        return !isNaN(client_no) && client_no > max ? client_no : max;
 	    }, 0);
 		
 		// 기본값으로 새 행 데이터 생성
 		const newRow = {
-			mtr_no: maxNo +1,
-			mtr_name: '',
-			ress_unit: '',
-			use_unit: '', 
-			mtr_status: '', 
+			client_no: maxNo +1,
+			client_name: '',
+			client_tel: '',
+			client_boss: '', 
+			client_emp: '', 
+			client_postcode: '', 
+			client_adrress: '', 
+			client_type: '', 
+			client_memo: ''
 		};
 		
 		// 새 행을 TOAST UI Grid에 추가
@@ -63,7 +86,7 @@ $(function() {
 		const invalidRows = modifiedRows.createdRows.filter(row => {
 			console.log('검사 중인 행 데이터:', row); // 디버깅용 출력
 		    return (
-		        !row.mtr_name 
+		        !row.client_name 
 		    );
 		});
 	
@@ -99,7 +122,7 @@ $(function() {
 		
 		const deleteList = selectedRows.map(row => row.mtr_no);
 		
-		axios.post('/api/material/delete', deleteList, {
+		axios.post('/api/client/delete', deleteList, {
 			headers: {
 			        'X-CSRF-TOKEN': csrfToken
 			    }
@@ -131,7 +154,7 @@ $(function() {
 		    createdRows: modifiedRows.createdRows
 		};
 
-	    axios.post('/api/material/save', payload, {
+	    axios.post('/api/client/save', payload, {
 	        headers: {
 	            'X-CSRF-TOKEN': csrfToken
 	        }

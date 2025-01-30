@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.deepen.entity.Material;
-import com.deepen.service.MaterialService;
+import com.deepen.entity.Client;
+import com.deepen.service.ClientService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -15,23 +15,23 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Controller
 @Log
-public class MaterialController {
+public class ClientController {
 	
-	/** 자재 서비스 */
-	private final MaterialService service;
+	/** 거래처 서비스 */
+	private final ClientService service;
 	
 	/**
 	 * 초기 화면
 	 * @view model
 	 * @return String
 	 */
-	@GetMapping("/material-info")
-	public String MaterialInfo(Model model) {
+	@GetMapping("/client-info")
+	public String ClientInfo(Model model) {
 		
-		List<Material> materialList = service.materialList();
-		model.addAttribute("materialList", materialList);
+		List<Client> clientList = service.clientList();
+		model.addAttribute("clientList", clientList);
 		
-		return "info/material_info";
+		return "info/client_info";
 		
 	}
 
