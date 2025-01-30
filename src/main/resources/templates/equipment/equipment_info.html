@@ -18,8 +18,8 @@
 	<link rel="icon" href="images/favicon.png" type="images/png">
 	
 	<!-- TOAST UI CDN -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	
 	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
 	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
@@ -141,8 +141,8 @@
 	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- TOAST UI CDN -->
-	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	
 	<script th:inline="javascript">
 
@@ -173,14 +173,39 @@
 				el: document.getElementById('grid'),
 				rowHeaders: ['checkbox'],
 				columns: [
-					{header: '고유번호',	name: 'id'},
-					{header: '일련번호',	name: 'no',		editor: 'text', sortable: true},
+					{header: '고유번호',	name: 'no'},
+					{header: '일련번호',	name: 'sn',		editor: 'text', sortable: true},
 					{header: '설비명',		name: 'name',	editor: 'text', sortable: true},
-					{header: '종류',		name: 'type',	editor: 'text', sortable: true},
+					{header: '종류',		name: 'kind',	editor: {
+														            type: 'select',
+														            options: {
+														              listItems: [
+														                { text: '절단', value: '절단' },
+														                { text: '절삭', value: '절삭' },
+														                { text: '조립', value: '조립' }
+														              ]
+														            }}, 	sortable: true},
 					{header: '제조사',		name: 'mnfct',	editor: 'text', sortable: true},
-					{header: '구입일',		name: 'buy',	editor: 'text', sortable: true},
-					{header: '설치일',		name: 'set',	editor: 'text', sortable: true},
-					{header: '사용여부',	name: 'useYn',	editor: 'text', sortable: true},
+					{header: '구입일',		name: 'buy',    editor: {
+													                type: 'datePicker',
+													                options: {
+													                    format: 'yyyy-MM-dd',
+																	language: 'ko'
+													                }}, 	sortable: true},
+					{header: '설치일',		name: 'set',    editor: {
+													                type: 'datePicker',
+													                options: {
+													                    format: 'yyyy-MM-dd',
+																	language: 'ko'
+													                }}, 	sortable: true},
+					{header: '사용여부',	name: 'useYn',	editor: {
+														            type: 'select',
+														            options: {
+														              listItems: [
+														                { text: 'Y', value: 'Y' },
+														                { text: 'N', value: 'N' },
+														              ]
+														            }}, 	sortable: true},
 					{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
 				],
 				data: data,
@@ -190,16 +215,16 @@
 			});
 			
 			// id 및 rowType 숨기기
-			grid.hideColumn("id");
+			grid.hideColumn("no");
 			grid.hideColumn("rowType");
 			
 			// 추가 버튼 이벤트
 			add.addEventListener('click', () => {
 				grid.appendRow({
-					"id": "",
 					"no": "",
+					"sn": "",
 					"name": "",
-					"type": "",
+					"kind": "",
 					"mnfct": "",
 					"buy": "",
 					"set": "",
@@ -279,10 +304,12 @@
 				const rowData = {};
 
 				// 각 행의 데이터를 꺼냄
-				rowData.id		= row.id;		// 고유번호
-				rowData.no		= row.no;		// 일련번호
+				//if(row.no != null && row.no != 'null' && row.no != '' && row.no != 'undefind'){
+					rowData.no	= row.no;		// 고유번호
+				//}
+				rowData.sn		= row.sn;		// 일련번호
 				rowData.name	= row.name;		// 설비명
-				rowData.type	= row.type;	 	// 종류
+				rowData.kind	= row.kind;	 	// 종류
 				rowData.mnfct	= row.mnfct;	// 제조사
 				rowData.buy		= row.buy;		// 구입일
 				rowData.set		= row.set;		// 설치일

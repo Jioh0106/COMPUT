@@ -15,6 +15,10 @@ public interface EquipmentInfoMapper {
 	
 	List<Map<String, Object>> equipmentInfo(Map<String, Object> searchMap);
 
-	//int saveData(List<Map<String, Object>> saveDataList);
+	int eqpInsert(Map<String, Object> saveDataList);
+
+	int eqpUpdate(Map<String, Object> saveDataList);
+
+	int eqpDelete(Map<String, Object> saveData);
 
 }

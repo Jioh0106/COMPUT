@@ -25,10 +25,23 @@ public class EquipmentInfoService {
 		return mapper.equipmentInfo(searchMap);
 	}
 
-	/*
-	 * public int saveData(List<Map<String, Object>> saveDataList) { return
-	 * mapper.saveData(saveDataList); }
-	 */
+	public int eqpSaveData(List<Map<String, Object>> saveDataList) {
+		//[{no=, sn=754903, name=비싼기계, kind=절삭, mnfct=사장님이 미쳤어요, buy=2025-01-13, set=2025-01-22, useYn=Y, rowType=insert}]
+		int result = 0;
+		System.out.println(saveDataList.toString());
+		for(Map<String, Object> saveData : saveDataList) {
+			String rowType = String.valueOf(saveData.get("rowType"));
+			if(rowType.equals("insert")) {
+				result = mapper.eqpInsert(saveData); 
+			} else if(rowType.equals("update")) {
+				result = mapper.eqpUpdate(saveData);
+			} else {
+				result = mapper.eqpDelete(saveData);
+			}
+		}
+		 return result;
+	}
+	 
 
 
 }
