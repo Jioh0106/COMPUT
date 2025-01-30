@@ -75,9 +75,9 @@ public class EquipmentInfoController {
 	@ResponseBody
 	public int eqpSaveData(@RequestBody List<Map<String, Object>> saveDataList) {
 
-		//int result = service.eqpSaveData(saveDataList);
+		int result = service.eqpSaveData(saveDataList);
 
-		return 1;
+		return result;
 	}
 
 	

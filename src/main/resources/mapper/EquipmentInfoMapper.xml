@@ -16,56 +16,74 @@
 	</select>
 	
 	<select id="equipmentInfo" resultType="map" parameterType="map">
-		 SELECT *
+		 SELECT
+		 				  info_no as "no"
+		 				, info_sn as "sn"
+						, info_nm as "name"
+						, info_kind as "kind"
+						, info_mnfct as "mnfct"
+						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
+						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
+						, info_useyn as "useYn"
+						, 'select' AS  "rowType"
 		 FROM
-			 (SELECT 
-						  '573829' AS "no"
-						, '그냥기계' AS "name"
-						, '절단' AS "type"
-						, '설비의 모든 것' AS "mnfct"
-						, '2025-01-12' AS "buy"
-						, '2025-01-20' AS "set"
-						, 'Y' AS "useYn"
-						, 'select' AS  "rowType"
-					FROM
-						dual
-					UNION ALL
-					SELECT 
-						  '754903' AS "no"
-						, '비싼기계' AS "name"
-						, '절삭' AS "type"
-						, '사장님이 미쳤어요' AS "mnfct"
-						, '2025-01-12' AS "buy"
-						, '2025-01-20' AS "set"
-						, 'Y' AS "useYn"
-						, 'select' AS  "rowType"
-					FROM
-						dual
-					UNION ALL
-					SELECT 
-						  '66042' AS "no"
-						, '저렴한기계' AS "name"
-						, '조립' AS "type"
-						, '조림말고조립' AS "mnfct"
-						, '2025-01-12' AS "buy"
-						, '2025-01-20' AS "set"
-						, 'Y' AS "useYn"
-						, 'select' AS  "rowType"
-					FROM
-						dual)
-				<where>
-					<if test="yearMonth != null and yearMonth != ''">
-						 AND TO_CHAR(TO_DATE("buy", 'YYYY-MM-DD'), 'YYYY-MM') = #{yearMonth}
-				 	</if>
-					<if test="value != null and value != ''">
-						 AND (TO_CHAR(TO_DATE("buy", 'YYYY-MM-DD'), 'YYYY-MM') = #{value}
-						 	  OR "name" LIKE '%' || #{value} || '%')
-				 	</if>
-				</where>
+			 equipment_info
+		<where>
+			<if test="yearMonth != null and yearMonth != ''">
+				 AND TO_CHAR(info_buy_date, 'YYYY-MM') = #{yearMonth}
+		 	</if>
+			<if test="value != null and value != ''">
+				 AND (TO_CHAR(info_buy_date, 'YYYY-MM') = #{value}
+				 	  OR info_nm LIKE '%' || #{value} || '%')
+		 	</if>
+		</where>
+		ORDER BY
+			info_buy_date DESC
 	</select>
 	
+	<insert id="eqpInsert" parameterType="map">
+		INSERT INTO equipment_info (
+			info_no
+		  , info_sn
+		  , info_nm
+		  , info_kind
+		  , info_mnfct
+		  , info_buy_date
+		  , info_set_date
+		  , info_useyn
+		  , info_reg_date
+		
+		) VALUES ( 
+			equipment_info_seq.NEXTVAL
+		  , #{sn}
+		  , #{name}
+		  , #{kind}
+		  , #{mnfct}
+		  , TO_DATE(#{buy}, 'YYYY-MM-DD')
+		  , TO_DATE(#{set}, 'YYYY-MM-DD')
+		  , #{useYn}
+		  , CURRENT_DATE
+		)
+	</insert>
 	
+	<update id="eqpUpdate" parameterType="map">
+		UPDATE equipment_info 
+		SET   info_sn			= #{sn}
+			, info_nm			= #{name}
+			, info_kind			= #{kind}
+			, info_mnfct		= #{mnfct}
+			, info_buy_date		= TO_DATE(#{buy}, 'YYYY-MM-DD')
+			, info_set_date		= TO_DATE(#{set}, 'YYYY-MM-DD')
+			, info_useyn		= #{useYn}
+			, info_mdfn_date	= CURRENT_DATE
+		WHERE info_no 			= #{no}
+	</update>
 	
+	<delete id="eqpDelete" parameterType="map">
+		DELETE 
+		  FROM equipment_info
+		 WHERE info_no = #{no}
+	</delete>
 	
 </mapper>
 
