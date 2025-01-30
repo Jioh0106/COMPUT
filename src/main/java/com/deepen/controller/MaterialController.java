@@ -29,7 +29,6 @@ public class MaterialController {
 	public String MaterialInfo(Model model) {
 		
 		List<Material> materialList = service.materialList();
-		log.info(materialList.toString());
 		model.addAttribute("materialList", materialList);
 		
 		return "info/material_info";

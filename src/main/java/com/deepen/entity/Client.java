@@ -20,25 +20,25 @@ public class Client {
 	@Column(name = "client_name", length = 200, nullable = false)
 	private String client_name;
 	
-	@Column(name = "client_tel", length = 30, nullable = false)
+	@Column(name = "client_tel", length = 30)
 	private String client_tel;
 	
-	@Column(name = "client_boss", length = 30, nullable = false)
+	@Column(name = "client_boss", length = 30)
 	private String client_boss;
 	
-	@Column(name = "client_emp", length = 30, nullable = false)
+	@Column(name = "client_emp", length = 30)
 	private String client_emp;
 	
 	@Column(name = "client_postcode")
 	private Integer client_postcode;
 	
-	@Column(name = "client_adrress", length = 200, nullable = false)
+	@Column(name = "client_adrress", length = 200)
 	private String client_adrress;
 	
-	@Column(name = "client_type", length = 30, nullable = false)
+	@Column(name = "client_type", length = 30)
 	private String client_type;
 	
-	@Column(name = "client_memo", length = 300, nullable = false)
+	@Column(name = "client_memo", length = 300)
 	private String client_memo;
 	
 	

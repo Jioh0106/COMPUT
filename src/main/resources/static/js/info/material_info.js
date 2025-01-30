@@ -14,7 +14,7 @@ $(function() {
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '자재번호', name: 'mtr_no', editor: isEditable ? 'text' : null},
-			{header: '지재명', name: 'mtr_name', editor: isEditable ? 'text' : null},
+			{header: '자재명', name: 'mtr_name', editor: isEditable ? 'text' : null},
 			{header: '최소단위', name: 'ress_unit', editor: isEditable ? 'text' : null},
 			{header: '사용 단위', name: 'use_unit', editor: isEditable ? 'text' : null},
 			{header: '사용여부', name: 'mtr_status', editor: isEditable ? 'text' : null},

@@ -15,18 +15,15 @@ import lombok.extern.java.Log;
 @Service
 public class MaterialService {
 	
+	/** 자재 레포지토리 **/
 	private final MaterialRepository repository;
-		
+	
+	/** 자재 목록 조회 **/
 	public List<Material> materialList() {
 		return repository.findAll();
 	}
 	
-	
-	public void deleteMaterial(List<Integer> deleteList) {
-		repository.deleteAllById(deleteList);
-	}
-
-
+	/** 자재 항목 추가 **/
 	public void insertMaterial(List<Material> createdRows) {
 		for(Material row : createdRows) {
 			row.setMtr_no(null);
@@ -34,12 +31,16 @@ public class MaterialService {
 		}
 	}
 
-	
+	/** 자재 항목 수정 **/
 	public void updateMaterial(List<Material> updatedRows) {
 		for(Material row : updatedRows) {
 			repository.save(row);
 		}
 	}
 	
+	/** 자재 항목 삭제 **/
+	public void deleteMaterial(List<Integer> deleteList) {
+		repository.deleteAllById(deleteList);
+	}
 	
 } // MaterialService
