@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<div class="display-flex">
+				<h3>BOM 등록</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="form-group">
+										<label for="first-name-column">상품번호</label>
+										<input type="text" name="product_no" id="proNo" class="form-control" 
+										th:value="${productNo}" readonly>
+									</div>
+								</div>
+								
+								<div class="col-md-6 col-12">
+									<div class="form-group">
+										<label for="first-name-column">상품명</label>
+										<input type="text" id="proName" name="product_name" 
+										th:value="${productName}" class="form-control" 
+										readonly>
+									</div>
+								</div>
+							</div>
+							
+							<!-- 검색 조건 시작 -->
+							<div class="row mb-4">
+							    <!-- 자재/상품명 검색 -->
+								<div class="col-md-6">
+									<label for="nameSearch" class="form-label">자재/상품명</label>
+									<div class="input-group mb-3">
+										<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+										<input type="text" class="form-control" id="searchInput" placeholder="자재 또는 상품명을 입력해주세요." aria-label="Recipient's username"
+											aria-describedby="button-addon2" onkeyup="searchMtrProduct()">
+									</div>
+								</div>
+							</div>
+							<!-- 검색 조건 끝-->	
+								
+								<!--자재/상품 그리드-->										   
+								<div id="materialGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-success" id="save"  value="등록" onclick=" popupRegistBtn()">
+										<input type="button" class="btn btn-outline-danger" id="del" value="취소">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+								
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+			
+			var Grid = tui.Grid;
+
+			
+			
+		const materialGrid = new Grid({
+				el: document.getElementById('materialGrid'),
+				rowHeaders: ['checkbox'],
+				columns: [
+					{header: '자재/상품번호', name: 'ITEM_NO', hidden: true},
+					{header: '자재구분',	name: 'ITEM_TYPE', editor: 'text', sortable: true},
+					{header: '자재/상품명',	name: 'ITEM_NAME', editor: 'text', sortable: true},
+					{header: '단위',		name: 'ITEM_UNIT', editor: 'text', sortable: true}
+					
+				],
+				data: [],
+				columnOptions: {
+				  resizable: true
+				}
+			});
+			
+		
+			function searchMtrProduct() {
+			  const searchValue = document.getElementById('searchInput').value;
+
+	          // Ajax 요청
+	          fetch(`/api/product/mtrlist?item_name=${encodeURIComponent(searchValue)}`)
+	              .then(response => response.json())
+	              .then(data => {
+					  console.log('데이터:', data);
+	                  materialGrid.resetData(data); // 그리드 데이터 업데이트
+	              })
+	              .catch(error => console.error('데이터 로드 중 오류 발생:', error));
+			}
+	
+			
+			// 페이지 로드 시 초기 데이터 가져오기
+		      document.addEventListener('DOMContentLoaded', () => {
+		           searchMtrProduct(); // 초기 데이터 조회
+		    });
+			
+			
+			//팝업창 등록버튼
+			function popupRegistBtn() {
+			 const selectedRow = materialGrid.getCheckedRows();
+				selectedRow.forEach(row => {
+				    console.log('체크된 행의 자재/상품pk:', row.ITEM_NO); // 각 행의 ITEM_NAME 출력
+				 });
+			
+			 //목적상품번호
+		  	 const product_no = /*[[${productNo}]]*/ 'UNKNOWN';
+		   	 console.log('목적상품', product_no);
+			
+			 //체크박스에서 선택한 행들.
+			 const itemSelect = selectedRow.map(row => ({
+				itemType: row.ITEM_TYPE,
+				itemNo: row.ITEM_NO,
+				itemUnit: row.ITEM_UNIT,
+				productNo: product_no
+				}));
+			 console.log("itemSelect 값:", itemSelect);
+			
+			 fetch('/api/product/bom/insert',{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					 [header]: token // CSRF 토큰 추가
+				},
+				body: JSON.stringify(itemSelect)	
+			 })
+			 .then(response => response.text()) //컨트롤러에서 String으로 응답을 받고있음. json()->text()로 바꿔줘야함.
+			 .then(data => {
+			    console.log('서버응답:', data);
+				alert(data);
+				window.opener.location.reload(); // 부모창 리로드
+				window.close(); // 팝업창 닫기
+			 })
+			 .catch(error => {
+			    console.error('에러발생:', error);
+				alert("등록실패" + error.message);
+			 });
+	  	}	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</script>
+
+
+</body>
+
+</html>

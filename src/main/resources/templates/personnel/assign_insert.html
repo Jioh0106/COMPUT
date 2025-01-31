@@ -478,7 +478,7 @@
 	        	});
 	
 	
-		 // 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+		 // (중간/최종)승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
 	        grid2.on('click', (ev) => {
 	            if (ev.rowKey !== null) {
 	                const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
@@ -498,8 +498,8 @@
 			approverString = `${selectApprover.approverEmp_id}`;
 				Swal.fire({
 				        icon: "success",
-						title: "중간승인권자 선택",
-						text: `중간승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
+						title: "승인권자 선택",
+						text: `승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
 						confirmButtonText: "확인"
 				    })
 	        }
