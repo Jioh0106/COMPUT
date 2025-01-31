@@ -48,7 +48,15 @@ public class EquipmentInfoController {
 		// 현재 월 기준으로 설비 정보 목록 조회
 		List<Map<String, Object>> equipmentList = service.equipmentInfo(searchMap);
 		model.addAttribute("equipmentList", equipmentList);
+		
+		// 거래처 목록 조회
+		List<Map<String, Object>> clientList = service.clientInfo();
+		model.addAttribute("clientList", clientList);
 
+		// 설비 종류 목록 조회
+		List<Map<String, Object>> kindList = service.kindInfo();
+		model.addAttribute("kindList", kindList);
+		
 		return "equipment/equipment_info";
 	}
 	
