@@ -33,7 +33,7 @@ public class ProductService {
 		Product product = new Product();
 		product.setProduct_name(productDto.getProduct_name());
 		product.setProduct_unit(productDto.getProduct_unit());
-		product.setProduct_price(productDto.getProduct_price());
+		product.setProduct_type(productDto.getProduct_type());
 		product.setProduct_date(LocalDateTime.now());
 		
 		pdRepository.save(product);
@@ -69,7 +69,7 @@ public class ProductService {
 			bom.setProduct_no(bomDto.getProductNo());
 			bom.setBom_date(LocalDateTime.now());
 			
-			if(bomDto.getItemType().equals("상품")) {
+			if(bomDto.getItemType().equals("반제품")) {
 				bom.setMtrproduct_no(bomDto.getItemNo());
 			}else if(bomDto.getItemType().equals("자재")) {
 				bom.setMtr_no(bomDto.getItemNo());

@@ -38,10 +38,11 @@
 		product_no AS item_no,
 	    product_name AS item_name,
 	    product_unit AS item_unit,
-	    '상품' AS  item_type
+	    product_type AS item_type
 	FROM 
 	    product
-	    
+	WHERE
+		product_type = '반제품'    
 	 ) all_select
 	WHERE 
 	    item_name LIKE '%' || #{item_name} || '%'

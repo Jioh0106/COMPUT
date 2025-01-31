@@ -18,4 +18,5 @@ public class ProductDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime product_date; //등록일
+	private String product_type; // 상품유형(반제품/완제품)
 }

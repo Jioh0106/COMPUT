@@ -124,7 +124,7 @@
 								<!-- 버튼 시작 -->
 								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
 									<div class="float-end">
-										<input type="button" class="btn btn-outline-secondary" id="bom" value="bom등록" onclick="popUp()">
+										<input type="button" class="btn btn-outline-secondary" id="bom" value="bom찾기" onclick="popUp()">
 										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick="saveData()">
 										<input type="button" class="btn btn-outline-danger" id="del" value="삭제" onclick="deleteSelectedRows()">
 									</div>
@@ -164,6 +164,14 @@
 								<select id="proUnit" class="form-control" name="product_unit">
 									<option>단위 선택</option>
 									<option value="개">개</option>
+								</select>
+								
+								
+								<label for="first-name-column">상품유형</label>
+								<select id="proType" class="form-control" name="product_type">
+									<option>상품유형</option>
+									<option value="완제품">완제품</option>
+									<option value="반제품">반제품</option>
 								</select>
 								
 	                          </div>
@@ -212,6 +220,7 @@
 				rowHeaders: ['checkbox'],
 				columns: [
 					{header: '상품번호',	name: 'PRODUCT_NO', editor: 'text', sortable: true},
+					{header: '상품유형',	name: 'PRODUCT_TYPE', editor: 'text', sortable: true},
 					{header: '상품명',	name: 'PRODUCT_NAME', editor: 'text', sortable: true},
 					{header: '단위',		name: 'PRODUCT_UNIT', editor: 'text', sortable: true},
 					{header: '등록일',	name: 'PRODUCT_DATE', editor: 'text', sortable: true}
@@ -255,10 +264,10 @@
 		  document.getElementById('registBtn').addEventListener('click', function () {
 			 const productName = document.getElementById('proName').value;
 			 const productUnit = document.getElementById('proUnit').value;
-			
+			 const productType = document.getElementById('proType').value;
 		     
 			 //빈칸검사
-			 if (!productName || !productUnit) {
+			 if (!productName || !productUnit || !productType) {
 		         alert('모든 필드를 입력하세요.');
 		         return;
 			   }
@@ -270,7 +279,8 @@
 			        contentType: 'application/json',
 			        data: JSON.stringify({
 			            product_name: productName,
-			            product_unit: productUnit
+			            product_unit: productUnit,
+			            product_type: productType
 			           
 			        }),
 					beforeSend: function (xhr) {
@@ -290,6 +300,7 @@
 				
 		  	});
      
+		  
 			//상품그리드 조회
 			function updateProductGrid() {
 			    const productName = document.getElementById('productName').value || ''; // 상품명 입력값
@@ -410,15 +421,16 @@
 			    })
 			    .then(data => {
 			        alert("삭제가 완료되었습니다.");
-					location.reload();
+					
 					// 상위 그리드에서 선택된 상품번호 가져오기
-					productGrid.on('click', (event) => {
-					    const clickedRow = productGrid.getRow(event.rowKey);
-					    const productNo = clickedRow.PRODUCT_NO; // 상품번호 가져오기
-						//하위그리드 업데이트
-						updateBomGrid(productNo);
-						
-					});
+// 					productGrid.on('click', (event) => {
+// 					    const clickedRow = productGrid.getRow(event.rowKey);
+// 					    const productNo = clickedRow.PRODUCT_NO; // 상품번호 가져오기
+// 						//하위그리드 업데이트
+// 						updateBomGrid(productNo);
+// 					});
+			        updateBomGrid(productNo);
+			        
 			    })
 			    .catch(error => {
 			        console.error("삭제 중 오류 발생:", error);
