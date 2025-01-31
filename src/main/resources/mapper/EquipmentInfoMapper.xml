@@ -21,7 +21,7 @@
 		 				, info_sn as "sn"
 						, info_nm as "name"
 						, info_kind as "kind"
-						, TO_NUMBER(info_mnfct) as "mnfct"
+						, info_mnfct as "mnfct"
 						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
 						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
 						, info_useyn as "useYn"
@@ -43,7 +43,7 @@
 	
 	<select id="clientInfo" resultType="map">
 		SELECT
-			  client_no AS "no"
+			  TO_CHAR(client_no) AS "no"
 			, client_name AS "name"
 		FROM
 			client
