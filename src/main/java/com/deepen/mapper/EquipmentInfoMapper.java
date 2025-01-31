@@ -14,6 +14,10 @@ public interface EquipmentInfoMapper {
 	List<Map<String, Object>> yearMonthList();
 	
 	List<Map<String, Object>> equipmentInfo(Map<String, Object> searchMap);
+	
+	List<Map<String, Object>> clientInfo();
+	
+	List<Map<String, Object>> kindInfo();
 
 	int eqpInsert(Map<String, Object> saveDataList);
 

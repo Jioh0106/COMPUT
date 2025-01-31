@@ -21,7 +21,7 @@
 		 				, info_sn as "sn"
 						, info_nm as "name"
 						, info_kind as "kind"
-						, info_mnfct as "mnfct"
+						, TO_NUMBER(info_mnfct) as "mnfct"
 						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
 						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
 						, info_useyn as "useYn"
@@ -39,6 +39,30 @@
 		</where>
 		ORDER BY
 			info_buy_date DESC
+	</select>
+	
+	<select id="clientInfo" resultType="map">
+		SELECT
+			  client_no AS "no"
+			, client_name AS "name"
+		FROM
+			client
+		WHERE
+			client_type = '발주'
+	</select>
+	
+	<select id="kindInfo" resultType="map">
+		SELECT
+			  common_detail_code AS "code"
+			, common_detail_name AS "name"
+		FROM
+			common_detail
+		WHERE
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'EQTP'
+		AND
+			common_detail_status = 'Y'
+		ORDER BY
+			common_detail_display
 	</select>
 	
 	<insert id="eqpInsert" parameterType="map">
