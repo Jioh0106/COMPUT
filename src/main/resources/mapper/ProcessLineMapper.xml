@@ -4,85 +4,101 @@
 
 <mapper namespace="com.deepen.mapper.ProcessLineMapper">
 
-	<select id="yearMonthList" resultType="map">
-		SELECT 
-		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') AS "yearMonth"
-		FROM 
-		    DUAL
-		CONNECT BY 
-		    LEVEL <![CDATA[<=]]> MONTHS_BETWEEN(TRUNC(SYSDATE, 'MM'), DATE '2024-12-01') + 1
-		ORDER BY 
-		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') desc
-	</select>
-	
-	<select id="equipmentInfo" resultType="map" parameterType="map">
-		 SELECT
-		 				  info_no as "no"
-		 				, info_sn as "sn"
-						, info_nm as "name"
-						, info_kind as "kind"
-						, info_mnfct as "mnfct"
-						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
-						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
-						, info_useyn as "useYn"
-						, 'select' AS  "rowType"
-		 FROM
-			 equipment_info
+	<select id="processInfo" resultType="map" parameterType="map">
+		SELECT
+	  		process_no as "no",
+			process_name as "name",
+		 	process_priority as "priority",
+			is_active as "isActive",
+			description as "description",
+			TO_CHAR(created_date, 'YYYY-MM-DD hh:mm:ss') as "cDate",
+			TO_CHAR(updated_date, 'YYYY-MM-DD hh:mm:ss') as "udDate",
+			'select' AS  "rowType"
+		 FROM process_info
 		<where>
-			<if test="yearMonth != null and yearMonth != ''">
-				 AND TO_CHAR(info_buy_date, 'YYYY-MM') = #{yearMonth}
-		 	</if>
 			<if test="value != null and value != ''">
-				 AND (TO_CHAR(info_buy_date, 'YYYY-MM') = #{value}
-				 	  OR info_nm LIKE '%' || #{value} || '%')
+				AND process_name LIKE '%' || #{value} || '%'
 		 	</if>
 		</where>
-		ORDER BY
-			info_buy_date DESC
+		ORDER BY process_no
 	</select>
 	
-	<insert id="eqpInsert" parameterType="map">
-		INSERT INTO equipment_info (
-			info_no
-		  , info_sn
-		  , info_nm
-		  , info_kind
-		  , info_mnfct
-		  , info_buy_date
-		  , info_set_date
-		  , info_useyn
-		  , info_reg_date
+	<insert id="processInsert" parameterType="map">
+		INSERT INTO process_info (
+			process_name,
+		 	process_priority,
+			is_active,
+			description
 		
 		) VALUES ( 
-			equipment_info_seq.NEXTVAL
-		  , #{sn}
-		  , #{name}
-		  , #{kind}
-		  , #{mnfct}
-		  , TO_DATE(#{buy}, 'YYYY-MM-DD')
-		  , TO_DATE(#{set}, 'YYYY-MM-DD')
-		  , #{useYn}
-		  , CURRENT_DATE
+		  #{name},
+		  #{priority},
+		  #{isActive},
+		  #{description}
 		)
 	</insert>
 	
-	<update id="eqpUpdate" parameterType="map">
-		UPDATE equipment_info 
-		SET   info_sn			= #{sn}
-			, info_nm			= #{name}
-			, info_kind			= #{kind}
-			, info_mnfct		= #{mnfct}
-			, info_buy_date		= TO_DATE(#{buy}, 'YYYY-MM-DD')
-			, info_set_date		= TO_DATE(#{set}, 'YYYY-MM-DD')
-			, info_useyn		= #{useYn}
-			, info_mdfn_date	= CURRENT_DATE
-		WHERE info_no 			= #{no}
+	<update id="processUpdate" parameterType="map">
+		UPDATE process_info 
+		SET   process_name		= #{name}
+			, process_priority	= #{priority}
+			, is_active			= #{isActive}
+			, description		= #{description}
+			, updated_date		= sysdate
+		WHERE process_no 		= #{no}
 	</update>
 	
-	<delete id="eqpDelete" parameterType="map">
+	<delete id="processDelete" parameterType="map">
 		DELETE 
-		  FROM equipment_info
-		 WHERE info_no = #{no}
+		  FROM process_info
+		 WHERE process_no = #{no}
+	</delete>
+	
+	
+	<select id="lineInfo" resultType="map" parameterType="map">
+		SELECT
+	  		line_no as "no",
+			line_name as "name",
+			is_active as "isActive",
+			description as "description",
+			TO_CHAR(created_date, 'YYYY-MM-DD hh:mm:ss') as "cDate",
+			TO_CHAR(updated_date, 'YYYY-MM-DD hh:mm:ss') as "udDate",
+			'select' AS  "rowType"
+		 FROM line_info
+		<where>
+			<if test="value != null and value != ''">
+				AND	line_name LIKE '%' || #{value} || '%'
+		 	</if>
+		</where>
+		ORDER BY line_no
+	</select>
+	
+	<insert id="lineInsert" parameterType="map">
+		INSERT INTO line_info (
+			line_name,
+			is_active,
+			description
+		
+		) VALUES ( 
+		  #{name},
+		  #{isActive},
+		  #{description}
+		)
+	</insert>
+	
+	<update id="lineUpdate" parameterType="map">
+		UPDATE line_info 
+		SET   line_name			= #{name}
+			, is_active			= #{isActive}
+			, description		= #{description}
+			, updated_date		= sysdate
+		WHERE line_no 		= #{no}
+	</update>
+	
+	<delete id="lineDelete" parameterType="map">
+		DELETE 
+		  FROM line_info
+		 WHERE line_no = #{no}
 	</delete>
 	
 </mapper>

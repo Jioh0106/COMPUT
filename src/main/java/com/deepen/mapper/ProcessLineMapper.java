@@ -10,15 +10,23 @@ import org.springframework.stereotype.Repository;
 @Mapper
 @Repository
 public interface ProcessLineMapper {
-
-	List<Map<String, Object>> yearMonthList();
 	
-	List<Map<String, Object>> equipmentInfo(Map<String, Object> searchMap);
+	// 공정
+	List<Map<String, Object>> processInfo(Map<String, Object> searchMap);
 
-	int eqpInsert(Map<String, Object> saveDataList);
+	int processInsert(Map<String, Object> saveData);
 
-	int eqpUpdate(Map<String, Object> saveDataList);
+	int processUpdate(Map<String, Object> saveData);
 
-	int eqpDelete(Map<String, Object> saveData);
+	int processDelete(Map<String, Object> saveData);
+	
+	// 라인
+	List<Map<String, Object>> lineInfo(Map<String, Object> searchMap);
+
+	int lineInsert(Map<String, Object> saveData);
+
+	int lineUpdate(Map<String, Object> saveData);
+
+	int lineDelete(Map<String, Object> saveData);
 
 }

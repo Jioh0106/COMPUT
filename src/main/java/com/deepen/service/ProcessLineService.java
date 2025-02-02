@@ -15,18 +15,17 @@ import lombok.extern.java.Log;
 @Log
 public class ProcessLineService {
 
-	private final ProcessLineMapper mapper;
+	private final ProcessLineMapper plMapper;
 
-	public List<Map<String, Object>> yearMonthList() {
-		return mapper.yearMonthList();
-	}
+//	public List<Map<String, Object>> yearMonthList() {
+//		return mapper.yearMonthList();
+//	}
 	
-	public List<Map<String, Object>> equipmentInfo(Map<String, Object> searchMap) {
-		return mapper.equipmentInfo(searchMap);
+	public List<Map<String, Object>> processInfo(Map<String, Object> searchMap) {
+		return plMapper.processInfo(searchMap);
 	}
 
-	public int eqpSaveData(List<Map<String, Object>> saveDataList) {
-		//[{no=, sn=754903, name=비싼기계, kind=절삭, mnfct=사장님이 미쳤어요, buy=2025-01-13, set=2025-01-22, useYn=Y, rowType=insert}]
+	public int saveProcessData(List<Map<String, Object>> saveDataList) {
 		int result = 0;
 		
 		for(Map<String, Object> saveData : saveDataList) {
@@ -34,19 +33,42 @@ public class ProcessLineService {
 			String rowType = String.valueOf(saveData.get("rowType"));
 			
 			if(rowType.equals("insert")) { 			// 추가일 경우
-				//result = mapper.eqpInsert(saveData); 
+				result = plMapper.processInsert(saveData); 
 				
 			} else if(rowType.equals("update")) {	// 수정일 경우
-				//result = mapper.eqpUpdate(saveData);
-				
+				result = plMapper.processUpdate(saveData);
 			} else {								// 삭제일 경우
-				//result = mapper.eqpDelete(saveData);
+				result = plMapper.processDelete(saveData);
 			}
 		}
 		
 		 return result;
 	}
 	 
+	public List<Map<String, Object>> lineInfo(Map<String, Object> searchMap) {
+		log.info(plMapper.processInfo(searchMap).toString());
+		return plMapper.lineInfo(searchMap);
+	}
 
+	public int saveLineData(List<Map<String, Object>> saveDataList) {
+		log.info(saveDataList.toString());
+		int result = 0;
+		
+		for(Map<String, Object> saveData : saveDataList) {
+			
+			String rowType = String.valueOf(saveData.get("rowType"));
+			
+			if(rowType.equals("insert")) { 			// 추가일 경우
+				result = plMapper.lineInsert(saveData); 
+				
+			} else if(rowType.equals("update")) {	// 수정일 경우
+				result = plMapper.lineUpdate(saveData);
+			} else {								// 삭제일 경우
+				result = plMapper.lineDelete(saveData);
+			}
+		}
+		
+		 return result;
+	}
 
 }

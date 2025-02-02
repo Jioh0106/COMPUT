@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>작업지시</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					 <!-- 검색 영역 -->
+				    <div class="row mb-3">
+				        <div class="col-md-2">
+				            <label for="company" class="form-label">회사</label>
+				            <select class="form-select" id="company">
+				                <option value="ALL">ALL</option>
+				                <option value="1">회사 1</option>
+				                <option value="2">회사 2</option>
+				            </select>
+				        </div>
+				        <div class="col-md-2">
+				            <label for="plant" class="form-label">필터명 데모</label>
+				            <select class="form-select" id="plant">
+				                <option value="ALL">ALL</option>
+				                <option value="PLANT1">PLANT1</option>
+				                <option value="PLANT2">PLANT2</option>
+				            </select>
+				        </div>
+				        <div class="col-md-2">
+				            <label for="order-number" class="form-label">제조오더번호</label>
+				            <input type="text" id="order-number" class="form-control">
+				        </div>
+				        <div class="col-md-2">
+				            <label for="operation" class="form-label">공정</label>
+				            <select class="form-select" id="operation">
+				                <option value="ALL">ALL</option>
+				                <option value="PROCESS1">공정1</option>
+				                <option value="PROCESS2">공정2</option>
+				            </select>
+				        </div>
+				        <div class="col-md-2 d-flex align-items-end">
+				            <button class="btn btn-primary w-100">조회</button>
+				        </div>
+				    </div>
+				
+				    <!-- 작업 시작/종료 버튼 -->
+				    <div class="row mb-3">
+				        <div class="col text-end">
+				            <button class="btn btn-primary me-2">작업시작</button>
+				            <button class="btn btn-secondary">작업종료</button>
+				        </div>
+				    </div>
+				
+				    <!-- 작업 지시 Grid -->
+				    <div id="work-order-grid" style="height: 300px; margin-bottom: 20px;"></div>
+				
+					<hr>
+				
+				    <!-- 하단 탭 메뉴 -->
+				    <div class="d-flex justify-content-between align-items-center">
+				        <ul class="nav nav-tabs" id="tabMenu" role="tablist">
+				            <li class="nav-item" role="presentation">
+				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업자</button>
+				            </li>
+				            <li class="nav-item" role="presentation">
+				                <button class="nav-link" id="tab-etc-tab" data-bs-toggle="tab" data-bs-target="#tab-etc" type="button" role="tab">비가동</button>
+				            </li>
+				        </ul>
+				        <div>
+				            <button class="btn btn-success me-2">추가</button>
+				            <button class="btn btn-danger">삭제</button>
+				        </div>
+				    </div>
+				
+				    <!-- 탭 내용 -->
+				    <div class="tab-content mt-2">
+				        <div class="tab-pane fade show active" id="tab-production" role="tabpanel">
+				            <div id="tab-production-grid" style="height: 300px;"></div>
+				        </div>
+				        <div class="tab-pane fade" id="tab-material" role="tabpanel">
+				            <div id="tab-material-grid" style="height: 300px;"></div>
+				        </div>
+				        <div class="tab-pane fade" id="tab-worker" role="tabpanel">
+				            <div id="tab-worker-grid" style="height: 300px;"></div>
+				        </div>
+				        <div class="tab-pane fade" id="tab-etc" role="tabpanel">
+				            <div id="tab-etc-grid" style="height: 300px;"></div>
+				        </div>
+				    </div>
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script th:inline="javascript">
+	
+	</script>
+</body>
+
+</html>

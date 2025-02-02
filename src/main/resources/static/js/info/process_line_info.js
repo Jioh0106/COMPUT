@@ -1,56 +1,38 @@
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
-let grid = "";
+let processGrid = "";
+let lineGrid = "";
 
 // 페이지 로드 시 설비 정보 조회하는 함수 호출
+
 window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
-	selectInfo();
+	selectProcessInfo();
+	selectLineInfo();
 };
 
+// 공정정보
 // 초기 화면 함수
-function selectInfo() {
-	
-	const data = /*[[${processLineList}]]*/[];
-	
+function selectProcessInfo() {
+		
+	const data = processList;
+	//console.log("processList:", data);
 	var Grid = tui.Grid;
 
-	if (grid) {
+	if (processGrid) {
 		// 이미 생성된 경우 destroy하지 않고 재사용
-		grid.refreshLayout();
+		processGrid.refreshLayout();
 		return;
 	}
 	
-	grid = new Grid({
+	processGrid = new Grid({
 		el: document.getElementById('processGrid'),
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '고유번호',	name: 'no'},
-			{header: '일련번호',	name: 'sn',		editor: 'text', sortable: true},
-			{header: '설비명',		name: 'name',	editor: 'text', sortable: true},
-			{header: '종류',		name: 'kind',	editor: {
-												            type: 'select',
-												            options: {
-												              listItems: [
-												                { text: '절단', value: '절단' },
-												                { text: '절삭', value: '절삭' },
-												                { text: '조립', value: '조립' }
-												              ]
-												            }}, 	sortable: true},
-			{header: '제조사',		name: 'mnfct',	editor: 'text', sortable: true},
-			{header: '구입일',		name: 'buy',    editor: {
-											                type: 'datePicker',
-											                options: {
-											                    format: 'yyyy-MM-dd',
-															language: 'ko'
-											                }}, 	sortable: true},
-			{header: '설치일',		name: 'set',    editor: {
-											                type: 'datePicker',
-											                options: {
-											                    format: 'yyyy-MM-dd',
-															language: 'ko'
-											                }}, 	sortable: true},
-			{header: '사용여부',	name: 'useYn',	editor: {
+			{header: '공정번호', name: 'no'},
+			{header: '공정이름', name: 'name',	editor: 'text', sortable: true},
+			{header: '공정우선순위', name: 'priority',	editor: 'text', sortable: true},
+			{header: '사용여부', name: 'isActive',	editor: {
 												            type: 'select',
 												            options: {
 												              listItems: [
@@ -58,6 +40,9 @@ function selectInfo() {
 												                { text: 'N', value: 'N' },
 												              ]
 												            }}, 	sortable: true},
+			{header: '설명', name: 'description', editor: 'text', sortable: true},
+			{header: '생성일', name: 'cDate'},
+			{header: '수정일', name: 'udDate'},
 			{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
 		],
 		data: data,
@@ -67,20 +52,19 @@ function selectInfo() {
 	});
 	
 	// id 및 rowType 숨기기
-	grid.hideColumn("no");
-	grid.hideColumn("rowType");
+	//processGrid.hideColumn("no");
+	processGrid.hideColumn("rowType");
 	
 	// 추가 버튼 이벤트
-	add.addEventListener('click', () => {
-		grid.appendRow({
+	proAdd.addEventListener('click', () => {
+		processGrid.appendRow({
 			"no": "",
-			"sn": "",
 			"name": "",
-			"kind": "",
-			"mnfct": "",
-			"buy": "",
-			"set": "",
-			"useYn": "",
+			"priority": "",
+			"isActive": "",
+			"description": "",
+			"cDate": "",
+			"udDate": "",
 			"rowType": "insert"
 		},
 			{
@@ -91,42 +75,42 @@ function selectInfo() {
 	
 	// 저장 버튼 이벤트
 	// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
-	save.addEventListener('mousedown', () => {
-		grid.blur(); // 포커스 해제
+	proSave.addEventListener('mousedown', () => {
+		processGrid.blur(); // 포커스 해제
 
 		// 수정된 행일 경우 rowType을 update로 변경
-		const updatedRows = grid.getModifiedRows().updatedRows;
+		const updatedRows = processGrid.getModifiedRows().updatedRows;
 		updatedRows.forEach((row, index) => {
-			grid.setValue(row.rowKey, "rowType", "update")
+			processGrid.setValue(row.rowKey, "rowType", "update")
 		});
 	});
 	
 	// 체크박스가 활성화된 행의 index를 배열에 저장
 	let delRows = [];
-	grid.on('check', (ev) => {
+	processGrid.on('check', (ev) => {
 		delRows.push(ev.rowKey);
 	});
 	
 	// 삭제 버튼 이벤트
 	// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
-	del.addEventListener('mousedown', () => {
-		grid.blur(); // 포커스 해제
+	proDel.addEventListener('mousedown', () => {
+		processGrid.blur(); // 포커스 해제
 		
 		// delRows 저장된 인덱스에 대한 행 삭제 처리
 		delRows.forEach((index) => {
 			// 삭제된 행일 경우 rowType을 update로 변경
-			grid.setValue(index, "rowType", "delete")
-			grid.removeRow(index);
+			processGrid.setValue(index, "rowType", "delete")
+			processGrid.removeRow(index);
 		});
 	});
 }; // selectInfo 함수 끝
 
 // 검색 조건 입력 조회
-function searchSelect(searchId){
+function searchProcess(searchId){
 	const value = document.getElementById(searchId).value;
 	var data = {value: value};
 	$.ajax({
-		url: "/eqpSearchSelect",
+		url: "/searchProcess",
 		contentType: "application/json",
 		data: JSON.stringify(data),
 		type: 'POST',
@@ -135,14 +119,14 @@ function searchSelect(searchId){
 			xhr.setRequestHeader(header, token);
 		},
 		success: function (response) {
-			grid.resetData(response);
+			processGrid.resetData(response);
 		} // success
 	}) // ajax
 }
 
 // 추가 및 수정된 값이 저장된 json을 들고 통신
-function saveData() {
-	const modifiedRows = grid.getModifiedRows(); // 수정된 데이터 가져오기
+function saveProcessData() {
+	const modifiedRows = processGrid.getModifiedRows(); // 수정된 데이터 가져오기
 
 	const createdRows = modifiedRows.createdRows; // 추가된 행
 	const updatedRows = modifiedRows.updatedRows; // 수정된 행
@@ -156,24 +140,196 @@ function saveData() {
 		const rowData = {};
 
 		// 각 행의 데이터를 꺼냄
-		//if(row.no != null && row.no != 'null' && row.no != '' && row.no != 'undefind'){
-			rowData.no	= row.no;		// 고유번호
-		//}
-		rowData.sn		= row.sn;		// 일련번호
-		rowData.name	= row.name;		// 설비명
-		rowData.kind	= row.kind;	 	// 종류
-		rowData.mnfct	= row.mnfct;	// 제조사
-		rowData.buy		= row.buy;		// 구입일
-		rowData.set		= row.set;		// 설치일
-		rowData.useYn	= row.useYn;	// 사용여부
-		rowData.rowType = row.rowType;	// 행 타입
-
+		rowData.no = row.no;					// 고유번호
+		rowData.name = row.name;				// 공정명
+		rowData.priority = row.priority;	 	// 우선순위
+		rowData.isActive = row.isActive;		// 사용여부
+		rowData.description	= row.description;	// 설명
+		rowData.cDate = row.cDate;				// 생성일
+		rowData.udDate = row.udDate;			// 수정일
+		rowData.rowType = row.rowType;			// 행 타입
+	
 		data.push(rowData);
 	});
 
 	// 수정된 데이터를 서버로 전송
 	$.ajax({
-		url: "/eqpSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
+		url: "/processSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
+		type: 'POST',
+		contentType: "application/json",
+		data: JSON.stringify(data),
+		//추가해야 하는 부분
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		success: function (res) {
+			if (res == 1) {
+				Swal.fire({
+					title: "저장 성공",
+					icon: "success",
+					confirmButtonText: "확인"
+				}).then(function () { // 확인 클릭 시 실행
+					location.reload(true); // 페이지 새로고침
+				});
+			} else {
+				Swal.fire({
+					title: "저장 실패",
+					icon: "error",
+					confirmButtonText: "확인"
+				});
+			}
+		},
+		error: function () {
+			Swal.fire({
+				title: "서버 오류",
+				icon: "error",
+				confirmButtonText: "확인"
+			});
+		}
+	});
+}; // save 함수 끝
+
+// 라인 정보
+// 초기 화면 함수
+function selectLineInfo() {
+	
+	const data = lineList;
+	console.log("lineList:", data);  // 확인용
+	var Grid = tui.Grid;
+
+	if (lineGrid) {
+		// 이미 생성된 경우 destroy하지 않고 재사용
+		lineGrid.refreshLayout();
+		return;
+	}
+	
+	lineGrid = new Grid({
+		el: document.getElementById('lineGrid'),
+		rowHeaders: ['checkbox'],
+		columns: [
+			{header: '라인번호', name: 'no'},
+			{header: '라인이름', name: 'name',	editor: 'text', sortable: true},
+			{header: '사용여부', name: 'isActive',	editor: {
+												            type: 'select',
+												            options: {
+												              listItems: [
+												                { text: 'Y', value: 'Y' },
+												                { text: 'N', value: 'N' },
+												              ]
+												            }}, 	sortable: true},
+			{header: '설명', name: 'description', editor: 'text', sortable: true},
+			{header: '생성일', name: 'cDate'},
+			{header: '수정일', name: 'udDate'},
+			{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
+		],
+		data: data,
+		columnOptions: {
+		  resizable: true
+		}
+	});
+	
+	// id 및 rowType 숨기기
+	//lineGrid.hideColumn("no");
+	lineGrid.hideColumn("rowType");
+	
+	// 추가 버튼 이벤트
+	lineAdd.addEventListener('click', () => {
+		lineGrid.appendRow({
+			"no": "",
+			"name": "",
+			"isActive": "",
+			"description": "",
+			"cDate": "",
+			"udDate": "",
+			"rowType": "insert"
+		},
+			{
+				at: 0, // 행 추가 인덱스
+				focus: true
+			});
+	});
+	
+	// 저장 버튼 이벤트
+	// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
+	lineSave.addEventListener('mousedown', () => {
+		lineGrid.blur(); // 포커스 해제
+
+		// 수정된 행일 경우 rowType을 update로 변경
+		const updatedRows = lineGrid.getModifiedRows().updatedRows;
+		updatedRows.forEach((row, index) => {
+			lineGrid.setValue(row.rowKey, "rowType", "update")
+		});
+	});
+	
+	// 체크박스가 활성화된 행의 index를 배열에 저장
+	let delRows = [];
+	lineGrid.on('check', (ev) => {
+		delRows.push(ev.rowKey);
+	});
+	
+	// 삭제 버튼 이벤트
+	// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
+	lineDel.addEventListener('mousedown', () => {
+		lineGrid.blur(); // 포커스 해제
+		
+		// delRows 저장된 인덱스에 대한 행 삭제 처리
+		delRows.forEach((index) => {
+			// 삭제된 행일 경우 rowType을 update로 변경
+			lineGrid.setValue(index, "rowType", "delete")
+			lineGrid.removeRow(index);
+		});
+	});
+}; // selectInfo 함수 끝
+
+// 검색 조건 입력 조회
+function searchLine(searchId){
+	const value = document.getElementById(searchId).value;
+	var data = {value: value};
+	$.ajax({
+		url: "/searchLine",
+		contentType: "application/json",
+		data: JSON.stringify(data),
+		type: 'POST',
+		//추가해야 하는 부분
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+		success: function (response) {
+			lineGrid.resetData(response);
+		} // success
+	}) // ajax
+}
+
+// 추가 및 수정된 값이 저장된 json을 들고 통신
+function saveLineData() {
+	const modifiedRows = lineGrid.getModifiedRows(); // 수정된 데이터 가져오기
+
+	const createdRows = modifiedRows.createdRows; // 추가된 행
+	const updatedRows = modifiedRows.updatedRows; // 수정된 행
+	const deletedRows = modifiedRows.deletedRows; // 수정된 행
+
+	// 모든 수정된 데이터 배열로 합치기
+	const modifiedData = [...createdRows, ...updatedRows, ...deletedRows];
+	const data = [];
+
+	modifiedData.forEach(row => {
+		const rowData = {};
+
+		// 각 행의 데이터를 꺼냄
+		rowData.no = row.no;					// 고유번호
+		rowData.name = row.name;				// 공정명
+		rowData.isActive = row.isActive;		// 사용여부
+		rowData.description	= row.description;	// 설명
+		rowData.cDate = row.cDate;				// 생성일
+		rowData.udDate = row.udDate;			// 수정일
+		rowData.rowType = row.rowType;			// 행 타입
+	
+		data.push(rowData);
+	});
+
+	// 수정된 데이터를 서버로 전송
+	$.ajax({
+		url: "/lineSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
 		type: 'POST',
 		contentType: "application/json",
 		data: JSON.stringify(data),
