@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>공정/라인 정보</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					
+					<section class="section">
+						<!-- 검색 조건 시작 -->
+						<!-- <div class="row mb-4"> -->
+					   	<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: nowrap;">
+						    <!-- 공정명 -->
+						    <div style="display: flex; align-items: center; gap: 8px;">
+						        <span style="font-size: 1rem; white-space: nowrap;">공정명</span>
+						        <input type="text" id="processSearchInput" class="form-control" style="width: 150px;" onkeyup="searchProcess(this.id)">
+						    </div>
+						
+						    <!-- 라인명 -->
+						    <div style="display: flex; align-items: center; gap: 8px;">
+						        <span style="font-size: 1rem; white-space: nowrap;">라인명</span>
+						        <input type="text" id="lineSearchInput" class="form-control" style="width: 150px;" onkeyup="searchLine(this.id)">
+						    </div>
+						</div>
+
+						<!-- 검색 조건 끝-->
+						
+						<!-- 공정 그리드 시작 -->
+						<div class="row" id="basic-table">
+							<form>
+																		   
+								<div id="processGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-secondary" id="proAdd" value="추가">
+										<input type="button" class="btn btn-outline-success" id="proSave"  value="저장" onclick="saveProcessData()">
+										<input type="button" class="btn btn-outline-danger" id="proDel" value="삭제">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+								
+							</form>
+						</div>
+						<!-- 공정 그리드 끝  -->
+						
+						<hr>
+						
+						<!-- 라인 그리드 시작 -->
+						<div class="row" id="basic-table">
+							<form>
+								<div id="lineGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-secondary" id="lineAdd" value="추가">
+										<input type="button" class="btn btn-outline-success" id="lineSave"  value="저장" onclick="saveLineData()">
+										<input type="button" class="btn btn-outline-danger" id="lineDel" value="삭제">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+								
+							</form>
+						</div>
+						<!-- 라인 그리드 끝 -->
+					</section>
+					
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script th:inline="javascript">
+	 /*<![CDATA[*/
+	    const processList = /*[[${processList}]]*/ [];
+	    const lineList = /*[[${lineList}]]*/ [];
+    /*]]>*/
+	</script>
+	<script src="js/info/process_line_info.js"></script>
+</body>
+
+</html>

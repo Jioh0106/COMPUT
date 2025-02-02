@@ -200,6 +200,7 @@ function showModal(empDetailInfo) {
 const deleteBtn = document.getElementById("deleteBtn");
 const updateBtn = document.getElementById("updateBtn");
 const updateForm = document.getElementById("updateForm");
+
 // 그리드에서 삭제하고싶은 key 배열로 만들어주기
 function CheckedRowValues(gridObj,jsonKey){
 	const checkedRowsIds = gridObj.getCheckedRows();

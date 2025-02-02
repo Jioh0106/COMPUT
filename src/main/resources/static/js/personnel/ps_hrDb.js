@@ -149,13 +149,10 @@ async function countMonthlyHireExit(){
 		   	return match ? match.HIRE_COUNT : 0;
         });
 		
-		console.log("hireData :",hireData);
-		
 		const exitData = monthData.map(monthData => {
             const match = result.find(item => item.MONTH === monthData);
             return match ? match.EXIT_COUNT : 0;
         });
-		console.log("exitData :",exitData);
 		
 		const lineChartData = {
 			categories : monthData,

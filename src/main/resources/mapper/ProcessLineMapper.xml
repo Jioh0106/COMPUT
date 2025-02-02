@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.ProcessLineMapper">
+
+	<select id="processInfo" resultType="map" parameterType="map">
+		SELECT
+	  		process_no as "no",
+			process_name as "name",
+		 	process_priority as "priority",
+			is_active as "isActive",
+			description as "description",
+			TO_CHAR(created_date, 'YYYY-MM-DD hh:mm:ss') as "cDate",
+			TO_CHAR(updated_date, 'YYYY-MM-DD hh:mm:ss') as "udDate",
+			'select' AS  "rowType"
+		 FROM process_info
+		<where>
+			<if test="value != null and value != ''">
+				AND process_name LIKE '%' || #{value} || '%'
+		 	</if>
+		</where>
+		ORDER BY process_no
+	</select>
+	
+	<insert id="processInsert" parameterType="map">
+		INSERT INTO process_info (
+			process_name,
+		 	process_priority,
+			is_active,
+			description
+		
+		) VALUES ( 
+		  #{name},
+		  #{priority},
+		  #{isActive},
+		  #{description}
+		)
+	</insert>
+	
+	<update id="processUpdate" parameterType="map">
+		UPDATE process_info 
+		SET   process_name		= #{name}
+			, process_priority	= #{priority}
+			, is_active			= #{isActive}
+			, description		= #{description}
+			, updated_date		= sysdate
+		WHERE process_no 		= #{no}
+	</update>
+	
+	<delete id="processDelete" parameterType="map">
+		DELETE 
+		  FROM process_info
+		 WHERE process_no = #{no}
+	</delete>
+	
+	
+	<select id="lineInfo" resultType="map" parameterType="map">
+		SELECT
+	  		line_no as "no",
+			line_name as "name",
+			is_active as "isActive",
+			description as "description",
+			TO_CHAR(created_date, 'YYYY-MM-DD hh:mm:ss') as "cDate",
+			TO_CHAR(updated_date, 'YYYY-MM-DD hh:mm:ss') as "udDate",
+			'select' AS  "rowType"
+		 FROM line_info
+		<where>
+			<if test="value != null and value != ''">
+				AND	line_name LIKE '%' || #{value} || '%'
+		 	</if>
+		</where>
+		ORDER BY line_no
+	</select>
+	
+	<insert id="lineInsert" parameterType="map">
+		INSERT INTO line_info (
+			line_name,
+			is_active,
+			description
+		
+		) VALUES ( 
+		  #{name},
+		  #{isActive},
+		  #{description}
+		)
+	</insert>
+	
+	<update id="lineUpdate" parameterType="map">
+		UPDATE line_info 
+		SET   line_name			= #{name}
+			, is_active			= #{isActive}
+			, description		= #{description}
+			, updated_date		= sysdate
+		WHERE line_no 		= #{no}
+	</update>
+	
+	<delete id="lineDelete" parameterType="map">
+		DELETE 
+		  FROM line_info
+		 WHERE line_no = #{no}
+	</delete>
+	
+</mapper>
+
+
+
