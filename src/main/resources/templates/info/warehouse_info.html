@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>창고 정보</title>
+
+    <!-- 공통 스타일 -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    
+    <!-- TOAST UI Grid -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="/assets/vendors/sweetalert2/sweetalert2.min.css">
+    
+    <style>
+        .tui-grid-cell {
+            background-color: #ffffff !important;
+        }
+    </style>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 사이드 메뉴바-->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        
+        <!-- 메인 content -->
+        <div id="main">
+            <div class="d-flex justify-content-between">
+                <h3>창고 정보</h3>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <!-- 그리드 시작 -->
+                    <div class="row" id="basic-table">
+                        <div id="grid"></div>
+                    </div>
+                    <!-- 그리드 끝 -->
+                    <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                        <div class="d-flex justify-content-end" style="margin-top: 10px;">
+                            <input type="button" class="btn btn-outline-secondary ms-2" id="append" value="창고추가">
+                            <input type="button" class="btn btn-outline-success ms-2" id="save" value="저장">
+                            <input type="button" class="btn btn-outline-danger ms-2" id="delete" value="삭제">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구역 선택 모달 -->
+    <div id="zoneModal" style="display: none;">
+        <div class="modal-content">
+            <div style="text-align: left; margin: 20px;">
+                    <!-- 구역 체크박스 -->
+                <div id="zoneCheckboxes" class="mb-3">
+                </div>
+                <div class="d-flex align-items-center">
+                    <input type="text" id="newZone" placeholder="구역 입력 (예:알파벳,숫자)" 
+                           class="form-control" style="width: 200px; margin-right: 10px;">
+                    <button type="button" id="addZoneBtn" 
+                            class="btn btn-outline-secondary">구역 추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="/js/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+
+    <script th:inline="javascript">
+        const role = /*[[${#authentication.authorities[0].authority.replace('ROLE_', '')}]]*/ '';
+        const warehouseList = /*[[${warehouseList}]]*/ [];
+    </script>
+    
+    <script src="/js/info/warehouse_info.js"></script>
+</body>
+</html>
