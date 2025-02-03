@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>입고관리</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+    
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="image/x-icon">
+    
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+    <style>
+        .tui-grid-cell {
+            background-color: #ffffff !important;
+        }
+        .display-flex {
+            display: flex;
+        }
+        .buttons {
+            margin-left: auto;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .nav-tabs .nav-item .nav-link {
+            color: #607080;
+        }
+        .nav-tabs .nav-item .nav-link.active {
+            color: #435ebe;
+            font-weight: bold;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 사이드 메뉴바-->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        
+        <!-- 메인 content -->
+        <div id="main">
+            
+            <div class="display-flex">
+                <h3>입고관리</h3>
+                <div class="buttons">
+                    <button type="button" class="btn btn-primary">입고등록</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- 검색 영역 -->
+                    <section class="section search-container">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <!-- 첫 번째 데이트 피커 -->
+                            <div>
+                                <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+                                    <input type="text" id="startDate" aria-label="Date-Time"/> 
+                                    <span class="tui-ico-date"></span>
+                                </div>
+                                <div id="startDatePicker" style="margin-top: -1px;"></div>
+                            </div>
+
+                            <span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+
+                            <!-- 두 번째 데이트 피커 -->
+                            <div>
+                                <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+                                    <input type="text" id="endDate" aria-label="Date-Time"/> 
+                                    <span class="tui-ico-date"></span>
+                                </div>
+                                <div id="endDatePicker" style="margin-top: -1px;"></div>
+                            </div>
+
+                            <!-- 검색어 입력 -->
+                            <div>
+                                <input type="text" class="form-control" id="searchInput" placeholder="검색어를 입력하세요">
+                            </div>
+
+                            <button type="button" class="btn btn-primary">검색</button>
+                        </div>
+                    </section>
+
+                    <!-- 탭 영역 -->
+                    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" 
+                               aria-controls="pending" aria-selected="true">대기</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="complete-tab" data-bs-toggle="tab" href="#complete" role="tab" 
+                               aria-controls="complete" aria-selected="false">완료</a>
+                        </li>
+                    </ul>
+
+                    <!-- 탭 컨텐츠 -->
+                    <div class="tab-content" id="mainTabContent">
+                        <!-- 대기 탭 -->
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            <div id="pendingGrid"></div>
+                        </div>
+
+                        <!-- 완료 탭 -->
+                        <div class="tab-pane fade" id="complete" role="tabpanel" aria-labelledby="complete-tab">
+                            <div id="completeGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 -->
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    
+    <!-- TOAST UI CDN -->
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/inbound/inbound.js"></script>
+    
+</body>
+</html>
