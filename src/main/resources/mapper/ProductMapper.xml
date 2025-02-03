@@ -7,7 +7,11 @@
 	<!--상품리스트 조회/검색-->
 	<select id="listProduct" parameterType="Map" resultType="java.util.Map">
 	SELECT 
-	  *
+	  product_no,
+	  product_name,
+	  product_unit,
+	  product_date,
+	  product_type
 	FROM 
 	    product
 	WHERE 
@@ -16,7 +20,7 @@
 	      AND product_name LIKE '%' || #{productName} || '%'
 	    </if>
 	    <if test="searchMonth != null and searchMonth != ''">
-	      	AND TO_CHAR(product_date, 'YYYY-MM') = #{searchMonth}
+	      		AND TRUNC(product_date, 'MONTH') = TO_DATE(#{searchMonth}, 'YYYY-MM')
 	    </if>
 	ORDER BY 
 	    product_no DESC
@@ -90,9 +94,15 @@
     </foreach>
 	</delete>
 
+	
+	<!--하위그리드 공정컬럼 select박스  -->
+	<select id="selectProcess" resultType="java.util.Map">
+	SELECT process_no, process_name
+	FROM process_info
+	WHERE is_active ='Y'
+	</select>
 
-
-
-
+	
+	
 
 </mapper>

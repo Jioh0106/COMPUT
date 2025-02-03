@@ -1,5 +1,6 @@
 package com.deepen.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,8 +16,8 @@ public class ProductDTO {
 	private String product_name; //상품명 
 	private String product_unit; //단위 
 	private Integer product_price; //가격
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime product_date; //등록일
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+	private LocalDate product_date; //등록일
 	private String product_type; // 상품유형(반제품/완제품)
 }

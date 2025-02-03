@@ -1,5 +1,6 @@
 package com.deepen.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -30,7 +31,7 @@ public class Product {
 	private Integer product_price; //가격 
  	
 	@Column(name = "product_date")
-	private LocalDateTime product_date; //등록일
+	private LocalDate product_date; //등록일
 	
 	@Column(name = "product_type", length = 20 )
 	private String product_type; //상품유형

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.BomDTO;
+import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.service.ProductService;
 
@@ -87,10 +88,21 @@ public class ProductRestController {
     } 
 	
 	
+	//BOM 그리드 select 박스 공정 조회
+	@GetMapping("/select/process")
+	public ResponseEntity<List<Map<String, Object>>> selectProcess(){
+		List<Map<String, Object>> processList = pdService.selectProcess();
+		log.info("공정유형 : " + processList);
+		return ResponseEntity.ok(processList);
+	}
 	
 	
-	
-	
+	//BOM 테이블 업데이트
+	@PostMapping("/bom/update")
+	public ResponseEntity<String> updateBom(@RequestBody List<BomDTO> items) {
+	    pdService.updateBom(items); // 서비스에서 UPDATE 처리
+	    return ResponseEntity.ok("BOM 데이터 업데이트 완료");
+	}
 	
 	
 }

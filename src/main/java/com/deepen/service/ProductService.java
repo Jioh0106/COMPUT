@@ -1,13 +1,16 @@
 package com.deepen.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.BomDTO;
+import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.entity.Bom;
 import com.deepen.entity.Product;
@@ -34,7 +37,7 @@ public class ProductService {
 		product.setProduct_name(productDto.getProduct_name());
 		product.setProduct_unit(productDto.getProduct_unit());
 		product.setProduct_type(productDto.getProduct_type());
-		product.setProduct_date(LocalDateTime.now());
+		product.setProduct_date(LocalDate.now());
 		
 		pdRepository.save(product);
 		log.info("생성된 상품 번호 "+ product.getProduct_no());
@@ -93,11 +96,28 @@ public class ProductService {
         pdMapper.deleteRow(no);
     }
 	
-	
+	//BOM 공정 컬럼 select 박스 조회
+	public List<Map<String, Object>> selectProcess() {
+		return pdMapper.selectProcess();
+	}
 	 
-	 
-	 
-	 
+	//BOM 테이블 업데이트(공정, 소모량, 상태, 등록일) 
+	public void updateBom(List<BomDTO> items) {
+		for(BomDTO bomDto : items) {
+			Optional<Bom> bomNo = bomRepository.findById(bomDto.getBom_no());
+			
+			log.info("업데이트 bom번호 "+bomDto.getBom_no());
+			log.info("업데이트 값들 : "+ bomDto);
+			if(bomNo.isPresent()) {
+				Bom bom = bomNo.get();
+				bom.setBom_status(bomDto.getBom_status());
+				bom.setProcess_name(bomDto.getProcess_name());
+				bom.setBom_quantity(bomDto.getBom_quantity());
+				bom.setBom_date(LocalDateTime.now());
+				bomRepository.save(bom);
+			}
+		}
+	} 
 	 
 	 
 }
