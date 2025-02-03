@@ -25,6 +25,16 @@
 	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 
 <style>
+.tab-content > .tab-pane {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+}
+.tab-content > .tab-pane.active {
+    visibility: visible;
+    height: auto;
+    overflow: visible;
+}
 
 </style>
 
@@ -50,32 +60,54 @@
 				<div class="card-body" id="default">
 					 <!-- 검색 영역 -->
 				    <div class="row mb-3">
-				        <div class="col-md-2">
-				            <label for="company" class="form-label">회사</label>
-				            <select class="form-select" id="company">
-				                <option value="ALL">ALL</option>
-				                <option value="1">회사 1</option>
-				                <option value="2">회사 2</option>
-				            </select>
-				        </div>
-				        <div class="col-md-2">
-				            <label for="plant" class="form-label">필터명 데모</label>
-				            <select class="form-select" id="plant">
-				                <option value="ALL">ALL</option>
-				                <option value="PLANT1">PLANT1</option>
-				                <option value="PLANT2">PLANT2</option>
-				            </select>
-				        </div>
-				        <div class="col-md-2">
-				            <label for="order-number" class="form-label">제조오더번호</label>
+				    	 <div class="col-md-2">
+				            <label for="order-number" class="form-label">생산계획번호</label>
 				            <input type="text" id="order-number" class="form-control">
 				        </div>
+				        <!-- <div class="col-md-2">
+					        <div style="display: flex; align-items: center; gap: 1rem;">
+								<span style="font-size: 1rem; line-height: 2rem;">입사일</span>
+								첫 번째 데이트 피커
+								<div>
+									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										<input type="text" id="startDate" name="startDate" aria-label="Date-Time" placeholder="시작일 선택"/>
+										<span class="tui-ico-date"></span>
+									</div>
+									<div id="tui-date-picker-container1"
+										style="margin-top: -1px; z-index: 2000; position: relative;"></div>
+								</div>
+				
+								구분자
+								<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+				
+								두 번째 데이트 피커
+								<div>
+									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										<input type="text" id="endDate" name="endDate" aria-label="Date-Time" placeholder="끝일 선택"/>
+										<span class="tui-ico-date"></span>
+									</div>
+									<div id="tui-date-picker-container2"
+										style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+								</div>
+				
+								<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
+								<div>
+									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										<input type="text" id="search" name="search"/>
+									</div>
+								</div>
+							</div>
+						</div> -->
 				        <div class="col-md-2">
-				            <label for="operation" class="form-label">공정</label>
+				            <label for="operation" class="form-label">공정/라인</label>
 				            <select class="form-select" id="operation">
-				                <option value="ALL">ALL</option>
-				                <option value="PROCESS1">공정1</option>
-				                <option value="PROCESS2">공정2</option>
+				                <option value="ALL">공정 선택</option>
+				            </select>
+				        </div>
+				        <div class="col-md-2">
+				        	<label for="operation" class="form-label"></label>
+				        	<select class="form-select" id="operation">
+				                <option value="ALL">라인 선택</option>
 				            </select>
 				        </div>
 				        <div class="col-md-2 d-flex align-items-end">
@@ -86,45 +118,42 @@
 				    <!-- 작업 시작/종료 버튼 -->
 				    <div class="row mb-3">
 				        <div class="col text-end">
-				            <button class="btn btn-primary me-2">작업시작</button>
-				            <button class="btn btn-secondary">작업종료</button>
+				            <button class="btn btn-outline-primary me-1">작업시작</button>
+				            <button class="btn btn-outline-secondary">작업종료</button>
 				        </div>
 				    </div>
 				
 				    <!-- 작업 지시 Grid -->
-				    <div id="work-order-grid" style="height: 300px; margin-bottom: 20px;"></div>
+				    <div id="workInstructionGrid" style="height: 300px; margin-bottom: 20px;"></div>
 				
 					<hr>
 				
 				    <!-- 하단 탭 메뉴 -->
 				    <div class="d-flex justify-content-between align-items-center">
 				        <ul class="nav nav-tabs" id="tabMenu" role="tablist">
-				            <li class="nav-item" role="presentation">
-				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업자</button>
+				            <li class="nav-item me-1" role="presentation">
+				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업담당자</button>
 				            </li>
 				            <li class="nav-item" role="presentation">
+				                <button class="nav-link" id="tab-material-tab" data-bs-toggle="tab" data-bs-target="#tab-material" type="button" role="tab">자재투입</button>
+				            </li>
+				            <!-- <li class="nav-item" role="presentation">
 				                <button class="nav-link" id="tab-etc-tab" data-bs-toggle="tab" data-bs-target="#tab-etc" type="button" role="tab">비가동</button>
-				            </li>
+				            </li> -->
 				        </ul>
 				        <div>
-				            <button class="btn btn-success me-2">추가</button>
-				            <button class="btn btn-danger">삭제</button>
+				            <button class="btn btn-outline-success me-1">추가</button>
+				            <button class="btn btn-outline-danger">삭제</button>
 				        </div>
 				    </div>
 				
 				    <!-- 탭 내용 -->
 				    <div class="tab-content mt-2">
-				        <div class="tab-pane fade show active" id="tab-production" role="tabpanel">
-				            <div id="tab-production-grid" style="height: 300px;"></div>
+				        <div class="tab-pane fade" id="tab-worker" role="tabpanel">
+				            <div id="workerGrid" style="height: 300px;"></div>
 				        </div>
 				        <div class="tab-pane fade" id="tab-material" role="tabpanel">
-				            <div id="tab-material-grid" style="height: 300px;"></div>
-				        </div>
-				        <div class="tab-pane fade" id="tab-worker" role="tabpanel">
-				            <div id="tab-worker-grid" style="height: 300px;"></div>
-				        </div>
-				        <div class="tab-pane fade" id="tab-etc" role="tabpanel">
-				            <div id="tab-etc-grid" style="height: 300px;"></div>
+				            <div id="materialGrid" style="height: 300px;"></div>
 				        </div>
 				    </div>
 				</div> <!-- card-body -->
@@ -141,6 +170,7 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="js/process/work_instruction.js"></script>
 	<script th:inline="javascript">
 	
 	</script>
