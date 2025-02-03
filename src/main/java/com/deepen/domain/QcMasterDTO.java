@@ -1,6 +1,7 @@
 package com.deepen.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -16,4 +17,8 @@ public class QcMasterDTO {
     private String unit;
     private String qcMethod;
     private String useYn;
+    private String createUser;
+    private LocalDateTime createTime;
+    private String updateUser;
+    private LocalDateTime updateTime;
 }

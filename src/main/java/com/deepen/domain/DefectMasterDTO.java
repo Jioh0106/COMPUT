@@ -1,5 +1,7 @@
 package com.deepen.domain;
 
+import java.time.LocalDateTime;
+
 import lombok.Data;
 
 @Data
@@ -11,4 +13,8 @@ public class DefectMasterDTO {
     private String defectLevel;
     private String judgmentCriteria;
     private String useYn;
+    private String createUser;
+    private LocalDateTime createTime;
+    private String updateUser;
+    private LocalDateTime updateTime;
 }

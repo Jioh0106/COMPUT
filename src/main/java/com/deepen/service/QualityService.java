@@ -12,6 +12,7 @@ import com.deepen.repository.DefectMasterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,6 @@ public class QualityService {
                                    .collect(Collectors.toList());
     }
     
-    // Entity -> DTO 변환 메서드들은 이전과 동일하게 유지
     private QcMasterDTO convertToQcDTO(QcMaster entity) {
         QcMasterDTO dto = new QcMasterDTO();
         dto.setQcCode(entity.getQcCode());
@@ -50,6 +50,10 @@ public class QualityService {
         dto.setUnit(entity.getUnit());
         dto.setQcMethod(entity.getQcMethod());
         dto.setUseYn(entity.getUseYn());
+        dto.setCreateUser(entity.getCreateUser());
+        dto.setCreateTime(entity.getCreateTime());
+        dto.setUpdateUser(entity.getUpdateUser());
+        dto.setUpdateTime(entity.getUpdateTime());
         return dto;
     }
     
@@ -62,6 +66,98 @@ public class QualityService {
         dto.setDefectLevel(entity.getDefectLevel());
         dto.setJudgmentCriteria(entity.getJudgmentCriteria());
         dto.setUseYn(entity.getUseYn());
+        dto.setCreateUser(entity.getCreateUser());
+        dto.setCreateTime(entity.getCreateTime());
+        dto.setUpdateUser(entity.getUpdateUser());
+        dto.setUpdateTime(entity.getUpdateTime());
         return dto;
+    }
+    
+    @Transactional
+    public QcMasterDTO createQc(QcMasterDTO dto) {
+        QcMaster entity = new QcMaster();
+        entity.setQcCode(generateQcCode());
+        entity.setQcName(dto.getQcName());
+        entity.setProcessNo(dto.getProcessNo());
+        entity.setProductNo(dto.getProductNo());
+        entity.setTargetValue(dto.getTargetValue());
+        entity.setUcl(dto.getUcl());
+        entity.setLcl(dto.getLcl());
+        entity.setUnit(dto.getUnit());
+        entity.setQcMethod(dto.getQcMethod());
+        entity.setUseYn("Y");
+        entity.setCreateUser(dto.getCreateUser());
+        entity.setCreateTime(LocalDateTime.now());
+        
+        return convertToQcDTO(qcMasterRepository.save(entity));
+    }
+
+    @Transactional
+    public DefectMasterDTO createDefect(DefectMasterDTO dto) {
+        DefectMaster entity = new DefectMaster();
+        entity.setDefectCode(generateDefectCode());
+        entity.setDefectName(dto.getDefectName());
+        entity.setProcessNo(dto.getProcessNo());
+        entity.setDefectType(dto.getDefectType());
+        entity.setDefectLevel(dto.getDefectLevel());
+        entity.setJudgmentCriteria(dto.getJudgmentCriteria());
+        entity.setUseYn("Y");
+        entity.setCreateUser(dto.getCreateUser());
+        entity.setCreateTime(LocalDateTime.now());
+        
+        return convertToDefectDTO(defectMasterRepository.save(entity));
+    }
+
+    private String generateQcCode() {
+        String lastCode = qcMasterRepository.findTopByOrderByQcCodeDesc()
+                .map(QcMaster::getQcCode)
+                .orElse("QC000");
+        
+        int sequence = Integer.parseInt(lastCode.substring(2)) + 1;
+        return String.format("QC%03d", sequence);
+    }
+
+    private String generateDefectCode() {
+        String lastCode = defectMasterRepository.findTopByOrderByDefectCodeDesc()
+                .map(DefectMaster::getDefectCode)
+                .orElse("DF000");
+        
+        int sequence = Integer.parseInt(lastCode.substring(2)) + 1;
+        return String.format("DF%03d", sequence);
+    }
+    
+    @Transactional
+    public QcMasterDTO updateQc(QcMasterDTO dto) {
+        QcMaster entity = qcMasterRepository.findById(dto.getQcCode())
+            .orElseThrow(() -> new RuntimeException("QC not found"));
+            
+        entity.setQcName(dto.getQcName());
+        entity.setProcessNo(dto.getProcessNo());
+        entity.setProductNo(dto.getProductNo());
+        entity.setTargetValue(dto.getTargetValue());
+        entity.setUcl(dto.getUcl());
+        entity.setLcl(dto.getLcl());
+        entity.setUnit(dto.getUnit());
+        entity.setQcMethod(dto.getQcMethod());
+        entity.setUpdateUser(dto.getUpdateUser());
+        entity.setUpdateTime(LocalDateTime.now());
+        
+        return convertToQcDTO(qcMasterRepository.save(entity));
+    }
+
+    @Transactional
+    public DefectMasterDTO updateDefect(DefectMasterDTO dto) {
+        DefectMaster entity = defectMasterRepository.findById(dto.getDefectCode())
+            .orElseThrow(() -> new RuntimeException("Defect not found"));
+            
+        entity.setDefectName(dto.getDefectName());
+        entity.setProcessNo(dto.getProcessNo());
+        entity.setDefectType(dto.getDefectType());
+        entity.setDefectLevel(dto.getDefectLevel());
+        entity.setJudgmentCriteria(dto.getJudgmentCriteria());
+        entity.setUpdateUser(dto.getUpdateUser());
+        entity.setUpdateTime(LocalDateTime.now());
+        
+        return convertToDefectDTO(defectMasterRepository.save(entity));
     }
 }

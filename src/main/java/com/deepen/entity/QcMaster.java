@@ -50,5 +50,12 @@ public class QcMaster {
 	
 	@Column(name = "create_time", nullable = false)
 	private LocalDateTime createTime;
+	
+	@Column(name = "update_user")
+	private String updateUser;
+	
+	@Column(name = "update_time")
+	private LocalDateTime updateTime;
+	
 
 }
