@@ -30,6 +30,9 @@ public class Inbound {
 
     @Column(name = "in_qty", nullable = false)
     private int in_qty; // 입고수량
+    
+    @Column(name = "deffect_qty")
+    private int deffect_qty; // 불량수량
 
     @Column(name = "warehouse_id", nullable = false, length = 20)
     private String warehouse_id; // 창고 ID

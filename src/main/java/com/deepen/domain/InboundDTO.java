@@ -12,6 +12,7 @@ public class InboundDTO {
     private String item_name;			// 품목명(재고명, 상품명)
     private LocalDateTime in_date; 		// 입고일자
     private int in_qty; 				// 입고수량
+    private int deffect_qty; 			// 불량수량
     private String warehouse_id; 		// 창고 ID
     private String warehouse_name; 		// 창고명
     private String zone; 				// 구역(창고)

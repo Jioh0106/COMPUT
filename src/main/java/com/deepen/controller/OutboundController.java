@@ -14,12 +14,14 @@ public class OutboundController {
 	
     private final OutboundService outboundService;
     
+    //출고 관리 
     @GetMapping("/outbound")
     public String outbound() {
         
         return "outbound/outbound";
     }
 	
+    //출고 등록 팝업
     @GetMapping("/outboundPopup")
     public String outboundPopup() {
         

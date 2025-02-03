@@ -53,11 +53,11 @@ $(function() {
         {header: '출고번호', name: 'out_no'},
         {header: '품목명', name: 'item_name'},
         {header: '출고수량', name: 'out_qty'},
-        {header: '출고일자', name: 'out_date'},
         {header: '창고명', name: 'warehouse_name'},
         {header: '구역', name: 'zone'},
         {header: '등록자', name: 'reg_user'},
         {header: '등록일', name: 'reg_date'},
+        {header: '출고일자', name: 'out_date'},
         {header: '상태', name: 'status'},
     ];
 

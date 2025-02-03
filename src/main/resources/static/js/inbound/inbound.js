@@ -53,13 +53,13 @@ $(function() {
         {header: '입고번호', name: 'in_no'},
         {header: '품목명', name: 'item_name'},
         {header: '입고수량', name: 'in_qty'},
-        {header: '입고일자', name: 'in_date'},
         {header: '창고명', name: 'warehouse_name'},
         {header: '구역', name: 'zone'},
         {header: '검수자', name: 'inspector'},
         {header: '검수결과', name: 'inspection_result'},
         {header: '등록자', name: 'reg_user'},
         {header: '등록일', name: 'reg_date'},
+        {header: '입고일자', name: 'in_date'},
         {header: '상태', name: 'status'},
     ];
 
