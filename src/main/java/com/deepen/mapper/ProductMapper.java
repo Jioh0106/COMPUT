@@ -23,6 +23,10 @@ public interface ProductMapper {
 	 
 	 void deleteRow(@Param("list") List<Integer> no);
 	 
+	 void deleteRowProduct(@Param("list") List<Integer> no);
+
 	 List<Map<String, Object>> selectProcess();
+	 
+	 List<CommonDetailDTO> selectUnit();
 	
 }

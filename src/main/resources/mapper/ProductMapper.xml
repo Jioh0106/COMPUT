@@ -10,7 +10,7 @@
 	  product_no,
 	  product_name,
 	  product_unit,
-	  product_date,
+	  TO_CHAR(product_date, 'YYYY-MM-DD HH24:MI:SS') AS product_date,
 	  product_type
 	FROM 
 	    product
@@ -81,7 +81,7 @@
         b.bom_no		
 	</select>
 
-	<!--체크박스 삭제-->
+	<!--하위그리드 체크박스 삭제-->
 	<delete id="deleteRow" parameterType="list">
 	DELETE 
 	FROM 
@@ -93,15 +93,35 @@
         #{bom_no}
     </foreach>
 	</delete>
-
 	
-	<!--하위그리드 공정컬럼 select박스  -->
+	<!--상위그리드 체크박스 삭제 -->
+	<delete id="deleteRowProduct" parameterType="list">
+	DELETE
+	FROM
+		product
+	WHERE
+		product_no
+	IN
+	<foreach item="product_no" collection="list" open="(" separator="," close=")">
+        #{product_no}
+    </foreach>		
+	</delete>
+	
+	<!-- 하위그리드 공정 select박스 조회 -->
 	<select id="selectProcess" resultType="java.util.Map">
 	SELECT process_no, process_name
 	FROM process_info
 	WHERE is_active ='Y'
 	</select>
-
+	
+	<!-- 단위 공통코드 select박스 조회 -->
+	<select id="selectUnit" resultType="com.deepen.domain.CommonDetailDTO">
+	SELECT common_detail_code, common_detail_name
+	FROM common_detail
+	WHERE SUBSTR(common_detail_code,1,4) 
+		IN('UNIT')
+		AND common_detail_status ='Y' 
+	</select>
 	
 	
 

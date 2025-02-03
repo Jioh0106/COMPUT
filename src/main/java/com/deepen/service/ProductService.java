@@ -1,6 +1,5 @@
 package com.deepen.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +36,7 @@ public class ProductService {
 		product.setProduct_name(productDto.getProduct_name());
 		product.setProduct_unit(productDto.getProduct_unit());
 		product.setProduct_type(productDto.getProduct_type());
-		product.setProduct_date(LocalDate.now());
+		product.setProduct_date(LocalDateTime.now());
 		
 		pdRepository.save(product);
 		log.info("생성된 상품 번호 "+ product.getProduct_no());
@@ -88,14 +87,23 @@ public class ProductService {
 		return bom;
 	}
 	
-	//체크박스 삭제
+	//하위그리드 체크박스 삭제
 	 public void deleteRow(List<Integer> no) {
         if (no == null || no.isEmpty()) {
             throw new IllegalArgumentException("삭제할 ID 목록이 비어 있습니다.");
         }
         pdMapper.deleteRow(no);
     }
-	
+	 
+	 //상위그리드 체크박스 삭제
+	 public void deleteRowProduct(List<Integer> no) {
+		 if (no == null || no.isEmpty()) {
+			 throw new IllegalArgumentException("삭제할 ID 목록이 비어 있습니다.");
+		 }
+		 pdMapper.deleteRowProduct(no);
+	 }
+
+
 	//BOM 공정 컬럼 select 박스 조회
 	public List<Map<String, Object>> selectProcess() {
 		return pdMapper.selectProcess();
@@ -119,5 +127,18 @@ public class ProductService {
 		}
 	} 
 	 
-	 
+	
+	//단위 공통코드 조회
+	public List<CommonDetailDTO> selectUnit(){
+		List<CommonDetailDTO> unitList = pdMapper.selectUnit();
+		return unitList;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }

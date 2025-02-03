@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +77,7 @@ public class ProductRestController {
 		return ResponseEntity.ok(bomData);
 	}
 	
-	//BOM 그리드 삭제
+	//BOM 하위그리드 삭제
 	@PostMapping("/delete/row")
 	public ResponseEntity<String> deleteRows(@RequestBody List<Integer> no) {
         try {
@@ -86,6 +87,18 @@ public class ProductRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생: " + e.getMessage());
         }
     } 
+	
+	//BOM 상위그리드 삭제
+	@PostMapping("/delete/row/product")
+	public ResponseEntity<String> deleteRowsProduct(@RequestBody List<Integer> no) {
+		try {
+			pdService.deleteRowProduct(no);
+			return ResponseEntity.ok("삭제가 완료되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생: " + e.getMessage());
+		}
+	} 
+
 	
 	
 	//BOM 그리드 select 박스 공정 조회
@@ -103,6 +116,14 @@ public class ProductRestController {
 	    pdService.updateBom(items); // 서비스에서 UPDATE 처리
 	    return ResponseEntity.ok("BOM 데이터 업데이트 완료");
 	}
+	
+	//단위 공통코드 조회
+	@GetMapping("/select/unit")
+	public List<CommonDetailDTO> selectunit(){
+		List<CommonDetailDTO> unitList = pdService.selectUnit();
+		return unitList;
+	}
+	
 	
 	
 }

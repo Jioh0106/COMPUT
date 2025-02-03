@@ -222,9 +222,26 @@
 				rowHeaders: ['checkbox'],
 				columns: [
 					{header: '상품번호',	name: 'PRODUCT_NO', editor: 'text', sortable: true},
-					{header: '상품유형',	name: 'PRODUCT_TYPE', editor: 'text', sortable: true},
+					{header: '상품유형',	
+					name: 'PRODUCT_TYPE', 
+					editor: {
+						type: 'select',
+		                options: {
+		                    listItems: [
+		                        { value: '완제품', text: '완제품' },  
+		                        { value: '반제품', text: '반제품' }
+		                    ]
+		                }
+					}, 
+					sortable: true},
+					
 					{header: '상품명',	name: 'PRODUCT_NAME', editor: 'text', sortable: true},
-					{header: '단위',		name: 'PRODUCT_UNIT', editor: 'text', sortable: true},
+					
+					{header: '단위',		
+					name: 'PRODUCT_UNIT', 
+					editor:'text', 
+					sortable: true, width: 100},
+					
 					{header: '등록일',	name: 'PRODUCT_DATE', editor: 'text', sortable: true}
 				],
 				data: [],
@@ -235,7 +252,7 @@
 		
 	
 		let processOptions = [];
-		
+		let unitOptions = [];
 		
 		function loadProcessOptions() {
 		    fetch('/api/product/select/process')
@@ -259,8 +276,7 @@
 		            console.error('공정 목록을 불러오는 중 오류 발생:', error);
 		        });
 			 }
-					
-	
+		
 		
 		const bomGrid = new Grid({
 						el: document.getElementById('bomGrid'),
@@ -269,7 +285,11 @@
 							{header: 'bom번호',	name: 'bom_no', width: 100},
 							{header: '원자재',	name: 'mtr_name',		editor: 'text', sortable: true, width: 150},
 							{header: '자재상품',	name: 'product_name',	editor: 'text', sortable: true, width: 150},
-							{header: '단위',		name: 'bom_unit',	editor: 'text', sortable: true, width: 100},
+							
+							{header: '단위',		name: 'bom_unit',	
+							editor: 'text',
+							sortable: true, width: 100},
+							
 							{header: '소모량',	name: 'bom_quantity',	editor: 'text', sortable: true, width: 100},
 							{header: '등록일',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
 							
@@ -309,7 +329,24 @@
 						}
 					});
 			
-					
+		function selectUnit(){
+			fetch('/api/product/select/unit')
+				.then(response => response.json())
+				.then(data => {
+					console.log(" 서버에서 받은 단위 데이터:", data);
+				  	unitOptions = data.map(unit => ({
+		                text: unit.common_detail_name, // 옵션 표시값
+		                value: unit.common_detail_code // 실제 저장될 값
+		            }));
+				  	
+				    console.log("단위 옵션:", unitOptions);
+
+		            // BOM 및 Product 그리드에 select 박스 적용
+		            productGrid();
+		            bomGrid();
+		        })
+		        .catch(error => console.error("단위 데이터 조회 오류:", error));
+			}		
 			
 			//공정유형 공통코드 -> 이름값으로 변경 후 쉼표로 구분				
 			function processCodeToName(value) {
@@ -447,6 +484,7 @@
 			   document.addEventListener('DOMContentLoaded', function () {
 			       loadProcessOptions(); // 공정 옵션 데이터 로드
 			       updateProductGrid();  // 상품 목록 로드
+			       selectUnit(); //단위 목록 로드
 			   });
 			
 			
@@ -478,33 +516,45 @@
 		        });
 			}
 			
+			
 			// bom체크박스 삭제 함수 - 삭제버튼
 			function deleteSelectedRows() {
-			    // 그리드에서 체크된 행 가져오기
-			    const selectedRows = bomGrid.getCheckedRows();
-
-			    if (selectedRows.length === 0) {
-			        alert("삭제할 행을 선택해주세요.");
+			    let idsToDelete = [];
+			    let url = '';
+			
+			    // 🚀 상위 그리드(상품)에서 체크된 행 확인
+			    const selectedProductRows = productGrid.getCheckedRows();
+			    const selectedBomRows = bomGrid.getCheckedRows();
+			
+			    if (selectedProductRows.length > 0 && selectedBomRows.length === 0) {
+			        // 상위 그리드(상품)에서 선택된 경우 (하위 그리드 미선택)
+			        idsToDelete = selectedProductRows.map(row => row.PRODUCT_NO);
+			        url = '/api/product/delete/row/product'; //  상위 그리드 삭제 API
+			        
+			    } else if (selectedBomRows.length > 0 && selectedProductRows.length === 0) {
+			        // 하위 그리드(BOM)에서 선택된 경우 (상위 그리드 미선택)
+			        idsToDelete = selectedBomRows.map(row => row.bom_no);
+			        url = '/api/product/delete/row'; // 하위 그리드 삭제 API
+			        
+			    } else if (selectedProductRows.length > 0 && selectedBomRows.length > 0) {
+			        // 그리드를 둘 다 선택한 경우 → 하나만 선택하라고 알림
+			        alert("상품과 BOM을 동시에 삭제할 수 없습니다. 하나만 선택해주세요.");
+			        return;
+			        
+			    } else {
+			        alert("삭제할 항목을 선택해주세요.");
 			        return;
 			    }
-
-			    // 삭제할 ID 목록 추출 (예: primary key)
-			    const idsToDelete = selectedRows.map(row => row.bom_no); // 'id'는 PK 컬럼 이름에 맞게 변경
-				
-				// 현재 선택된 상위 상품번호 가져오기 (클릭 이벤트 필요 없음)
-				const selectedRow = productGrid.getRow(productGrid.getFocusedCell()?.rowKey);
-				   if (!selectedRow || !selectedRow.PRODUCT_NO) {
-				       alert("상품을 먼저 선택해주세요.");
-				       return;
-				   }
-				const productNo = selectedRow.PRODUCT_NO;
-
-			    // 서버로 삭제 요청 보내기
-			    fetch('/api/product/delete/row', {
+			
+			    console.log(" 삭제 요청 URL:", url);
+			    console.log(" 삭제할 ID 목록:", idsToDelete);
+			
+			    //서버로 삭제 요청 보내기
+			    fetch(url, {
 			        method: 'POST',
 			        headers: {
 			            'Content-Type': 'application/json',
-						 [header]: token // CSRF 토큰 추가
+			            [header]: token // CSRF 토큰 추가
 			        },
 			        body: JSON.stringify(idsToDelete)
 			    })
@@ -516,12 +566,24 @@
 			    })
 			    .then(data => {
 			        alert("삭제가 완료되었습니다.");
-			        updateBomGrid(productNo);
+			        if (url === '/api/product/delete/row/product') {
+			            //  상위 그리드 삭제 후, 하위 그리드 초기화
+			            updateProductGrid();
+			            bomGrid.resetData([]); // 상품 삭제 시 BOM도 초기화
+			        } else {
+			            //  하위 그리드 삭제 후, 다시 하위 그리드 갱신
+			            const selectedRow = productGrid.getRow(productGrid.getFocusedCell()?.rowKey);
+			            if (selectedRow && selectedRow.PRODUCT_NO) {
+			                updateBomGrid(selectedRow.PRODUCT_NO);
+			            }
+			        }
 			    })
 			    .catch(error => {
 			        console.error("삭제 중 오류 발생:", error);
 			    });
 			}
+
+
 			
 			
 			//BOM그리드 업데이트(소모량, 등록일, 공정, 상태)
