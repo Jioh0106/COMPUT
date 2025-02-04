@@ -55,7 +55,6 @@ public class EquipmentSttsController {
 	public List<Map<String, Object>> selectEqpSearch(@RequestBody Map<String, Object> searchMap) {
 
 		List<Map<String, Object>> equipmentList = service.selectEquipmentStts(searchMap);
-		// 상태에 대한 파라미터 값 출력 형태 [USST001, USST002]
 
 		return equipmentList;
 	}

@@ -24,23 +24,19 @@ public class EquipmentSttsService {
 	}
 
 	public List<Map<String, Object>> selectEquipmentStts(Map<String, Object> searchMap) {
-		Object valueObj = searchMap.get("value"); // Object로 가져오기
+		String getChk = String.valueOf(searchMap.get("checkboxes")); // 
+		String chk = getChk.replaceAll("[\\[\\]]", "").trim(); // [] 제거 및 공백 제거
 
-	    List<String> valueList = new ArrayList<>();
+	    List<String> chkList = new ArrayList<>();
 
-	    if (valueObj instanceof String) {
-	        String valueStr = ((String) valueObj).replaceAll("[\\[\\]]", "").trim(); // [] 제거 및 공백 제거
-	        if (!valueStr.isEmpty() && !"null".equalsIgnoreCase(valueStr)) {
-	            valueList = Arrays.asList(valueStr.split("\\s*,\\s*")); // 쉼표로 구분하여 리스트로 변환
-	        }
-	    } else if (valueObj instanceof List) {
-	        valueList = (List<String>) valueObj; // 이미 리스트 형태면 그대로 사용
-	    }
+        if (!chk.isEmpty() && !chk.equals("null")) {
+        	chkList = Arrays.asList(chk.split("\\s*,\\s*")); // 쉼표로 구분하여 리스트로 변환
+        } 
 
-	    searchMap.put("valueList", valueList); // ✅ MyBatis에서 사용 가능하도록 valueList 추가
-	    searchMap.put("valueListSize", valueList.size()); // ✅ valueListSize도 추가
+        // mapper에서 사용하기 위한 추가
+	    searchMap.put("chkList", chkList); // foreach 돌릴 valueList 추가
+	    searchMap.put("chkListSize", chkList.size()); // if에서 사용할 리스트 size 추가
 		
-		System.out.println(valueList.toString());
 		return mapper.selectEquipmentStts(searchMap);
 	}
 
