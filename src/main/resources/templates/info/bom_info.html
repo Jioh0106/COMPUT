@@ -154,22 +154,22 @@
 	
 	<script th:inline="javascript">
 
-		const header = document.querySelector('meta[name="_csrf_header"]').content;
-		const token = document.querySelector('meta[name="_csrf"]').content;
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+			const token = document.querySelector('meta[name="_csrf"]').content;
 
 			
 			var Grid = tui.Grid;
 
 			
 			
-		const materialGrid = new Grid({
+			const materialGrid = new Grid({
 				el: document.getElementById('materialGrid'),
 				rowHeaders: ['checkbox'],
 				columns: [
 					{header: '자재/상품번호', name: 'ITEM_NO', hidden: true},
-					{header: '자재구분',	name: 'ITEM_TYPE', editor: 'text', sortable: true},
-					{header: '자재/상품명',	name: 'ITEM_NAME', editor: 'text', sortable: true},
-					{header: '단위',		name: 'ITEM_UNIT', editor: 'text', sortable: true}
+					{header: '자재구분',	   name: 'ITEM_TYPE', editor: 'text', sortable: true},
+					{header: '자재/상품명',   name: 'ITEM_NAME', editor: 'text', sortable: true},
+					{header: '단위',		   name: 'ITEM_UNIT', editor: 'text', sortable: true}
 					
 				],
 				data: [],
@@ -178,7 +178,8 @@
 				}
 			});
 			
-		
+			
+			//자재,반제품명 검색
 			function searchMtrProduct() {
 			  const searchValue = document.getElementById('searchInput').value;
 
@@ -199,7 +200,7 @@
 		    });
 			
 			
-			//팝업창 등록버튼
+			//팝업창에서 bom등록 (팝업창 등록버튼)
 			function popupRegistBtn() {
 			 const selectedRow = materialGrid.getCheckedRows();
 				selectedRow.forEach(row => {
@@ -231,14 +232,20 @@
 			 .then(data => {
 			    console.log('서버응답:', data);
 				alert(data);
-				window.opener.location.reload(); // 부모창 리로드
+				
+				//window.opener.location.reload(); // 부모창 리로드
+						 // 🔹 부모 창의 `updateBomGrid(productNo)` 함수 실행 (하위 그리드만 업데이트)
+		        if (window.opener && typeof window.opener.updateBomGrid === "function") {
+		            window.opener.updateBomGrid(product_no);
+		        }
+				
 				window.close(); // 팝업창 닫기
 			 })
 			 .catch(error => {
 			    console.error('에러발생:', error);
 				alert("등록실패" + error.message);
 			 });
-	  	}	
+	  		}	
 		
 		
 		

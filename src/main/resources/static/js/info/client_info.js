@@ -15,11 +15,11 @@ $(function() {
 		columns: [
 			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},
 			{ header: '거래처명', name: 'client_name', width: 150, editor: isEditable ? 'text' : null},
-			{ header: '연락처', name: 'client_tel', width: 100, editor: isEditable ? 'text' : null},
-			{ header: '대표자명', name: 'client_boss', width: 80, editor: isEditable ? 'text' : null},
-			{ header: '담당자명', name: 'client_emp', width: 80, editor: isEditable ? 'text' : null},
+			{ header: '연락처', name: 'client_tel', width: 120, editor: isEditable ? 'text' : null},
+			{ header: '대표자명', name: 'client_boss', width: 100, editor: isEditable ? 'text' : null},
+			{ header: '담당자명', name: 'client_emp', width: 100, editor: isEditable ? 'text' : null},
 			{ header: '우편번호', name: 'client_postcode', width: 80, editor: isEditable ? 'text' : null},
-			{ header: '주소', name: 'client_adrress', width: 250, editor: isEditable ? 'text' : null},
+			{ header: '주소', name: 'client_adrress', width: 300, editor: isEditable ? 'text' : null},
 			{
 				header: '구분', 
 				name: 'client_type', 
@@ -36,7 +36,45 @@ $(function() {
 			    } : null,
 				filter: 'select'
 			},
-			{ header: '메모', name: 'client_memo', width: 150, editor: isEditable ? 'text' : null},
+			{
+				header: '등록일', 
+				name: 'client_date', 
+				width: 100, 
+				editor: isEditable
+					? {
+	                type: 'datePicker',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+				: null,
+	            filter: {
+	                type: 'date',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+			},
+			{
+				header: '수정일', 
+				name: 'client_update', 
+				width: 100, 
+				editor: isEditable
+					? {
+	                type: 'datePicker',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+				: null,
+	            filter: {
+	                type: 'date',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+			},
+			{ header: '메모', name: 'client_memo', width: 200, editor: isEditable ? 'text' : null},
 		],
 		editing: isEditable  // 편집 기능 활성화
 	});

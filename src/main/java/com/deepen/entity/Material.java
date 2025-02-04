@@ -1,5 +1,9 @@
 package com.deepen.entity;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,16 +22,43 @@ public class Material {
 	@Column(name = "mtr_no", nullable = false)
 	private Integer mtr_no;
 	
-	@Column(name = "mtr_name", length = 200, nullable = false)
+	@Column(name = "mtr_name", length = 50, nullable = false)
 	private String mtr_name;
 	
-	@Column(name = "ress_unit", length = 30)
-	private String ress_unit;
+	@Column(name = "mtr_type", length = 50, nullable = false)
+	private String mtr_type;
 	
-	@Column(name = "use_unit", length = 30)
-	private String use_unit;
+	@Column(name = "composition", length = 50, nullable = false)
+	private String composition;
 	
-	@Column(name = "mtr_status", length = 1)
+	@Column(name = "hardness", length = 50)
+	private String hardness;
+	
+	@Column(name = "density")
+	private Integer density;
+	
+	@Column(name = "melting_point")
+	private Integer melting_point;
+	
+	@Column(name = "tensile_strength")
+	private Integer tensile_strength;
+	
+	@Column(name = "mtr_use", length = 50, nullable = false)
+	private String mtr_use;
+	
+	@Column(name = "mtr_unit")
+	private String mtr_unit;
+	
+	@Column(name = "mtr_reg_data", nullable = false)
+	private LocalDate mtr_reg_data;
+	
+	@Column(name = "mtr_mod_data")
+	private LocalDate mtr_mod_data;
+	
+	@Column(name = "mtr_status", length = 1,  nullable = false)
 	private String mtr_status; // default ='Y' 
+	
+	
+
 	
 }

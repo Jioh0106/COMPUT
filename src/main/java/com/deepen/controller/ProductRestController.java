@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.BomDTO;
+import com.deepen.domain.CommonDetailDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.service.ProductService;
 
@@ -32,7 +34,6 @@ public class ProductRestController {
 	//상품테이블 저장
 	@PostMapping("/save")
 	public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO productDto){
-		
 		Integer productNo = pdService.saveProduct(productDto);
 		log.info("상품번호"+productNo);
 		productDto.setProduct_no(productNo);
@@ -75,7 +76,7 @@ public class ProductRestController {
 		return ResponseEntity.ok(bomData);
 	}
 	
-	//BOM 그리드 삭제
+	//BOM 하위그리드 삭제
 	@PostMapping("/delete/row")
 	public ResponseEntity<String> deleteRows(@RequestBody List<Integer> no) {
         try {
@@ -86,10 +87,55 @@ public class ProductRestController {
         }
     } 
 	
+	//BOM 상위그리드 삭제
+	@PostMapping("/delete/row/product")
+	public ResponseEntity<String> deleteRowsProduct(@RequestBody List<Integer> no) {
+		try {
+			pdService.deleteRowProduct(no);
+			return ResponseEntity.ok("삭제가 완료되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생: " + e.getMessage());
+		}
+	} 
+
 	
 	
+	//BOM 그리드 select 박스 공정 조회
+	@GetMapping("/select/process")
+	public ResponseEntity<List<Map<String, Object>>> selectProcess(){
+		List<Map<String, Object>> processList = pdService.selectProcess();
+		log.info("공정유형 : " + processList);
+		return ResponseEntity.ok(processList);
+	}
 	
 	
+	//BOM 테이블 업데이트
+//	@PostMapping("/bom/update")
+//	public ResponseEntity<String> updateBom(@RequestBody List<BomDTO> items) {
+//	    pdService.updateBom(items); // 서비스에서 UPDATE 처리
+//	    return ResponseEntity.ok("BOM 데이터 업데이트 완료");
+//	}
+	
+	
+	 @PostMapping("/update/all")
+	    public ResponseEntity<String> updateAll(@RequestBody Map<String, Object> requestData) {
+	        try {
+	            log.info("상품 및 BOM 업데이트 요청: " + requestData);
+	            pdService.updateAll(requestData);
+	            return ResponseEntity.ok("상품 및 BOM 데이터 업데이트 완료");
+	        } catch (Exception e) {
+	            log.info("업데이트 실패:"+ e.toString());
+	            return ResponseEntity.internalServerError().body("업데이트 실패");
+	        }
+	    }
+	
+	
+	//단위 공통코드 조회
+	@GetMapping("/select/unit")
+	public List<CommonDetailDTO> selectunit(){
+		List<CommonDetailDTO> unitList = pdService.selectUnit();
+		return unitList;
+	}
 	
 	
 	
