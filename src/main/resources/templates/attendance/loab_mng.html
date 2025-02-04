@@ -240,12 +240,13 @@
 	    </div>
 	</div>
 	
-	
 		
 	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.js"></script>
 	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script><!-- 한글 번역 파일 -->
 		
 	<!-- 제이쿼리 -->
 	<script src="/js/jquery-3.7.1.js"></script>	
@@ -264,7 +265,6 @@
 
 	<script th:inline="javascript">
 		$(function () {
-			
 			let emp_role = /*[[${emp.emp_role}]]*/'';
 			console.log("emp_role : " + emp_role); 
 			
@@ -543,6 +543,7 @@
 			
 			let grid;		// 휴직 메인 그리드 전역 변수
 			let modalGrid; 	// 사원 검색 모달창 그리드 전역 변수
+ 			
 			
 			const gridData = /*[[${absenceList}]]*/''; // 메인 그리드 데이터
 			
