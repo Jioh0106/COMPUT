@@ -214,7 +214,10 @@
 		
 		
 			
-		
+		let processOptions = [];
+		let unitOptions = [];
+		let unitMap = {};// 공통코드 → 단위명 매핑 객체
+				
 				
 		
 		const productGrid = new Grid({
@@ -239,7 +242,13 @@
 					
 					{header: '단위',		
 					name: 'PRODUCT_UNIT', 
-					editor:'text', 
+					editor: {
+			               type: 'select',
+			               options: {
+			                   listItems: unitOptions // 전역변수
+			               }
+			           },
+					formatter: ({ value }) => unitMap[value] || value, // 공통코드 → 단위명 변환   
 					sortable: true, width: 100},
 					
 					{header: '등록일',	name: 'PRODUCT_DATE', editor: 'text', sortable: true}
@@ -251,8 +260,7 @@
 			});
 		
 	
-		let processOptions = [];
-		let unitOptions = [];
+		
 		
 		function loadProcessOptions() {
 		    fetch('/api/product/select/process')
@@ -329,24 +337,43 @@
 						}
 					});
 			
-		function selectUnit(){
-			fetch('/api/product/select/unit')
-				.then(response => response.json())
-				.then(data => {
-					console.log(" 서버에서 받은 단위 데이터:", data);
-				  	unitOptions = data.map(unit => ({
-		                text: unit.common_detail_name, // 옵션 표시값
-		                value: unit.common_detail_code // 실제 저장될 값
-		            }));
-				  	
-				    console.log("단위 옵션:", unitOptions);
+					
+					
+					
+					
+			function selectUnit() {
+			    fetch('/api/product/select/unit')
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("서버에서 받은 단위 데이터:", data);
 
-		            // BOM 및 Product 그리드에 select 박스 적용
-		            productGrid();
-		            bomGrid();
-		        })
-		        .catch(error => console.error("단위 데이터 조회 오류:", error));
-			}		
+			            const unitOptions = data.map(unit => ({
+			                text: unit.common_detail_name, // 옵션 표시값
+			                value: unit.common_detail_code // 실제 저장될 값
+			            }));
+
+			            console.log("단위 옵션:", unitOptions);
+						
+						// 공통코드 → 단위명 매핑 객체 생성
+			          	unitMap = Object.fromEntries(
+			              data.map(unit => [unit.common_detail_code, unit.common_detail_name])
+			          	);
+						console.log("✅ unitMap:", unitMap);
+						
+			            // productGrid의 단위 컬럼 업데이트
+			            productGrid.getColumns().forEach(column => {
+			                if (column.name === 'PRODUCT_UNIT' && column.editor) {
+			                    column.editor.options.listItems = unitOptions;
+			                }
+			            });
+			            productGrid.refreshLayout();
+			         
+			        })
+			        .catch(error => console.error("단위 데이터 조회 오류:", error));
+				}
+			
+				
+	
 			
 			//공정유형 공통코드 -> 이름값으로 변경 후 쉼표로 구분				
 			function processCodeToName(value) {
@@ -586,29 +613,43 @@
 
 			
 			
-			//BOM그리드 업데이트(소모량, 등록일, 공정, 상태)
+			//BOM그리드, 상품그리드 업데이트
 			function updateBom(){
 				const bomData = bomGrid.getData();
+				const productData = productGrid.getData();
+				
+				const product = productData.map(row => ({
+				      product_no: row.PRODUCT_NO,
+				      product_name: row.PRODUCT_NAME,
+				      product_type: row.PRODUCT_TYPE,
+				      product_unit: row.PRODUCT_UNIT
+				  }));
 				
 				bomData.forEach(row => {
-				    
+				      
 					  //공정이름을 공정번호로 변환 (서버는 process_no로 저장해야 함)
 					  const process = processOptions.find(p => p.text === row.process_name);
 					  row.process_name = process ? process.value : row.process_name; // process_no로 변환
 					  console.log('공정유형ㅗㅗ', row.process_name);	
 					  
+					  row.bom_no = row.bom_no || null;
 				      row.bom_quantity = row.bom_quantity || 0; // 소모량 기본값 0
 				      row.bom_status = row.bom_status || 'Y';  // 상태 기본값 'Y'
+					 
 				  });
 				  
+				  const gridUpdate = {
+					bomList: bomData,
+					product: product //여러개의 상품을 배열로 전송
+				  }
 				  
-				  fetch('/api/product/bom/update', { // 새로운 API 엔드포인트 사용
+				  fetch('/api/product/update/all', { // 새로운 API 엔드포인트 사용
 				         method: 'POST',
 				         headers: {
 				             'Content-Type': 'application/json',
 				             [header]: token
 				         },
-				         body: JSON.stringify(bomData)
+				         body: JSON.stringify(gridUpdate)
 				     })
 				     .then(response => response.text())
 				     .then(data => {

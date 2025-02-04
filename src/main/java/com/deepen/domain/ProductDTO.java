@@ -22,9 +22,8 @@ public class ProductDTO {
 	private String product_type; // 상품유형(반제품/완제품)
 	
 	
-	//상위그리드, 하위그리드 선택 삭제
-	private List<Integer> productNoList;
-    private List<Integer> bomNoList;
+
 	
 	
 }
+

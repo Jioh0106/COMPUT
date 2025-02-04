@@ -110,23 +110,70 @@ public class ProductService {
 	}
 	 
 	//BOM 테이블 업데이트(공정, 소모량, 상태, 등록일) 
-	public void updateBom(List<BomDTO> items) {
-		for(BomDTO bomDto : items) {
-			Optional<Bom> bomNo = bomRepository.findById(bomDto.getBom_no());
-			
-			log.info("업데이트 bom번호 "+bomDto.getBom_no());
-			log.info("업데이트 값들 : "+ bomDto);
-			if(bomNo.isPresent()) {
-				Bom bom = bomNo.get();
-				bom.setBom_status(bomDto.getBom_status());
-				bom.setProcess_name(bomDto.getProcess_name());
-				bom.setBom_quantity(bomDto.getBom_quantity());
-				bom.setBom_date(LocalDateTime.now());
-				bomRepository.save(bom);
-			}
-		}
-	} 
-	 
+//	public void updateBom(List<BomDTO> items) {
+//		for(BomDTO bomDto : items) {
+//			Optional<Bom> bomNo = bomRepository.findById(bomDto.getBom_no());
+//			
+//			log.info("업데이트 bom번호 "+bomDto.getBom_no());
+//			log.info("업데이트 값들 : "+ bomDto);
+//			if(bomNo.isPresent()) {
+//				Bom bom = bomNo.get();
+//				bom.setBom_status(bomDto.getBom_status());
+//				bom.setProcess_name(bomDto.getProcess_name());
+//				bom.setBom_quantity(bomDto.getBom_quantity());
+//				bom.setBom_date(LocalDateTime.now());
+//				bomRepository.save(bom);
+//			}
+//		}
+//	} 
+	
+	
+	  public void updateAll(Map<String, Object> requestData) {
+	        try {
+	            // 1. 상품 데이터 업데이트
+	        	 List<Map<String, Object>> productList = (List<Map<String, Object>>) requestData.get("product");
+
+	        	 if (productList != null) {
+	                 for (Map<String, Object> productMap : productList) {
+	                     Integer productNo = Integer.parseInt(productMap.get("product_no").toString());
+	                     Optional<Product> productOpt = pdRepository.findById(productNo);
+
+	                     if (productOpt.isPresent()) {
+	                         Product product = productOpt.get();
+	                         product.setProduct_name(productMap.get("product_name").toString());
+	                         product.setProduct_type(productMap.get("product_type").toString());
+	                         product.setProduct_unit(productMap.get("product_unit").toString());
+	                         product.setProduct_date(LocalDateTime.now());
+	                         pdRepository.save(product);
+	                         log.info("✅ 상품 업데이트 완료: " + productNo);
+	                     } 
+	                 }
+	             }
+	        	 
+	            // 2. BOM 데이터 업데이트
+	            List<Map<String, Object>> bomList = (List<Map<String, Object>>) requestData.get("bomList");
+
+	            if (bomList != null) {
+	                for (Map<String, Object> bomMap : bomList) {
+	                    Integer bomNo = Integer.parseInt(bomMap.get("bom_no").toString());
+	                    Optional<Bom> bomOpt = bomRepository.findById(bomNo);
+
+	                    if (bomOpt.isPresent()) {
+	                        Bom bom = bomOpt.get();
+	                        bom.setBom_status(bomMap.get("bom_status").toString());
+	                        bom.setProcess_name(bomMap.get("process_name").toString());
+	                        bom.setBom_quantity(Integer.parseInt(bomMap.get("bom_quantity").toString()));
+	                        bom.setBom_date(LocalDateTime.now());
+	                        bomRepository.save(bom);
+	                        log.info("BOM 업데이트 완료: " + bomNo);
+	                    }
+	                }
+	            }
+	        } catch (Exception e) {
+	            log.info("업데이트 오류 발생:"+ e.toString());
+	            throw new RuntimeException("상품 및 BOM 업데이트 중 오류 발생");
+	        }
+	    }
 	
 	//단위 공통코드 조회
 	public List<CommonDetailDTO> selectUnit(){

@@ -25,6 +25,7 @@
 	ORDER BY 
 	    product_no DESC
 	</select>
+
 	
 	<!--자재/상품 리스트 조회-->
 	<select id="mtrAndProduct" parameterType="String" resultType="java.util.Map">
@@ -33,7 +34,7 @@
 	FROM(SELECT
 		mtr_no AS item_no,  
 	    mtr_name AS item_name,
-	    use_unit AS item_unit,
+	    mtr_unit AS item_unit,
 	    '자재' AS item_type
 	FROM 
 	    material

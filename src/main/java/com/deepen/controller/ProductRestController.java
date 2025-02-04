@@ -111,11 +111,25 @@ public class ProductRestController {
 	
 	
 	//BOM 테이블 업데이트
-	@PostMapping("/bom/update")
-	public ResponseEntity<String> updateBom(@RequestBody List<BomDTO> items) {
-	    pdService.updateBom(items); // 서비스에서 UPDATE 처리
-	    return ResponseEntity.ok("BOM 데이터 업데이트 완료");
-	}
+//	@PostMapping("/bom/update")
+//	public ResponseEntity<String> updateBom(@RequestBody List<BomDTO> items) {
+//	    pdService.updateBom(items); // 서비스에서 UPDATE 처리
+//	    return ResponseEntity.ok("BOM 데이터 업데이트 완료");
+//	}
+	
+	
+	 @PostMapping("/update/all")
+	    public ResponseEntity<String> updateAll(@RequestBody Map<String, Object> requestData) {
+	        try {
+	            log.info("상품 및 BOM 업데이트 요청: " + requestData);
+	            pdService.updateAll(requestData);
+	            return ResponseEntity.ok("상품 및 BOM 데이터 업데이트 완료");
+	        } catch (Exception e) {
+	            log.info("업데이트 실패:"+ e.toString());
+	            return ResponseEntity.internalServerError().body("업데이트 실패");
+	        }
+	    }
+	
 	
 	//단위 공통코드 조회
 	@GetMapping("/select/unit")
