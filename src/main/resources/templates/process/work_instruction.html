@@ -61,43 +61,36 @@
 					 <!-- 검색 영역 -->
 				    <div class="row mb-3">
 				    	 <div class="col-md-2">
-				            <label for="order-number" class="form-label">생산계획번호</label>
-				            <input type="text" id="order-number" class="form-control">
-				        </div>
-				        <!-- <div class="col-md-2">
-					        <div style="display: flex; align-items: center; gap: 1rem;">
-								<span style="font-size: 1rem; line-height: 2rem;">입사일</span>
-								첫 번째 데이트 피커
-								<div>
-									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-										<input type="text" id="startDate" name="startDate" aria-label="Date-Time" placeholder="시작일 선택"/>
-										<span class="tui-ico-date"></span>
-									</div>
-									<div id="tui-date-picker-container1"
-										style="margin-top: -1px; z-index: 2000; position: relative;"></div>
-								</div>
-				
-								구분자
-								<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
-				
-								두 번째 데이트 피커
-								<div>
-									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-										<input type="text" id="endDate" name="endDate" aria-label="Date-Time" placeholder="끝일 선택"/>
-										<span class="tui-ico-date"></span>
-									</div>
-									<div id="tui-date-picker-container2"
-										style="margin-top: -1px; z-index: 1000; position: relative;"></div>
-								</div>
-				
-								<span style="font-size: 1rem; line-height: 2rem;"> 사번 / 이름</span>
-								<div>
-									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-										<input type="text" id="search" name="search"/>
-									</div>
-								</div>
+				            <label for="planNoSearch" class="form-label">생산계획번호</label>
+				            <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+								<input type="text" id="planNoSearch" name="planNoSearch"/>
 							</div>
-						</div> -->
+				        </div>
+				        <div class="col-md-2">
+				        	<label for="startDate" class="form-label">지시일</label>
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="startDate" name="startDate" aria-label="Date-Time" placeholder="시작일 선택"/>
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container1"
+									style="margin-top: -1px; z-index: 2000; position: relative;"></div>
+							</div>
+			
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+			
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="endDate" name="endDate" aria-label="Date-Time" placeholder="끝일 선택"/>
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container2"
+									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+						</div>
 				        <div class="col-md-2">
 				            <label for="operation" class="form-label">공정/라인</label>
 				            <select class="form-select" id="operation">
@@ -146,16 +139,19 @@
 				            <button class="btn btn-outline-danger">삭제</button>
 				        </div>
 				    </div>
-				
-				    <!-- 탭 내용 -->
+					<!-- 하단 탭 메뉴 끝-->
+					
+				    <!-- 탭 내용 시작-->
 				    <div class="tab-content mt-2">
-				        <div class="tab-pane fade" id="tab-worker" role="tabpanel">
+				        <div class="tab-pane active" id="tab-worker" role="tabpanel">
 				            <div id="workerGrid" style="height: 300px;"></div>
 				        </div>
-				        <div class="tab-pane fade" id="tab-material" role="tabpanel">
+				        <div class="tab-pane " id="tab-material" role="tabpanel">
 				            <div id="materialGrid" style="height: 300px;"></div>
 				        </div>
 				    </div>
+				    <!-- 탭 내용 끝-->
+				    
 				</div> <!-- card-body -->
 			</div> <!-- card -->
 		</div> <!-- main -->

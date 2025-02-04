@@ -1,15 +1,20 @@
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
+const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
+const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+
+startDatePicker.setNull();
+endDatePicker.setNull();
+
 let workInstructionGrid = "";
 let workerGrid = "";
 let materialGrid = "";
 
 window.onload = function() { 
-	console.log("작업시지 js 연결");
 	createWorkInstructionGrid();
 	createWorkerGrid();
-	createMaterialGrid();
+	document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
 };
 
 function createWorkInstructionGrid(){
@@ -60,15 +65,16 @@ function createWorkerGrid(){
 		//const data = processList;
 		//console.log("processList:", data);
 		var Grid = tui.Grid;
-
+		
+		// 탭 활성화
+		document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+		document.getElementById('tab-worker').classList.add("active");
+		
 		if (workerGrid) {
 			// 이미 생성된 경우 destroy하지 않고 재사용
 			workerGrid.refreshLayout();
 			return;
 		}
-		
-		let workerDiv = document.getElementById('tab-worker');
-		workerDiv.classList.add('active');
 		
 		workerGrid = new Grid({
 			el: document.getElementById('workerGrid'),
@@ -103,15 +109,15 @@ function createMaterialGrid(){
 		//const data = processList;
 		//console.log("processList:", data);
 		var Grid = tui.Grid;
-
+		
+		document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+		document.getElementById('tab-material').classList.add("active");
+		
 		if (materialGrid) {
 			// 이미 생성된 경우 destroy하지 않고 재사용
 			materialGrid.refreshLayout();
 			return;
 		}
-		
-		let materialDiv = document.getElementById('tab-material');
-		materialDiv.classList.add('active');
 		
 		materialGrid = new Grid({
 			el: document.getElementById('materialGrid'),
@@ -144,3 +150,16 @@ function createMaterialGrid(){
 		materialGrid.hideColumn("rowType");
 		
 };
+
+
+// // toast ui datepiker
+function datePiker(containerSelector, inputSelector){
+	return new tui.DatePicker(containerSelector,{
+		date : new Date(),
+		input : {
+			element: inputSelector,
+			format: 'yyyy-MM-dd'
+		},
+		language : 'ko'
+	});
+}
