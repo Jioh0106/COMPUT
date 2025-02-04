@@ -34,7 +34,6 @@ public class ProductRestController {
 	//상품테이블 저장
 	@PostMapping("/save")
 	public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO productDto){
-		
 		Integer productNo = pdService.saveProduct(productDto);
 		log.info("상품번호"+productNo);
 		productDto.setProduct_no(productNo);

@@ -163,7 +163,6 @@
 								<label for="first-name-column">단위</label>
 								<select id="proUnit" class="form-control" name="product_unit">
 									<option>단위 선택</option>
-									<option value="개">개</option>
 								</select>
 								
 								
@@ -219,7 +218,7 @@
 		let unitMap = {};// 공통코드 → 단위명 매핑 객체
 				
 				
-		
+		//상위그리드(상품)
 		const productGrid = new Grid({
 				el: document.getElementById('productGrid'),
 				rowHeaders: ['checkbox'],
@@ -248,7 +247,7 @@
 			                   listItems: unitOptions // 전역변수
 			               }
 			           },
-					formatter: ({ value }) => unitMap[value] || value, // 공통코드 → 단위명 변환   
+			        formatter: ({ value }) => unitMap[value] || value,
 					sortable: true, width: 100},
 					
 					{header: '등록일',	name: 'PRODUCT_DATE', editor: 'text', sortable: true}
@@ -260,8 +259,7 @@
 			});
 		
 	
-		
-		
+		//공정테이블에서 공정유형 조회 함수
 		function loadProcessOptions() {
 		    fetch('/api/product/select/process')
 		        .then(response => response.json())
@@ -286,6 +284,7 @@
 			 }
 		
 		
+		//하위그리드(bom)
 		const bomGrid = new Grid({
 						el: document.getElementById('bomGrid'),
 						rowHeaders: ['checkbox'],
@@ -337,10 +336,7 @@
 						}
 					});
 			
-					
-					
-					
-					
+			//상위그리드 단위 공통코드 조회 함수		
 			function selectUnit() {
 			    fetch('/api/product/select/unit')
 			        .then(response => response.json())
@@ -349,7 +345,7 @@
 
 			            const unitOptions = data.map(unit => ({
 			                text: unit.common_detail_name, // 옵션 표시값
-			                value: unit.common_detail_code // 실제 저장될 값
+			                value: unit.common_detail_code
 			            }));
 
 			            console.log("단위 옵션:", unitOptions);
@@ -358,7 +354,20 @@
 			          	unitMap = Object.fromEntries(
 			              data.map(unit => [unit.common_detail_code, unit.common_detail_name])
 			          	);
-						console.log("✅ unitMap:", unitMap);
+						console.log(" unitMap:", unitMap);
+			            
+						// **모달창의 select 박스 업데이트**
+			            const proUnitSelect = document.getElementById('proUnit');
+			            if (proUnitSelect) {
+			                proUnitSelect.innerHTML = '<option value="">단위 선택</option>'; // 기본 옵션 추가
+			                unitOptions.forEach(option => {
+			                    const newOption = document.createElement('option');
+			                    newOption.value = option.value; // 코드값 저장
+			                    newOption.textContent = option.text; // 이름값 표시
+			                    proUnitSelect.appendChild(newOption);
+			                });
+			            }
+						
 						
 			            // productGrid의 단위 컬럼 업데이트
 			            productGrid.getColumns().forEach(column => {
@@ -372,8 +381,19 @@
 			        .catch(error => console.error("단위 데이터 조회 오류:", error));
 				}
 			
-				
-	
+			//단위 공통코드 이름값으로 유지되도록	
+			productGrid.on('afterChange', (ev) => {
+			    ev.changes.forEach(change => {
+			        if (change.columnName === 'PRODUCT_UNIT') {
+			            // 코드값을 unitMap에서 변환 후 저장
+			            const selectedName = unitMap[change.value] || change.value;
+			            productGrid.setValue(change.rowKey, 'PRODUCT_UNIT', selectedName);
+			        }
+			    });
+			});
+
+
+			
 			
 			//공정유형 공통코드 -> 이름값으로 변경 후 쉼표로 구분				
 			function processCodeToName(value) {
@@ -402,6 +422,7 @@
 		   function openProductModal() {
 		       const productModal = new bootstrap.Modal(document.getElementById('productModal'));
 		       productModal.show();
+		       selectUnit();
 		   }
 		
 		  
@@ -410,7 +431,7 @@
 			 const productName = document.getElementById('proName').value;
 			 const productUnit = document.getElementById('proUnit').value;
 			 const productType = document.getElementById('proType').value;
-		     
+			 console.log("^^등록 버튼 클릭 - 단위:", productUnit);
 			 //빈칸검사
 			 if (!productName || !productUnit || !productType) {
 		         alert('모든 필드를 입력하세요.');
@@ -448,8 +469,8 @@
 		  
 			//상품그리드 조회
 			function updateProductGrid() {
-			    const productName = document.getElementById('productName').value || ''; // 상품명 입력값
-			    const searchMonth = document.getElementById('searchMonth').value || ''; // 등록 월 입력값
+			    const productName = document.getElementById('productName').value || ''; // 검색 상품명 입력값
+			    const searchMonth = document.getElementById('searchMonth').value || ''; // 검색 월 입력값
 				console.log('상품명:', productName); // 디버깅용
 				console.log('등록월:', searchMonth); // 디버깅용
 
@@ -549,7 +570,7 @@
 			    let idsToDelete = [];
 			    let url = '';
 			
-			    // 🚀 상위 그리드(상품)에서 체크된 행 확인
+			    // 상위 그리드(상품)에서 체크된 행 확인
 			    const selectedProductRows = productGrid.getCheckedRows();
 			    const selectedBomRows = bomGrid.getCheckedRows();
 			
@@ -625,6 +646,8 @@
 				      product_unit: row.PRODUCT_UNIT
 				  }));
 				
+				console.log('product :', product);
+				
 				bomData.forEach(row => {
 				      
 					  //공정이름을 공정번호로 변환 (서버는 process_no로 저장해야 함)
@@ -659,7 +682,6 @@
 				     .catch(error => {
 				         console.error('BOM 업데이트 오류:', error);
 				     });
-				
 			}
 			
 			
