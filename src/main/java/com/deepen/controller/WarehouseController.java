@@ -22,7 +22,6 @@ public class WarehouseController {
     public String warehouse(Model model) {
         List<Warehouse> warehouseList = service.warehouseList();
         model.addAttribute("warehouseList", warehouseList);
-        System.err.println(warehouseList);
         return "info/warehouse_info";
     }
 	

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.EquipmentSttsMapper">
+
+	<select id="selectStts" resultType="map">
+		SELECT
+			  common_detail_code AS "code"
+			, common_detail_name AS "name"
+		FROM
+			common_detail
+		WHERE
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
+		AND
+			common_detail_status = 'Y'
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<select id="selectEquipmentStts" resultType="map" parameterType="map">
+		SELECT	  
+			  info_sn AS "sn"
+			, info_nm AS "name"
+			, (SELECT process_name FROM process_info WHERE process_no = ei.process_no) AS "processNm"
+			, info_type AS "type"
+			, info_use_date AS "useDate"
+		FROM
+			equipment_info ei
+		<where>
+			AND info_useyn = 'Y'
+		</where>
+	</select>
+	
+</mapper>
+
+
+
