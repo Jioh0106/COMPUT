@@ -13,11 +13,55 @@ $(function() {
 		data: data, 
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '자재번호', name: 'mtr_no', editor: isEditable ? 'text' : null},
-			{header: '자재명', name: 'mtr_name', editor: isEditable ? 'text' : null},
-			{header: '최소단위', name: 'ress_unit', editor: isEditable ? 'text' : null},
-			{header: '사용 단위', name: 'use_unit', editor: isEditable ? 'text' : null},
-			{header: '사용여부', name: 'mtr_status', editor: isEditable ? 'text' : null},
+			{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null},
+			{header: '자재 이름', name: 'mtr_name', width: 200, editor: isEditable ? 'text' : null},
+			{header: '자재 종류', name: 'mtr_type', width: 150, editor: isEditable ? 'text' : null, filter: 'select' },
+			{header: '자재 성분', name: 'composition', width: 150, editor: isEditable ? 'text' : null},
+			{header: '경도/강도', name: 'hardness', width: 100, editor: isEditable ? 'text' : null},
+			{header: '밀도 (g/cm³)', name: 'density', width: 100, editor: isEditable ? 'text' : null},
+			{header: '융점 (°C)', name: 'melting_point', width: 100, editor: isEditable ? 'text' : null},
+			{header: '인장 강도 (MPa)', name: 'tensile_strength', width: 100, editor: isEditable ? 'text' : null},
+			{header: '주요 용도', name: 'mtr_use', width: 150, editor: isEditable ? 'text' : null},
+			{header: '자재 단위', name: 'mtr_unit', width: 80, editor: isEditable ? 'text' : null},
+			{
+				header: '등록일', 
+				name: 'mtr_reg_data', 
+				width: 100, 
+				editor: isEditable
+					? {
+	                type: 'datePicker',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+				: null,
+	            filter: {
+	                type: 'date',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+			},
+			{
+				header: '수정일', 
+				name: 'mtr_mod_data', 
+				width: 100, 
+				editor: isEditable
+					? {
+	                type: 'datePicker',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+				: null,
+	            filter: {
+	                type: 'date',
+	                options: {
+	                    format: 'yyyy-MM-dd'
+	                }
+	            }
+			},
+			{header: '사용여부', name: 'mtr_status', width: 80, editor: isEditable ? 'text' : null, filter: 'select' },
 		],
 		editing: isEditable  // 편집 기능 활성화
 	});
