@@ -32,5 +32,8 @@ public class Product {
 	@Column(name = "product_date")
 	private LocalDateTime product_date; //등록일
 	
+	@Column(name = "product_type", length = 20 )
+	private String product_type; //상품유형
+	
 	
 }

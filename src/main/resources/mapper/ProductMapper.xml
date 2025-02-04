@@ -7,20 +7,26 @@
 	<!--상품리스트 조회/검색-->
 	<select id="listProduct" parameterType="Map" resultType="java.util.Map">
 	SELECT 
-	  *
+	  p.product_no,
+	  p.product_name,
+	  c.common_detail_name AS product_unit,
+	  TO_CHAR(p.product_date, 'YYYY-MM-DD HH24:MI:SS') AS product_date,
+	  p.product_type
 	FROM 
-	    product
+	    product p
+	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code   
 	WHERE 
 	    1 = 1
 	    <if test="productName != null and productName != ''">
-	      AND product_name LIKE '%' || #{productName} || '%'
+	      AND p.product_name LIKE '%' || #{productName} || '%'
 	    </if>
 	    <if test="searchMonth != null and searchMonth != ''">
-	      	AND TO_CHAR(product_date, 'YYYY-MM') = #{searchMonth}
+	      		AND TRUNC(p.product_date, 'MONTH') = TO_DATE(#{searchMonth}, 'YYYY-MM')
 	    </if>
 	ORDER BY 
-	    product_no DESC
+	    p.product_no DESC
 	</select>
+
 	
 	<!--자재/상품 리스트 조회-->
 	<select id="mtrAndProduct" parameterType="String" resultType="java.util.Map">
@@ -29,7 +35,7 @@
 	FROM(SELECT
 		mtr_no AS item_no,  
 	    mtr_name AS item_name,
-	    use_unit AS item_unit,
+	    mtr_unit AS item_unit,
 	    '자재' AS item_type
 	FROM 
 	    material
@@ -38,10 +44,11 @@
 		product_no AS item_no,
 	    product_name AS item_name,
 	    product_unit AS item_unit,
-	    '상품' AS  item_type
+	    product_type AS item_type
 	FROM 
 	    product
-	    
+	WHERE
+		product_type = '반제품'    
 	 ) all_select
 	WHERE 
 	    item_name LIKE '%' || #{item_name} || '%'
@@ -76,7 +83,7 @@
         b.bom_no		
 	</select>
 
-	<!--체크박스 삭제-->
+	<!--하위그리드 체크박스 삭제-->
 	<delete id="deleteRow" parameterType="list">
 	DELETE 
 	FROM 
@@ -88,10 +95,36 @@
         #{bom_no}
     </foreach>
 	</delete>
-
-
-
-
-
+	
+	<!--상위그리드 체크박스 삭제 -->
+	<delete id="deleteRowProduct" parameterType="list">
+	DELETE
+	FROM
+		product
+	WHERE
+		product_no
+	IN
+	<foreach item="product_no" collection="list" open="(" separator="," close=")">
+        #{product_no}
+    </foreach>		
+	</delete>
+	
+	<!-- 하위그리드 공정 select박스 조회 -->
+	<select id="selectProcess" resultType="java.util.Map">
+	SELECT process_no, process_name
+	FROM process_info
+	WHERE is_active ='Y'
+	</select>
+	
+	<!-- 단위 공통코드 select박스 조회 -->
+	<select id="selectUnit" resultType="com.deepen.domain.CommonDetailDTO">
+	SELECT common_detail_code, common_detail_name
+	FROM common_detail
+	WHERE SUBSTR(common_detail_code,1,4) 
+		IN('UNIT')
+		AND common_detail_status ='Y' 
+	</select>
+	
+	
 
 </mapper>
