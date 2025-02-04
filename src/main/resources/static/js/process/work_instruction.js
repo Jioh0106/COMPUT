@@ -1,21 +1,57 @@
+// spring security token
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
-const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
-const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+// toast ui datepiker
+function datePiker(containerSelector, inputSelector){
+	return new tui.DatePicker(containerSelector,{
+		date : new Date(),
+		input : {
+			element: inputSelector,
+			format: 'yyyy-MM-dd'
+		},
+		language : 'ko'
+	});
+}
 
-startDatePicker.setNull();
-endDatePicker.setNull();
-
-let workInstructionGrid = "";
-let workerGrid = "";
-let materialGrid = "";
+// toast ui Select Box
+function selectBox(idSelector,placeholderText/*data*/){
+	return new tui.SelectBox(idSelector,{
+		placeholder: placeholderText,
+		data:[
+				{label:'가공',value:'가공'},
+				{label:'열처리',value:'열처리'},
+				{label:'조립',value:'조립'},
+				{label:'표면처리',value:'표면처리'}
+			],
+		//data:data,
+	});
+}
 
 window.onload = function() { 
+	
+	// 데이트 피커 생성
+	const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
+	const endDatePicker = datePiker('#tui-date-picker-container2','#endDate');
+
+	// 데이트 피커 초기값 설정
+	startDatePicker.setNull();
+	endDatePicker.setNull();
+	
+	// select box 생성
+	selectBox("#processSelectBox","공정 선택");
+	selectBox("#lineSelectBox","라인 선택");
+	
+	// 그리드 생성
 	createWorkInstructionGrid();
 	createWorkerGrid();
 	document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
 };
+
+// 그리드 초기값
+let workInstructionGrid = "";
+let workerGrid = "";
+let materialGrid = "";
 
 function createWorkInstructionGrid(){
 		//const data = [];//processList;
@@ -110,6 +146,7 @@ function createMaterialGrid(){
 		//console.log("processList:", data);
 		var Grid = tui.Grid;
 		
+		// 탭 활성화
 		document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
 		document.getElementById('tab-material').classList.add("active");
 		
@@ -151,15 +188,3 @@ function createMaterialGrid(){
 		
 };
 
-
-// // toast ui datepiker
-function datePiker(containerSelector, inputSelector){
-	return new tui.DatePicker(containerSelector,{
-		date : new Date(),
-		input : {
-			element: inputSelector,
-			format: 'yyyy-MM-dd'
-		},
-		language : 'ko'
-	});
-}

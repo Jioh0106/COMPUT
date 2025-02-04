@@ -19,22 +19,13 @@
 	
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/select-box/latest/toastui-select-box.css" />
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	
 	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
 	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 
 <style>
-.tab-content > .tab-pane {
-    visibility: hidden;
-    height: 0;
-    overflow: hidden;
-}
-.tab-content > .tab-pane.active {
-    visibility: visible;
-    height: auto;
-    overflow: visible;
-}
 
 </style>
 
@@ -60,14 +51,18 @@
 				<div class="card-body" id="default">
 					 <!-- 검색 영역 -->
 				    <div class="row mb-3">
-				    	 <div class="col-md-2">
-				            <label for="planNoSearch" class="form-label">생산계획번호</label>
+				    	 <div class="col-md-2 d-flex">
+				    	 	<div class="col-6">
+				            	<label for="planNoSearch" class="form-label"><b>생산계획번호</b></label>
+				    	 	</div>
 				            <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
 								<input type="text" id="planNoSearch" name="planNoSearch"/>
 							</div>
 				        </div>
-				        <div class="col-md-2">
-				        	<label for="startDate" class="form-label">지시일</label>
+				        <div class="col-md-3 d-flex">
+				        	<div class="col-2">
+				        		<label for="startDate" class="form-label"><b>지시일</b></label>
+			        		</div>
 							<!-- 첫 번째 데이트 피커 -->
 							<div>
 								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
@@ -91,28 +86,24 @@
 									style="margin-top: -1px; z-index: 1000; position: relative;"></div>
 							</div>
 						</div>
-				        <div class="col-md-2">
-				            <label for="operation" class="form-label">공정/라인</label>
-				            <select class="form-select" id="operation">
-				                <option value="ALL">공정 선택</option>
-				            </select>
+				        <div class="col-md-3 d-flex">
+				        	<div class="col-2">
+				            	<label for="processSelectBox" class="form-label"><b>공정/라인</b></label>
+				            </div>	
+				            <div id="processSelectBox" style="width: 200px"></div>
+				            <div id="lineSelectBox" style="width: 200px"></div>
 				        </div>
-				        <div class="col-md-2">
-				        	<label for="operation" class="form-label"></label>
-				        	<select class="form-select" id="operation">
-				                <option value="ALL">라인 선택</option>
-				            </select>
-				        </div>
-				        <div class="col-md-2 d-flex align-items-end">
+				        <!-- <div class="col-md-2 d-flex align-items-end">
 				            <button class="btn btn-primary w-100">조회</button>
-				        </div>
+				        </div> -->
 				    </div>
 				
 				    <!-- 작업 시작/종료 버튼 -->
-				    <div class="row mb-3">
+				    <div class="row mb-2">
 				        <div class="col text-end">
-				            <button class="btn btn-outline-primary me-1">작업시작</button>
-				            <button class="btn btn-outline-secondary">작업종료</button>
+				            <button class="btn btn-outline-primary me-1" id="workStart">작업시작</button>
+				            <button class="btn btn-outline-success me-1" id="defectCheck">불량검사</button>
+				            <button class="btn btn-outline-secondary" id="workEnd">작업종료</button>
 				        </div>
 				    </div>
 				
@@ -130,9 +121,6 @@
 				            <li class="nav-item" role="presentation">
 				                <button class="nav-link" id="tab-material-tab" data-bs-toggle="tab" data-bs-target="#tab-material" type="button" role="tab">자재투입</button>
 				            </li>
-				            <!-- <li class="nav-item" role="presentation">
-				                <button class="nav-link" id="tab-etc-tab" data-bs-toggle="tab" data-bs-target="#tab-etc" type="button" role="tab">비가동</button>
-				            </li> -->
 				        </ul>
 				        <div>
 				            <button class="btn btn-outline-success me-1">추가</button>
@@ -165,6 +153,7 @@
 
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/select-box/latest/toastui-select-box.js"></script>
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	<script src="js/process/work_instruction.js"></script>
 	<script th:inline="javascript">
