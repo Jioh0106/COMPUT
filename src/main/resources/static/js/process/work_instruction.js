@@ -69,21 +69,39 @@ function createWorkInstructionGrid(){
 			rowHeaders: ['checkbox'],
 			bodyHeight: 280,
 			columns: [
-				{header: '지시번호', name: 'no', sortable: true},
-				{header: '공정명', name: 'name',	editor: 'text'},
-				{header: '공정우선순위', name: 'priority',	editor: 'text', sortable: true},
-				{header: '사용여부', name: 'isActive',	editor: {
-													            type: 'select',
-													            options: {
-													              listItems: [
-													                { text: 'Y', value: 'Y' },
-													                { text: 'N', value: 'N' },
-													              ]
-													            }}, filter : 'select'},
-				{header: '설명', name: 'description', editor: 'text'},
-				{header: '생성일', name: 'cDate'},
-				{header: '수정일', name: 'udDate'},
-				{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
+				{header: '지시번호', name: 'wi_no', sortable: true},
+				{header: '계획번호', name: 'plan_no', sortable: true},
+				{header: '품목번호', name: 'product_no', sortable: true},
+				{header: '품목', name: 'product_name'},
+				{header: 'BOM번호', name: 'bom_no'},
+				{header: '공정', name: 'process_name', editor: {
+														type: 'select',
+														options: {
+														listItems: [
+															{ text: '가공', value: '가공' },
+															{ text: '조립', value: '조립' }
+														]
+														}}, filter : 'select'},
+				{header: '라인', name: 'line_name', editor: {
+																type: 'select',
+																options: {
+																listItems: [
+																	{ text: '라인1', value: '라인1' },
+																	{ text: '라인2', value: '라인1' }
+																]
+																}}, filter : 'select'},
+				{header: '설비', name: 'equ_name', editor: {
+															type: 'select',
+															options: {
+															listItems: [
+																{ text: '설비1', value: '설비1' },
+																{ text: '설비2', value: '설비2' }
+															]
+															}}, filter : 'select'},
+				{header: '상태', name: 'wi_status',	editor: 'text', sortable: true},
+				{header: '작업시작시간', name: 'cDate'},
+				{header: '작업완료시간', name: 'udDate'},
+				{header: '작업담당자', name: 'emp_id'},
 			],
 			data: [],
 			columnOptions: {
@@ -93,7 +111,6 @@ function createWorkInstructionGrid(){
 		
 		// id 및 rowType 숨기기
 		//workInstructionGrid.hideColumn("no");
-		workInstructionGrid.hideColumn("rowType");
 };
 
 function createWorkerGrid(){
@@ -119,8 +136,8 @@ function createWorkerGrid(){
 			columns: [
 				{header: '사원번호', name: 'no', sortable: true},
 				{header: '사원명', name: 'name',	editor: 'text'},
-				{header: '부서', name: 'priority',	editor: 'text', sortable: true},
-				{header: '직급', name: 'isActive',	editor: {
+				{header: '부서', name: 'dept',	editor: 'text', sortable: true},
+				{header: '직급', name: 'position',	editor: {
 													            type: 'select',
 													            options: {
 													              listItems: [
@@ -128,9 +145,8 @@ function createWorkerGrid(){
 													                { text: 'N', value: 'N' },
 													              ]
 									        				 }}, filter : 'select'},
-				{header: '연락처', name: 'description', editor: 'text'},
-				{header: '이메일', name: 'cDate'},
-				{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
+				{header: '연락처', name: 'phone', editor: 'text'},
+				{header: '이메일', name: 'email'},
 			],
 			data: [],
 			columnOptions: {
@@ -138,7 +154,6 @@ function createWorkerGrid(){
 			},
 		});
 		//workInstructionGrid.hideColumn("no");
-		workerGrid.hideColumn("rowType");
 };
 
 function createMaterialGrid(){
@@ -161,21 +176,11 @@ function createMaterialGrid(){
 			rowHeaders: ['checkbox'],
 			bodyHeight: 280,
 			columns: [
-				{header: '자재번호', name: 'no', sortable: true},
-				{header: '자재명', name: 'name',	editor: 'text'},
-				{header: '공정우선순위', name: 'priority',	editor: 'text', sortable: true},
-				{header: '사용여부', name: 'isActive',	editor: {
-													            type: 'select',
-													            options: {
-													              listItems: [
-													                { text: 'Y', value: 'Y' },
-													                { text: 'N', value: 'N' },
-													              ]
-													            }}, filter : 'select'},
-				{header: '설명', name: 'description', editor: 'text'},
-				{header: '생성일', name: 'cDate'},
-				{header: '수정일', name: 'udDate'},
-				{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
+				{header: '자재번호', name: 'mtl_no', sortable: true},
+				{header: '자재명', name: 'mtl_name', sortable: true},
+				{header: '창고', name: 'warehouse', sortable: true},
+				{header: '구역', name: 'zone', sortable: true},
+				{header: '출고수량', name: 'out_qty', sortable: true}
 			],
 			data: [],
 			columnOptions: {
@@ -184,7 +189,5 @@ function createMaterialGrid(){
 		});
 		
 		//materialGrid.hideColumn("no");
-		materialGrid.hideColumn("rowType");
-		
 };
 
