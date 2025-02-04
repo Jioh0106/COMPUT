@@ -1,7 +1,6 @@
 package com.deepen.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,21 +15,14 @@ public interface CommonDetailRepository extends JpaRepository<CommonDetail, Stri
     List<CommonDetail> findByCommon_detail_codeStartingWithOrderByCommon_detail_codeDesc(@Param("prefix") String prefix);
     
     //이름으로 공통코드 조회
-    @Query("SELECT c.common_detail_code FROM CommonDetail c WHERE c.common_detail_name = :commonDetailName")
+    @Query("SELECT c.commonDetailCode FROM CommonDetail c WHERE c.commonDetailName = :commonDetailName")
     String findCommonDetailCodeByName(@Param("commonDetailName") String commonDetailName);
-//extends JpaRepository<T(Entity), ID(기본키 형)>
-//JpaRepository 지원하는 기본 메서드 제공
-//save(Entity) : 엔티티 저장 및 수정
-//void delete(Entity) : 엔티티 삭제
-//void deleteById(id) : 엔티티 삭제
-
-//count : 엔티티 총 개수 반환
-//List<Entity> findAll() : 모든 엔티티 조회
-//Entity findById(id) : id(기준키)에 대한 엔티티 조회
-
-//쿼리 메서드 정의
-//아이디 비밀번호 조회 : findByIdAndPass(id,pass) => where id = ? and pass = ?
-//                findByIdOrPass(id,pass) => where id = ? or pass = ?
-//                findByNumBetween() => where num between ? and ?
-
+    
+    // 단위 코드 조회
+    @Query("SELECT c FROM CommonDetail c WHERE c.commonDetailCode LIKE 'UNIT%' AND c.commonDetailStatus = 'Y'")
+    List<CommonDetail> findUnitCodes();
+    
+    // 특정 공통코드로 조회
+    @Query("SELECT c FROM CommonDetail c WHERE c.commonDetailCode LIKE :code% AND c.commonDetailStatus = 'Y'")
+    List<CommonDetail> findByCommonCode(@Param("code") String code);
 }

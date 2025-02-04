@@ -19,11 +19,6 @@
         .tui-grid-cell { background-color: #ffffff !important; }
         .display-flex { display: flex; }
         .buttons { margin-left: auto; }
-        #qcGrid, #defectGrid {
-            margin-bottom: 20px;
-            width: 100%;
-            height: 300px;
-        }
         .mb-4 { margin-bottom: 1.5rem !important; }
         .required::after {
             content: " *";
@@ -93,17 +88,49 @@
         </div>
     </div>
 
+	<script src="/js/jquery-3.7.1.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/main.js"></script>
-    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-    <script src="/js/jquery-3.7.1.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="assets/js/main.js"></script>
 
     <script th:inline="javascript">
+    
         const header = document.querySelector('meta[name="_csrf_header"]').content;
         const token = document.querySelector('meta[name="_csrf"]').content;
         let isEditMode = false;
+        
+    	const Grid = tui.Grid;
+    	
+    	// 공통 데이터 저장
+        let processList = [];
+        let unitList = [];
+        let useYnList = [];
+    	
+    	 // 초기 데이터 로드
+        $(document).ready(function() {
+        	loadCommonData();
+            loadGridData();
+        });
+    	 
+    	// 공통 데이터 로드
+        function loadCommonData() {
+            $.ajax({
+                url: '/api/quality/common/process',
+                type: 'GET',
+                success: function(response) {
+                    processList = response;
+                }
+            });
+            
+            $.ajax({
+                url: '/api/quality/common/unit',
+                type: 'GET',
+                success: function(response) {
+                    unitList = response;
+                }
+            });
+        }
         
         const qcGrid = new Grid({
             el: document.getElementById('qcGrid'),
@@ -111,18 +138,43 @@
             columns: [
                 {header: '검사코드', name: 'qcCode', editor: 'text'},
                 {header: '검사명', name: 'qcName', editor: 'text'},
-                {header: '공정번호', name: 'processNo', editor: 'text'},
-                {header: '제품번호', name: 'productNo', editor: 'text'},
+                {header: '공정', name: 'processName', editor: {
+                    type: 'select',
+                    options: {
+                        listItems: processList.map(p => ({
+                            text: p.processName,
+                            value: p.processNo
+                        }))
+                    }
+                }},
                 {header: '목표값', name: 'targetValue', editor: 'text'},
                 {header: '상한값', name: 'ucl', editor: 'text'},
                 {header: '하한값', name: 'lcl', editor: 'text'},
-                {header: '단위', name: 'unit', editor: 'text'},
+                {header: '단위', name: 'unitName', editor: {
+                    type: 'select',
+                    options: {
+                        listItems: unitList.map(u => ({
+                            text: u.commonDetailName,
+                            value: u.commonDetailCode
+                        }))
+                    }
+                }},
                 {header: '검사방법', name: 'qcMethod', editor: 'text'},
-                {header: '사용여부', name: 'useYn', editor: 'text'},
-                {header: '생성자', name: 'createUser'},
+                {
+                    header: '사용여부', 
+                    name: 'useYn', 
+                    editor: {
+                        type: 'select',
+                        options: {
+                            listItems: [
+                                {text: '사용', value: 'Y'},
+                                {text: '미사용', value: 'N'}
+                            ]
+                        }
+                    }
+                },
                 {header: '생성일시', name: 'createTime',
                     formatter: ({value}) => value ? new Date(value).toLocaleString() : ''},
-                {header: '수정자', name: 'updateUser'},
                 {header: '수정일시', name: 'updateTime',
                     formatter: ({value}) => value ? new Date(value).toLocaleString() : ''}
             ]
@@ -134,15 +186,30 @@
             columns: [
                 {header: '불량코드', name: 'defectCode', editor: 'text'},
                 {header: '불량명', name: 'defectName', editor: 'text'},
-                {header: '공정번호', name: 'processNo', editor: 'text'},
+                {header: '공정', name: 'processName', editor: {
+                    type: 'select',
+                    options: {
+                        listItems: []
+                    }
+                }},
                 {header: '불량유형', name: 'defectType', editor: 'text'},
                 {header: '불량수준', name: 'defectLevel', editor: 'text'},
                 {header: '판정기준', name: 'judgmentCriteria', editor: 'text'},
-                {header: '사용여부', name: 'useYn', editor: 'text'},
-                {header: '생성자', name: 'createUser'},
+                {
+                    header: '사용여부', 
+                    name: 'useYn', 
+                    editor: {
+                        type: 'select',
+                        options: {
+                            listItems: [
+                                {text: '사용', value: 'Y'},
+                                {text: '미사용', value: 'N'}
+                            ]
+                        }
+                    }
+                },
                 {header: '생성일시', name: 'createTime',
                     formatter: ({value}) => value ? new Date(value).toLocaleString() : ''},
-                {header: '수정자', name: 'updateUser'},
                 {header: '수정일시', name: 'updateTime',
                     formatter: ({value}) => value ? new Date(value).toLocaleString() : ''}
             ]
@@ -162,7 +229,6 @@
             const prefix = activeTab === 'qc' ? 'QC' : 'DF';
             const newCode = `${prefix}${String(maxNo + 1).padStart(3, '0')}`;
             
-            const currentUser = 'SYSTEM'; // 실제 로그인 사용자 정보로 대체 필요
             const currentTime = new Date().toISOString();
 
             if (activeTab === 'qc') {
@@ -170,14 +236,12 @@
                     qcCode: newCode,
                     qcName: '',
                     processNo: '',
-                    productNo: '',
                     targetValue: '',
                     ucl: '',
                     lcl: '',
                     unit: '',
                     qcMethod: '',
                     useYn: 'Y',
-                    createUser: currentUser,
                     createTime: currentTime
                 }, { focus: true });
             } else {
@@ -189,7 +253,6 @@
                     defectLevel: '',
                     judgmentCriteria: '',
                     useYn: 'Y',
-                    createUser: currentUser,
                     createTime: currentTime
                 }, { focus: true });
             }
@@ -202,7 +265,6 @@
             editBtn.classList.toggle('btn-primary');
 
             const currentTime = new Date().toISOString();
-            const currentUser = 'SYSTEM'; // 실제 로그인 사용자 정보로 대체 필요
 
             if (!isEditMode) {
                 const activeTab = $('.tab-pane.active').attr('id');
@@ -211,7 +273,6 @@
 
                 modifiedRows.updatedRows.forEach(row => {
                     row.updateTime = currentTime;
-                    row.updateUser = currentUser;
                 });
             }
             
@@ -222,7 +283,7 @@
             [qcGrid, defectGrid].forEach(grid => {
                 const columns = grid.getColumns();
                 columns.forEach(column => {
-                    if (!['createUser', 'createTime', 'updateUser', 'updateTime'].includes(column.name)) {
+                    if (!['createTime', 'updateTime'].includes(column.name)) {
                         column.editor = isEditMode ? 'text' : false;
                     }
                 });
@@ -259,16 +320,13 @@
             }
 
             const currentTime = new Date().toISOString();
-            const currentUser = 'SYSTEM'; // 실제 로그인 사용자 정보로 대체 필요
 
             [...modifiedRows.createdRows, ...modifiedRows.updatedRows].forEach(row => {
                 if (!row.createTime) {
                     row.createTime = currentTime;
-                    row.createUser = currentUser;
                 }
                 if (modifiedRows.updatedRows.includes(row)) {
                     row.updateTime = currentTime;
-                    row.updateUser = currentUser;
                 }
 
                 const url = `/api/quality/${activeTab}${modifiedRows.createdRows.includes(row) ? '' : '/update'}`;
@@ -292,14 +350,32 @@
             alert('저장되었습니다.');
         }
 
-        // 초기 데이터 로드
-        $(document).ready(function() {
-            loadGridData();
-        });
-
         // 탭 변경 이벤트
         $('#qualityTab button').on('shown.bs.tab', function (e) {
-            const currentTab = $(e.target).data('bs-target').slice(1);
+	    const currentTab = $(e.target).data('bs-target').slice(1);
+	    const grid = currentTab === 'qc' ? qcGrid : defectGrid;
+	    
+	    // 해당 탭의 데이터만 로드
+	    $.ajax({
+		        url: `/api/quality/${currentTab}/list`,
+		        type: 'GET',
+		        beforeSend: function(xhr) {
+		            xhr.setRequestHeader(header, token);
+		        },
+		        success: function(response) {
+		            console.log(`${currentTab} Data:`, response);
+		            grid.refreshLayout();
+		            grid.resetData(response);
+		        },
+		        error: function(xhr, status, error) {
+		            console.error(`${currentTab} Error:`, error);
+		            console.error('Status:', status);
+		            console.error('Response:', xhr.responseText);
+		        }
+		    });
+		});
+        
+        document.addEventListener('DOMContentLoaded', function() {
             loadGridData();
         });
     </script>

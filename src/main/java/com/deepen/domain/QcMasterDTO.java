@@ -10,15 +10,14 @@ public class QcMasterDTO {
     private String qcCode;
     private String qcName;
     private Integer processNo;
-    private Integer productNo;
+    private String processName;
     private BigDecimal targetValue;
     private BigDecimal ucl;
     private BigDecimal lcl;
-    private String unit;
+    private String unitCode;
+    private String unitName;
     private String qcMethod;
     private String useYn;
-    private String createUser;
     private LocalDateTime createTime;
-    private String updateUser;
     private LocalDateTime updateTime;
 }

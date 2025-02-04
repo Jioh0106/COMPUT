@@ -24,6 +24,7 @@ public interface DefectMasterRepository extends JpaRepository<DefectMaster, Stri
     );
 
     Optional<DefectMaster> findTopByOrderByDefectCodeDesc();
+    
+    @Query("SELECT d FROM DefectMaster d WHERE d.processNo = :processNo")
+    List<DefectMaster> findByProcessNo(@Param("processNo") Integer processNo);
 }
-
-

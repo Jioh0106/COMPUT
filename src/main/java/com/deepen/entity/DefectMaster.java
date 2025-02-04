@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -19,10 +21,11 @@ public class DefectMaster {
     @Column(name = "defect_name", nullable = false)
     private String defectName;
 
-    @Column(name = "process_no")
-    private Integer processNo;
+    @ManyToOne
+    @JoinColumn(name = "process_no")
+    private ProcessInfo process;
 
-    @Column(name = "defect_type", nullable = false)
+    @Column(name = "defect_type")
     private String defectType;
 
     @Column(name = "defect_level")
@@ -34,15 +37,9 @@ public class DefectMaster {
     @Column(name = "use_yn", nullable = false)
     private String useYn;
 
-    @Column(name = "create_user", nullable = false)
-    private String createUser;
-
-    @Column(name = "create_time", nullable = false)
+    @Column(name = "create_time")
     private LocalDateTime createTime;
     
-    @Column(name = "update_user")
-	private String updateUser;
-	
-	@Column(name = "update_time")
-	private LocalDateTime updateTime;
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
 }

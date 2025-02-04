@@ -9,12 +9,11 @@ public class DefectMasterDTO {
     private String defectCode;
     private String defectName;
     private Integer processNo;
+    private String processName;
     private String defectType;
     private String defectLevel;
     private String judgmentCriteria;
     private String useYn;
-    private String createUser;
     private LocalDateTime createTime;
-    private String updateUser;
     private LocalDateTime updateTime;
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.DefectMasterDTO;
 import com.deepen.domain.QcMasterDTO;
+import com.deepen.entity.CommonDetail;
+import com.deepen.entity.ProcessInfo;
 import com.deepen.service.QualityService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class QualityRestController {
-	
-	private final QualityService qualityService;
-	
-	@GetMapping("/qc/list")
+    
+    private final QualityService qualityService;
+    
+    @GetMapping("/qc/list")
     public ResponseEntity<List<QcMasterDTO>> getQcList() {
         return ResponseEntity.ok(qualityService.getQcList());
     }
@@ -33,6 +35,16 @@ public class QualityRestController {
     @GetMapping("/defect/list")
     public ResponseEntity<List<DefectMasterDTO>> getDefectList() {
         return ResponseEntity.ok(qualityService.getDefectList());
+    }
+    
+    @GetMapping("/common/process")
+    public ResponseEntity<List<ProcessInfo>> getProcessList() {
+        return ResponseEntity.ok(qualityService.getProcessList());
+    }
+    
+    @GetMapping("/common/unit")
+    public ResponseEntity<List<CommonDetail>> getUnitList() {
+        return ResponseEntity.ok(qualityService.getUnitList());
     }
     
     @PostMapping("/qc")
