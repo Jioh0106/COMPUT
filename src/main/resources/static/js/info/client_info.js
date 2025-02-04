@@ -90,6 +90,13 @@ $(function() {
 	        return !isNaN(client_no) && client_no > max ? client_no : max;
 	    }, 0);
 		
+		// 행 추가 시 신청일 현재 시간으로 세팅
+		const now = new Date(); // 현재 날짜와 시간 가져오기
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+		const day = String(now.getDate()).padStart(2, '0');
+		let request_date = `${year}-${month}-${day}`;
+		
 		// 기본값으로 새 행 데이터 생성
 		const newRow = {
 			client_no: maxNo +1,
@@ -100,6 +107,8 @@ $(function() {
 			client_postcode: '', 
 			client_adrress: '', 
 			client_type: '', 
+			client_date: request_date, 
+			client_update: '', 
 			client_memo: ''
 		};
 		
