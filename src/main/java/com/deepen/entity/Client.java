@@ -1,5 +1,7 @@
 package com.deepen.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +39,12 @@ public class Client {
 	
 	@Column(name = "client_type", length = 30)
 	private String client_type;
+	
+	@Column(name = "client_date", nullable = false)
+	private LocalDate client_date;
+	
+	@Column(name = "client_update")
+	private LocalDate client_update;
 	
 	@Column(name = "client_memo", length = 300)
 	private String client_memo;
