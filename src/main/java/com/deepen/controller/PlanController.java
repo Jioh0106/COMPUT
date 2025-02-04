@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.deepen.service.PrdctPlanService;
+import com.deepen.service.PlanService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -12,10 +12,10 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Controller
 @Log
-public class PrdctPlanController {
+public class PlanController {
 	
 	/** 거래처 서비스 */
-	private final PrdctPlanService service;
+	private final PlanService service;
 	
 	/**
 	 * 초기 화면

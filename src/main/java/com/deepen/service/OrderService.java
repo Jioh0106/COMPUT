@@ -8,7 +8,7 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Log
 @Service
-public class PrdctPlanService {
+public class OrderService {
 	
 	
 	
