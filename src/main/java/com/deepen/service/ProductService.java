@@ -68,8 +68,9 @@ public class ProductService {
 		
 		for(BomDTO bomDto : items) {
 			Bom bom = new Bom();
-			
-			bom.setBom_unit(bomDto.getItemUnit());
+			String unit = cdRepository.findCommonDetailCodeByName(bomDto.getItemUnit());
+			log.info("bom그리드 단위 :"+unit);
+			bom.setBom_unit(unit);
 			bom.setProduct_no(bomDto.getProductNo());
 			bom.setBom_date(LocalDateTime.now());
 			
