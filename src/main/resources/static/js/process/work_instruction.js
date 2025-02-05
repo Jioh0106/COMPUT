@@ -60,7 +60,7 @@ window.onload = function() {
 	startDatePicker.setNull();
 	endDatePicker.setNull();
 	
-	// select box 생성
+	// 서버에서 받은 데이터로 select box 생성
 	fetchProcessInfoList();
 	//selectBox("#lineSelectBox","라인 선택");
 	
