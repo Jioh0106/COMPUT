@@ -636,8 +636,11 @@
 			
 			//BOM그리드, 상품그리드 업데이트
 			function updateBom(){
-				const bomData = bomGrid.getData();
-				const productData = productGrid.getData();
+				//const bomData = bomGrid.getData();
+				//const productData = productGrid.getData();
+				
+				const bomData = bomGrid.getModifiedRows().updatedRows || [];  // 수정된 행만 가져오기
+				const productData = productGrid.getModifiedRows().updatedRows || [];  // 수정된 상품 데이터만 가져오기
 				
 				const product = productData.map(row => ({
 				      product_no: row.PRODUCT_NO,
@@ -677,7 +680,8 @@
 				     .then(response => response.text())
 				     .then(data => {
 				         alert('BOM 데이터 업데이트 완료');
-				         updateBomGrid(productNo); // 저장 후 그리드 새로고침
+				         updateBomGrid(productNo);
+						 updateProductGrid(); // 저장 후 그리드 새로고침
 				     })
 				     .catch(error => {
 				         console.error('BOM 업데이트 오류:', error);
