@@ -14,17 +14,15 @@ import com.deepen.entity.QcMaster;
 public interface QcMasterRepository extends JpaRepository<QcMaster, String> {
     
     @Query("SELECT q FROM QcMaster q " +
-           "WHERE (:processNo IS NULL OR :processNo <= 0 OR q.processNo = :processNo) " +
-           "AND (:searchName IS NULL OR :searchName = '' OR q.qcName LIKE CONCAT('%', :searchName, '%')) " +
-           "AND q.useYn = :useYn")
+           "WHERE (:processNo IS NULL OR q.process.processNo = :processNo) " +
+           "AND (:searchName IS NULL OR q.qcName LIKE %:searchName%) ")
     List<QcMaster> findBySearchConditions(
         @Param("processNo") Integer processNo,
-        @Param("searchName") String searchName,
-        @Param("useYn") String useYn
+        @Param("searchName") String searchName
     );
 
     Optional<QcMaster> findTopByOrderByQcCodeDesc();
     
-    @Query("SELECT q FROM QcMaster q WHERE q.processNo = :processNo")
+    @Query("SELECT q FROM QcMaster q WHERE q.process.processNo = :processNo")
     List<QcMaster> findByProcessNo(@Param("processNo") Integer processNo);
 }

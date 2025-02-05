@@ -9,13 +9,11 @@ import lombok.Data;
 public class QcMasterDTO {
     private String qcCode;
     private String qcName;
-    private Integer processNo;
-    private String processName;
+    private Integer process;
     private BigDecimal targetValue;
     private BigDecimal ucl;
     private BigDecimal lcl;
-    private String unitCode;
-    private String unitName;
+    private String unit;
     private String qcMethod;
     private String useYn;
     private LocalDateTime createTime;

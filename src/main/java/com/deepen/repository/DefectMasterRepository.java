@@ -14,7 +14,7 @@ import com.deepen.entity.DefectMaster;
 public interface DefectMasterRepository extends JpaRepository<DefectMaster, String> {
     
     @Query("SELECT d FROM DefectMaster d " +
-           "WHERE (:processNo IS NULL OR d.processNo = :processNo) " +
+           "WHERE (:processNo IS NULL OR d.process.processNo = :processNo) " +
            "AND (:searchName IS NULL OR d.defectName LIKE %:searchName%) " +
            "AND d.useYn = :useYn")
     List<DefectMaster> findBySearchConditions(
@@ -25,6 +25,6 @@ public interface DefectMasterRepository extends JpaRepository<DefectMaster, Stri
 
     Optional<DefectMaster> findTopByOrderByDefectCodeDesc();
     
-    @Query("SELECT d FROM DefectMaster d WHERE d.processNo = :processNo")
+    @Query("SELECT d FROM DefectMaster d WHERE d.process.processNo = :processNo")
     List<DefectMaster> findByProcessNo(@Param("processNo") Integer processNo);
 }

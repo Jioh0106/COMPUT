@@ -3,7 +3,9 @@ package com.deepen.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,5 +67,17 @@ public class QualityRestController {
     @PutMapping("/defect/update")
     public ResponseEntity<DefectMasterDTO> updateDefect(@RequestBody DefectMasterDTO defectMasterDTO) {
         return ResponseEntity.ok(qualityService.updateDefect(defectMasterDTO));
+    }
+    
+    @DeleteMapping("/qc/{qcCode}")
+    public ResponseEntity<Void> deleteQc(@PathVariable(name = "qcCode") String qcCode) {
+        qualityService.deleteQc(qcCode);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/defect/{defectCode}")
+    public ResponseEntity<Void> deleteDefect(@PathVariable(name = "defectCode") String defectCode) {
+        qualityService.deleteDefect(defectCode);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,28 +1,44 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COMPUT.</title>
 
-    <link rel="stylesheet" href="assets/css/bootstrap.css">
-    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
-    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/app.css">
+    <!-- TOAST Grid CSS -->
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
     
+    <!-- Bootstrap & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    
+    <!-- CSRF 토큰 -->
     <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
     <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <style>
-        .tui-grid-cell { background-color: #ffffff !important; }
-        .display-flex { display: flex; }
-        .buttons { margin-left: auto; }
-        .mb-4 { margin-bottom: 1.5rem !important; }
+        .tui-grid-cell { 
+            background-color: #ffffff !important; 
+        }
+        .display-flex { 
+            display: flex; 
+        }
+        .buttons { 
+            margin-left: auto; 
+        }
+        .mb-4 { 
+            margin-bottom: 1.5rem !important; 
+        }
         .required::after {
             content: " *";
             color: red;
+        }
+        #qcGrid, #defectGrid {
+            margin-top: 20px;
+            min-height: 400px;
         }
     </style>
 </head>
@@ -40,6 +56,7 @@
                     <section class="section">
                         <div class="row" id="basic-table">
                             <form>
+                                <!-- 검색 조건 -->
                                 <div class="row mb-4">
                                     <div class="col-md-4">
                                         <label for="processNo" class="form-label">공정구분</label>
@@ -51,20 +68,28 @@
                                         <label for="searchName" class="form-label">검사항목</label>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            <input type="text" class="form-control" id="searchName" placeholder="검사항목명을 입력하세요" onkeyup="updateGrids()">
+                                            <input type="text" class="form-control" id="searchName" 
+                                                   placeholder="검사항목명을 입력하세요" 
+                                                   onkeyup="updateGrids()">
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- 탭 메뉴 -->
                                 <ul class="nav nav-tabs" id="qualityTab" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="qc-tab" data-bs-toggle="tab" data-bs-target="#qc" type="button" role="tab">품질검사 기준</button>
+                                        <button class="nav-link active" id="qc-tab" 
+                                                data-bs-toggle="tab" data-bs-target="#qc" 
+                                                type="button" role="tab">품질검사 기준</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="defect-tab" data-bs-toggle="tab" data-bs-target="#defect" type="button" role="tab">불량검사 기준</button>
+                                        <button class="nav-link" id="defect-tab" 
+                                                data-bs-toggle="tab" data-bs-target="#defect" 
+                                                type="button" role="tab">불량검사 기준</button>
                                     </li>
                                 </ul>
 
+                                <!-- 탭 콘텐츠 -->
                                 <div class="tab-content mt-3" id="qualityTabContent">
                                     <div class="tab-pane fade show active" id="qc" role="tabpanel">
                                         <div id="qcGrid"></div>
@@ -74,7 +99,8 @@
                                     </div>
                                 </div>
 
-                                <div class="float-end">
+                                <!-- 버튼 그룹 -->
+                                <div class="float-end mt-3">
                                     <button type="button" class="btn btn-outline-secondary" onclick="addNewRow()">추가</button>
                                     <button type="button" class="btn btn-outline-success" onclick="saveData()">저장</button>
                                     <button type="button" class="btn btn-outline-secondary" id="editBtn" onclick="toggleEditMode()">수정</button>
@@ -88,296 +114,12 @@
         </div>
     </div>
 
-	<script src="/js/jquery-3.7.1.js"></script>
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
-	<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-	<script src="assets/js/main.js"></script>
-
-    <script th:inline="javascript">
-    
-        const header = document.querySelector('meta[name="_csrf_header"]').content;
-        const token = document.querySelector('meta[name="_csrf"]').content;
-        let isEditMode = false;
-        
-    	const Grid = tui.Grid;
-    	
-    	// 공통 데이터 저장
-        let processList = [];
-        let unitList = [];
-        let useYnList = [];
-    	
-    	 // 초기 데이터 로드
-        $(document).ready(function() {
-        	loadCommonData();
-            loadGridData();
-        });
-    	 
-    	// 공통 데이터 로드
-        function loadCommonData() {
-            $.ajax({
-                url: '/api/quality/common/process',
-                type: 'GET',
-                success: function(response) {
-                    processList = response;
-                }
-            });
-            
-            $.ajax({
-                url: '/api/quality/common/unit',
-                type: 'GET',
-                success: function(response) {
-                    unitList = response;
-                }
-            });
-        }
-        
-        const qcGrid = new Grid({
-            el: document.getElementById('qcGrid'),
-            rowHeaders: ['checkbox'],
-            columns: [
-                {header: '검사코드', name: 'qcCode', editor: 'text'},
-                {header: '검사명', name: 'qcName', editor: 'text'},
-                {header: '공정', name: 'processName', editor: {
-                    type: 'select',
-                    options: {
-                        listItems: processList.map(p => ({
-                            text: p.processName,
-                            value: p.processNo
-                        }))
-                    }
-                }},
-                {header: '목표값', name: 'targetValue', editor: 'text'},
-                {header: '상한값', name: 'ucl', editor: 'text'},
-                {header: '하한값', name: 'lcl', editor: 'text'},
-                {header: '단위', name: 'unitName', editor: {
-                    type: 'select',
-                    options: {
-                        listItems: unitList.map(u => ({
-                            text: u.commonDetailName,
-                            value: u.commonDetailCode
-                        }))
-                    }
-                }},
-                {header: '검사방법', name: 'qcMethod', editor: 'text'},
-                {
-                    header: '사용여부', 
-                    name: 'useYn', 
-                    editor: {
-                        type: 'select',
-                        options: {
-                            listItems: [
-                                {text: '사용', value: 'Y'},
-                                {text: '미사용', value: 'N'}
-                            ]
-                        }
-                    }
-                },
-                {header: '생성일시', name: 'createTime',
-                    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''},
-                {header: '수정일시', name: 'updateTime',
-                    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''}
-            ]
-        });
-
-        const defectGrid = new Grid({
-            el: document.getElementById('defectGrid'),
-            rowHeaders: ['checkbox'],
-            columns: [
-                {header: '불량코드', name: 'defectCode', editor: 'text'},
-                {header: '불량명', name: 'defectName', editor: 'text'},
-                {header: '공정', name: 'processName', editor: {
-                    type: 'select',
-                    options: {
-                        listItems: []
-                    }
-                }},
-                {header: '불량유형', name: 'defectType', editor: 'text'},
-                {header: '불량수준', name: 'defectLevel', editor: 'text'},
-                {header: '판정기준', name: 'judgmentCriteria', editor: 'text'},
-                {
-                    header: '사용여부', 
-                    name: 'useYn', 
-                    editor: {
-                        type: 'select',
-                        options: {
-                            listItems: [
-                                {text: '사용', value: 'Y'},
-                                {text: '미사용', value: 'N'}
-                            ]
-                        }
-                    }
-                },
-                {header: '생성일시', name: 'createTime',
-                    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''},
-                {header: '수정일시', name: 'updateTime',
-                    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''}
-            ]
-        });
-
-        function addNewRow() {
-            const activeTab = $('.tab-pane.active').attr('id');
-            const grid = activeTab === 'qc' ? qcGrid : defectGrid;
-            
-            const maxNo = grid.getData().reduce((max, row) => {
-                const code = activeTab === 'qc' ? row.qcCode : row.defectCode;
-                const prefix = activeTab === 'qc' ? 'QC' : 'DF';
-                const num = parseInt(code?.replace(prefix, '') || '0', 10);
-                return !isNaN(num) && num > max ? num : max;
-            }, 0);
-
-            const prefix = activeTab === 'qc' ? 'QC' : 'DF';
-            const newCode = `${prefix}${String(maxNo + 1).padStart(3, '0')}`;
-            
-            const currentTime = new Date().toISOString();
-
-            if (activeTab === 'qc') {
-                grid.prependRow({
-                    qcCode: newCode,
-                    qcName: '',
-                    processNo: '',
-                    targetValue: '',
-                    ucl: '',
-                    lcl: '',
-                    unit: '',
-                    qcMethod: '',
-                    useYn: 'Y',
-                    createTime: currentTime
-                }, { focus: true });
-            } else {
-                grid.prependRow({
-                    defectCode: newCode,
-                    defectName: '',
-                    processNo: '',
-                    defectType: '',
-                    defectLevel: '',
-                    judgmentCriteria: '',
-                    useYn: 'Y',
-                    createTime: currentTime
-                }, { focus: true });
-            }
-        }
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const editBtn = document.getElementById('editBtn');
-            editBtn.textContent = isEditMode ? '수정 완료' : '수정';
-            editBtn.classList.toggle('btn-primary');
-
-            const currentTime = new Date().toISOString();
-
-            if (!isEditMode) {
-                const activeTab = $('.tab-pane.active').attr('id');
-                const grid = activeTab === 'qc' ? qcGrid : defectGrid;
-                const modifiedRows = grid.getModifiedRows();
-
-                modifiedRows.updatedRows.forEach(row => {
-                    row.updateTime = currentTime;
-                });
-            }
-            
-            updateGridEditableState();
-        }
-
-        function updateGridEditableState() {
-            [qcGrid, defectGrid].forEach(grid => {
-                const columns = grid.getColumns();
-                columns.forEach(column => {
-                    if (!['createTime', 'updateTime'].includes(column.name)) {
-                        column.editor = isEditMode ? 'text' : false;
-                    }
-                });
-                grid.setColumns(columns);
-            });
-        }
-
-        function loadGridData() {
-            $.ajax({
-                url: '/api/quality/qc/list',
-                type: 'GET',
-                success: function(response) {
-                    qcGrid.resetData(response);
-                }
-            });
-
-            $.ajax({
-                url: '/api/quality/defect/list',
-                type: 'GET',
-                success: function(response) {
-                    defectGrid.resetData(response);
-                }
-            });
-        }
-
-        function saveData() {
-            const activeTab = $('.tab-pane.active').attr('id');
-            const grid = activeTab === 'qc' ? qcGrid : defectGrid;
-            const modifiedRows = grid.getModifiedRows();
-            
-            if (modifiedRows.createdRows.length === 0 && modifiedRows.updatedRows.length === 0) {
-                alert('저장할 데이터가 없습니다.');
-                return;
-            }
-
-            const currentTime = new Date().toISOString();
-
-            [...modifiedRows.createdRows, ...modifiedRows.updatedRows].forEach(row => {
-                if (!row.createTime) {
-                    row.createTime = currentTime;
-                }
-                if (modifiedRows.updatedRows.includes(row)) {
-                    row.updateTime = currentTime;
-                }
-
-                const url = `/api/quality/${activeTab}${modifiedRows.createdRows.includes(row) ? '' : '/update'}`;
-                $.ajax({
-                    url: url,
-                    type: modifiedRows.createdRows.includes(row) ? 'POST' : 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(row),
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader(header, token);
-                    },
-                    success: function() {
-                        loadGridData();
-                    },
-                    error: function() {
-                        alert('저장 중 오류가 발생했습니다.');
-                    }
-                });
-            });
-            
-            alert('저장되었습니다.');
-        }
-
-        // 탭 변경 이벤트
-        $('#qualityTab button').on('shown.bs.tab', function (e) {
-	    const currentTab = $(e.target).data('bs-target').slice(1);
-	    const grid = currentTab === 'qc' ? qcGrid : defectGrid;
-	    
-	    // 해당 탭의 데이터만 로드
-	    $.ajax({
-		        url: `/api/quality/${currentTab}/list`,
-		        type: 'GET',
-		        beforeSend: function(xhr) {
-		            xhr.setRequestHeader(header, token);
-		        },
-		        success: function(response) {
-		            console.log(`${currentTab} Data:`, response);
-		            grid.refreshLayout();
-		            grid.resetData(response);
-		        },
-		        error: function(xhr, status, error) {
-		            console.error(`${currentTab} Error:`, error);
-		            console.error('Status:', status);
-		            console.error('Response:', xhr.responseText);
-		        }
-		    });
-		});
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadGridData();
-        });
-    </script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+	<script th:src="@{/js/info/quality_info.js}"></script>
 </body>
 </html>

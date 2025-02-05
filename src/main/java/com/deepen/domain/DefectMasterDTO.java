@@ -8,8 +8,7 @@ import lombok.Data;
 public class DefectMasterDTO {
     private String defectCode;
     private String defectName;
-    private Integer processNo;
-    private String processName;
+    private Integer process;
     private String defectType;
     private String defectLevel;
     private String judgmentCriteria;

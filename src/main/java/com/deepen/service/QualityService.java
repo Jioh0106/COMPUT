@@ -32,7 +32,7 @@ public class QualityService {
     private final CommonDetailRepository commonDetailRepository;
     
     public List<QcMasterDTO> getQcList() {
-        return qcMasterRepository.findBySearchConditions(null, null, "Y")
+        return qcMasterRepository.findBySearchConditions(null, null)
                                 .stream()
                                 .map(this::convertToQcDTO)
                                 .collect(Collectors.toList());
@@ -62,8 +62,7 @@ public class QualityService {
         
         // Process 정보
         if(entity.getProcess() != null) {
-            dto.setProcessNo(entity.getProcess().getProcessNo());
-            dto.setProcessName(entity.getProcess().getProcessName());
+            dto.setProcess(entity.getProcess().getProcessNo());
         }
         
         dto.setTargetValue(entity.getTargetValue());
@@ -73,8 +72,7 @@ public class QualityService {
         
         // Unit 정보
         if(entity.getUnit() != null) {
-            dto.setUnitCode(entity.getUnit().getCommon_detail_code());
-            dto.setUnitName(entity.getUnit().getCommon_detail_name());
+            dto.setUnit(entity.getUnit().getCommon_detail_code());
         }
         
         dto.setUseYn(entity.getUseYn());
@@ -91,8 +89,7 @@ public class QualityService {
         
         // Process 정보
         if(entity.getProcess() != null) {
-            dto.setProcessNo(entity.getProcess().getProcessNo());
-            dto.setProcessName(entity.getProcess().getProcessName());
+            dto.setProcess(entity.getProcess().getProcessNo());
         }
         
         dto.setDefectType(entity.getDefectType());
@@ -112,7 +109,7 @@ public class QualityService {
         entity.setQcName(dto.getQcName());
         
         // Process 설정
-        ProcessInfo process = processInfoRepository.findById(dto.getProcessNo())
+        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
@@ -122,7 +119,7 @@ public class QualityService {
         entity.setQcMethod(dto.getQcMethod());
         
         // Unit 설정
-        CommonDetail unit = commonDetailRepository.findById(dto.getUnitCode())
+        CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
             .orElseThrow(() -> new RuntimeException("Unit not found"));
         entity.setUnit(unit);
         
@@ -139,7 +136,7 @@ public class QualityService {
         entity.setDefectName(dto.getDefectName());
         
         // Process 설정
-        ProcessInfo process = processInfoRepository.findById(dto.getProcessNo())
+        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
@@ -177,7 +174,7 @@ public class QualityService {
             
         entity.setQcName(dto.getQcName());
         
-        ProcessInfo process = processInfoRepository.findById(dto.getProcessNo())
+        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
@@ -186,7 +183,7 @@ public class QualityService {
         entity.setLcl(dto.getLcl());
         entity.setQcMethod(dto.getQcMethod());
         
-        CommonDetail unit = commonDetailRepository.findById(dto.getUnitCode())
+        CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
             .orElseThrow(() -> new RuntimeException("Unit not found"));
         entity.setUnit(unit);
         
@@ -203,7 +200,7 @@ public class QualityService {
             
         entity.setDefectName(dto.getDefectName());
         
-        ProcessInfo process = processInfoRepository.findById(dto.getProcessNo())
+        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
@@ -214,5 +211,15 @@ public class QualityService {
         entity.setUpdateTime(LocalDateTime.now());
         
         return convertToDefectDTO(defectMasterRepository.save(entity));
+    }
+    
+    @Transactional
+    public void deleteQc(String qcCode) {
+        qcMasterRepository.deleteById(qcCode);
+    }
+
+    @Transactional
+    public void deleteDefect(String defectCode) {
+        defectMasterRepository.deleteById(defectCode);
     }
 }
