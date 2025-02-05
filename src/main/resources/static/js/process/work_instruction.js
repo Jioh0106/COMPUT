@@ -73,7 +73,7 @@ function createWorkInstructionGrid(){
 				{header: '계획번호', name: 'plan_no', sortable: true},
 				{header: '품목번호', name: 'product_no', sortable: true},
 				{header: '품목', name: 'product_name'},
-				{header: 'BOM번호', name: 'bom_no'},
+				{header: '수량', name: 'bom_no'},
 				{header: '공정', name: 'process_name', editor: {
 														type: 'select',
 														options: {
@@ -115,7 +115,7 @@ function createWorkInstructionGrid(){
 
 function createWorkerGrid(){
 	
-		//const data = processList;
+		const data = workerList;
 		//console.log("processList:", data);
 		var Grid = tui.Grid;
 		

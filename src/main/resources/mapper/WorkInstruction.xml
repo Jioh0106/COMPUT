@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.WorkInstructionMapper">
+
+	<select id="selectWokerInfoListByPosition" resultType="java.util.Map">
+		SELECT 
+			e.emp_id AS "no", 
+			e.emp_name AS "name",
+			cdd.common_detail_name AS "dept",
+			cdp.common_detail_name AS "position",
+			e.emp_phone AS "phone",
+			e.emp_email AS "email"
+		FROM employees e
+		LEFT JOIN COMMON_DETAIL cdd 
+		    ON cdd.common_detail_code LIKE 'DEPT%'
+		    AND cdd.common_detail_code = e.emp_dept
+		    AND cdd.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdp
+		    ON cdp.common_detail_code LIKE 'PSTN%'
+		    AND cdp.common_detail_code = e.emp_position
+		    AND cdp.common_detail_status = 'Y'
+		WHERE e.emp_dept = 'DEPT007'
+		ORDER BY emp_no
+	</select>
+	
+</mapper>
+
+
+
