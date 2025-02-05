@@ -25,6 +25,15 @@
 		ORDER BY emp_no
 	</select>
 	
+	<select id="selectProcessInfo" resultType="com.deepen.domain.ProcessInfoDTO">
+		SELECT 
+			process_no AS "processNo", 
+			process_name AS "processName", 
+			process_priority AS "processPriority"
+		FROM process_info
+		WHERE is_active = 'Y'
+	</select>
+	
 </mapper>
 
 

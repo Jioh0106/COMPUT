@@ -6,29 +6,29 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.domain.ProcessInfoDTO;
 import com.deepen.service.WorkInstructionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Log
-public class WorkInstructionController {
+public class WorkInstructionRestController {
 	
 	private final WorkInstructionService wiService;
 
-	@GetMapping("/work-instruction")
-	public String workInstruction(Model model) {
+	@GetMapping("/process-info")
+	public List<ProcessInfoDTO> workInstruction() {
 		
-		// 작업담당자 정보
-		List<Map<String, Object>> workerList =  wiService.getWorkerListByPosition();
+		// selectbox에 넣을 공정 정보
+		wiService.getProcessList();
 		
-		model.addAttribute("workerList", workerList);
-		
-		return "process/work_instruction";
+		return wiService.getProcessList();
 	}
 	
 }

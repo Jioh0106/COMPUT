@@ -12,20 +12,42 @@ function datePiker(containerSelector, inputSelector){
 		},
 		language : 'ko'
 	});
-}
+};
 
 // toast ui Select Box
-function selectBox(idSelector,placeholderText/*data*/){
+function selectBox(idSelector,placeholderText,fetchData){
 	return new tui.SelectBox(idSelector,{
 		placeholder: placeholderText,
-		data:[
-				{label:'가공',value:'가공'},
-				{label:'열처리',value:'열처리'},
-				{label:'조립',value:'조립'},
-				{label:'표면처리',value:'표면처리'}
-			],
-		//data:data,
+		data:fetchData
 	});
+};
+
+// 들고온 공정 정보로 select box 생성
+async function fetchProcessInfoList(){
+	try{
+		const response = await fetch("process-info");
+		
+		if (!response.ok) {
+           	throw new Error("네트워크 응답 실패");
+       	}
+		
+		const processInfoList = await response.json();
+		console.log("processInfoList",processInfoList);
+		
+		const fetchData = processInfoList.map(item => ({
+			label:item.processName,
+			value:item.processNo
+		}));
+		
+		selectBox("#processSelectBox","공정 선택",fetchData);
+		
+	}catch(error){
+		console.error("error",error);
+	}
+};
+
+async function fetchLineInfoList(){
+	
 }
 
 window.onload = function() { 
@@ -39,8 +61,8 @@ window.onload = function() {
 	endDatePicker.setNull();
 	
 	// select box 생성
-	selectBox("#processSelectBox","공정 선택");
-	selectBox("#lineSelectBox","라인 선택");
+	fetchProcessInfoList();
+	//selectBox("#lineSelectBox","라인 선택");
 	
 	// 그리드 생성
 	createWorkInstructionGrid();
@@ -114,11 +136,12 @@ function createWorkInstructionGrid(){
 };
 
 function createWorkerGrid(){
-	
-		const data = workerList;
-		//console.log("processList:", data);
-		var Grid = tui.Grid;
 		
+		// 작업자 초기값
+		const data = workerList;
+		
+		var Grid = tui.Grid;
+		Grid.applyTheme('clean');
 		// 탭 활성화
 		document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
 		document.getElementById('tab-worker').classList.add("active");
@@ -135,8 +158,8 @@ function createWorkerGrid(){
 			bodyHeight: 280,
 			columns: [
 				{header: '사원번호', name: 'no', sortable: true},
-				{header: '사원명', name: 'name',	editor: 'text'},
-				{header: '부서', name: 'dept',	editor: 'text', sortable: true},
+				{header: '사원명', name: 'name',	filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '부서', name: 'dept'},
 				{header: '직급', name: 'position',	editor: {
 													            type: 'select',
 													            options: {
@@ -145,10 +168,10 @@ function createWorkerGrid(){
 													                { text: 'N', value: 'N' },
 													              ]
 									        				 }}, filter : 'select'},
-				{header: '연락처', name: 'phone', editor: 'text'},
+				{header: '연락처', name: 'phone', filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
 				{header: '이메일', name: 'email'},
 			],
-			data: [],
+			data: data,
 			columnOptions: {
 			  resizable: true
 			},
