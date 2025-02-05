@@ -29,6 +29,30 @@ public class OrderController {
 		
 	}
 	
+	/**
+	 * 수주 등록 팝업창
+	 * @view model
+	 * @return String
+	 */
+	@GetMapping("/reg-sale")
+	public String regSale(Model model) {
+		
+		return "production/reg_sale";
+		
+	}
+	
+	/**
+	 * 발주 등록 팝업창
+	 * @view model
+	 * @return String
+	 */
+	@GetMapping("/reg-buy")
+	public String regBuy(Model model) {
+		
+		return "production/reg_buy";
+		
+	}
+	
 	
 	
 
