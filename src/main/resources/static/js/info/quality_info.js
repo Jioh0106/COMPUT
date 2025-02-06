@@ -80,23 +80,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 컬럼 정의
 	const columns = {
 		// 공정 컬럼
-		// 공정 컬럼 정의 수정
 		createProcessColumn() {
 			return {
 				header: '공정',
-				name: 'process',          // process로 통일
+				name: 'process',
 				width: 120,
 				formatter: ({ value }) => {
-					if (!value) return '미지정';
 					const process = state.processList.find(p => p.processNo === Number(value));
-					return process ? process.processName : '미지정';
+					return process?.processName ?? '';
 				},
 				editor: {
 					type: 'select',
 					options: {
 						listItems: state.processList.map(p => ({
 							text: p.processName,
-							value: p.processNo        // 숫자 타입 유지
+							value: p.processNo
 						}))
 					}
 				},
@@ -110,9 +108,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				header: '단위',
 				name: 'unit',
 				width: 80,
+				align: 'center',
 				formatter: ({ value }) => {
 					const unit = state.unitList.find(u => u.common_detail_code === value);
-					return unit ? unit.common_detail_name : '미지정';
+					return unit?.common_detail_name ?? '';
 				},
 				editor: {
 					type: 'select',
@@ -125,6 +124,26 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			};
 		},
+		
+		// 사용여부 컬럼
+		createUseYnColumn() {
+			return {
+				header: '사용여부',
+				name: 'useYn',
+				width: 80,
+				align: 'center',
+				formatter: 'listItemText',
+				editor: {
+					type: 'select',
+					options: {
+						listItems: [
+							{ text: '사용', value: 'Y' },
+							{ text: '미사용', value: 'N' }
+						]
+					}
+				}
+			};
+		},
 
 		// QC 그리드 컬럼
 		getQcColumns() {
@@ -132,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				{
 					header: '검사코드',
 					name: 'qcCode',
-					width: 100,
+					width: 120,
 					align: 'center',
 					sortable: true
 				},
@@ -181,10 +200,25 @@ document.addEventListener('DOMContentLoaded', function() {
 				{
 					header: '검사방법',
 					name: 'qcMethod',
-					width: 150,
 					editor: 'text'
 				},
-				this.createUseYnColumn()
+				this.createUseYnColumn(),
+				{
+				    header: '생성일시',
+				    name: 'createTime',
+				    width: 150,
+				    align: 'center',
+				    sortable: true,
+				    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''
+				},
+				{
+				    header: '수정일시',
+				    name: 'updateTime',
+				    width: 150,
+				    align: 'center',
+				    sortable: true,
+				    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''
+				}
 			];
 		},
 
@@ -194,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				{
 					header: '불량코드',
 					name: 'defectCode',
-					width: 100,
+					width: 120,
 					align: 'center',
 					sortable: true
 				},
@@ -221,32 +255,27 @@ document.addEventListener('DOMContentLoaded', function() {
 				{
 					header: '판정기준',
 					name: 'judgmentCriteria',
-					width: 200,
 					editor: 'text'
 				},
-				this.createUseYnColumn()
+				this.createUseYnColumn(),
+				{
+					header: '생성일시',
+					name: 'createTime',
+					width: 150,
+					align: 'center',
+					sortable: true,
+					formatter: ({value}) => value ? new Date(value).toLocaleString() : ''
+				},
+				{
+				    header: '수정일시',
+				    name: 'updateTime',
+				    width: 150,
+				    align: 'center',
+				    sortable: true,
+				    formatter: ({value}) => value ? new Date(value).toLocaleString() : ''
+				}
 			];
 		},
-
-		// 사용여부 컬럼
-		createUseYnColumn() {
-			return {
-				header: '사용여부',
-				name: 'useYn',
-				width: 80,
-				align: 'center',
-				formatter: 'listItemText',
-				editor: {
-					type: 'select',
-					options: {
-						listItems: [
-							{ text: '사용', value: 'Y' },
-							{ text: '미사용', value: 'N' }
-						]
-					}
-				}
-			};
-		}
 	};
 
 	// 그리드 초기화

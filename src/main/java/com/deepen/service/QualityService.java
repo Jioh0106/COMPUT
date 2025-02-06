@@ -39,7 +39,7 @@ public class QualityService {
     }
     
     public List<DefectMasterDTO> getDefectList() {
-        return defectMasterRepository.findBySearchConditions(null, null, "Y")
+        return defectMasterRepository.findBySearchConditions(null, null)
                                    .stream()
                                    .map(this::convertToDefectDTO)
                                    .collect(Collectors.toList());

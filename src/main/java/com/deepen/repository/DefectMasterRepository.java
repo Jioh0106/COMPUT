@@ -15,12 +15,10 @@ public interface DefectMasterRepository extends JpaRepository<DefectMaster, Stri
     
     @Query("SELECT d FROM DefectMaster d " +
            "WHERE (:processNo IS NULL OR d.process.processNo = :processNo) " +
-           "AND (:searchName IS NULL OR d.defectName LIKE %:searchName%) " +
-           "AND d.useYn = :useYn")
+           "AND (:searchName IS NULL OR d.defectName LIKE %:searchName%) ")
     List<DefectMaster> findBySearchConditions(
         @Param("processNo") Integer processNo,
-        @Param("searchName") String searchName,
-        @Param("useYn") String useYn
+        @Param("searchName") String searchName
     );
 
     Optional<DefectMaster> findTopByOrderByDefectCodeDesc();
