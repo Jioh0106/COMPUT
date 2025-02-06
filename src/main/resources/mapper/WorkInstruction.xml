@@ -34,6 +34,14 @@
 		WHERE is_active = 'Y'
 	</select>
 	
+	<select id="selectLineInfo" resultType="com.deepen.domain.LineInfoDTO">
+		SELECT 
+			line_no AS "lineNo", 
+			line_name AS "lineName" 
+		FROM line_info
+		WHERE is_active = 'Y'
+	</select>
+	
 </mapper>
 
 

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class LineInfoDTO {
     private Integer lineNo;
-    private String processName;
+    private String lineName;
     private String description;
     private String isActive;
     private LocalDate createdDate;

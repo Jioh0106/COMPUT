@@ -22,7 +22,7 @@ function selectBox(idSelector,placeholderText,fetchData){
 	});
 };
 
-// 들고온 공정 정보로 select box 생성
+// 서버에서 전달받은 정보로 공정 select box 생성
 async function fetchProcessInfoList(){
 	try{
 		const response = await fetch("process-info");
@@ -34,20 +34,41 @@ async function fetchProcessInfoList(){
 		const processInfoList = await response.json();
 		console.log("processInfoList",processInfoList);
 		
-		const fetchData = processInfoList.map(item => ({
+		const processData = processInfoList.map(item => ({
 			label:item.processName,
 			value:item.processNo
 		}));
 		
-		selectBox("#processSelectBox","공정 선택",fetchData);
+		// selectBox 생성
+		selectBox("#processSelectBox","공정 선택",processData);
 		
 	}catch(error){
 		console.error("error",error);
 	}
 };
 
+// 서버에서 전달받은 정보로 라인 select box 생성
 async function fetchLineInfoList(){
-	
+	try{
+		const response = await fetch("line-info");
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		
+		const lineInfoList = await response.json();
+		console.log("lineInfoList",lineInfoList);
+		
+		const lineDate = lineInfoList.map(item =>({
+			label: item.lineName,
+			value: item.lineNo
+		}));
+		
+		// selectBox 생성
+		selectBox("#lineSelectBox","라인 선택",lineDate);
+	}catch(error){
+		console.error("error",error);
+	}
 }
 
 window.onload = function() { 
@@ -62,7 +83,7 @@ window.onload = function() {
 	
 	// 서버에서 받은 데이터로 select box 생성
 	fetchProcessInfoList();
-	//selectBox("#lineSelectBox","라인 선택");
+	fetchLineInfoList();
 	
 	// 그리드 생성
 	createWorkInstructionGrid();
@@ -121,9 +142,9 @@ function createWorkInstructionGrid(){
 															]
 															}}, filter : 'select'},
 				{header: '상태', name: 'wi_status',	editor: 'text', sortable: true},
-				{header: '작업시작시간', name: 'cDate'},
-				{header: '작업완료시간', name: 'udDate'},
-				{header: '작업담당자', name: 'emp_id'},
+				{header: '작업 시작일', name: 'cDate'},
+				{header: '작업 종료일', name: 'udDate'},
+				{header: '작업 담당자', name: 'emp_id'},
 			],
 			data: [],
 			columnOptions: {

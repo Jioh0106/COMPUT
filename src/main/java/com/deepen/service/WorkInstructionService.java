@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.deepen.domain.LineInfoDTO;
 import com.deepen.domain.ProcessInfoDTO;
 import com.deepen.mapper.ProcessLineMapper;
 import com.deepen.mapper.WorkInstructionMapper;
@@ -26,5 +27,9 @@ public class WorkInstructionService {
 	// 공정 정보
 	public List<ProcessInfoDTO> getProcessList(){
 		return wiMapper.selectProcessInfo();
+	}
+
+	public List<LineInfoDTO> getLineList() {
+		return wiMapper.selectLineInfo();
 	}
 }
