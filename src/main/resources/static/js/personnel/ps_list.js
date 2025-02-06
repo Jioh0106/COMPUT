@@ -30,8 +30,6 @@ const empListGrid = new Grid({
   el: document.getElementById('grid'),
   data: [], // 초기 데이터
   rowHeaders: ['checkbox'],
-  //scrollX: false,
-  //scrollY: false,
   bodyHeight: 600,
   columns: [
     { 

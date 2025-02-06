@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.deepen.service.ProcessLineService;
 
-import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -28,9 +27,6 @@ public class ProcessLineController {
 		
 		List<Map<String, Object>> processList = plService.processInfo(null);
 		List<Map<String, Object>> lineList = plService.lineInfo(null);
-		
-		log.info(processList.toString());
-		log.info(lineList.toString());
 		
 		model.addAttribute("processList", processList);
 		model.addAttribute("lineList", lineList);

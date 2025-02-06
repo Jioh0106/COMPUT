@@ -8,7 +8,7 @@ let lineGrid = "";
 
 window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
 	selectProcessInfo();
-	selectLineInfo();
+	document.getElementById('tab-line-tab').addEventListener('click',selectLineInfo);
 };
 
 // 공정정보
@@ -18,31 +18,35 @@ function selectProcessInfo() {
 	const data = processList;
 	//console.log("processList:", data);
 	var Grid = tui.Grid;
-
+	
 	if (processGrid) {
 		// 이미 생성된 경우 destroy하지 않고 재사용
 		processGrid.refreshLayout();
 		return;
 	}
 	
+	document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+		document.getElementById('tab-process').classList.add("active");
+	
 	processGrid = new Grid({
 		el: document.getElementById('processGrid'),
 		rowHeaders: ['checkbox'],
+		bodyHeight: 280,
 		columns: [
-			{header: '공정번호', name: 'no'},
-			{header: '공정이름', name: 'name',	editor: 'text', sortable: true},
-			{header: '공정우선순위', name: 'priority',	editor: 'text', sortable: true},
-			{header: '사용여부', name: 'isActive',	editor: {
+			{header: '공정번호', name: 'no', width: '100', sortable: true},
+			{header: '공정명', name: 'name',	width: '210', editor: 'text'},
+			{header: '공정우선순위', name: 'priority',	width: '120' ,editor: 'text', sortable: true},
+			{header: '설명', name: 'description', editor: 'text'},
+			{header: '사용여부', name: 'isActive',	 width : '90',editor: {
 												            type: 'select',
 												            options: {
 												              listItems: [
 												                { text: 'Y', value: 'Y' },
 												                { text: 'N', value: 'N' },
 												              ]
-												            }}, 	sortable: true},
-			{header: '설명', name: 'description', editor: 'text', sortable: true},
-			{header: '생성일', name: 'cDate'},
-			{header: '수정일', name: 'udDate'},
+												            }}, filter : 'select'},
+			{header: '생성일', name: 'cDate',	 width : '180'},
+			{header: '수정일', name: 'udDate', width : '180'},
 			{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
 		],
 		data: data,
@@ -196,7 +200,10 @@ function selectLineInfo() {
 	const data = lineList;
 	console.log("lineList:", data);  // 확인용
 	var Grid = tui.Grid;
-
+	
+	document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+	document.getElementById('tab-line').classList.add("active");
+	
 	if (lineGrid) {
 		// 이미 생성된 경우 destroy하지 않고 재사용
 		lineGrid.refreshLayout();
@@ -206,20 +213,21 @@ function selectLineInfo() {
 	lineGrid = new Grid({
 		el: document.getElementById('lineGrid'),
 		rowHeaders: ['checkbox'],
+		bodyHeight: 280,
 		columns: [
-			{header: '라인번호', name: 'no'},
-			{header: '라인이름', name: 'name',	editor: 'text', sortable: true},
-			{header: '사용여부', name: 'isActive',	editor: {
+			{header: '라인번호', name: 'no', width: '100', sortable: true},
+			{header: '라인명', name: 'name', width: '320', editor: 'text'},
+			{header: '설명', name: 'description', editor: 'text'},
+			{header: '사용여부', name: 'isActive', width: '90', editor: {
 												            type: 'select',
 												            options: {
 												              listItems: [
 												                { text: 'Y', value: 'Y' },
 												                { text: 'N', value: 'N' },
 												              ]
-												            }}, 	sortable: true},
-			{header: '설명', name: 'description', editor: 'text', sortable: true},
-			{header: '생성일', name: 'cDate'},
-			{header: '수정일', name: 'udDate'},
+												            }}, filter : 'select'},
+			{header: '생성일', name: 'cDate', width : '180'},
+			{header: '수정일', name: 'udDate', width : '180'},
 			{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
 		],
 		data: data,

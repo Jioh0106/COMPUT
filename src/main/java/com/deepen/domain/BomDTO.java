@@ -24,6 +24,7 @@ public class BomDTO {
 	private String process_name; //공정
 	
 	
+	
 	//BOM자재 선택 값
 	private Integer itemNo;
 	private String itemType;

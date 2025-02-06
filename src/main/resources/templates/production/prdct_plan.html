@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>COMPUT.</title>
+	
+	<!--공통 -->
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
+	<link rel="stylesheet" href="/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="/assets/vendors/iconly/bold.css">
+	<link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="/assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+		
+	<!--  sweetalert  -->
+	<link rel="stylesheet" href="/assets/vendors/sweetalert2/sweetalert2.min.css">
+
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui-time-picker/latest/tui-time-picker.css">
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+	
+	<!--근무 관리 CSS -->
+	<link rel="stylesheet" href="/css/work_mng.css">
+</head>
+<body>
+		
+	<div id="app">
+		
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+		
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<div class="d-flex justify-content-between">
+				<h3>생산 계획</h3>
+				
+				<div class="buttons">
+					<button type="button" class="btn btn-primary" onclick="openView()">계획 등록</button>
+				</div>
+			</div>
+				
+			
+			<div class="card">
+				<div class="card-body">
+					<!-- 데이트 피커 시작 -->
+					<section class="section mb-4">
+						<div style="display: flex; align-items: center; gap: 0.5rem;">
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
+										 class="form-control" placeholder="시작일 선택" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-1" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
+										 class="form-control" placeholder="종료일 선택" />
+									<span class="tui-ico-date"></span>
+								</div>
+								<div id="tui-date-picker-container-2" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
+							</div>
+							
+							<div style="display: flex; align-items: center;" class="ms-3">
+								<span style="font-size: 1rem; line-height: 2rem;"> 상태 </span>
+								<div class="ms-3">
+									<select class="form-select deptArea" id="deptSelect" name="deptSelect" >
+										<option value="" selected>전체</option>
+										<option value="" >등록</option>
+										<option value="" >생산중</option>
+										<option value="" >완료</option>
+										<option value="" >중단</option>
+									</select>
+								</div>
+							</div>
+							
+						</div>
+					</section>
+					<!-- 데이트 피커 끝 -->
+
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<div id="grid"></div>
+						</div>
+					</section>
+					<!-- 그리드 끝 -->
+
+					
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
+		</div><!--main--> 
+	</div><!-- app -->
+		
+		
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script><!-- 한글 번역 파일 -->
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
+	
+	<!-- 제이쿼리 -->
+	<script src="/js/jquery-3.7.1.js"></script>	
+	
+	<!--Axios -->
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	
+	<!-- sweet arert -->
+	<script src="/assets/vendors/sweetalert2/sweetalert2.all.min.js"></script>
+	
+	<!-- 공통 -->
+	<script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script src="/assets/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/main.js"></script>
+	
+	<!--생산 계획 JS -->
+	<script th:inline="javascript" th:src="@{/js/production/prdct_plan.js}" ></script>
+</body>
+
+</html>

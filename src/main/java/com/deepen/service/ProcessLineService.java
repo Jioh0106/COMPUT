@@ -16,10 +16,6 @@ import lombok.extern.java.Log;
 public class ProcessLineService {
 
 	private final ProcessLineMapper plMapper;
-
-//	public List<Map<String, Object>> yearMonthList() {
-//		return mapper.yearMonthList();
-//	}
 	
 	public List<Map<String, Object>> processInfo(Map<String, Object> searchMap) {
 		return plMapper.processInfo(searchMap);
@@ -34,7 +30,6 @@ public class ProcessLineService {
 			
 			if(rowType.equals("insert")) { 			// 추가일 경우
 				result = plMapper.processInsert(saveData); 
-				
 			} else if(rowType.equals("update")) {	// 수정일 경우
 				result = plMapper.processUpdate(saveData);
 			} else {								// 삭제일 경우
@@ -60,7 +55,6 @@ public class ProcessLineService {
 			
 			if(rowType.equals("insert")) { 			// 추가일 경우
 				result = plMapper.lineInsert(saveData); 
-				
 			} else if(rowType.equals("update")) {	// 수정일 경우
 				result = plMapper.lineUpdate(saveData);
 			} else {								// 삭제일 경우

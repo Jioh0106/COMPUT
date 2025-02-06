@@ -14,7 +14,5 @@ public interface EquipmentSttsMapper {
 	List<Map<String, Object>> selectStts();
 
 	List<Map<String, Object>> selectEquipmentStts(Map<String, Object> searchMap);
-
-
-
+	
 }
