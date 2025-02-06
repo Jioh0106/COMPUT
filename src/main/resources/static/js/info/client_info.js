@@ -14,7 +14,13 @@ $(function() {
 		rowHeaders: ['checkbox'],
 		columns: [
 			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},
-			{ header: '거래처명', name: 'client_name', width: 150, editor: isEditable ? 'text' : null},
+			{ 
+				header: '거래처명', 
+				name: 'client_name', 
+				width: 150, 
+				filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
+				editor: isEditable ? 'text' : null
+			},
 			{ header: '연락처', name: 'client_tel', width: 120, editor: isEditable ? 'text' : null},
 			{ header: '대표자명', name: 'client_boss', width: 100, editor: isEditable ? 'text' : null},
 			{ header: '담당자명', name: 'client_emp', width: 100, editor: isEditable ? 'text' : null},
