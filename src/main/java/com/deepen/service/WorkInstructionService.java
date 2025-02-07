@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.deepen.domain.LineInfoDTO;
 import com.deepen.domain.ProcessInfoDTO;
-import com.deepen.mapper.ProcessLineMapper;
 import com.deepen.mapper.WorkInstructionMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,8 @@ public class WorkInstructionService {
 	public List<ProcessInfoDTO> getProcessList(){
 		return wiMapper.selectProcessInfo();
 	}
-
+	
+	// 라인 정보
 	public List<LineInfoDTO> getLineList() {
 		return wiMapper.selectLineInfo();
 	}

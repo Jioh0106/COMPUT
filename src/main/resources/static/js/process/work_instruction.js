@@ -69,7 +69,7 @@ async function fetchLineInfoList(){
 	}catch(error){
 		console.error("error",error);
 	}
-}
+};
 
 window.onload = function() { 
 	

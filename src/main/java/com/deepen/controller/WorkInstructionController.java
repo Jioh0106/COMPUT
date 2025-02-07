@@ -24,7 +24,7 @@ public class WorkInstructionController {
 	public String workInstruction(Model model) {
 		
 		// 작업담당자 정보
-		List<Map<String, Object>> workerList =  wiService.getWorkerListByPosition();
+		List<Map<String, Object>> workerList = wiService.getWorkerListByPosition();
 		
 		model.addAttribute("workerList", workerList);
 		
