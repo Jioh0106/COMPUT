@@ -32,4 +32,15 @@ public class WorkInstructionService {
 	public List<LineInfoDTO> getLineList() {
 		return wiMapper.selectLineInfo();
 	}
+	
+	// 작업 지시 정보 불러오기
+	public List<Map<String, Object>> getWorkInstruction() {
+		
+		// 작업계획에서 받아온 정보 작업 지시 정보에 insert 후 조회
+		// insert 데이터 - 지시번호, 계획번호, 품목번호, 품목, 수량, 상태="대기중"(공통코드)
+		
+		
+		return null;
+	}
+	
 }
