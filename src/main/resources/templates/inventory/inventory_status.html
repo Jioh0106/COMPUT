@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>재고현황</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4 align-items-center">
+								    <!-- 상품명 -->
+									<div class="col-md-4">
+										<label for="nameSearch" class="form-label">품명 검색</label>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+										</div>
+									</div>
+								</div>
+								<!-- 검색 조건 끝-->
+								
+								<!--재고현황 그리드-->										   
+								<div id="inventoryGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
+			
+		
+	
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+	 	var Grid = tui.Grid;
+		
+		const inventoryGrid = new Grid({
+			el: document.getElementById('inventoryGrid'),
+			columns: [
+				{header: '재고번호',	name: 'inventory_no', width: 100},
+				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
+				{header: '자재/완제품번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
+				{header: '품명',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
+				{header: '재고량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '단위',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '창고명',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '구역',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '수정자',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '수정일',	name: 'bom_date',	editor: 'text', sortable: true, width: 150}
+				
+			],
+			data: [],
+			columnOptions: {
+			  resizable: true
+			}
+		});
+		
+		
+		
+	</script>
+
+</body>
+
+</html>

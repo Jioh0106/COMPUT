@@ -41,14 +41,15 @@
 	    material
 	UNION ALL
 	SELECT 
-		product_no AS item_no,
-	    product_name AS item_name,
-	    product_unit AS item_unit,
-	    product_type AS item_type
+		p.product_no AS item_no,
+	    p.product_name AS item_name,
+	    c.common_detail_name AS item_unit,
+	    p.product_type AS item_type
 	FROM 
-	    product
+	    product p
+	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code    
 	WHERE
-		product_type = '반제품'    
+		p.product_type = '반제품'    
 	 ) all_select
 	WHERE 
 	    item_name LIKE '%' || #{item_name} || '%'
@@ -64,19 +65,27 @@
         b.product_no AS product_no,
         m.mtr_name AS mtr_name, 
         p2.product_name AS product_name, 
-        b.bom_unit AS bom_unit,
+        c.common_detail_name AS bom_unit,
         b.bom_quantity AS bom_quantity,
         b.bom_date AS bom_date,
         b.bom_status AS bom_status,
-        b.process_name AS process_name
+       
+       (
+        SELECT LISTAGG(pi.process_name, '/') WITHIN GROUP (ORDER BY pi.process_no)
+        FROM process_info pi
+        WHERE INSTR('/' || b.process_name || '/', '/' || pi.process_no || '/') > 0
+    	) AS process_name  
+        
      FROM
         bom b
+     LEFT JOIN
+     	common_detail c ON b.bom_unit = c.common_detail_code   
      INNER JOIN
         product p ON b.product_no = p.product_no
      LEFT JOIN
         material m ON b.mtr_no = m.mtr_no 
      LEFT JOIN
-        product p2 ON b.mtrproduct_no = p2.product_no 
+        product p2 ON b.mtrproduct_no = p2.product_no
      WHERE
         p.product_no = #{product_no}
      ORDER BY
