@@ -29,8 +29,10 @@ import lombok.extern.java.Log;
 @RequestMapping("/api/work")
 public class WorkRestController {
 	
+	/** 근무관리 서비스 */
 	private final WorkService workService;
 	
+	/** 직원 검색 조회 */
 	@GetMapping("/serchEmp")
 	public ResponseEntity<List<Map<String, String>>> getSerchEmpList(@RequestParam Map<String, String> serchEmpInfo) {
 		
@@ -86,6 +88,7 @@ public class WorkRestController {
 	    
     } // insertWork
 	
+	/** 근무일정 정보 조회 */
 	@GetMapping("/list")
 	public ResponseEntity<List<WorkDTO>> getWorkList(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
@@ -103,7 +106,6 @@ public class WorkRestController {
 		return ResponseEntity.ok(list);
         
 	}
-	
 	
 	@GetMapping("/list/serch")
 	public ResponseEntity<List<WorkDTO>> getWorkListSerch(@RequestParam("start") String start, 
