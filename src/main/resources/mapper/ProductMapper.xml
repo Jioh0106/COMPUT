@@ -69,7 +69,13 @@
         b.bom_quantity AS bom_quantity,
         b.bom_date AS bom_date,
         b.bom_status AS bom_status,
-        b.process_name AS process_name
+       
+       (
+        SELECT LISTAGG(pi.process_name, '/') WITHIN GROUP (ORDER BY pi.process_no)
+        FROM process_info pi
+        WHERE INSTR('/' || b.process_name || '/', '/' || pi.process_no || '/') > 0
+    	) AS process_name  
+        
      FROM
         bom b
      LEFT JOIN
@@ -79,7 +85,7 @@
      LEFT JOIN
         material m ON b.mtr_no = m.mtr_no 
      LEFT JOIN
-        product p2 ON b.mtrproduct_no = p2.product_no 
+        product p2 ON b.mtrproduct_no = p2.product_no
      WHERE
         p.product_no = #{product_no}
      ORDER BY

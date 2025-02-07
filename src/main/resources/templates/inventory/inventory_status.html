@@ -80,7 +80,7 @@
 
 
 			<div class="display-flex">
-				<h3>생산이력</h3>
+				<h3>재고현황</h3>
 			</div>
 			<!-- display-flex -->
 
@@ -93,31 +93,28 @@
 							<form>
 								<!-- 검색 조건 시작 -->
 								<div class="row mb-4 align-items-center">
-								    <!-- 상품등록월-->
-								    <div class="col-md-4">
-								       <label for="searchMonth" class="form-label">등록월</label>
-								       <input type="month" id="searchMonth" class="form-control" onchange="updateProductGrid()">
-								    </div>
 								    <!-- 상품명 -->
 									<div class="col-md-4">
-										<label for="nameSearch" class="form-label">상품명</label>
+										<label for="nameSearch" class="form-label">품명 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
+											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
 												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
 										</div>
 									</div>
 								</div>
 								<!-- 검색 조건 끝-->
 								
-								<div class="float-end mb-3">
-								<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
-								</div>
+								<!--재고현황 그리드-->										   
+								<div id="inventoryGrid" class="mb-3 mt-2"></div>
 								
-								<!--생산이력 그리드-->										   
-								<div id="prdcGrid" class="mb-3 mt-2"></div>
-								
-								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
 							</form>
 						</div>
 					</section>
@@ -149,6 +146,26 @@
 
 	 	var Grid = tui.Grid;
 		
+		const inventoryGrid = new Grid({
+			el: document.getElementById('inventoryGrid'),
+			columns: [
+				{header: '재고번호',	name: 'inventory_no', width: 100},
+				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
+				{header: '자재/완제품번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
+				{header: '품명',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
+				{header: '재고량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '단위',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '창고명',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '구역',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '수정자',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '수정일',	name: 'bom_date',	editor: 'text', sortable: true, width: 150}
+				
+			],
+			data: [],
+			columnOptions: {
+			  resizable: true
+			}
+		});
 		
 		
 		
