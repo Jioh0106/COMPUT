@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.EquipmentHstryMapper">
+
+	<select id="yearMonthList" resultType="map">
+		SELECT 
+		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') AS "yearMonth"
+		FROM 
+		    DUAL
+		CONNECT BY 
+		    LEVEL <![CDATA[<=]]> MONTHS_BETWEEN(TRUNC(SYSDATE, 'MM'), DATE '2024-12-01') + 1
+		ORDER BY 
+		    TO_CHAR(ADD_MONTHS(DATE '2024-12-01', LEVEL - 1), 'YYYY-MM') desc
+	</select>
+	
+	<select id="equipmentInfo" resultType="map" parameterType="map">
+		 SELECT
+		 				  info_no as "no"
+		 				, info_sn as "sn"
+						, info_nm as "name"
+						, info_kind as "kind"0516
+						, info_mnfct as "mnfct"
+						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
+						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
+						, info_useyn as "useYn"
+						, 'select' AS  "rowType"
+		 FROM
+			 equipment_info
+		<where>
+			<if test="yearMonth != null and yearMonth != ''">
+				 AND TO_CHAR(info_buy_date, 'YYYY-MM') = #{yearMonth}
+		 	</if>
+			<if test="value != null and value != ''">
+				 AND (TO_CHAR(info_buy_date, 'YYYY-MM') = #{value}
+				 	  OR info_nm LIKE '%' || #{value} || '%')
+		 	</if>
+		</where>
+		ORDER BY
+			info_buy_date DESC
+	</select>
+	
+	<select id="clientInfo" resultType="map">
+		SELECT
+			  TO_CHAR(client_no) AS "no"
+			, client_name AS "name"
+		FROM
+			client
+		WHERE
+			client_type = '발주'
+	</select>
+	
+	<select id="selectStts" resultType="map">
+		SELECT
+			  common_detail_code AS "code"
+			, common_detail_name AS "name"
+		FROM
+			common_detail
+		WHERE
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'MNTP'
+		AND
+			common_detail_status = 'Y'
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<insert id="eqpInsert" parameterType="map">
+		INSERT INTO equipment_info (
+			info_no
+		  , info_sn
+		  , info_nm
+		  , info_kind
+		  , info_mnfct
+		  , info_buy_date
+		  , info_set_date
+		  , info_useyn
+		  , info_reg_date
+		
+		) VALUES ( 
+			equipment_info_seq.NEXTVAL
+		  , #{sn}
+		  , #{name}
+		  , #{kind}
+		  , #{mnfct}
+		  , TO_DATE(#{buy}, 'YYYY-MM-DD')
+		  , TO_DATE(#{set}, 'YYYY-MM-DD')
+		  , #{useYn}
+		  , CURRENT_DATE
+		)
+	</insert>
+	
+	<update id="eqpUpdate" parameterType="map">
+		UPDATE equipment_info 
+		SET   info_sn			= #{sn}
+			, info_nm			= #{name}
+			, info_kind			= #{kind}
+			, info_mnfct		= #{mnfct}
+			, info_buy_date		= TO_DATE(#{buy}, 'YYYY-MM-DD')
+			, info_set_date		= TO_DATE(#{set}, 'YYYY-MM-DD')
+			, info_useyn		= #{useYn}
+			, info_mdfn_date	= CURRENT_DATE
+		WHERE info_no 			= #{no}
+	</update>
+	
+	<delete id="eqpDelete" parameterType="map">
+		DELETE 
+		  FROM equipment_info
+		 WHERE info_no = #{no}
+	</delete>
+	
+</mapper>
+
+
+
