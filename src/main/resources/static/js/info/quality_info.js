@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Grid 테마 설정
 	const Grid = tui.Grid;
-	Grid.applyTheme('striped');
 
 	// 상태 관리
 	const state = {

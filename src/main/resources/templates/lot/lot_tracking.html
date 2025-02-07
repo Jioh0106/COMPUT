@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+<link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+<link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+<link rel="stylesheet" th:href="@{/assets/css/app.css}">
+<link rel="icon" href="images/favicon.png" type="images/png">
+
+<!-- CSRF 토큰 -->
+<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+<style>
+	.tui-grid-cell {
+		background-color: #ffffff !important;
+	}
+	
+	.display-flex {
+		display: flex;
+	}
+	
+	.buttons {
+		margin-left: auto;
+	}
+	
+	.mb-4 {
+		margin-bottom: 1.5rem !important;
+	}
+	
+	.required::after {
+		content: " *";
+		color: red;
+	}
+</style>
+</head>
+
+<body>
+	<div id="app">
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+		<div id="main">
+			<div class="display-flex">
+				<h3>LOT 관리</h3>
+			</div>
+
+			<div class="card">
+				<div class="card-body">
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<!-- 검색 조건 -->
+								<div class="row mb-4">
+									<div class="col-md-4">
+										<select id="processNo" class="form-select">
+											<option value="">공정선택</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<select id="lotStatus" class="form-select">
+											<option value="">LOT상태</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<input type="text" id="searchLotNo" class="form-control"
+											placeholder="LOT번호" />
+									</div>
+									<div class="col-md-2">
+										<input type="text" id="searchProduct" class="form-control"
+											placeholder="제품" />
+									</div>
+									<div class="col-md-2">
+										<button onclick="searchLots()" class="btn btn-primary">검색</button>
+									</div>
+								</div>
+
+								<div id="lotGrid" class="mb-3 mt-2"></div>
+
+								<div class="float-end mt-3">
+									<button type="button" class="btn btn-outline-secondary" onclick="addNewLot()">신규</button>
+                                    <button type="button" class="btn btn-outline-success" onclick="saveLotData()">저장</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="deleteLots()">삭제</button>
+								</div>
+								
+							</form>
+						</div>
+					</section>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+	<script th:src="@{/js/lot/lot_tracking.js}"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+</body>
+</html>
