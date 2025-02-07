@@ -111,14 +111,13 @@ $(function() {
 
 	// ====================================== 
 	// 그리드 데이터 초기화
-	let start = instance1.getDate().toLocaleDateString('en-CA'); 
+	let ger_date = '';
 	console.log("start : "  + start);
 	console.log("end : "  + end);
 
-	axios.get('/api/work/list', {
+	axios.get('/api/order/list', {
 		params: {
-			start: start,
-			end: end
+			date: ger_date,
 		},
 	})
 	.then(function (response) {
