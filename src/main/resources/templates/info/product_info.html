@@ -267,7 +267,7 @@
 					console.log(" 서버에서 받은 공정유형 데이터:", data);
 		            processOptions = data.map(item => ({
 		                value: String(item.PROCESS_NO),  // 저장할 공정 코드 (ex: 1,2,3..)
-		                text: item.PROCESS_NAME   // 화면에 표시될 공정명 (ex: 가공)
+		                text: item.PROCESS_NAME    // 화면에 표시될 공정명 (ex: 가공)
 		            	}));
 						 // 공정 select 박스에 즉시 반영
 			            bomGrid.getColumns().forEach(column => {
@@ -328,7 +328,7 @@
 				                    ]
 				                }
 				            },
-							sortable: true, width: 50}
+							sortable: true, width: 100}
 						],
 						data: [],
 						columnOptions: {
@@ -395,22 +395,24 @@
 
 			
 			
-			//공정유형 공통코드 -> 이름값으로 변경 후 쉼표로 구분				
+			//공정유형 공통코드 -> 이름값으로 변경 후 /로 구분				
 			function processCodeToName(value) {
 			    if (!value) return '';
-				
-				// 값이 쉼표로 구분된 문자열이라면 배열로 변환
-				   if (typeof value === 'string' && value.includes(',')) {
-				       value = value.split(',').map(v => v.trim()); // 문자열 → 배열 변환
-				   }
-				
-				//값이 여러개일때 -> 공정유형이 배열로 담김 -> 공통코드를 이름으로 바꾸고 쉼표 넣기
+			 	
+				//값이 여러개일때 -> 공정유형이 배열로 담김 -> 공정id를 이름으로 바꾸고 / 넣기
 				if (Array.isArray(value)) {
 				        return value.map(v => {
 				            const process = processOptions.find(p => p.value === v);
 				            return process ? process.text : v;
-				        }).join(', '); // 쉼표로 구분된 문자열로 변환
+				        }).join('/'); //   '/'로 구분된 문자열로 변환
 				    }
+			 
+				// 쉼표(`,`) 포함된 문자열일 경우 → `/`로 변환 후 처리
+			    if (typeof value === 'string' && value.includes(',')) {
+			        value = value.split(',').map(v => v.trim()); // 쉼표로 나눠 배열로 변환
+			        return processCodeToName(value); // 배열 변환 후 다시 실행
+			    }
+				
 				
 			    const process = processOptions.find(p => p.value === value);
 			    return process ? process.text : value;  // 코드 → 이름 변환
@@ -636,8 +638,11 @@
 			
 			//BOM그리드, 상품그리드 업데이트
 			function updateBom(){
-				const bomData = bomGrid.getData();
-				const productData = productGrid.getData();
+				//const bomData = bomGrid.getData();
+				//const productData = productGrid.getData();
+				
+				const bomData = bomGrid.getModifiedRows().updatedRows || [];  // 수정된 행만 가져오기
+				const productData = productGrid.getModifiedRows().updatedRows || [];  // 수정된 상품 데이터만 가져오기
 				
 				const product = productData.map(row => ({
 				      product_no: row.PRODUCT_NO,
@@ -653,6 +658,10 @@
 					  //공정이름을 공정번호로 변환 (서버는 process_no로 저장해야 함)
 					  const process = processOptions.find(p => p.text === row.process_name);
 					  row.process_name = process ? process.value : row.process_name; // process_no로 변환
+					  // 쉼표(`,`)로 구분된 데이터라면 '/'로 변환하여 저장
+					  if (typeof row.process_name === 'string' && row.process_name.includes(',')) {
+					      row.process_name = row.process_name.split(',').map(v => v.trim()).join('/'); // 쉼표 → 슬래시 변환
+					  }
 					  console.log('공정유형ㅗㅗ', row.process_name);	
 					  
 					  row.bom_no = row.bom_no || null;
@@ -677,7 +686,8 @@
 				     .then(response => response.text())
 				     .then(data => {
 				         alert('BOM 데이터 업데이트 완료');
-				         updateBomGrid(productNo); // 저장 후 그리드 새로고침
+				         updateBomGrid(productNo);
+						 updateProductGrid(); // 저장 후 그리드 새로고침
 				     })
 				     .catch(error => {
 				         console.error('BOM 업데이트 오류:', error);

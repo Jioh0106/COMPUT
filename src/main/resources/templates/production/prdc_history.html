@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>생산이력</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4 align-items-center">
+								    <!-- 상품등록월-->
+								    <div class="col-md-4">
+								       <label for="searchMonth" class="form-label">등록월</label>
+								       <input type="month" id="searchMonth" class="form-control" onchange="updateProductGrid()">
+								    </div>
+								    <!-- 상품명 -->
+									<div class="col-md-4">
+										<label for="nameSearch" class="form-label">상품명</label>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+										</div>
+									</div>
+								</div>
+								<!-- 검색 조건 끝-->
+								
+								<div class="float-end mb-3">
+								<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
+								</div>
+								
+								<!--생산이력 그리드-->										   
+								<div id="prdcGrid" class="mb-3 mt-2"></div>
+								
+								
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
+			
+		
+	
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+	 	var Grid = tui.Grid;
+		
+		
+		
+		
+	</script>
+
+</body>
+
+</html>
