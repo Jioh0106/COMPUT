@@ -42,7 +42,7 @@ public class EquipmentHstryController {
 		// (yearMonthList 내림차순으로 정렬했기 때문에 현재 날짜는 0번째)
 		searchMap.put("yearMonth", yearMonthList.get(0).get("yearMonth"));
 		
-		// 설비 상태 목록 조회
+		// 설비 상태 목록 조회/
 		List<Map<String, Object>> sttsList = service.selectStts();
 		model.addAttribute("sttsList", sttsList);
 		

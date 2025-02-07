@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Mapper
 @Repository
 public interface EquipmentHstryMapper {
-
+//
 	List<Map<String, Object>> yearMonthList();
 	
 	List<Map<String, Object>> equipmentInfo(Map<String, Object> searchMap);
