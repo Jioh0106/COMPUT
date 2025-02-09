@@ -29,7 +29,7 @@ public class ClientRestController {
 	
 	/** 거래처 그리드 정보 저장 **/
 	@PostMapping("/save")
-    public ResponseEntity<List<Client>> saveMaterial(@RequestBody Map<String, List<Client>> modifiedRows) {
+    public ResponseEntity<List<Client>> saveClient(@RequestBody Map<String, List<Client>> modifiedRows) {
 		log.info("modifiedRows : " + modifiedRows.toString());
 		
 		List<Client> updatedRows = modifiedRows.get("updatedRows");

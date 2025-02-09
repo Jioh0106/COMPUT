@@ -14,10 +14,21 @@ public class OrdersDTO {
 	private String order_type;
 	private Integer client_no;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private Timestamp order_date;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-	private Timestamp rder_update;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+	private Timestamp order_update;
+	
+	// -----------------------------------------------
+	
+	
+	private String emp_name;
+	private String client_name;
+	private Integer count;
+	
+	
+	
+	
 	
 }

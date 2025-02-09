@@ -6,12 +6,122 @@
 	
 	<!-- 주문관리 목록 조회  -->
 	<select id="getOrdersList" resultType="com.deepen.domain.OrdersDTO" parameterType="map">
-	    SELECT *
-	      FROM orders
+		SELECT o.ORDER_ID 
+			 , ORDER_DATE 
+			 , ORDER_EMP
+			 , e.EMP_NAME 
+			 , ORDER_TYPE
+			 , o.CLIENT_NO
+			 , c.CLIENT_NAME 
+		     , CASE 
+		           WHEN COUNT(s.ORDER_ID) > 0 THEN COUNT(s.ORDER_ID)  -- sale 테이블에서 개수 카운트
+		           WHEN COUNT(b.ORDER_ID) > 0 THEN COUNT(b.ORDER_ID)  -- buy 테이블에서 개수 카운트
+		           ELSE 0 
+		       END AS count  -- 하나의 컬럼으로 개수 출력
+			 , ORDER_UPDATE 
+		  FROM ORDERS o
+		  JOIN EMPLOYEES e 
+		    ON o.ORDER_EMP = e.EMP_ID 
+		  JOIN CLIENT c 
+		   ON o.CLIENT_NO = c.CLIENT_NO 
+		 LEFT JOIN sale S
+		   ON o.ORDER_ID = s.ORDER_ID
+		 LEFT JOIN BUY b 
+		   ON o.ORDER_ID = b.ORDER_ID
+		GROUP BY o.ORDER_ID, o.ORDER_DATE, o.ORDER_EMP, e.EMP_NAME, 
+		         o.ORDER_TYPE, o.CLIENT_NO, c.CLIENT_NAME, o.ORDER_UPDATE
+	</select>
+
+
+	<select id="getClientSerch" resultType="com.deepen.domain.ClientDTO" parameterType="string">
+		SELECT CLIENT_NO
+		     , CLIENT_NAME
+		     , CLIENT_TEL
+		     , CLIENT_BOSS
+		     , CLIENT_EMP
+		     , CLIENT_POSTCODE
+		     , CLIENT_ADRRESS
+		     , CLIENT_POSTCODE
+		     , CLIENT_DATE
+		  FROM CLIENT 
+	     WHERE CLIENT_TYPE = #{type}
 	</select>
 	
-
+	<select id="getPrdctSerch" resultType="com.deepen.domain.ProductDTO">
+		SELECT product_no
+			 , product_name
+			 , product_unit
+			 , product_date
+			 , product_type
+			 , d.common_detail_name AS unit_name
+		  FROM product p
+		  JOIN common_detail d 
+		    ON p.product_unit = d.common_detail_code
+		 WHERE product_type = '완제품'
+	</select>
 	
+	<insert id="insertOrders" parameterType="com.deepen.domain.OrdersDTO">
+		INSERT INTO orders (
+			   order_id
+			 , order_date
+			 , order_emp
+			 , order_type
+			 , client_no
+		)
+		VALUES (
+			  #{order_id}
+			, SYSTIMESTAMP
+			, #{order_emp}
+			, #{order_type}
+			, #{client_no}
+		)
+	</insert>
+	
+	<insert id="insertSale" parameterType="com.deepen.domain.SaleDTO">
+		INSERT INTO sale (
+			   order_id
+			 , product_no
+			 , sale_unit
+			 , sale_vol
+			 , sale_deadline
+			 , required_materials
+			 , sale_status
+		) VALUES (
+			  #{order_id}
+			, #{product_no}
+			, #{sale_unit}
+			, #{sale_vol}
+			, #{sale_deadline}
+			, #{required_materials}
+			, #{sale_status}
+		)
+	</insert>
+	
+	<select id="getDetailSale" parameterType="string">
+		SELECT s.SALE_NO
+			 , o.ORDER_ID
+			 , o.ORDER_TYPE
+			 , s.PRODUCT_NO
+			 , p.PRODUCT_NAME
+			 , cd.COMMON_DETAIL_NAME AS unit_name
+			 , s.SALE_VOL 
+			 , s.SALE_DEADLINE 
+			 , o.ORDER_EMP 
+			 , e.EMP_NAME 
+			 , o.ORDER_DATE 
+			 , s.REQUIRED_MATERIALS 
+			 , s.SALE_STATUS 
+		  FROM ORDERS o 
+		  JOIN EMPLOYEES e 
+		    ON o.ORDER_EMP = e.EMP_ID 
+		  JOIN SALE s 
+		    ON s.ORDER_ID = o.ORDER_ID 
+		  JOIN PRODUCT p 
+		    ON p.PRODUCT_NO = s.PRODUCT_NO 
+		  JOIN COMMON_DETAIL cd 
+		    ON s.SALE_UNIT = cd.COMMON_DETAIL_CODE 
+		 WHERE o.ORDER_ID = #{order_id};
+	</select>
 	
 </mapper>
 
