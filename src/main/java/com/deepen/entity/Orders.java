@@ -37,8 +37,8 @@ public class Orders {
 	@Column(name = "client_no", nullable = false)
 	private Integer client_no;
 	
-	@Column(name = "rder_update")
-	private Timestamp rder_update;
+	@Column(name = "order_update")
+	private Timestamp order_update;
 	
 	
 	

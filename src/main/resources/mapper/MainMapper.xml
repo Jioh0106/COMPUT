@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.MainMapper">
+	
+	<select id="getLoginEmp" resultType="java.util.Map" >
+		SELECT * 
+		  FROM emp_list_all
+		 WHERE emp_id = #{emp_id}
+	</select>
+	
+	
+</mapper>
+
+

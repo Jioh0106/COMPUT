@@ -26,6 +26,8 @@ public class AbsenceDTO {
 	
 	private Integer request_no;
 	private String absence_remark;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime update_date;
 	private String update_emp_id;
 	
