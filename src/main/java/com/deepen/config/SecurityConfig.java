@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	
 	private final MyUserDetailsService myUserDetailsService;
+	private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler; 
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -52,13 +53,15 @@ public class SecurityConfig {
 						.loginProcessingUrl("/loginPro")
 						.usernameParameter("emp_id")
 						.passwordParameter("emp_pw")
-						.defaultSuccessUrl("/", true)
+						.successHandler(customAuthenticationSuccessHandler)
 						.failureUrl("/login")
 						)
 				.logout(logoutCustomizer
 						-> logoutCustomizer
 						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 						.logoutSuccessUrl("/")
+						.invalidateHttpSession(true)  
+						.deleteCookies("JSESSIONID")
 						)
 				.userDetailsService(myUserDetailsService)
 				.build();
