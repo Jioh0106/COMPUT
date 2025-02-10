@@ -1,9 +1,13 @@
 package com.deepen.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.deepen.domain.ClientDTO;
+import com.deepen.entity.Client;
 import com.deepen.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,11 +23,11 @@ public class OrderController {
 	
 	/**
 	 * 초기 화면
-	 * @view model
+	 * @view 
 	 * @return String
 	 */
 	@GetMapping("/prdct-order")
-	public String prdctOrder(Model model) {
+	public String prdctOrder() {
 		
 		return "production/prdct_order";
 		
@@ -31,7 +35,7 @@ public class OrderController {
 	
 	/**
 	 * 수주 등록 팝업창
-	 * @view model
+	 * @view model 
 	 * @return String
 	 */
 	@GetMapping("/reg-sale")

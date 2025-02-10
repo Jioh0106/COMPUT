@@ -22,7 +22,7 @@ public class ProductDTO {
 	private String product_type; // 상품유형(반제품/완제품)
 	
 	
-
+	private String unit_name; 
 	
 	
 }

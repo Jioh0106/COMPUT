@@ -707,31 +707,10 @@
 			            const rowData = grid.getRow(rowKey);
 						
 						// 행정보 전달
-			            showEmpModal(rowKey, columnName);
+			            showEmpModal(rowKey);
 			        }
 			        
 			    });
-			 	
-			 	
-			    grid.on('editingFinish', function (ev) {
-			    	const { rowKey, columnName } = ev;
-
-			        // 사원번호 또는 사원명 수정 시 모달 띄우기
-			        if (columnName === 'ABSENCE_START' || columnName === 'ABSENCE_END') {
-			            ev.stop(); // 기본 편집 동작 중단
-			            
-			        	// 해당 행의 데이터 가져오기
-			            const rowData = grid.getRow(rowKey);
-						
-						// 행정보 전달
-			            showEmpModal(rowKey, columnName);
-			        }
-			        
-			    });
-			 	
-			 	
-			 	
-			 	
 			 	
 				
 			});
@@ -739,7 +718,7 @@
 			
 			
 			// 사원 조회 모달창 표시 함수
-			function showEmpModal(rowKey, columnName) {
+			function showEmpModal(rowKey) {
 			    const modal = $('#empSerchModal'); // 모달창 요소
 
 			    // Toast UI Grid 초기화 (최초 1회만 실행)
