@@ -15,11 +15,17 @@ import com.deepen.domain.ProcessInfoDTO;
 public interface WorkInstructionMapper {
 	
 	// 작업 담당자 조회(생산부)
-	List<Map<String, Object>> selectWokerInfoListByPosition();
+	List<Map<String, Object>> selectWorkerInfoListByPosition();
 	
 	// select 박스에 넣을 공정 정보
 	List<ProcessInfoDTO> selectProcessInfo();
 	
 	// select 박스에 넣을 라인 정보
 	List<LineInfoDTO> selectLineInfo();
+	
+	// 작업지시등록을 위한 정보
+	List<Map<String, Object>> selectRegWorkInstruction();
+	
+	// 계획에서 가져온 작업지시정보 insert
+	void insertWorkInstruction(Map<String, Object> insertData);
 }

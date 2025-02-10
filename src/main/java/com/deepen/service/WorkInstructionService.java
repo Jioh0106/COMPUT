@@ -20,7 +20,7 @@ public class WorkInstructionService {
 	
 	// 작업담장자 정보
 	public List<Map<String, Object>> getWorkerListByPosition(){
-		return wiMapper.selectWokerInfoListByPosition();
+		return wiMapper.selectWorkerInfoListByPosition();
 	}
 	
 	// 공정 정보
@@ -31,6 +31,21 @@ public class WorkInstructionService {
 	// 라인 정보
 	public List<LineInfoDTO> getLineList() {
 		return wiMapper.selectLineInfo();
+	}
+	
+	// 계획에서 작업지시 등록 정보 기져오기
+	public List<Map<String, Object>> getRegWorkInstruction(){
+		List<Map<String, Object>> list = wiMapper.selectRegWorkInstruction();
+		return list;
+	}
+	
+	// 계획에서 가져온 작업지시 정보 테이블에 insert
+	public void regWorkInstruction(List<Map<String, Object>> insertList) {
+		log.info(insertList.toString());
+		
+		for(Map<String, Object> insertData : insertList) {
+			wiMapper.insertWorkInstruction(insertData);
+		}
 	}
 	
 	// 작업 지시 정보 불러오기

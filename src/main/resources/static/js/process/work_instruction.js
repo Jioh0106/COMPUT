@@ -25,7 +25,7 @@ function selectBox(idSelector,placeholderText,fetchData){
 // 서버에서 전달받은 정보로 공정 select box 생성
 async function fetchProcessInfoList(){
 	try{
-		const response = await fetch("process-info");
+		const response = await fetch("/api/process-info");
 		
 		if (!response.ok) {
            	throw new Error("네트워크 응답 실패");
@@ -50,7 +50,7 @@ async function fetchProcessInfoList(){
 // 서버에서 전달받은 정보로 라인 select box 생성
 async function fetchLineInfoList(){
 	try{
-		const response = await fetch("line-info");
+		const response = await fetch("/api/line-info");
 		
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
@@ -236,7 +236,6 @@ function createMaterialGrid(){
 		//materialGrid.hideColumn("no");
 };
 
-//document.getElementById('regWork').addEventListener('click', () =>{
 document.getElementById('large').addEventListener('shown.bs.modal', () => {	
 	var Grid = tui.Grid;
 	
@@ -246,25 +245,78 @@ document.getElementById('large').addEventListener('shown.bs.modal', () => {
 		return;
 	}
 	
-	//document.querySelector('.tui-grid-body-container').style.width ='100%';
-	
 	regGrid = new Grid({
 		el: document.getElementById('regGrid'),
 		rowHeaders: ['checkbox'],
 		bodyHeight: 280,
 		columns: [
-			{header: '계획번호', name: 'planId'},
-			{header: '품목번호', name: 'mtl_name'},
-			{header: '품목', name: 'warehouse'},
-			{header: '수량', name: 'zone'}
+			{header: '계획번호', name: 'PLAN_ID'},
+			{header: '품목번호', name: 'PRODUCT_NO'},
+			{header: '품목', name: 'PRODUCT_NAME'},
+			{header: '수량', name: 'SALE_VOL'},
+			{header: '생산 시작 예정일', name: 'PLAN_START_DATE'},
+			{header: '생산 완료 목표일', name: 'PLAN_END_DATE'},
+			{header: ' ', name: 'PLAN_PRIORITY'}
 		],
 		data: [],
 		columnOptions: {
 		  resizable: true
 		},
-		width: 'auto'
 	});
 	
-	regGrid.setWidth('100%');
-	
+	fetchRegWorkInstructionInfo();
 });
+
+/**
+ * 생산계획의 작업정보 가져오기
+ */
+async function fetchRegWorkInstructionInfo(){
+	try{
+		const response = await fetch('/api/reg-work-instruction-info');
+		if (!response.ok) {
+           	throw new Error("네트워크 응답 실패");
+       	}
+		const result = await response.json();
+		console.log("result",result);
+		
+		// 그리드 데이터 바인딩
+		regGrid.resetData(result);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+};
+
+//
+document.getElementById('insert-work-instruction').addEventListener('click', () =>{
+	const checkedRows = regGrid.getCheckedRows();
+	console.log("checkedRows",checkedRows);
+	const data = checkedRows.map(row =>({
+		PLAN_ID:row.PLAN_ID
+	}));
+	console.log("data",data);
+	insertWorkInstruction('/api/insert-work-instruction',data);
+});
+
+
+async function insertWorkInstruction(url,data){
+	try{
+		const response = await fetch(url,{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		location.reload(true);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+}
+
