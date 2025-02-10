@@ -7,7 +7,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.deepen.domain.BuyDTO;
 import com.deepen.domain.ClientDTO;
+import com.deepen.domain.MaterialDTO;
 import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.domain.SaleDTO;
@@ -18,18 +20,28 @@ import com.deepen.domain.SaleDTO;
 public interface OrdersMapper {
 
 	List<OrdersDTO> getOrdersList();
-
+	
+	List<OrdersDTO> getOrderSerchList(Map<String, String> map);
+	
 	List<ClientDTO> getClientSerch(String type);
 
 	List<ProductDTO> getPrdctSerch();
+
+	List<MaterialDTO> getMtrSerch();
 
 	void insertOrders(OrdersDTO order);
 
 	void insertSale(SaleDTO sale);
 
-	List<Map<String, Object>> getDetailSale(String order_id);
+	void insertBuy(BuyDTO buy);
 
-	List<Map<String, Object>> getDetailBuy(String order_id);
+	List<SaleDTO> getDetailSale(@Param("order_id") String order_id);
+
+	List<BuyDTO> getDetailBuy(@Param("order_id") String order_id);
+
+	
+
+
 
 
 	

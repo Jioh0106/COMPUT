@@ -1,9 +1,6 @@
 package com.deepen.domain;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,24 +9,18 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class SaleDTO {
+public class BuyDTO {
 	
-	private Integer sale_no;
+	private Integer buy_no;
 	private String order_id;
-	private Integer product_no;
-	private String sale_unit;
-	private Integer sale_vol;
+	private Integer mtr_no;
+	private String buy_unit;
+	private Integer buy_vol;	
+	private String buy_status;
 	
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date sale_deadline;
+	// ==========================================
 	
-	private String required_materials;
-	private String sale_status;
-	
-	// ==============================
-	
-	private String product_name;
+	private String mtr_name;
 	private String unit_name;
 	private String order_type;
 	private String order_emp;
