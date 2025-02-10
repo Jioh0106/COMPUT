@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+
+    <!-- TOAST Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+    <!-- Bootstrap & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    
+    <!-- CSRF 토큰 -->
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+        .tui-grid-cell { 
+            background-color: #ffffff !important; 
+        }
+        .display-flex { 
+            display: flex; 
+        }
+        .buttons { 
+            margin-left: auto; 
+        }
+        .mb-4 { 
+            margin-bottom: 1.5rem !important; 
+        }
+        .tree-view {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <div class="display-flex">
+                <h3>LOT 추적</h3>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <section class="section">
+                        <div class="row" id="basic-table">
+                            <form>
+                                <!-- 검색 조건 -->
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <label for="searchLotNo" class="form-label">LOT 번호</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="searchLotNo" 
+                                                   placeholder="LOT 번호를 입력하세요">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="traceDepth" class="form-label">추적 깊이</label>
+                                        <select id="traceDepth" class="form-control">
+                                            <option value="-1">전체</option>
+                                            <option value="1">1단계</option>
+                                            <option value="2">2단계</option>
+                                            <option value="3">3단계</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-primary" onclick="traceLot()">
+                                                조회
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 탭 메뉴 -->
+                                <ul class="nav nav-tabs" id="traceTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="tree-tab" 
+                                                data-bs-toggle="tab" data-bs-target="#tree" 
+                                                type="button" role="tab">트리 뷰</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="process-tab" 
+                                                data-bs-toggle="tab" data-bs-target="#process" 
+                                                type="button" role="tab">공정 이력</button>
+                                    </li>
+                                </ul>
+
+                                <!-- 탭 콘텐츠 -->
+                                <div class="tab-content mt-3" id="traceTabContent">
+                                    <!-- 트리 뷰 탭 -->
+                                    <div class="tab-pane fade show active" id="tree" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>상위 LOT (원자재)</h6>
+                                                <div id="backwardTree" class="tree-view"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>하위 LOT (제품)</h6>
+                                                <div id="forwardTree" class="tree-view"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 공정 이력 탭 -->
+                                    <div class="tab-pane fade" id="process" role="tabpanel">
+                                        <div id="processGrid"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+</body>
+</html>

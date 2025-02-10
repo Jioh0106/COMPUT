@@ -10,9 +10,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QualityController {
 
-	// 품질 관리
+	// 품질 기준정보
 	@GetMapping("/quality-info")
 	public String qualityInfo(Model model) {
 		return "info/quality_info";
+	}
+	
+	// 품질 관리
+	@GetMapping
+	public String quality_check(Model model) {
+		return "process/quality_check";
 	}
 }

@@ -30,6 +30,7 @@ public class QualityService {
     private final DefectMasterRepository defectMasterRepository;
     private final ProcessInfoRepository processInfoRepository;
     private final CommonDetailRepository commonDetailRepository;
+    private final LotQcLogRepository lotQcLogRepository;
     
     public List<QcMasterDTO> getQcList() {
         return qcMasterRepository.findBySearchConditions(null, null)
@@ -221,5 +222,37 @@ public class QualityService {
     @Transactional
     public void deleteDefect(String defectCode) {
         defectMasterRepository.deleteById(defectCode);
+    }
+    
+ // 품질검사 대기 목록 조회
+    public List<QualityCheckDTO> getQualityCheckWaitList() {
+        return lotQcLogRepository.findByLotStatus("QC_WAIT")
+                               .stream()
+                               .map(this::convertToQualityCheckDTO)
+                               .collect(Collectors.toList());
+    }
+
+    // 품질검사 시작
+    @Transactional
+    public void startQualityCheck(QualityCheckDTO dto) {
+        LotQcLog lotQcLog = lotQcLogRepository.findById(dto.getQcLogNo())
+            .orElseThrow(() -> new RuntimeException("QC Log not found"));
+        lotQcLog.setLotStatus("QC_IN_PROGRESS");
+        lotQcLog.setInspector(dto.getInspector());
+        lotQcLog.setStartTime(LocalDateTime.now());
+        lotQcLogRepository.save(lotQcLog);
+    }
+
+    // 품질검사 완료
+    @Transactional
+    public void completeQualityCheck(QualityCheckDTO dto) {
+        LotQcLog lotQcLog = lotQcLogRepository.findById(dto.getQcLogNo())
+            .orElseThrow(() -> new RuntimeException("QC Log not found"));
+        lotQcLog.setLotStatus("QC_COMPLETE");
+        lotQcLog.setMeasureValue(dto.getMeasureValue());
+        lotQcLog.setJudgement(dto.getJudgement());
+        lotQcLog.setEndTime(LocalDateTime.now());
+        lotQcLog.setNote(dto.getNote());
+        lotQcLogRepository.save(lotQcLog);
     }
 }

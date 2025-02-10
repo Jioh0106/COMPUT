@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.DefectMasterDTO;
 import com.deepen.domain.QcMasterDTO;
+import com.deepen.domain.QualityCheckDTO;
 import com.deepen.entity.CommonDetail;
 import com.deepen.entity.ProcessInfo;
 import com.deepen.service.QualityService;
@@ -78,6 +79,26 @@ public class QualityRestController {
     @DeleteMapping("/defect/{defectCode}")
     public ResponseEntity<Void> deleteDefect(@PathVariable(name = "defectCode") String defectCode) {
         qualityService.deleteDefect(defectCode);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 품질검사 대기 목록 조회
+    @GetMapping("/check/wait-list")
+    public ResponseEntity<List<QualityCheckDTO>> getWaitList() {
+        return ResponseEntity.ok(qualityService.getQualityCheckWaitList());
+    }
+    
+    // 품질검사 시작
+    @PostMapping("/check/start")
+    public ResponseEntity<Void> startQualityCheck(@RequestBody QualityCheckDTO dto) {
+        qualityService.startQualityCheck(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    // 품질검사 결과 저장
+    @PostMapping("/check/complete")
+    public ResponseEntity<Void> completeQualityCheck(@RequestBody QualityCheckDTO dto) {
+        qualityService.completeQualityCheck(dto);
         return ResponseEntity.ok().build();
     }
 }

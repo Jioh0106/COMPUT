@@ -8,11 +8,10 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-public class LotTrackingController {
+public class LotTraceController {
 	
-	@GetMapping("/lot-tracking")
-	public String lotTrackingView(Model model) {
-		return "lot/lot_tracking";
+	@GetMapping("/lot-trace")
+	public String traceLot(Model model) {
+		return "lot/lot_trace";
 	}
-
 }
