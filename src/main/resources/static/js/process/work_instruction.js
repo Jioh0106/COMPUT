@@ -95,6 +95,7 @@ window.onload = function() {
 let workInstructionGrid = "";
 let workerGrid = "";
 let materialGrid = "";
+let regGrid = "";
 
 function createWorkInstructionGrid(){
 		//const data = [];//processList;
@@ -235,3 +236,35 @@ function createMaterialGrid(){
 		//materialGrid.hideColumn("no");
 };
 
+//document.getElementById('regWork').addEventListener('click', () =>{
+document.getElementById('large').addEventListener('shown.bs.modal', () => {	
+	var Grid = tui.Grid;
+	
+	if (regGrid) {
+		// 이미 생성된 경우 destroy하지 않고 재사용
+		regGrid.refreshLayout();
+		return;
+	}
+	
+	//document.querySelector('.tui-grid-body-container').style.width ='100%';
+	
+	regGrid = new Grid({
+		el: document.getElementById('regGrid'),
+		rowHeaders: ['checkbox'],
+		bodyHeight: 280,
+		columns: [
+			{header: '계획번호', name: 'planId'},
+			{header: '품목번호', name: 'mtl_name'},
+			{header: '품목', name: 'warehouse'},
+			{header: '수량', name: 'zone'}
+		],
+		data: [],
+		columnOptions: {
+		  resizable: true
+		},
+		width: 'auto'
+	});
+	
+	regGrid.setWidth('100%');
+	
+});

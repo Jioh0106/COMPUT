@@ -48,6 +48,10 @@
     font-size: 0.8rem;
     height: 28px
 }
+
+/* .tui-grid-body-container{
+	width: 100%
+} */
 </style>
 
 </head>
@@ -61,11 +65,11 @@
 
 		<!-- 메인 content -->
 		<div id="main">
-
+			
 			<div class="display-flex">
 				<h3>작업 지시</h3>
 			</div>
-
+			
 			<div class="card">
 				<div class="card-body" id="default">
 					 <!-- 검색 영역 -->
@@ -110,9 +114,52 @@
 				            <div class="selectBox me-1" id="processSelectBox"></div>
 				            <div class="selectBox" id="lineSelectBox"></div>
 				        </div>
+				        <div class="col-auto ps-0 d-flex ms-auto">
+				        	 <button class="btn btn-primary btn-sm align-items-center justify-content-center me-1" id="regWork" 
+				        	 		 data-bs-toggle="modal" data-bs-target="#large">
+				        	 	작업등록
+				        	 </button>
+				        	 
+				        	 <!--사원 상세 모달-->
+				        	 <!-- TODO -->
+<!-- 				        	 style="padding-right: 17px; display: block;" -->
+				             <div class="modal fade" id="large" tabindex="-1" role="dialog" 
+					                aria-labelledby="psDatailModalTitle" aria-hidden="true">
+			                	<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+				                    <div class="modal-content">
+				                        <div class="modal-header">
+				                            <h5 class="modal-title">
+												생산 계획
+											</h5>
+				                        </div>
+				                        
+				                        <!-- 모달 바디 시작 -->
+				                        <div class="modal-body">
+											<div class="card-body">
+												<div id="regGrid" style="display: block"></div>
+				                        	</div>
+				                        </div>
+				                        <!-- 모달 바디 끝 -->
+				                        
+				                        <div class="modal-footer">
+				                            <button type="button" id="insert-work-instruction" class="btn btn-outline-success ml-1">
+				                                <i class="bx bx-check d-block d-sm-none"></i>
+				                                <span class="d-none d-sm-block">등록</span>
+				                            </button>
+				                            <button type="button" class="btn btn-outline-danger"
+				                                data-bs-dismiss="modal">
+				                                <i class="bx bx-x d-block d-sm-none"></i>
+				                                <span class="d-none d-sm-block">취소</span>
+				                            </button>
+				                        </div>
+				                    </div>
+				                </div>
+				            </div>
+			            	<!--사원 상세 모달 끝-->
+				        </div>
 				    </div>
 					<hr class="m-1">
-				    <!-- 작업 시작/종료 버튼 -->
+				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 시작 -->
 				    <div class="row h-75 py-1">
 				        <div class="col d-flex justify-content-end ">
 				            <button class="btn btn-outline-primary btn-sm align-items-center justify-content-center me-1" id="workStart">작업시작</button>
@@ -120,6 +167,7 @@
 				            <button class="btn btn-outline-secondary btn-sm align-items-center justify-content-center" id="workEnd">작업종료</button>
 				        </div>
 				    </div>
+				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 끝 -->
 				
 				    <!-- 작업 지시 Grid -->
 				    <div class="grid-height" id="workInstructionGrid" style="margin-bottom: 20px;"></div>
