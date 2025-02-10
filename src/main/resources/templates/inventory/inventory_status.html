@@ -95,7 +95,7 @@
 								<div class="row mb-4 align-items-center">
 								    <!-- 상품명 -->
 									<div class="col-md-4">
-										<label for="nameSearch" class="form-label">품명 검색</label>
+										<label for="nameSearch" class="form-label">품목명 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
 											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
@@ -152,13 +152,14 @@
 				{header: '재고번호',	name: 'inventory_no', width: 100},
 				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
 				{header: '자재/완제품번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
-				{header: '품명',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
-				{header: '재고량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '단위',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '창고명',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '구역',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '수정자',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '수정일',	name: 'bom_date',	editor: 'text', sortable: true, width: 150}
+				{header: '품목명',		name: 'item_name', editor: 'text', sortable: true, width: 100},
+				{header: '재고량',	name: 'inventory_qty',	editor: 'text', sortable: true, width: 150},
+				{header: '실재고량',	name: 'inventory_count',	editor: 'text', sortable: true, width: 150},
+				{header: '단위',	name: 'unit',	editor: 'text', sortable: true, width: 150},
+				{header: '창고',	name: 'warehouse_id',	editor: 'text', sortable: true, width: 150},
+				{header: '구역',	name: 'zon',	editor: 'text', sortable: true, width: 150},
+				{header: '수정자',	name: 'mod_user',	editor: 'text', sortable: true, width: 150},
+				{header: '수정일',	name: 'mod_date',	editor: 'text', sortable: true, width: 150}
 				
 			],
 			data: [],

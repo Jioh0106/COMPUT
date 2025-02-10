@@ -4,7 +4,10 @@
 
 <mapper namespace="com.deepen.mapper.InventoryMapper">
 <!-- 재고현황 매퍼 -->
+<select id="inventoryStatus">
+	select * from inventory
 
+</select>
 
 
 
