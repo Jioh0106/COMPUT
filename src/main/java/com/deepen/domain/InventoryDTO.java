@@ -14,7 +14,9 @@ public class InventoryDTO {
 	private String warehouse_id; //창고id
 	private String zone; //구역
 	private Integer inventory_qty; //재고량
+	private Integer inventory_count;//실재고량
 	private String mod_user; //수정자
 	private LocalDateTime mod_date;//수정일
+	private String unit; //단위
 	
 }
