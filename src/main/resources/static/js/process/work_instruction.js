@@ -134,18 +134,18 @@ function createWorkInstructionGrid(){
 																	{ text: '라인2', value: '라인1' }
 																]
 																}}, filter : 'select'},
-				{header: '설비', name: 'equ_name', editor: {
+				/*{header: '설비', name: 'equ_name', editor: {
 															type: 'select',
 															options: {
 															listItems: [
 																{ text: '설비1', value: '설비1' },
 																{ text: '설비2', value: '설비2' }
 															]
-															}}, filter : 'select'},
+															}}, filter : 'select'},*/
 				{header: '상태', name: 'wi_status',	editor: 'text', sortable: true},
 				{header: '작업 시작일', name: 'cDate'},
 				{header: '작업 종료일', name: 'udDate'},
-				{header: '작업 담당자', name: 'emp_id'},
+				{header: '작업 담당자', name: 'emp_id'}
 			],
 			data: [],
 			columnOptions: {
