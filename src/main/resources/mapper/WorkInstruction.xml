@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.WorkInstructionMapper">
+
+	<select id="selectWorkerInfoListByPosition" resultType="java.util.Map">
+		SELECT 
+			e.emp_id AS "no", 
+			e.emp_name AS "name",
+			cdd.common_detail_name AS "dept",
+			cdp.common_detail_name AS "position",
+			e.emp_phone AS "phone",
+			e.emp_email AS "email"
+		FROM employees e
+		LEFT JOIN COMMON_DETAIL cdd 
+		    ON cdd.common_detail_code LIKE 'DEPT%'
+		    AND cdd.common_detail_code = e.emp_dept
+		    AND cdd.common_detail_status = 'Y'
+		LEFT JOIN COMMON_DETAIL cdp
+		    ON cdp.common_detail_code LIKE 'PSTN%'
+		    AND cdp.common_detail_code = e.emp_position
+		    AND cdp.common_detail_status = 'Y'
+		WHERE e.emp_dept = 'DEPT007'
+		ORDER BY emp_no
+	</select>
+	
+	<select id="selectProcessInfo" resultType="com.deepen.domain.ProcessInfoDTO">
+		SELECT 
+			process_no AS "processNo", 
+			process_name AS "processName", 
+			process_priority AS "processPriority"
+		FROM process_info
+		WHERE is_active = 'Y'
+	</select>
+	
+	<select id="selectLineInfo" resultType="com.deepen.domain.LineInfoDTO">
+		SELECT 
+			line_no AS "lineNo", 
+			line_name AS "lineName" 
+		FROM line_info
+		WHERE is_active = 'Y'
+	</select>
+	
+	<select id="selectRegWorkInstruction" resultType="java.util.Map">
+		SELECT 
+		    p.plan_id,
+		    o.order_id,
+		    s.product_no,
+		    pd.product_name,
+		    s.sale_vol,
+		    TO_CHAR(p.plan_start_date, 'YYYY-MM-DD') AS "PLAN_START_DATE",
+		    TO_CHAR(p.plan_end_date, 'YYYY-MM-DD') AS "PLAN_END_DATE",
+		    p.plan_priority 
+		FROM plans p
+		JOIN orders o 
+		    ON o.order_id = p.order_id
+		JOIN SALE s 
+		    ON p.order_id = s.order_id
+		    AND REGEXP_SUBSTR(p.plan_id, '[^-]+', 1, 3) = s.product_no
+		JOIN PRODUCT pd
+		    ON pd.product_no = s.product_no
+		WHERE o.order_type = '수주'
+		    AND p.plan_status IN ('PRGR001', 'PRGR004')
+		ORDER BY p.plan_id
+	</select>
+	
+	<insert id="insertWorkInstruction" parameterType="Map">
+		INSERT into work_instruction (
+			plan_id
+			
+		) VALUES (
+			#{PLAN_ID}
+		)
+	</insert>
+</mapper>
+
+
+
