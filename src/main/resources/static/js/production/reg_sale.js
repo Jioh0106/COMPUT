@@ -1,23 +1,3 @@
-
-// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
-function datePickerReplace(id) {
-	$(document).ready(function () {
-		// 숫자가 아닌 정규식
-		var replaceNotInt = /[^0-9]/gi;
-
-		$(`#${id}`).on("focusout", function () {
-			var x = $(this).val();
-			if (x.length > 0) {
-				if (x.match(replaceNotInt)) {
-					x = x.replace(replaceNotInt, "");
-				}
-				$(this).val(x);
-			}
-		}).on("keyup", function () {
-			$(this).val($(this).val().replace(replaceNotInt, ""));
-		});
-	});
-}
 $(function() {	
 	// 등록일자는 오늘 날짜로 고정
 	const today = new Date();
@@ -335,7 +315,7 @@ $(function() {
 
 	
 	// 수주 등록 버튼 클릭 이벤트
-	$('#appendWork').on('click', function (e) {
+	$('#appendOrder').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
 		let client_no = $('#client_no').val();
@@ -405,3 +385,23 @@ $(function() {
 });	// 돔 로드 이벤트
 
 	
+
+// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
+function datePickerReplace(id) {
+	$(document).ready(function () {
+		// 숫자가 아닌 정규식
+		var replaceNotInt = /[^0-9]/gi;
+
+		$(`#${id}`).on("focusout", function () {
+			var x = $(this).val();
+			if (x.length > 0) {
+				if (x.match(replaceNotInt)) {
+					x = x.replace(replaceNotInt, "");
+				}
+				$(this).val(x);
+			}
+		}).on("keyup", function () {
+			$(this).val($(this).val().replace(replaceNotInt, ""));
+		});
+	});
+}

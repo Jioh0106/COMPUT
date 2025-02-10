@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
@@ -57,7 +57,7 @@
 							<div>
 								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
 									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
-										 class="form-control" placeholder="등록일 선택" />
+										 class="form-control serch" placeholder="등록일 선택" />
 									<span class="tui-ico-date"></span>
 								</div>
 								<div id="tui-date-picker-container-1" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
@@ -66,7 +66,7 @@
 							<span style="font-size: 1rem; line-height: 2rem;"> 등록 직원 / 거래처명 </span>
 														
 							<div id="searchArea">
-								<input type="text" id="searchWord"  class="form-control" />
+								<input type="text" id="searchWord"  class="form-control serch" />
 							</div>
 
 							<div id="typeCheck" class="ms-3 mt-2">
@@ -74,7 +74,7 @@
 								    <li class="d-inline-block me-2 mb-1">
 								        <div class="form-check">
 								            <div class="checkbox">
-								                <input type="checkbox"  class="form-check-input" id="all-check" checked>
+								                <input type="checkbox"  class="form-check-input serch" id="all-check" checked>
 								                <label for="checkbox1">전체</label>
 								            </div>
 								        </div>
@@ -82,7 +82,7 @@
 								    <li class="d-inline-block me-2 mb-1">
 								        <div class="form-check">
 								            <div class="checkbox">
-								                <input type="checkbox" class="form-check-input" id="sale-check" checked>
+								                <input type="checkbox" class="form-check-input serch" id="sale-check" checked>
 								                <label for="checkbox2">수주</label>
 								            </div>
 								        </div>
@@ -90,7 +90,7 @@
 								    <li class="d-inline-block me-2 mb-1">
 								        <div class="form-check">
 								            <div class="checkbox">
-								                <input type="checkbox" class="form-check-input" id="buy-check" checked>
+								                <input type="checkbox" class="form-check-input serch" id="buy-check" checked>
 								                <label for="checkbox3">발주</label>
 								            </div>
 								        </div>
@@ -119,9 +119,8 @@
 				</div> <!-- card-body -->
 			</div> <!-- card -->
 			
-			
 		    <!-- 주문 상세 -수주 모달창 -->
-		    <div class="modal fade text-left w-100" id="order-sale" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		    <div class="modal fade w-100" id="order-sale" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
 		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
 		           
 		            <div class="modal-content">
@@ -146,7 +145,7 @@
 		    </div> <!-- 주문 상세 - 수주 모달창 -->
 			
 		    <!-- 주문 상세 -발주 모달창 -->
-		    <div class="modal fade text-left w-100" id="order-buy" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		    <div class="modal fade w-100" id="order-buy" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
 		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
 		           
 		            <div class="modal-content">
@@ -170,10 +169,6 @@
 		        </div>
 		    </div> <!-- 주문 상세 - 발주 모달창 -->
 			
-			
-			
-			
-		</div>
 			
 			
 		</div><!--main--> 
