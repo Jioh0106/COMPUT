@@ -25,10 +25,6 @@ public class EquipmentHstryService {
 		return mapper.equipmentInfo(searchMap);
 	}
 	
-	public List<Map<String, Object>> clientInfo() {
-		return mapper.clientInfo();
-	}
-	
 	public List<Map<String, Object>> selectStts() {
 		return mapper.selectStts();
 	}
@@ -53,6 +49,10 @@ public class EquipmentHstryService {
 		}
 		
 		 return result;
+	}
+
+	public List<Map<String, Object>> equipmentHstry(Map<String, Object> searchMap) {
+		return mapper.equipmentHstry(searchMap);
 	}
 
 }

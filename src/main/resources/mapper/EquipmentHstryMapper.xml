@@ -16,39 +16,16 @@
 	</select>
 	
 	<select id="equipmentInfo" resultType="map" parameterType="map">
-		 SELECT
-		 				  info_no as "no"
-		 				, info_sn as "sn"
-						, info_nm as "name"
-						, info_kind as "kind"0516
-						, info_mnfct as "mnfct"
-						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
-						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
-						, info_useyn as "useYn"
-						, 'select' AS  "rowType"
-		 FROM
+		SELECT
+			  info_no as "no"
+			, info_sn as "sn"
+			, info_nm as "name"
+		FROM
 			 equipment_info
-		<where>
-			<if test="yearMonth != null and yearMonth != ''">
-				 AND TO_CHAR(info_buy_date, 'YYYY-MM') = #{yearMonth}
-		 	</if>
-			<if test="value != null and value != ''">
-				 AND (TO_CHAR(info_buy_date, 'YYYY-MM') = #{value}
-				 	  OR info_nm LIKE '%' || #{value} || '%')
-		 	</if>
-		</where>
+		WHERE
+			info_useyn = 'Y'
 		ORDER BY
 			info_buy_date DESC
-	</select>
-	
-	<select id="clientInfo" resultType="map">
-		SELECT
-			  TO_CHAR(client_no) AS "no"
-			, client_name AS "name"
-		FROM
-			client
-		WHERE
-			client_type = '발주'
 	</select>
 	
 	<select id="selectStts" resultType="map">
@@ -108,6 +85,23 @@
 		  FROM equipment_info
 		 WHERE info_no = #{no}
 	</delete>
+	
+	<select id="equipmentHstry" resultType="map" parameterType="map">
+		SELECT
+			   hsty_no AS "hstyNo"
+			 , info_no AS "infoNo"
+			 , hsty_type AS "hstyType"
+			 , hsty_date AS "hstyDate"
+			 , hsty_dtl AS "hstyDtl"
+			 , hsty_prfr AS "hstyPrfr"
+			 , TO_CHAR(hsty_reg_date, 'YYYY-MM-DD') AS "regDate"
+			 , TO_CHAR(hsty_mdfn_date, 'YYYY-MM-DD') AS "mdfnDate"
+			 , 'select' AS "rowType"
+		FROM
+			equipment_history
+		ORDER BY
+			hsty_no DESC
+	</select>
 	
 </mapper>
 
