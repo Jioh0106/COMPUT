@@ -81,8 +81,6 @@
 
 			<div class="card">
 				<div class="card-body" id="default">
-
-					<!-- 그리드 시작 -->
 					<section class="section">
 						<div class="row" id="basic-table">
 							<form>
@@ -150,6 +148,7 @@
 								</div>
 								<!-- 검색 조건 끝-->
 
+								<!-- 그리드 -->
 								<div id="grid" class="mb-3 mt-2"></div>
 
 								<!-- 버튼 시작 -->
@@ -167,8 +166,6 @@
 							</form>
 						</div>
 					</section>
-					<!-- 그리드 끝  -->
-
 				</div>
 				<!-- card-body -->
 			</div>
@@ -205,8 +202,7 @@
 		// 초기 화면 함수
 		function selectInfo() {
 			
-			const data = /*[[${equipmentList}]]*/[];
-			const clientList = /*[[${clientList}]]*/ []; // 거래처 정보
+			const data = /*[[${hstryList}]]*/[];
 			const kindList = /*[[${kindList}]]*/ []; // 설비종류 정보
 			
 			var Grid = tui.Grid;
@@ -220,6 +216,7 @@
 			grid = new Grid({
 				el: document.getElementById('grid'),
 				rowHeaders: ['checkbox'],
+				editingEvent: 'click',
 				columns: [
 				/* 
 				관리일자
@@ -231,25 +228,22 @@
 				등록일
 				수정일
 				*/
-					{header: '고유번호',	name: 'no'},
-					{header: '일련번호',	name: 'sn',		editor: 'text', sortable: true},
+					{header: '관리일자',	name: 'hstyDate',    editor: {
+														               type: 'datePicker',
+														               options: {
+														                   format: 'yyyy-MM-dd',
+																		language: 'ko'
+														               	}}, 	sortable: true},
+					{header: '일련번호',	name: 'infoNo',		editor: 'text', sortable: true},
 					{header: '설비명',		name: 'name',	editor: 'text', sortable: true},
-					{header: '종류',		name: 'kind',	formatter: 'listItemText', editor: {
+					/* {header: '종류',		name: 'kind',	formatter: 'listItemText', editor: {
 														            type: 'select',
 														            options: {
 														              listItems: kindList.map(kind => ({
 													                    text: kind.name, // 설비종류 이름
 													                    value: kind.code // 설비종류 코드
 														               }))
-														            }}, 	sortable: true},
-					{header: '제조사',		name: 'mnfct',	formatter: 'listItemText', editor: {
-														            type: 'select',
-														            options: {
-													            	  listItems: clientList.map(client => ({
-													                    text: client.name, // 거래처 이름
-													                    value: client.no // 거래처 번호
-													                   }))
-														            }}, 	sortable: true},
+														            }}, 	sortable: true}, */
 					{header: '구입일',		name: 'buy',    editor: {
 													                type: 'datePicker',
 													                options: {
@@ -279,7 +273,7 @@
 			});
 			
 			// id 및 rowType 숨기기
-			grid.hideColumn("no");
+			grid.hideColumn("infoNo");
 			grid.hideColumn("rowType");
 			
 			// 추가 버튼 이벤트
