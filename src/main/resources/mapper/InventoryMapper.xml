@@ -3,11 +3,35 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.deepen.mapper.InventoryMapper">
-<!-- 재고현황 매퍼 -->
-<select id="inventoryStatus">
-	select * from inventory
 
-</select>
+
+	<!-- 재고현황 매퍼 -->
+	<select id="inventoryStatus" resultType="com.deepen.domain.InventoryDTO">
+		SELECT
+		inventory_no,
+		i.inventory_type,
+		CASE
+		WHEN i.inventory_type = '완제품' then p.product_name
+		WHEN i.inventory_type = '자재' then m.mtr_name
+		ELSE NULL
+		END AS item_name,
+		w.warehouse_name AS warehouse_id,
+		i.inventory_qty,
+		i.inventory_count,
+		i.mod_date,
+		i.mod_user,
+		i.zone,
+		c.common_detail_name AS unit
+		FROM inventory i
+		LEFT JOIN product p ON i.inventory_type = '완제품' AND i.item_no = p.product_no
+		LEFT JOIN material m ON i.inventory_type = '자재' AND i.item_no = m.mtr_no
+		LEFT JOIN warehouse w ON i.warehouse_id = w.warehouse_id
+		LEFT JOIN common_detail c 
+		    ON (CASE 
+		            WHEN i.inventory_type = '완제품' THEN p.product_unit 
+		            WHEN i.inventory_type = '자재' THEN m.mtr_unit
+		        END) = c.common_detail_code
+	</select>
 
 
 

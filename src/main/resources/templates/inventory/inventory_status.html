@@ -105,16 +105,47 @@
 								</div>
 								<!-- 검색 조건 끝-->
 								
-								<!--재고현황 그리드-->										   
-								<div id="inventoryGrid" class="mb-3 mt-2"></div>
-								
-								<!-- 버튼 시작 -->
-								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
-									<div class="float-end">
-										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
-									</div>
-								<!--</div>-->
-								<!-- 버튼 끝 -->
+								<!--전체/받은요청/보낸요청 탭 시작-->
+					          <ul class="nav nav-tabs" id="myTab" role="tablist">
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link active" id="all" data-bs-toggle="tab" href="#home" role="tab"
+					                      aria-controls="home" aria-selected="true">전체</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="send" data-bs-toggle="tab" href="#profile" role="tab"
+					                      aria-controls="profile" aria-selected="false">완제품</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="reception" data-bs-toggle="tab" href="#contact" role="tab"
+					                      aria-controls="contact" aria-selected="false">자재</a>
+					              </li>
+					          </ul>
+					          <div class="tab-content" id="myTabContent">
+					              <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="home-tab">
+									
+									<!--재고현황 그리드-->										   
+									<div id="inventoryGrid" class="mb-3 mt-2"></div> 
+	
+					              </div>
+					              <div class="tab-pane fade" id="product" role="tabpanel" aria-labelledby="profile-tab">
+					                 
+					                 <!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					              <div class="tab-pane fade" id="material" role="tabpanel" aria-labelledby="contact-tab">
+					                  
+									<!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					          </div>
+							  <!--전체/받은요청/보낸요청 탭 끝-->
+							  <!-- 버튼 시작 -->
+  								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+  									<div class="float-end">
+  										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick="saveAllChanges()">
+  									</div>
+  								<!--</div>-->
+  								<!-- 버튼 끝 -->
 							</form>
 						</div>
 					</section>
@@ -146,18 +177,22 @@
 
 	 	var Grid = tui.Grid;
 		
+		
+		
+	
+	
+	
 		const inventoryGrid = new Grid({
 			el: document.getElementById('inventoryGrid'),
 			columns: [
 				{header: '재고번호',	name: 'inventory_no', width: 100},
 				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
-				{header: '자재/완제품번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
 				{header: '품목명',		name: 'item_name', editor: 'text', sortable: true, width: 100},
 				{header: '재고량',	name: 'inventory_qty',	editor: 'text', sortable: true, width: 150},
 				{header: '실재고량',	name: 'inventory_count',	editor: 'text', sortable: true, width: 150},
 				{header: '단위',	name: 'unit',	editor: 'text', sortable: true, width: 150},
 				{header: '창고',	name: 'warehouse_id',	editor: 'text', sortable: true, width: 150},
-				{header: '구역',	name: 'zon',	editor: 'text', sortable: true, width: 150},
+				{header: '구역',	name: 'zone',	editor: 'text', sortable: true, width: 150},
 				{header: '수정자',	name: 'mod_user',	editor: 'text', sortable: true, width: 150},
 				{header: '수정일',	name: 'mod_date',	editor: 'text', sortable: true, width: 150}
 				
@@ -169,6 +204,75 @@
 		});
 		
 		
+		document.addEventListener("DOMContentLoaded", function() {
+			function loadInventoryData() {
+		        $.ajax({
+		            url: "/api/inventory/list", 
+		            type: "GET",
+		            contentType: "application/json",
+		            dataType: "json",
+		            beforeSend: function(xhr) {
+		                xhr.setRequestHeader(header, token);  
+		            },
+		            success: function(response) {
+		                console.log("재고 데이터 로드 성공:", response);
+		                inventoryGrid.resetData(response);  // Grid에 데이터 삽입
+		            },
+		            error: function(xhr, status, error) {
+		                console.error("재고 데이터 로드 실패:", status, error);
+		            }
+		        });
+		    }
+
+		    //페이지 로드 후 즉시 데이터 로드
+		    loadInventoryData();
+			
+	});
+			
+	
+				
+	
+			//실재고량 업데이트 함수
+			function saveAllChanges() {
+			    const modifiedRows = inventoryGrid.getModifiedRows().updated || []; // 수정된 행 가져오기
+		
+			    console.log(" 수정된 실재고량 행:", modifiedRows);
+		
+			    if (!modifiedRows.length) {
+			        alert("변경된 데이터가 없습니다.");
+			        return;
+			    }
+		
+			    const dtoData = modifiedRows.map(row => ({
+			        inventory_no: Number(row.inventory_no), // 숫자 변환
+			        inventory_count: Number(row.inventory_count) // 숫자 변환
+			    }));
+		
+			    console.log(" 전송 데이터:", JSON.stringify(dtoData)); // JSON 확인
+		
+			    $.ajax({
+			        url: "/api/inventory/update",
+			        type: "POST",
+			        contentType: "application/json",
+			        data: JSON.stringify(dtoData), // 전송 데이터
+			        beforeSend: function (xhr) {
+			            xhr.setRequestHeader(header, token);
+			        },
+			        success: function () {
+			            console.log(" 일괄 업데이트 성공");
+			            alert("모든 변경 사항이 저장되었습니다.");
+			            loadInventoryData(); // 데이터 다시 로드
+			        },
+			        error: function (xhr, status, error) {
+			            console.error(" 일괄 업데이트 실패:", status, error);
+			            console.error(" 서버 응답:", xhr.responseText);
+			            alert("데이터 저장 중 오류가 발생했습니다.");
+			        }
+			    });
+			}
+		
+				
+				
 		
 	</script>
 
