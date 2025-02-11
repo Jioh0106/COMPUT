@@ -60,7 +60,6 @@ public class WorkInstructionService {
 		// 조립 품질검사 시작 =>  lot 공정 이력 인서트
 		// 조립 검사 완료 => 공정 상태 완료
 		
-		
 		List<Map<String, Object>> list = wiMapper.selectWorkInstruction();
 		
 		return list;
