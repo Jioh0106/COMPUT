@@ -12,21 +12,64 @@ function datePiker(containerSelector, inputSelector){
 		},
 		language : 'ko'
 	});
-}
+};
 
 // toast ui Select Box
-function selectBox(idSelector,placeholderText/*data*/){
+function selectBox(idSelector,placeholderText,fetchData){
 	return new tui.SelectBox(idSelector,{
 		placeholder: placeholderText,
-		data:[
-				{label:'가공',value:'가공'},
-				{label:'열처리',value:'열처리'},
-				{label:'조립',value:'조립'},
-				{label:'표면처리',value:'표면처리'}
-			],
-		//data:data,
+		data:fetchData
 	});
-}
+};
+
+// 서버에서 전달받은 정보로 공정 select box 생성
+async function fetchProcessInfoList(){
+	try{
+		const response = await fetch("/api/process-info");
+		
+		if (!response.ok) {
+           	throw new Error("네트워크 응답 실패");
+       	}
+		
+		const processInfoList = await response.json();
+		console.log("processInfoList",processInfoList);
+		
+		const processData = processInfoList.map(item => ({
+			label:item.processName,
+			value:item.processNo
+		}));
+		
+		// selectBox 생성
+		selectBox("#processSelectBox","공정 선택",processData);
+		
+	}catch(error){
+		console.error("error",error);
+	}
+};
+
+// 서버에서 전달받은 정보로 라인 select box 생성
+async function fetchLineInfoList(){
+	try{
+		const response = await fetch("/api/line-info");
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		
+		const lineInfoList = await response.json();
+		console.log("lineInfoList",lineInfoList);
+		
+		const lineDate = lineInfoList.map(item =>({
+			label: item.lineName,
+			value: item.lineNo
+		}));
+		
+		// selectBox 생성
+		selectBox("#lineSelectBox","라인 선택",lineDate);
+	}catch(error){
+		console.error("error",error);
+	}
+};
 
 window.onload = function() { 
 	
@@ -38,9 +81,9 @@ window.onload = function() {
 	startDatePicker.setNull();
 	endDatePicker.setNull();
 	
-	// select box 생성
-	selectBox("#processSelectBox","공정 선택");
-	selectBox("#lineSelectBox","라인 선택");
+	// 서버에서 받은 데이터로 select box 생성
+	fetchProcessInfoList();
+	fetchLineInfoList();
 	
 	// 그리드 생성
 	createWorkInstructionGrid();
@@ -52,6 +95,7 @@ window.onload = function() {
 let workInstructionGrid = "";
 let workerGrid = "";
 let materialGrid = "";
+let regGrid = "";
 
 function createWorkInstructionGrid(){
 		//const data = [];//processList;
@@ -73,7 +117,7 @@ function createWorkInstructionGrid(){
 				{header: '계획번호', name: 'plan_no', sortable: true},
 				{header: '품목번호', name: 'product_no', sortable: true},
 				{header: '품목', name: 'product_name'},
-				{header: 'BOM번호', name: 'bom_no'},
+				{header: '수량', name: 'bom_no'},
 				{header: '공정', name: 'process_name', editor: {
 														type: 'select',
 														options: {
@@ -90,18 +134,18 @@ function createWorkInstructionGrid(){
 																	{ text: '라인2', value: '라인1' }
 																]
 																}}, filter : 'select'},
-				{header: '설비', name: 'equ_name', editor: {
+				/*{header: '설비', name: 'equ_name', editor: {
 															type: 'select',
 															options: {
 															listItems: [
 																{ text: '설비1', value: '설비1' },
 																{ text: '설비2', value: '설비2' }
 															]
-															}}, filter : 'select'},
+															}}, filter : 'select'},*/
 				{header: '상태', name: 'wi_status',	editor: 'text', sortable: true},
-				{header: '작업시작시간', name: 'cDate'},
-				{header: '작업완료시간', name: 'udDate'},
-				{header: '작업담당자', name: 'emp_id'},
+				{header: '작업 시작일', name: 'cDate'},
+				{header: '작업 종료일', name: 'udDate'},
+				{header: '작업 담당자', name: 'emp_id'}
 			],
 			data: [],
 			columnOptions: {
@@ -114,11 +158,12 @@ function createWorkInstructionGrid(){
 };
 
 function createWorkerGrid(){
-	
-		//const data = processList;
-		//console.log("processList:", data);
-		var Grid = tui.Grid;
 		
+		// 작업자 초기값
+		const data = workerList;
+		
+		var Grid = tui.Grid;
+		Grid.applyTheme('clean');
 		// 탭 활성화
 		document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
 		document.getElementById('tab-worker').classList.add("active");
@@ -135,8 +180,8 @@ function createWorkerGrid(){
 			bodyHeight: 280,
 			columns: [
 				{header: '사원번호', name: 'no', sortable: true},
-				{header: '사원명', name: 'name',	editor: 'text'},
-				{header: '부서', name: 'dept',	editor: 'text', sortable: true},
+				{header: '사원명', name: 'name',	filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '부서', name: 'dept'},
 				{header: '직급', name: 'position',	editor: {
 													            type: 'select',
 													            options: {
@@ -145,10 +190,10 @@ function createWorkerGrid(){
 													                { text: 'N', value: 'N' },
 													              ]
 									        				 }}, filter : 'select'},
-				{header: '연락처', name: 'phone', editor: 'text'},
+				{header: '연락처', name: 'phone', filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
 				{header: '이메일', name: 'email'},
 			],
-			data: [],
+			data: data,
 			columnOptions: {
 			  resizable: true
 			},
@@ -190,4 +235,88 @@ function createMaterialGrid(){
 		
 		//materialGrid.hideColumn("no");
 };
+
+document.getElementById('large').addEventListener('shown.bs.modal', () => {	
+	var Grid = tui.Grid;
+	
+	if (regGrid) {
+		// 이미 생성된 경우 destroy하지 않고 재사용
+		regGrid.refreshLayout();
+		return;
+	}
+	
+	regGrid = new Grid({
+		el: document.getElementById('regGrid'),
+		rowHeaders: ['checkbox'],
+		bodyHeight: 280,
+		columns: [
+			{header: '계획번호', name: 'PLAN_ID'},
+			{header: '품목번호', name: 'PRODUCT_NO'},
+			{header: '품목', name: 'PRODUCT_NAME'},
+			{header: '수량', name: 'SALE_VOL'},
+			{header: '생산 시작 예정일', name: 'PLAN_START_DATE'},
+			{header: '생산 완료 목표일', name: 'PLAN_END_DATE'},
+			{header: ' ', name: 'PLAN_PRIORITY'}
+		],
+		data: [],
+		columnOptions: {
+		  resizable: true
+		},
+	});
+	
+	fetchRegWorkInstructionInfo();
+});
+
+/**
+ * 생산계획의 작업정보 가져오기
+ */
+async function fetchRegWorkInstructionInfo(){
+	try{
+		const response = await fetch('/api/reg-work-instruction-info');
+		if (!response.ok) {
+           	throw new Error("네트워크 응답 실패");
+       	}
+		const result = await response.json();
+		console.log("result",result);
+		
+		// 그리드 데이터 바인딩
+		regGrid.resetData(result);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+};
+
+//
+document.getElementById('insert-work-instruction').addEventListener('click', () =>{
+	const checkedRows = regGrid.getCheckedRows();
+	console.log("checkedRows",checkedRows);
+	const data = checkedRows.map(row =>({
+		PLAN_ID:row.PLAN_ID
+	}));
+	console.log("data",data);
+	insertWorkInstruction('/api/insert-work-instruction',data);
+});
+
+
+async function insertWorkInstruction(url,data){
+	try{
+		const response = await fetch(url,{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		location.reload(true);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+}
 
