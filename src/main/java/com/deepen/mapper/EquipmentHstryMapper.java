@@ -25,4 +25,10 @@ public interface EquipmentHstryMapper {
 
 	List<Map<String, Object>> equipmentHstry(Map<String, Object> searchMap);
 
+	int insert(Map<String, Object> saveData);
+
+	int update(Map<String, Object> saveData);
+
+	int delete(Map<String, Object> saveData);
+
 }

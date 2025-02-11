@@ -150,6 +150,7 @@
 
 								<!-- 그리드 -->
 								<div id="grid" class="mb-3 mt-2"></div>
+								<input type="hidden" class="form-control serch-content" id="emp_name" th:value="${session.sEmp.EMP_NAME}">
 
 								<!-- 버튼 시작 -->
 								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
@@ -203,7 +204,8 @@
 		function selectInfo() {
 			
 			const data = /*[[${hstryList}]]*/[];
-			const kindList = /*[[${kindList}]]*/ []; // 설비종류 정보
+			const sttsList = /*[[${sttsList}]]*/ []; // 상태유형 정보
+			const infoList = /*[[${infoList}]]*/ []; // 설비종류 정보
 			
 			var Grid = tui.Grid;
 
@@ -212,58 +214,38 @@
 				grid.refreshLayout();
 				return;
 			}
-			console.info(kindList);
+			//console.info(kindList);
 			grid = new Grid({
 				el: document.getElementById('grid'),
 				rowHeaders: ['checkbox'],
 				editingEvent: 'click',
 				columns: [
-				/* 
-				관리일자
-				일련번호
-				설비명/
-				관리 유형
-				상세내용
-				확인자
-				등록일
-				수정일
-				*/
 					{header: '관리일자',	name: 'hstyDate',    editor: {
 														               type: 'datePicker',
 														               options: {
 														                   format: 'yyyy-MM-dd',
 																		language: 'ko'
 														               	}}, 	sortable: true},
-					{header: '일련번호',	name: 'infoNo',		editor: 'text', sortable: true},
-					{header: '설비명',		name: 'name',	editor: 'text', sortable: true},
-					/* {header: '종류',		name: 'kind',	formatter: 'listItemText', editor: {
+					{header: '설비',		name: 'infoNo',		formatter: 'listItemText', editor: {
+															            type: 'select',
+															            options: {
+															              listItems: infoList.map(infoMap => ({
+														                    text: infoMap.name, // 설비종류 이름
+														                    value: String(infoMap.no) // 설비종류 코드
+															               }))
+															            }}, 	sortable: true},
+					{header: '관리유형',	name: 'hstyType',	formatter: 'listItemText', editor: {
 														            type: 'select',
 														            options: {
-														              listItems: kindList.map(kind => ({
-													                    text: kind.name, // 설비종류 이름
-													                    value: kind.code // 설비종류 코드
+														              listItems: sttsList.map(stts => ({
+													                    text: stts.name, // 설비종류 이름
+													                    value: stts.code // 설비종류 코드
 														               }))
-														            }}, 	sortable: true}, */
-					{header: '구입일',		name: 'buy',    editor: {
-													                type: 'datePicker',
-													                options: {
-													                    format: 'yyyy-MM-dd',
-																	language: 'ko'
-													                }}, 	sortable: true},
-					{header: '설치일',		name: 'set',    editor: {
-													                type: 'datePicker',
-													                options: {
-													                    format: 'yyyy-MM-dd',
-																	language: 'ko'
-													                }}, 	sortable: true},
-					{header: '사용여부',	name: 'useYn',	editor: {
-														            type: 'select',
-														            options: {
-														              listItems: [
-														                { text: 'Y', value: 'Y' },
-														                { text: 'N', value: 'N' },
-														              ]
 														            }}, 	sortable: true},
+					{header: '상세내용',	name: 'hstyDtl',    editor: 'text', 	sortable: true},
+					{header: '확인자',	name: 'hstyPrfr', sortable: true},
+					{header: '등록일',		name: 'regDate', sortable: true},
+					{header: '수정일',		name: 'mdfnDate', sortable: true},
 					{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
 				],
 				data: data,
@@ -273,20 +255,23 @@
 			});
 			
 			// id 및 rowType 숨기기
-			grid.hideColumn("infoNo");
+			//grid.hideColumn("infoNo");
 			grid.hideColumn("rowType");
+			
+			// 서버에서 전달된 확인자 이름
+			const empName = document.getElementById('emp_name').value;
 			
 			// 추가 버튼 이벤트
 			add.addEventListener('click', () => {
+				let today = new Date();   
+
+				let year = today.getFullYear(); // 년도
+				let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
+				let date = today.getDate();  // 날짜
+				
 				grid.appendRow({
-					"no": "",
-					"sn": "",
-					"name": "",
-					"kind": "",
-					"mnfct": "",
-					"buy": "",
-					"set": "",
-					"useYn": "",
+					"hstyPrfr": empName,
+					"regDate": year + "-" + month + "-" + date,
 					"rowType": "insert"
 				},
 					{
@@ -379,10 +364,10 @@
 
 			// 수정된 데이터를 서버로 전송
 			$.ajax({
-				url: "/eqpSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				url: "/eqpHstrySaveData", // 변경된 데이터를 처리할 컨트롤러 URL
 				type: 'POST',
 				contentType: "application/json",
-				data: JSON.stringify(data),
+				data: JSON.stringify(modifiedData),
 				//추가해야 하는 부분
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader(header, token);
