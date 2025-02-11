@@ -28,4 +28,7 @@ public interface WorkInstructionMapper {
 	
 	// 계획에서 가져온 작업지시정보 insert
 	void insertWorkInstruction(Map<String, Object> insertData);
+	
+	// 작업지시 테이블 정보
+	List<Map<String, Object>> selectWorkInstruction();
 }

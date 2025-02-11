@@ -60,5 +60,16 @@ public class WorkInstructionRestController {
 		
 	}
 	
-	
+	/**
+	 * 작업 지시 테이블 select
+	 * @param
+	 */
+	@GetMapping("/work-instruction-info")
+	public List<Map<String, Object>> getWorkInstruction(){
+		
+		// 품목 bom에 해당하는 공정 중복값 처리 후 우선순위가 높은 공정 insert
+		
+		List<Map<String, Object>> list = wiService.getWorkInstruction();
+		return list;
+	}
 }
