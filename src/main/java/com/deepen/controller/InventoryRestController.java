@@ -37,16 +37,22 @@ public class InventoryRestController {
 	//재고현황 업데이트
 	@PostMapping("/update")
 	public void updateInventory(@RequestBody List<InventoryDTO> modifiedRows, HttpSession session) {
-	    String mod_user = (String) session.getAttribute("sEmp");
-	    log.info("@@로그인한 사번:"+ mod_user);
-
+	 
+		Map<String, Object> emp = (Map<String, Object>) session.getAttribute("sEmp");
+		String emp_id = (String)emp.get("EMP_ID");
+		
+		
+	    log.info("@@로그인한 사번:"+ emp_id);
+	    System.out.println("수정한 행"+modifiedRows.toString());
 	    for (InventoryDTO row : modifiedRows) {
-	        Integer inventory_no = row.getInventory_no();
+	        Integer inventory_no = ((InventoryDTO) row).getInventory_no();
 	        Integer inventory_count = row.getInventory_count();
-
-	        if (inventory_no != null && inventory_count != null) {
-	            ivService.updateInventory(inventory_no, inventory_count, mod_user);
-	            log.info(" 업데이트 완료: 재고번호({}), 실재고량({})"+ inventory_no+ inventory_count);
+	        row.setMod_user(emp_id);
+	        String mod_user = row.getMod_user();
+	        
+	        if (inventory_no != null && inventory_count != null && mod_user !=null) {
+	            ivService.updateInventory(inventory_no, inventory_count, emp_id);
+	            log.info(" 업데이트 완료: 재고번호({}), 실재고량({})"+ inventory_no + " " +inventory_count);
 	        } else {
 	            log.info(" 유효하지 않은 데이터: "+ row);
 	        }
