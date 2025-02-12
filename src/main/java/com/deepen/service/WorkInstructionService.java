@@ -43,6 +43,10 @@ public class WorkInstructionService {
 	public void regWorkInstruction(List<Map<String, Object>> insertList) {
 		log.info(insertList.toString());
 		
+		// 계획에서 가져오는 품목에서 반재품을 분리 시켜서 insert를 한다
+		// 1. 계획번호에 해당하는 품목 조회
+		// 2. 품목에 해당하는 반제품 조회
+		
 		for(Map<String, Object> insertData : insertList) {
 			wiMapper.insertWorkInstruction(insertData);
 		}

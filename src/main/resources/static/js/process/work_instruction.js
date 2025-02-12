@@ -171,6 +171,8 @@ function createWorkerGrid(){
 		workerGrid = new Grid({
 			el: document.getElementById('workerGrid'),
 			rowHeaders: ['checkbox'],
+			scrollX: true,
+			scrollY: true,
 			bodyHeight: 280,
 			columns: [
 				{header: '사원번호', name: 'no', sortable: true},
@@ -213,6 +215,8 @@ function createMaterialGrid(){
 		materialGrid = new Grid({
 			el: document.getElementById('materialGrid'),
 			rowHeaders: ['checkbox'],
+			scrollX: true,
+			scrollY: true,
 			bodyHeight: 280,
 			columns: [
 				{header: '자재번호', name: 'mtl_no', sortable: true},
@@ -242,6 +246,8 @@ document.getElementById('large').addEventListener('shown.bs.modal', () => {
 	regGrid = new Grid({
 		el: document.getElementById('regGrid'),
 		rowHeaders: ['checkbox'],
+		scrollX: true,
+		scrollY: true,
 		bodyHeight: 280,
 		columns: [
 			{header: '계획번호', name: 'PLAN_ID'},
@@ -281,7 +287,9 @@ async function fetchRegWorkInstructionInfo(){
 	}
 };
 
-//
+/**
+ * 생산계획의 작업정보를 작업 지시 테이블에 insert
+ */
 document.getElementById('insert-work-instruction').addEventListener('click', () =>{
 	const checkedRows = regGrid.getCheckedRows();
 	console.log("checkedRows",checkedRows);
@@ -311,8 +319,11 @@ async function insertWorkInstruction(url,data){
 	}catch(error){
 		console.log("error",error);
 	}
-}
+};
 
+/**
+ * 작업 지시 정보 조회
+ */
 async function fetchWorkInstruction(){
 	try{
 		const response = await fetch("/api/work-instruction-info");
@@ -327,5 +338,24 @@ async function fetchWorkInstruction(){
 	}catch(error){
 		console.log("error",error);
 	}
-}
+};
+/**
+ * 클릭한 로우의 품목을 만드는데 필요한 자재 정보 조회
+ */
+workInstructionGrid.on('click',() => {
+	fetchMaterialsByRowSelection();
+});
+
+async function fetchMaterialsByRowSelection(){
+	try{
+		const response = await fetch("/api//material-info-by-row-selection");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		//const result = await response.json();
+	}catch(error){
+		
+	}
+};
+
 

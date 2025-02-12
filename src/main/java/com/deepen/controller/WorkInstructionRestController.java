@@ -51,17 +51,17 @@ public class WorkInstructionRestController {
 	
 	/**
 	 * 작업 지시 테이블 insert
-	 * @param insertList
+	 * @param planIdList
 	 */
 	@PostMapping("/insert-work-instruction")
-	public void postMethodName(@RequestBody List<Map<String, Object>> insertList) {
+	public void postMethodName(@RequestBody List<Map<String, Object>> planIdList) {
 		//log.info(insertList.toString());
-		wiService.regWorkInstruction(insertList);
+		wiService.regWorkInstruction(planIdList);
 		
 	}
 	
 	/**
-	 * 작업 지시 테이블 select
+	 * 작업 지시 테이블 조회
 	 * @param
 	 */
 	@GetMapping("/work-instruction-info")
@@ -70,6 +70,17 @@ public class WorkInstructionRestController {
 		// 품목 bom에 해당하는 공정 중복값 처리 후 우선순위가 높은 공정 insert
 		
 		List<Map<String, Object>> list = wiService.getWorkInstruction();
+		return list;
+	}
+	
+	/**
+	 * 클릭한 로우의 품목을 만드는데 필요한 자재 정보 조회
+	 */
+	@GetMapping("/material-info-by-row-selection")
+	public List<Map<String, Object>> getMaterialsByRowSelection(){
+		log.info("자재 정보 연결 준비");
+		
+		List<Map<String, Object>> list = null;
 		return list;
 	}
 }
