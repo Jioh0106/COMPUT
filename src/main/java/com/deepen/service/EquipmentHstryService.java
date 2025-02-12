@@ -3,6 +3,7 @@ package com.deepen.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import com.deepen.mapper.EquipmentHstryMapper;
@@ -29,7 +30,6 @@ public class EquipmentHstryService {
 			String name = String.valueOf(infoMap.get("name"));
 			infoMap.put("info", sn+"("+name+")");
 		}
-		System.out.println(infoList.toString() + " pppppppp");
 		return infoList;
 	}
 	
@@ -37,40 +37,19 @@ public class EquipmentHstryService {
 		return mapper.selectStts();
 	}
 
-	public int eqpSaveData(List<Map<String, Object>> saveDataList) {
-		//[{no=, sn=754903, name=비싼기계, kind=절삭, mnfct=사장님이 미쳤어요, buy=2025-01-13, set=2025-01-22, useYn=Y, rowType=insert}]/
-		int result = 0;
-		
-		for(Map<String, Object> saveData : saveDataList) {
-			
-			String rowType = String.valueOf(saveData.get("rowType"));
-			
-			if(rowType.equals("insert")) { 			// 추가일 경우
-				result = mapper.eqpInsert(saveData); 
-				
-			} else if(rowType.equals("update")) {	// 수정일 경우
-				result = mapper.eqpUpdate(saveData);
-				
-			} else {								// 삭제일 경우
-				result = mapper.eqpDelete(saveData);
-			}
-		}
-		
-		 return result;
-	}
-
 	public List<Map<String, Object>> equipmentHstry(Map<String, Object> searchMap) {
 		System.out.println(mapper.equipmentHstry(searchMap).toString());
 		return mapper.equipmentHstry(searchMap);
 	}
 
-	public int saveData(List<Map<String, Object>> saveDataList) {
+	public int saveData(User user, List<Map<String, Object>> saveDataList) {
 		//[{hstyDate=2025-02-12, infoNo=2, hstyType=MNTP003, hstyDtl=ㄹㅇㄴㅁㄹㅇㄴ, hstyPrfr=상위관리자, regDate=null, mdfnDate=null, rowType=insert, rowKey=0
 		int result = 0;
 		
 		for(Map<String, Object> saveData : saveDataList) {
 			
 			String rowType = String.valueOf(saveData.get("rowType"));
+			saveData.put("hstyPrfr", user.getUsername());
 			
 			if(rowType.equals("insert")) { 			// 추가일 경우
 				result = mapper.insert(saveData); 
@@ -83,6 +62,7 @@ public class EquipmentHstryService {
 			}
 		}
 		
+		System.out.println(saveDataList.toString());
 		 return result;
 	}
 

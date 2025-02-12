@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,10 +70,9 @@ public class EquipmentHstryController {
 	 */
 	@PostMapping("/eqpHstrySaveData")
 	@ResponseBody
-	public int saveData(@RequestBody List<Map<String, Object>> saveDataList) {
+	public int saveData(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> saveDataList) {
 
-		System.out.println(saveDataList.toString());
-		int result = service.saveData(saveDataList);
+		int result = service.saveData(user, saveDataList);
 
 		return result;
 	}
