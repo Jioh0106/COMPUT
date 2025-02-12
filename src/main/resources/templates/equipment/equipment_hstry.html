@@ -151,6 +151,8 @@
 								<!-- 그리드 -->
 								<div id="grid" class="mb-3 mt-2"></div>
 								<input type="hidden" class="form-control serch-content" id="emp_name" th:value="${session.sEmp.EMP_NAME}">
+								<input type="hidden" class="form-control serch-content" id="emp_id" th:value="${session.sEmp.EMP_ID}">
+								<input type="hidden" class="form-control serch-content" id="emp_role" th:value="${session.sEmp.EMP_ROLE}">
 
 								<!-- 버튼 시작 -->
 								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
@@ -187,6 +189,10 @@
 	<script
 		src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	
+	<!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 	<script th:inline="javascript">
 
@@ -203,6 +209,11 @@
 		// 초기 화면 함수
 		function selectInfo() {
 			
+			// 서버에서 전달된 확인자 이름
+			const empName = document.getElementById('emp_name').value;
+			const empId = document.getElementById('emp_id').value;  // 현재 로그인된 사용자 ID
+			const empRole = document.getElementById('emp_role').value;  // 현재 로그인된 사용자 권한
+			
 			const data = /*[[${hstryList}]]*/[];
 			const sttsList = /*[[${sttsList}]]*/ []; // 상태유형 정보
 			const infoList = /*[[${infoList}]]*/ []; // 설비종류 정보
@@ -214,12 +225,13 @@
 				grid.refreshLayout();
 				return;
 			}
-			//console.info(kindList);
+			
 			grid = new Grid({
 				el: document.getElementById('grid'),
 				rowHeaders: ['checkbox'],
 				editingEvent: 'click',
 				columns: [
+					{header: '관리번호',	name: 'hstyNo', sortable: true},
 					{header: '관리일자',	name: 'hstyDate',    editor: {
 														               type: 'datePicker',
 														               options: {
@@ -243,7 +255,7 @@
 														               }))
 														            }}, 	sortable: true},
 					{header: '상세내용',	name: 'hstyDtl',    editor: 'text', 	sortable: true},
-					{header: '확인자',	name: 'hstyPrfr', sortable: true},
+					{header: '확인자',		name: 'hstyPrfr', sortable: true},
 					{header: '등록일',		name: 'regDate', sortable: true},
 					{header: '수정일',		name: 'mdfnDate', sortable: true},
 					{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
@@ -255,11 +267,8 @@
 			});
 			
 			// id 및 rowType 숨기기
-			//grid.hideColumn("infoNo");
+			grid.hideColumn("hstyNo");
 			grid.hideColumn("rowType");
-			
-			// 서버에서 전달된 확인자 이름
-			const empName = document.getElementById('emp_name').value;
 			
 			// 추가 버튼 이벤트
 			add.addEventListener('click', () => {
@@ -270,7 +279,7 @@
 				let date = today.getDate();  // 날짜
 				
 				grid.appendRow({
-					"hstyPrfr": empName,
+					"hstyPrfr": empId,
 					"regDate": year + "-" + month + "-" + date,
 					"rowType": "insert"
 				},
@@ -279,6 +288,7 @@
 						focus: true
 					});
 			});
+
 			
 			// 저장 버튼 이벤트
 			// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
@@ -292,14 +302,48 @@
 				});
 			});
 			
-			// 체크박스가 활성화된 행의 index를 배열에 저장
+			// 셀 편집 시작 이벤트
+			grid.on('editingStart', function (ev) {
+		        const row = ev.rowKey; // 수정하려는 행의 index
+		        const rowData = grid.getRow(row); // 해당 행의 데이터
+		        const rowPrfr = rowData.hstyPrfr; // 행의 확인자 정보
+
+		        // 현재 사용자가 확인자랑 다를 경우 편집 불가
+		        if (rowPrfr != empId) {
+		        	swal("본인이 등록한 항목만 수정 가능합니다.");
+		            ev.stop();  // 편집을 중단
+		        }
+		    });
+			
+			// 행 체크 이벤트
 			let delRows = [];
 			grid.on('check', (ev) => {
-				delRows.push(ev.rowKey);
+				const row = ev.rowKey; // 수정하려는 행의 index
+		        const rowData = grid.getRow(row); // 해당 행의 데이터
+		        const rowPrfr = rowData.hstyPrfr; // 행의 확인자 정보
+
+		        // 현재 사용자가 확인자랑 다를 경우 체크 불가
+		        if (rowPrfr != empId) {
+		        	swal("본인이 등록한 항목만 수정 가능합니다.");
+		        	grid.uncheck(row);  // 해당 행의 체크박스 해제
+		        	
+		        } else { // 본인일 경우 삭제할 행 배열에 추가
+					delRows.push(ev.rowKey);
+		        }
+			});
+			
+			// 전체 체크 유효성 이벤트
+			grid.on('checkAll', (ev) => {
+		        // 현재 사용자 권한이 상위관리자가 아닐 경우 전체 체크 불가
+		        if (empRole != 'ATHR001') {
+		        	swal("전체 선택은 상위관리자만 가능합니다.");
+		        	grid.uncheckAll();  // 해당 행의 체크박스 전체 해제
+		        } else {
+		        	grid.refreshLayout(); // 강제 UI 갱신
+		        }
 			});
 			
 			// 삭제 버튼 이벤트
-			// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
 			del.addEventListener('mousedown', () => {
 				grid.blur(); // 포커스 해제
 				
@@ -341,26 +385,6 @@
 
 			// 모든 수정된 데이터 배열로 합치기
 			const modifiedData = [...createdRows, ...updatedRows, ...deletedRows];
-			const data = [];
-
-			modifiedData.forEach(row => {
-				const rowData = {};
-
-				// 각 행의 데이터를 꺼냄
-				//if(row.no != null && row.no != 'null' && row.no != '' && row.no != 'undefind'){
-					rowData.no	= row.no;		// 고유번호
-				//}
-				rowData.sn		= row.sn;		// 일련번호
-				rowData.name	= row.name;		// 설비명
-				rowData.kind	= row.kind;	 	// 종류
-				rowData.mnfct	= row.mnfct;	// 제조사
-				rowData.buy		= row.buy;		// 구입일
-				rowData.set		= row.set;		// 설치일
-				rowData.useYn	= row.useYn;	// 사용여부
-				rowData.rowType = row.rowType;	// 행 타입
-
-				data.push(rowData);
-			});
 
 			// 수정된 데이터를 서버로 전송
 			$.ajax({

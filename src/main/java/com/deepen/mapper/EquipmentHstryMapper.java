@@ -17,12 +17,6 @@ public interface EquipmentHstryMapper {
 	
 	List<Map<String, Object>> selectStts();
 
-	int eqpInsert(Map<String, Object> saveDataList);
-
-	int eqpUpdate(Map<String, Object> saveDataList);
-
-	int eqpDelete(Map<String, Object> saveData);
-
 	List<Map<String, Object>> equipmentHstry(Map<String, Object> searchMap);
 
 	int insert(Map<String, Object> saveData);

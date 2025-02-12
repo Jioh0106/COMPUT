@@ -42,56 +42,12 @@
 			common_detail_display
 	</select>
 	
-	<insert id="eqpInsert" parameterType="map">
-		INSERT INTO equipment_info (
-			info_no
-		  , info_sn
-		  , info_nm
-		  , info_kind
-		  , info_mnfct
-		  , info_buy_date
-		  , info_set_date
-		  , info_useyn
-		  , info_reg_date
-		
-		) VALUES ( 
-			equipment_info_seq.NEXTVAL
-		  , #{sn}
-		  , #{name}
-		  , #{kind}
-		  , #{mnfct}
-		  , TO_DATE(#{buy}, 'YYYY-MM-DD')
-		  , TO_DATE(#{set}, 'YYYY-MM-DD')
-		  , #{useYn}
-		  , CURRENT_DATE
-		)
-	</insert>
-	
-	<update id="eqpUpdate" parameterType="map">
-		UPDATE equipment_info 
-		SET   info_sn			= #{sn}
-			, info_nm			= #{name}
-			, info_kind			= #{kind}
-			, info_mnfct		= #{mnfct}
-			, info_buy_date		= TO_DATE(#{buy}, 'YYYY-MM-DD')
-			, info_set_date		= TO_DATE(#{set}, 'YYYY-MM-DD')
-			, info_useyn		= #{useYn}
-			, info_mdfn_date	= CURRENT_DATE
-		WHERE info_no 			= #{no}
-	</update>
-	
-	<delete id="eqpDelete" parameterType="map">
-		DELETE 
-		  FROM equipment_info
-		 WHERE info_no = #{no}
-	</delete>
-	
 	<select id="equipmentHstry" resultType="map" parameterType="map">
 		SELECT
 			   hsty_no AS "hstyNo"
-			 , info_no AS "infoNo"
+			 , TO_CHAR(info_no) AS "infoNo"
 			 , hsty_type AS "hstyType"
-			 , hsty_date AS "hstyDate"
+			 , TO_CHAR(hsty_date, 'YYYY-MM-DD') AS "hstyDate"
 			 , hsty_dtl AS "hstyDtl"
 			 , hsty_prfr AS "hstyPrfr"
 			 , TO_CHAR(hsty_reg_date, 'YYYY-MM-DD') AS "regDate"
@@ -100,8 +56,46 @@
 		FROM
 			equipment_history
 		ORDER BY
-			hsty_no DESC
+			hsty_date DESC
 	</select>
+	
+	<insert id="insert" parameterType="map">
+		INSERT INTO equipment_history (
+			hsty_no
+		  , info_no
+		  , hsty_type
+		  , hsty_date
+		  , hsty_dtl
+		  , hsty_prfr
+		  , hsty_reg_date
+		
+		) VALUES ( 
+			equipment_history_seq.NEXTVAL
+		  , TO_NUMBER(#{infoNo})
+		  , #{hstyType}
+		  , TO_DATE(#{hstyDate}, 'YYYY-MM-DD')
+		  , #{hstyDtl}
+		  , #{hstyPrfr}
+		  , CURRENT_DATE
+		)
+	</insert>
+	
+	<update id="update" parameterType="map">
+		UPDATE equipment_history 
+		SET   hsty_date			= TO_DATE(#{hstyDate}, 'YYYY-MM-DD')
+			, info_no			= #{infoNo}
+			, hsty_type			= #{hstyType}
+			, hsty_dtl			= #{hstyDtl}
+			, hsty_mdfn_date	= CURRENT_DATE
+		WHERE hsty_no 			= #{hstyNo}
+	</update>
+	
+	<delete id="delete" parameterType="map">
+		DELETE 
+		  FROM equipment_history
+		 WHERE hsty_no = #{hstyNo}
+	</delete>
+
 	
 </mapper>
 
