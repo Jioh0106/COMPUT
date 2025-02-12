@@ -55,10 +55,10 @@
 		FROM plans p
 		JOIN orders o 
 		    ON o.order_id = p.order_id
-		JOIN SALE s 
+		JOIN sale s 
 		    ON p.order_id = s.order_id
 		    AND REGEXP_SUBSTR(p.plan_id, '[^-]+', 1, 3) = s.product_no
-		JOIN PRODUCT pd
+		JOIN product pd
 		    ON pd.product_no = s.product_no
 		WHERE o.order_type = '수주'
 		    AND p.plan_status IN ('PRGR001', 'PRGR004')
@@ -73,6 +73,54 @@
 			#{PLAN_ID}
 		)
 	</insert>
+	
+	<select id="selectWorkInstruction" resultType="java.util.Map">
+		SELECT 
+			wi.wi_no AS "wi_no",
+		    p.plan_id AS "plan_id",
+		    s.product_no AS "product_no",
+		    pd.product_name AS "product_name",
+		    s.sale_vol AS "vol",
+		    s.sale_unit AS "unit",
+		    cdu.common_detail_name AS "unit_name",
+		    wi.process_no AS "process_no",
+		    pi.process_name AS "process_name",
+		    wi.line_no AS "line_no",
+		    li.line_name AS "line_name",
+		    wi.wi_status AS "wi_status",
+		    cdw.common_detail_name AS "wi_status_name",
+		    wi.qc_status AS "qc_status",
+		    wi.wi_start_date AS "start_date",
+		    wi.wi_end_date AS "end_date",
+		    wi.emp_id AS "emp_id",
+		    e.emp_name AS "emp_name"
+		FROM work_instruction wi 
+		JOIN plans p 
+			ON wi.plan_id = p.plan_id
+		JOIN orders o 
+		    ON o.order_id = p.order_id
+		JOIN SALE s 
+		    ON p.order_id = s.order_id
+		    AND REGEXP_SUBSTR(p.plan_id, '[^-]+', 1, 3) = s.product_no
+		JOIN PRODUCT pd
+		    ON pd.product_no = s.product_no
+		LEFT JOIN process_info pi
+			ON pi.process_no = wi.process_no
+		LEFT JOIN line_info li
+			ON li.line_no = wi.line_no
+		LEFT JOIN common_detail cdu
+		    ON cdu.common_detail_code LIKE 'UNIT%'
+		    AND cdu.common_detail_code = s.sale_unit
+		    AND cdu.common_detail_status = 'Y'
+		LEFT JOIN common_detail cdw
+		    ON cdw.common_detail_code LIKE 'PRGR%'
+		    AND cdw.common_detail_code = wi.wi_status
+		    AND cdw.common_detail_status = 'Y'
+		LEFT JOIN employees e
+			ON wi.emp_id = e.emp_id
+		WHERE o.order_type = '수주'
+		ORDER BY p.plan_id
+	</select>
 </mapper>
 
 

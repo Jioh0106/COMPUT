@@ -43,19 +43,30 @@ public class WorkInstructionService {
 	public void regWorkInstruction(List<Map<String, Object>> insertList) {
 		log.info(insertList.toString());
 		
+		// 계획에서 가져오는 품목에서 반재품을 분리 시켜서 insert를 한다
+		// 1. 계획번호에 해당하는 품목 조회
+		// 2. 품목에 해당하는 반제품 조회
+		
 		for(Map<String, Object> insertData : insertList) {
 			wiMapper.insertWorkInstruction(insertData);
 		}
 	}
 	
-	// 작업 지시 정보 불러오기
+	// 작업 지시 정보 조회
 	public List<Map<String, Object>> getWorkInstruction() {
 		
-		// 작업계획에서 받아온 정보 작업 지시 정보에 insert 후 조회
-		// insert 데이터 - 지시번호, 계획번호, 품목번호, 품목, 수량, 상태="대기중"(공통코드)
+		// 가공/표면처리/조립
+		// 처음 공정인 가공이 insert 되고
+		// 가공 품질검사 시작 => lot 공정 이력 인서트
+		// 가공 검사완료 => 작업지시 테이블 공정 표면처리로 update
+		// 표면처리 품질검사 시작 => lot 공정 이력 인서트
+		// 표면처리 검사 완료 => 작업지시 테이블 공정 조립으로 update
+		// 조립 품질검사 시작 =>  lot 공정 이력 인서트
+		// 조립 검사 완료 => 공정 상태 완료
 		
+		List<Map<String, Object>> list = wiMapper.selectWorkInstruction();
 		
-		return null;
+		return list;
 	}
 	
 }

@@ -111,47 +111,41 @@ function createWorkInstructionGrid(){
 		workInstructionGrid = new Grid({
 			el: document.getElementById('workInstructionGrid'),
 			rowHeaders: ['checkbox'],
+			scrollX: true,
+			scrollY: true,
+			//width: 'auto',
 			bodyHeight: 280,
 			columns: [
-				{header: '지시번호', name: 'wi_no', sortable: true},
-				{header: '계획번호', name: 'plan_no', sortable: true},
-				{header: '품목번호', name: 'product_no', sortable: true},
-				{header: '품목', name: 'product_name'},
-				{header: '수량', name: 'bom_no'},
-				{header: '공정', name: 'process_name', editor: {
-														type: 'select',
-														options: {
-														listItems: [
-															{ text: '가공', value: '가공' },
-															{ text: '조립', value: '조립' }
-														]
-														}}, filter : 'select'},
-				{header: '라인', name: 'line_name', editor: {
-																type: 'select',
-																options: {
-																listItems: [
-																	{ text: '라인1', value: '라인1' },
-																	{ text: '라인2', value: '라인1' }
-																]
-																}}, filter : 'select'},
-				/*{header: '설비', name: 'equ_name', editor: {
-															type: 'select',
-															options: {
-															listItems: [
-																{ text: '설비1', value: '설비1' },
-																{ text: '설비2', value: '설비2' }
-															]
-															}}, filter : 'select'},*/
-				{header: '상태', name: 'wi_status',	editor: 'text', sortable: true},
-				{header: '작업 시작일', name: 'cDate'},
-				{header: '작업 종료일', name: 'udDate'},
-				{header: '작업 담당자', name: 'emp_id'}
+				{header: '지시번호', name: 'wi_no', width:90, sortable: true},
+				{header: '계획번호', name: 'plan_id', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '품목번호', name: 'product_no', width:90, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '품목', name: 'product_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '수량', name: 'vol', width:50},
+				{header: '단위', name: 'unit_name', width:50},
+				{header: '라인', name: 'line_name', width:100, filter : 'select', editor: {
+																	            	type: 'select',
+																	            	options: {
+																	              	listItems: [
+																	                	{ text: 'Y', value: 'Y' },
+																	                	{ text: 'N', value: 'N' }
+																	              	]
+													        				 }}},
+				{header: '공정', name: 'process_name', width:80, filter : 'select'},
+				{header: '공정 상태', name: 'wi_status_name', width:90, filter : 'select'},
+				{header: '검사 상태', name: 'qc_status_name', width:100, filter : 'select'},
+				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
+				{header: '작업 종료일', name: 'end_date', width:120, sortable: true},
+				{header: '작업 담당자', name: 'emp_name', width:110, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }}
 			],
 			data: [],
 			columnOptions: {
 			  resizable: true
-			}
+			},
+			
 		});
+		
+		// 데이터 fetch
+		fetchWorkInstruction();
 		
 		// id 및 rowType 숨기기
 		//workInstructionGrid.hideColumn("no");
@@ -177,6 +171,8 @@ function createWorkerGrid(){
 		workerGrid = new Grid({
 			el: document.getElementById('workerGrid'),
 			rowHeaders: ['checkbox'],
+			scrollX: true,
+			scrollY: true,
 			bodyHeight: 280,
 			columns: [
 				{header: '사원번호', name: 'no', sortable: true},
@@ -219,6 +215,8 @@ function createMaterialGrid(){
 		materialGrid = new Grid({
 			el: document.getElementById('materialGrid'),
 			rowHeaders: ['checkbox'],
+			scrollX: true,
+			scrollY: true,
 			bodyHeight: 280,
 			columns: [
 				{header: '자재번호', name: 'mtl_no', sortable: true},
@@ -248,6 +246,8 @@ document.getElementById('large').addEventListener('shown.bs.modal', () => {
 	regGrid = new Grid({
 		el: document.getElementById('regGrid'),
 		rowHeaders: ['checkbox'],
+		scrollX: true,
+		scrollY: true,
 		bodyHeight: 280,
 		columns: [
 			{header: '계획번호', name: 'PLAN_ID'},
@@ -287,7 +287,9 @@ async function fetchRegWorkInstructionInfo(){
 	}
 };
 
-//
+/**
+ * 생산계획의 작업정보를 작업 지시 테이블에 insert
+ */
 document.getElementById('insert-work-instruction').addEventListener('click', () =>{
 	const checkedRows = regGrid.getCheckedRows();
 	console.log("checkedRows",checkedRows);
@@ -297,7 +299,6 @@ document.getElementById('insert-work-instruction').addEventListener('click', () 
 	console.log("data",data);
 	insertWorkInstruction('/api/insert-work-instruction',data);
 });
-
 
 async function insertWorkInstruction(url,data){
 	try{
@@ -318,5 +319,43 @@ async function insertWorkInstruction(url,data){
 	}catch(error){
 		console.log("error",error);
 	}
-}
+};
+
+/**
+ * 작업 지시 정보 조회
+ */
+async function fetchWorkInstruction(){
+	try{
+		const response = await fetch("/api/work-instruction-info");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		const workInstructionList = await response.json();
+		console.log("workInstructionList",workInstructionList);
+		
+		workInstructionGrid.resetData(workInstructionList);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+};
+/**
+ * 클릭한 로우의 품목을 만드는데 필요한 자재 정보 조회
+ */
+workInstructionGrid.on('click',() => {
+	fetchMaterialsByRowSelection();
+});
+
+async function fetchMaterialsByRowSelection(){
+	try{
+		const response = await fetch("/api//material-info-by-row-selection");
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		//const result = await response.json();
+	}catch(error){
+		
+	}
+};
+
 
