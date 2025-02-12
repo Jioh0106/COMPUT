@@ -18,8 +18,7 @@
 		w.warehouse_name AS warehouse_id,
 		i.inventory_qty,
 		i.inventory_count,
-		i.mod_date,
-		i.mod_user,
+		i.inventory_change_date,
 		i.zone,
 		c.common_detail_name AS unit
 		FROM inventory i

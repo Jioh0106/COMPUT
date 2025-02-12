@@ -151,10 +151,37 @@
 						</div>
 					</section>
 					<!-- 그리드 끝  -->
-
+					
 				</div> <!-- card-body -->
 			</div> <!-- card -->
 			
+			<!-- 재고현황 - 실재고량 변경 이력 모달창 시작 -->
+		    <div class="modal fade text-left w-100" id="history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
+		           
+		            <div class="modal-content">
+		                <div class="modal-header">
+		                    <h4 class="modal-title" id="myModalLabel17"> 실재고량 변경 이력 </h4>
+		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		                </div>
+		                <div class="modal-body">
+							<div class="row" id="basic-table">
+								<!-- 그리드 시작 -->
+								<div id="historyGrid"></div>
+								<!-- 그리드 끝 -->
+								<div class="d-flex justify-content-end">
+									<input type="button" class="btn btn-outline-secondary ms-2" id="append" value="추가">
+									<input type="button" class="btn btn-outline-success ms-2" id="modalSave" value="저장">
+<!-- 									<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"> -->
+										<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+<!-- 									</div> -->
+								</div>
+							</div>
+		                </div>
+		            </div>
+		        </div>
+		    </div> 
+		    <!-- 재고현황 - 실재고량 변경 이력 모달창 끝 -->
 			
 		
 	
@@ -178,6 +205,7 @@
 
 	 	var Grid = tui.Grid;
 		
+	 	//재고현황 그리드
 		const inventoryGrid = new Grid({
 			el: document.getElementById('inventoryGrid'),
 			columns: [
@@ -193,8 +221,7 @@
 				{header: '단위',	name: 'unit',	editor: 'text', sortable: true, width: 150},
 				{header: '창고',	name: 'warehouse_id',	editor: 'text', sortable: true, width: 150},
 				{header: '구역',	name: 'zone',	editor: 'text', sortable: true, width: 150},
-				{header: '수정자',	name: 'mod_user',	editor: 'text', sortable: true, width: 150},
-				{header: '수정일',	name: 'mod_date',	editor: 'text', sortable: true, width: 150}
+				{header: '재고량변경일',	name: 'inventory_change_date',	editor: 'text', sortable: true, width: 150}
 				
 			],
 			data: [],
@@ -204,10 +231,31 @@
 		});
 		
 		
+		
+		// 실재고량 변경 이력 모달 그리드
+		const historyGrid = new tui.Grid({
+			el: document.getElementById('historyGrid'),
+			data: [], // 서버에서 전달받은 데이터
+			rowHeaders: ['checkbox'],
+			columns: [
+				{header: '번호', name: 'history_no', hidden: true, width: 60},
+				{header: '변경 전 실재고량', name: 'prev_count', width: 100},
+				{header: '변경 후 실재고량', name: 'new_count', width: 100},
+				{header: '변경사유', name: 'change_reason', width: 120},
+				{header: '기타사유', name: 'reason_detail', width: 200},
+				{header: '수정자', name: 'mod_user', width: 100},
+				{header: '수정일', name: 'mod_date', width: 100}
+				
+			]
+		});
+		
+		
+		
 		let allData = []; // 전체 데이터를 저장할 변수
 
 		
 		document.addEventListener("DOMContentLoaded", function() {
+			//재고현황테이블 조회
 			function loadInventoryData() {
 		        $.ajax({
 		            url: "/api/inventory/list", 
@@ -254,58 +302,67 @@
 	            });
 	        });	
 				
-		    
-		    
-		    
 	});
 			
 	
-				
+	//--------------------------------------------------------실재고량 변경이력 모달창 시작
+		
 	
-			//실재고량 업데이트 함수
-			function saveAllChanges() {
-			    const modifiedRows = inventoryGrid.getModifiedRows().updatedRows; // 수정된 행 가져오기
+		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
+		let inventory_no = null; // 클릭한 행의 재고번호
+		let inventory_count = null; // 클릭한 행의 실재고량
+	
+		inventoryGrid.on('click', function (ev) {
+			  // 클릭된 row 데이터 가져오기
+	        	const rowData = ev.instance.getRow(ev.rowKey);
+	        	inventory_no = rowData.inventory_no;
+	        	inventory_count = rowData.inventory_count;
+	        	
+				console.log('로그인한 사번 : ', emp_id);	        
+				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
+				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
+	        $('#history').modal('show');
+		    
+// 			axios.get('/api/order/detail/sale', {
+// 				params: {
+// 					inventory_no: rowData.inventory_no  
+// 				}
+// 			})
+// 			.then(function (response) {
+// 			  const detailData = response.data;
+			  
+// 			  historyGrid.resetData(detailData);
+// 			  historyGrid.refreshLayout();
+// 			})
+// 			.catch(function (error) {
+// 			  console.error('Error fetching order detail:', error);
+// 			});
+	        
+		});
 		
-			    console.log(" 수정된 실재고량 행:", modifiedRows);
-		
-			    if (!modifiedRows.length) {
-			        alert("변경된 데이터가 없습니다.");
-			        return;
-			    }
-			 
-				const dtoData = [...modifiedRows];
-				const data = [];
-				dtoData.forEach(row => {
-					const rowData = {};
-					rowData.inventory_no = Number(row.inventory_no); // 숫자 변환
-			        rowData.inventory_count = Number(row.inventory_count); // 숫자 변환
-					
-			        data.push(rowData);
-			        
-				});
-				
-			    console.log(" 전송 데이터:", JSON.stringify(data)); // JSON 확인
-		
-			    $.ajax({
-			        url: "/api/inventory/update",
-			        type: "POST",
-			        contentType: "application/json",
-			        data: JSON.stringify(data), // 전송 데이터
-			        beforeSend: function (xhr) {
-			            xhr.setRequestHeader(header, token);
-			        },
-			        success: function () {
-			            console.log(" 일괄 업데이트 성공");
-			            alert("모든 변경 사항이 저장되었습니다.");
-			            location.reload(true);
-			        },
-			        error: function (xhr, status, error) {
-			            console.error(" 일괄 업데이트 실패:", status, error);
-			            console.error(" 서버 응답:", xhr.responseText);
-			            alert("데이터 저장 중 오류가 발생했습니다.");
-			        }
-			    });
-			}
+	
+		// "추가" 버튼 클릭 이벤트
+		$('#append').on('click', function (e) {
+			e.preventDefault(); // 기본 동작 방지
+			
+			// 기본값으로 새 행 데이터 생성
+			const newRow = {
+				history_no: '',
+				prev_count: inventory_count,
+				new_count: '',
+				change_reason: '', 
+				reason_detail: '', 
+				mod_user: emp_id, 
+				mod_date: '' 
+			};
+			
+			// 새 행을 TOAST UI Grid에 추가
+			historyGrid.prependRow(newRow, {
+				focus: true // 추가된 행에 포커스
+			});
+			
+		}); // 추가 버튼 이벤트
+	
 		
 			
 			
