@@ -4,17 +4,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.LineInfoDTO;
 import com.deepen.domain.ProcessInfoDTO;
 import com.deepen.service.WorkInstructionService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -54,10 +57,14 @@ public class WorkInstructionRestController {
 	 * @param planIdList
 	 */
 	@PostMapping("/insert-work-instruction")
-	public void postMethodName(@RequestBody List<Map<String, Object>> planIdList) {
-		//log.info(insertList.toString());
-		wiService.regWorkInstruction(planIdList);
+	public void insertWorkInstruction(@RequestBody List<Map<String, Object>> planIdList,
+									HttpServletRequest request) {
 		
+		HttpSession session = request.getSession();
+		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
+		String empId = (String) empInfo.get("EMP_ID");
+		
+		wiService.regWorkInstruction(planIdList,empId);
 	}
 	
 	/**
@@ -77,10 +84,17 @@ public class WorkInstructionRestController {
 	 * 클릭한 로우의 품목을 만드는데 필요한 자재 정보 조회
 	 */
 	@GetMapping("/material-info-by-row-selection")
-	public List<Map<String, Object>> getMaterialsByRowSelection(){
-		log.info("자재 정보 연결 준비");
+	public List<Map<String, Object>> getMaterialsByRowSelection(@RequestParam("productNo") String productNo,
+																@RequestParam("vol") String vol){
+		log.info("자재 정보 연결 준비 : "+productNo+", "+vol);
 		
-		List<Map<String, Object>> list = null;
-		return list;
+		List<Map<String, Object>> materialsList  = wiService.getMaterialsByProductNo(productNo,vol);
+		return materialsList;
+	}
+	
+	@PostMapping("/insert-material-warehouse")
+	public void insertMaterialInWarehouse(@RequestBody List<Map<String, Object>> insertMaterialData) {
+		log.info("자재 인서트 준비");
+		wiService.insertMaterialInWareHouse(insertMaterialData);
 	}
 }
