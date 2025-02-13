@@ -36,12 +36,8 @@ public class Inventory {
 	@Column(name = "inventory_count")
 	private Integer inventory_count; //실재고량
 	
-	@Column(name = "mod_user")
-	private String mod_user; //수정자
-	
-	@Column(name = "mod_date")
-	private  LocalDateTime mod_date; //수정일자
-	
+	@Column(name = "inventory_change_date")
+	private LocalDateTime inventory_change_date; //재고량변경일
 	
 	
 	

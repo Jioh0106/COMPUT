@@ -27,10 +27,10 @@ public class InventoryService {
 	}
 	
 	//재고현황 업데이트
-	 public void updateInventory(Integer inventory_no, Integer inventory_count, String mod_user) {
-        LocalDateTime now = LocalDateTime.now(); 
-        ivRepository.updateInventory(inventory_no, inventory_count, mod_user, now);
-    } 
+//	 public void updateInventory(Integer inventory_no, Integer inventory_count, String mod_user) {
+//        LocalDateTime now = LocalDateTime.now(); 
+//        ivRepository.updateInventory(inventory_no, inventory_count, mod_user, now);
+//    } 
 	
 	
 	

@@ -240,21 +240,27 @@
 			data: [], // 서버에서 전달받은 데이터
 			rowHeaders: ['checkbox'],
 			columns: [
-				{header: '번호', name: 'history_no', hidden: true, width: 60},
-				{header: '변경 전 실재고량', name: 'prev_count', width: 100},
-				{header: '변경 후 실재고량', name: 'new_count', width: 100},
-				{header: '변경사유', name: 'change_reason', width: 120,
-					formatter: 'listItemText', editor: {
+				{header: '번호', name: 'HISTORY_NO', hidden: true, width: 60},
+				{header: '변경 전 실재고량', name: 'PREV_COUNT', width: 100},
+				{header: '변경 후 실재고량', name: 'NEW_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '변경사유', name: 'CHANGE_REASON', width: 120,
+					formatter: ({ value }) => {
+				        const reason = reasonChangeList.find(item => item.code === value);
+				        return reason ? reason.name : value; // 매칭되는 name이 있으면 출력, 없으면 value 그대로 표시
+				    },
+					editor: {
 			            type: 'select',
 			            options: {
 			              listItems: reasonChangeList.map(reason => ({
 		                    text: reason.name, // 변경사유 이름(name과 code는 매퍼 AS "name", AS "code")
 		                    value: reason.code // 변경사유 코드
 			               }))
-			            }}, },
-				{header: '기타사유', name: 'reason_detail', width: 200},
-				{header: '수정자', name: 'mod_user', width: 100},
-				{header: '수정일', name: 'mod_date', width: 100}
+			            }
+					}, 
+					},
+				{header: '기타사유', name: 'REASON_DETAIL', editor: 'text', sortable: true, width: 200},
+				{header: '수정자', name: 'MOD_USER', width: 100},
+				{header: '수정일', name: 'MOD_DATE', width: 150}
 				
 			]
 		});
@@ -331,30 +337,38 @@
 				console.log('로그인한 사번 : ', emp_id);	        
 				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
 				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
-	        $('#history').modal('show');
-		    
-// 			axios.get('/api/order/detail/sale', {
-// 				params: {
-// 					inventory_no: rowData.inventory_no  
-// 				}
-// 			})
-// 			.then(function (response) {
-// 			  const detailData = response.data;
-			  
-// 			  historyGrid.resetData(detailData);
-// 			  historyGrid.refreshLayout();
-// 			})
-// 			.catch(function (error) {
-// 			  console.error('Error fetching order detail:', error);
-// 			});
-	        
-		});
+				$('#history').modal('show');
+			
+			//변경이력 데이터 조회 요청 (GET /api/inventory/history/{inventory_no})
+			$('#history').on('shown.bs.modal', function () {
+			fetch(`/api/inventory/history/${inventory_no}`)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("불러온 변경이력 데이터:", data);
+
+			            // ✅ 변경이력 데이터를 TOAST UI Grid에 적용
+			            historyGrid.resetData(data);
+			            historyGrid.refreshLayout();
+						
+			        })
+			        .catch(error => {
+			            console.error("Error fetching history data:", error);
+			        });
+	        	});
+			});
 		
 	
+			
 		// "추가" 버튼 클릭 이벤트
 		$('#append').on('click', function (e) {
 			e.preventDefault(); // 기본 동작 방지
 			
+			if (!inventory_no || inventory_no === null) {
+			       alert("재고번호를 선택해야함");
+			       return;
+			   }
+
+			   console.log('추가 버튼 클릭: inventory_no =', inventory_no, ', inventory_count =', inventory_count);
 			// 기본값으로 새 행 데이터 생성
 			const newRow = {
 				history_no: '',
@@ -374,6 +388,55 @@
 		}); // 추가 버튼 이벤트
 	
 		
+		// "저장" 버튼 클릭 이벤트
+			$('#modalSave').on('click', async function () {
+				
+				const checkedColumns = ['prev_count', 'new_count', 'change_reason', 'mod_user']
+				// 모든 행 데이터 가져오기
+				  const rows = historyGrid.getData();
+
+				  // 빈 값이 있는지 확인
+				  for (const row of rows) {
+				      for (const column of checkedColumns) {
+				          if (row[column] === null || row[column] === undefined || row[column] === '') {
+				              alert(`"${column}" 값이 비어 있습니다. 모든 필드를 입력해주세요.`);
+				              return; // 저장 중단
+				          }
+				      }
+				  }
+				  
+				  const data = rows.map(row =>({
+					inventory_no: inventory_no, //전역변수 클릭한 행의 재고번호
+					prev_count: inventory_count, //전역변수 클릭한 행의 실재고량
+					new_count: row.new_count,
+					change_reason: row.change_reason || null,
+					reason_detail: row.reason_detail,
+					mod_user: emp_id //전역변수
+					
+				  }));
+				  
+				  console.log("@전송 데이터:", JSON.stringify(data));
+				  
+				  // 모든 값이 입력된 경우, 저장 로직 실행
+			     try {
+					const response = await fetch('/api/inventory/history/save', {
+			           method: 'POST',
+			           headers: { 'Content-Type': 'application/json',
+				   	    [header]: token },
+			           body: JSON.stringify(data)
+			       });
+				   
+				   if (response.ok) {
+				              alert('저장 완료!');
+				          } else {
+				              alert('저장 실패');
+				          }
+			     } catch (error) {
+			         console.error('저장 실패:', error);
+			         alert('저장 중 오류가 발생했습니다.');
+			     }
+				
+			}); // 저장 클릭 이벤트
 			
 			
 		

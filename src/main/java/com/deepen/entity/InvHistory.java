@@ -18,28 +18,28 @@ public class InvHistory {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "history_no", nullable = false, unique = true)
+	@Column(name = "HISTORY_NO", nullable = false, unique = true)
 	private Integer history_no; //이력번호 PK
 	
-	@Column(name = "inventory_no")
+	@Column(name = "INVENTORY_NO")
 	private Integer inventory_no; //재고번호 FK값
 	
-	@Column(name = "prev_count")
+	@Column(name = "PREV_COUNT")
 	private Integer prev_count; //변경 전 실재고량
 	
-	@Column(name ="new_count" )
+	@Column(name ="NEW_COUNT" )
 	private Integer new_count; //변경 후 실재고량
 	
-	@Column(name ="change_reason" )
+	@Column(name ="CHANGE_REASON" )
 	private String change_reason; //변경사유
 	
-	@Column(name ="reason_detai" )
-	private String reason_detai; //기타사유
+	@Column(name ="REASON_DETAIL" )
+	private String reason_detail; //기타사유
 	
-	@Column(name ="mod_user" )
+	@Column(name ="MOD_USER" )
 	private String mod_user; //수정자
 	
-	@Column(name ="mod_date" )
+	@Column(name ="MOD_DATE" )
 	private LocalDateTime mod_date;//수정일
 	
 	

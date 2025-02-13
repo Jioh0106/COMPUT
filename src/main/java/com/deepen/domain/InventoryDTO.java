@@ -23,6 +23,9 @@ public class InventoryDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime mod_date;//수정일
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime inventory_change_date; //재고량변경일
 	private String unit; //단위
 	
 }
