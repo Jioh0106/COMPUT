@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
@@ -95,7 +95,12 @@
 						</div>
 					</section>
 					<!-- 그리드 끝 -->
-
+					<div class="d-flex justify-content-end">
+						<input type="button" class="btn btn-outline-success ms-2 deleteBtn" id="delete" value="저장">
+						<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+							<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+						</div>
+					</div>
 					
 				</div> <!-- card-body -->
 			</div> <!-- card -->

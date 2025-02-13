@@ -59,7 +59,7 @@ $(function() {
 			columns: [
 				{ header: 'No', name: 'sale_no', width: 60 },
 				{ header: '상품번호', name: 'product_no', width: 80, editor: 'text' },
-				{ header: '상품명', name: 'product_name', width: 200, editor: 'text'  },
+				{ header: '상품명', name: 'product_name', width: 230, editor: 'text'  },
 				{
 					header: '주문단위', 
 					name: 'sale_unit',
@@ -87,20 +87,6 @@ $(function() {
 	                        format: 'yyyy-MM-dd', 
 	                    }
 	                }
-				},
-				{
-					header: '필요자재여부', 
-					name: 'required_materials',
-					width: 100,
-					editor: {
-						type: 'select',
-						options: {
-	                        listItems: [
-	                            { text: 'true', value: 'true' },
-	                            { text: 'false', value: 'false' }
-	                        ]
-	                    }
-				    }
 				},
 				{
 					header: '수주 상태', 
@@ -160,7 +146,6 @@ $(function() {
 			sale_unit: '', 
 			sale_vol: '', 
 			sale_deadline: '', 
-			required_materials: '', 
 			sale_status: '', 
 		};
 		
@@ -341,7 +326,6 @@ $(function() {
 			    !row.sale_unit ||
 			    !row.sale_vol || 
 			    !row.sale_deadline || 
-			    !row.required_materials || 
 			    !row.sale_status
 			);
 		});
