@@ -231,6 +231,8 @@
 		});
 		
 		
+		const reasonChangeList = /*[[${reasonChangeList}]]*/ []; // 변경사유공통코드
+		console.log('변경사유 공통코드 :', reasonChangeList);
 		
 		// 실재고량 변경 이력 모달 그리드
 		const historyGrid = new tui.Grid({
@@ -241,7 +243,15 @@
 				{header: '번호', name: 'history_no', hidden: true, width: 60},
 				{header: '변경 전 실재고량', name: 'prev_count', width: 100},
 				{header: '변경 후 실재고량', name: 'new_count', width: 100},
-				{header: '변경사유', name: 'change_reason', width: 120},
+				{header: '변경사유', name: 'change_reason', width: 120,
+					formatter: 'listItemText', editor: {
+			            type: 'select',
+			            options: {
+			              listItems: reasonChangeList.map(reason => ({
+		                    text: reason.name, // 변경사유 이름(name과 code는 매퍼 AS "name", AS "code")
+		                    value: reason.code // 변경사유 코드
+			               }))
+			            }}, },
 				{header: '기타사유', name: 'reason_detail', width: 200},
 				{header: '수정자', name: 'mod_user', width: 100},
 				{header: '수정일', name: 'mod_date', width: 100}
