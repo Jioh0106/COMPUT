@@ -20,44 +20,94 @@ $(function() {
         editor: false        
     };
 
-    // 그리드 컬럼 정의
-    const columns = [
-        { header: '창고 ID', name: 'warehouse_id', width: 100 },
-        { header: '창고명', name: 'warehouse_name', width: 150, editor: isEditable ? 'text' : false },
-        { 
-            header: '창고유형', 
-            name: 'warehouse_type', 
-            width: 100,
-            // 권한이 있는 경우에만 선택 가능한 드롭다운 에디터 제공
-            editor: isEditable ? {
-                type: 'select',
-                options: {
-                    listItems: [
-                        { text: '완제품', value: '완제품' },
-                        { text: '원자재', value: '원자재' }
-                    ]
-                }
-            } : false 
-        },
-        { header: '위치', name: 'location', width: 300, editor: isEditable ? 'text' : false },
-        { header: '구역', name: 'zone', width: 180 },
-        { header: '관리자', name: 'manager', width: 100, editor: isEditable ? 'text' : false },
-        { 
-            header: '상태', 
-            name: 'status', 
-            width: 100,
-            // 권한이 있는 경우에만 선택 가능한 드롭다운 에디터 제공
-            editor: isEditable ? {
-                type: 'select',
-                options: {
-                    listItems: [
-                        { text: '사용', value: '사용' },
-                        { text: '미사용', value: '미사용' }
-                    ]
-                }
-            } : false 
-        }
-    ].map(col => ({ ...defaultColumnProps, ...col }));  // 각 컬럼에 기본 속성 적용
+	//컬럼 설정
+	function createColumn(options) {
+	  return {
+	    width: options.width,
+	    minWidth: options.width,
+	    align: 'center',
+	    ...options
+	  };
+	}
+	
+	function createColumn(options) {
+	  return {
+	    align: 'center',
+	    ...options
+	  };
+	}
+
+	const columns = [
+	 createColumn({ header: '창고 ID', name: 'warehouse_id' }),
+	 createColumn({ header: '창고명', name: 'warehouse_name', editor: isEditable ? 'text' : false }),
+	 createColumn({
+	   header: '창고유형',
+	   name: 'warehouse_type',
+	   editor: isEditable ? {
+	     type: 'select',
+	     options: {
+	       listItems: [
+	         { text: '완제품', value: '완제품' },
+	         { text: '자재', value: '자재' }
+	       ]
+	     }
+	   } : false
+	 }),
+	 createColumn({ header: '위치', name: 'location', width: 300, editor: isEditable ? 'text' : false }),
+	 createColumn({ header: '구역', name: 'zone' }),
+	 createColumn({ header: '관리자', name: 'manager', editor: isEditable ? 'text' : false }),
+	 createColumn({
+	   header: '상태',
+	   name: 'status', 
+	   editor: isEditable ? {
+	     type: 'select',
+	     options: {
+	       listItems: [
+	         { text: '사용', value: '사용' },
+	         { text: '미사용', value: '미사용' }
+	       ]
+	     }
+	   } : false
+	 })
+	];
+//    // 그리드 컬럼 정의
+//    const columns = [
+//        { header: '창고 ID', name: 'warehouse_id', width: 100 },
+//        { header: '창고명', name: 'warehouse_name', width: 150, editor: isEditable ? 'text' : false },
+//        { 
+//            header: '창고유형', 
+//            name: 'warehouse_type', 
+//            width: 100,
+//            // 권한이 있는 경우에만 선택 가능한 드롭다운 에디터 제공
+//            editor: isEditable ? {
+//                type: 'select',
+//                options: {
+//                    listItems: [
+//                        { text: '완제품', value: '완제품' },
+//                        { text: '원자재', value: '원자재' }
+//                    ]
+//                }
+//            } : false 
+//        },
+//        { header: '위치', name: 'location', width: 300, editor: isEditable ? 'text' : false },
+//        { header: '구역', name: 'zone', width: 180 },
+//        { header: '관리자', name: 'manager', width: 100, editor: isEditable ? 'text' : false },
+//        { 
+//            header: '상태', 
+//            name: 'status', 
+//            width: 100,
+//            // 권한이 있는 경우에만 선택 가능한 드롭다운 에디터 제공
+//            editor: isEditable ? {
+//                type: 'select',
+//                options: {
+//                    listItems: [
+//                        { text: '사용', value: '사용' },
+//                        { text: '미사용', value: '미사용' }
+//                    ]
+//                }
+//            } : false 
+//        }
+//    ].map(col => ({ ...defaultColumnProps, ...col }));  // 각 컬럼에 기본 속성 적용
 
     // Toast UI Grid 인스턴스 생성
     let grid = new tui.Grid({
