@@ -33,10 +33,10 @@ public class PlanController {
 	 * @view model
 	 * @return String
 	 */
-	@GetMapping("/add-plan")
-	public String addPlan(Model model) {
+	@GetMapping("/reg-plan")
+	public String regPlan(Model model) {
 		
-		return "production/add_plan";
+		return "production/reg_plan";
 		
 	}
 	

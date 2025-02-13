@@ -1,7 +1,7 @@
 // 팝업창 가운데 위치(듀얼모니터 포함)
 function openView(type) {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
-	var url = '/add-plan';
+	var url = '/reg-plan';
 	var popupW = 1000;
 	var popupH = 600;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
@@ -41,6 +41,9 @@ const instance2 = new tui.DatePicker(container2, {
 
 
 $(function() {	
+	var toastElement = document.querySelector(".toast");
+    var toast = new bootstrap.Toast(toastElement);
+    toast.show();
 	
 	// 부서 셀렉트 박스 
 	$('#statusSelect').on('click', function () {
@@ -97,11 +100,11 @@ $(function() {
 			{ header: '생산계획번호', name: 'plan_id' },
 			{ header: '등록 직원', name: 'emp_name' },
 			{ header: '상태', name: 'status_name' },
-			{ header: '우선순위', name: 'plan_end_date' },
+			{ header: '우선순위', name: 'plan_priority' },
+			{ header: '생산 시작 예정일', name: 'plan_start_date' },
+			{ header: '생산 완료 목표일', name: 'plan_end_date' },
 			{ header: '등록 일자', name: 'plan_date' },
 			{ header: '수정 일자', name: 'plan_update' },
-			{ header: '생산 시작 예정일', name: 'plan_start_date' },
-			{ header: '생산 완료 목표일', name: 'plan_end_date' }
 		],
 		data: [] // 서버에서 전달받은 데이터
 	});
