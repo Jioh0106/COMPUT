@@ -1,5 +1,7 @@
 package com.deepen.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,19 @@ public class EquipmentHstryService {
 	}
 
 	public List<Map<String, Object>> equipmentHstry(Map<String, Object> searchMap) {
-		System.out.println(mapper.equipmentHstry(searchMap).toString());
+		String getChk = String.valueOf(searchMap.get("checkboxes")); // 
+		String chk = getChk.replaceAll("[\\[\\]]", "").trim(); // [] 제거 및 공백 제거
+
+	    List<String> chkList = new ArrayList<>();
+
+        if (!chk.isEmpty() && !chk.equals("null")) {
+        	chkList = Arrays.asList(chk.split("\\s*,\\s*")); // 쉼표로 구분하여 리스트로 변환
+        } 
+
+        // mapper에서 사용하기 위한 추가
+	    searchMap.put("chkList", chkList); // foreach 돌릴 valueList 추가
+	    searchMap.put("chkListSize", chkList.size()); // if에서 사용할 리스트 size 추가
+	    System.out.println(searchMap.toString());
 		return mapper.equipmentHstry(searchMap);
 	}
 
