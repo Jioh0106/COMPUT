@@ -83,10 +83,10 @@ public class WorkInstructionService {
 	    log.info("상품번호: " + productNo);
 	    
 	    // 상품번호로 공정 정보 조회
-	    String processesName = wiMapper.selectDeduplicateProcessesName(productNo);
-	    log.info("공정 정보 : "+processesName);
+	    String processesNo = wiMapper.selectDeduplicateProcessesNo(productNo);
+	    log.info("공정 정보 : "+processesNo);
 	    
-	    return processesName;
+	    return processesNo;
 	}
 	
 	// 작업 지시 정보 조회
