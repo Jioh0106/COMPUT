@@ -1,5 +1,5 @@
 $(function() {    
-    // 사용자 권한에 따른 수정 가능 여부 설정
+    // 사용자 권한에 따른 수정 가능 여부 설정.
     // ATHR001, ATHR002 권한을 가진 사용자만 수정 가능
     const isEditable = role === 'ATHR001' || role === 'ATHR002';
     
