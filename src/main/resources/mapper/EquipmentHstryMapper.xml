@@ -55,6 +55,49 @@
 			 , 'select' AS "rowType"
 		FROM
 			equipment_history
+		<where>
+			<if test="yearMonth != null and yearMonth != ''">
+				 AND TO_CHAR(hsty_date, 'YYYY-MM') = #{yearMonth}
+		 	</if>
+			<if test="name != null and name != '' or month != null and month != '' or chkListSize != 0">
+      AND (
+         <choose>
+            <when test="name != null and name != '' and month != null and month != '' and chkListSize != 0">
+               (
+                  TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
+                  AND (SELECT info_nm 
+                       FROM equipment_info 
+                       WHERE info_no = equipment_history.info_no) 
+                       LIKE '%' || #{name} || '%'
+                  AND hsty_type IN
+                  <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+                     #{item}
+                  </foreach>
+               )
+            </when>
+            <otherwise>
+               (
+                  <if test="month != null and month != ''">
+                     TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
+                  </if>
+                  <if test="name != null and name != ''">
+                     OR (SELECT info_nm 
+                         FROM equipment_info 
+                         WHERE info_no = equipment_history.info_no) 
+                         LIKE '%' || #{name} || '%'
+                  </if>
+                  <if test="chkListSize != 0">
+                     OR hsty_type IN
+                     <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+                        #{item}
+                     </foreach>
+                  </if>
+               )
+            </otherwise>
+         </choose>
+      )
+   </if>
+		</where>
 		ORDER BY
 			hsty_date DESC
 	</select>
