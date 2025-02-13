@@ -63,7 +63,10 @@ $(function() {
 		}
 	});
 	
-	
+	instance1.on('change', function(event) {
+	    // 데이터피커 값이 변경될 때마다 처리
+	    $('.serch').trigger('change'); // 모든 .serch 요소에 change 이벤트 강제로 발생시키기
+	});
 	// =========================================================================
 
 	// 주문관리 그리드
@@ -71,27 +74,20 @@ $(function() {
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '주문번호', name: 'order_id'},
-			{header: '등록 일자', name: 'order_date'},
-			{header: '등록 직원', name: 'emp_name'},
-			{header: '구분', name: 'order_type'},
-			{header: '거래처', name: 'client_name'},
-			{header: '주문건수', name: 'count'},
-			{header: '수정일자', name: 'order_update'}
+			{header: '주문번호', name: 'order_id', sortingType: 'asc', sortable: true},
+			{header: '등록 일자', name: 'order_date', sortingType: 'asc', sortable: true},
+			{header: '등록 직원', name: 'emp_name', sortingType: 'asc', sortable: true},
+			{header: '구분', name: 'order_type', sortingType: 'asc', sortable: true},
+			{header: '거래처', name: 'client_name', sortingType: 'asc', sortable: true},
+			{header: '주문건수', name: 'count', sortingType: 'asc', sortable: true},
+			{header: '수정일자', name: 'order_update', sortingType: 'asc', sortable: true}
 		],
 		data: [] // 서버에서 전달받은 데이터
 	});
 
 	// ------------------------------------------------
 	// 주문 관리 그리드 데이터 초기화
-	let reg_date = '';
-	console.log("등록일자 : "  + reg_date);
-
-	axios.get('/api/order/list', {
-		params: {
-			reg_date: reg_date,
-		},
-	})
+	axios.get('/api/order/list')
 	.then(function (response) {
 		const data = response.data; // 데이터 로드
 		console.log('Fetched data:', data);
@@ -103,6 +99,46 @@ $(function() {
 	});
 	
 	// ============================================
+	// 주문 관리 그리드 필터 검색
+	$('.serch').on('change', function () {
+		let reg_date = $('#tui-date-picker-target-1').val();
+		let search_word = $('#searchWord').val();
+		let check_value = '';
+		
+		if ($('#all-check').is(':checked')) {
+			check_value = '전체';
+		} else {
+			if ($('#sale-check').is(':checked')) {
+			    check_value = '수주';
+			} else if ($('#buy-check').is(':checked')) {
+			    check_value = '발주';
+			}
+		}
+		console.log("reg_date=" + reg_date);
+		console.log("search_word=" + search_word);
+		console.log("check_value=" + check_value);
+		
+		axios.get('/api/order/list/serch', {
+		    params: {
+		        reg_date: reg_date,
+		        search_word: search_word,
+		        check_value: check_value
+		    }
+		})
+		.then(function (response) {
+		    const newData = response.data;
+		    grid.resetData(newData);
+		    grid.refreshLayout();
+		})
+		.catch(function (error) {
+		    console.error('Error fetching data:', error);
+		});
+		
+		
+			
+	}); // 주문 건 삭제 버튼 이벤트
+	
+	// ============================================
 	// 주문 상세 - 수주 모달 그리드
 	const grid2 = new tui.Grid({
 		el: document.getElementById('grid2'),
@@ -112,8 +148,9 @@ $(function() {
 			{header: '수주번호', name: 'sale_no', width: 60},
 			{header: '주문번호', name: 'order_id', width: 120},
 			{header: '구분', name: 'order_type', width: 80},
+			{header: '거래처명', name: 'client_name', width: 120},
 			{header: '상품번호', name: 'product_no', width: 80},
-			{header: '상품명', name: 'product_name', width: 120},
+			{header: '상품명', name: 'product_name', width: 200},
 			{header: '주문 단위', name: 'unit_name', width: 80},
 			{header: '주문량', name: 'sale_vol', width: 80},
 			{header: '납품기한', name: 'sale_deadline', width: 100},
@@ -135,14 +172,14 @@ $(function() {
 			{header: '주문번호', name: 'order_id', width: 130},
 			{header: '구분', name: 'order_type', width: 80},
 			{header: '거래처명', name: 'client_name', width: 80},
-			{header: '자재번호', name: 'product_no', width: 80},
-			{header: '자재명', name: 'product_name', width: 150},
+			{header: '자재번호', name: 'mtr_no', width: 80},
+			{header: '자재명', name: 'mtr_name', width: 150},
 			{header: '주문 단위', name: 'unit_name', width: 80},
-			{header: '주문량', name: 'sale_vol', width: 80},
+			{header: '주문량', name: 'buy_vol', width: 80},
 			{header: '직원번호', name: 'order_emp', width: 100},
 			{header: '등록직원', name: 'emp_name', width: 100},
 			{header: '등록일자', name: 'order_date', width: 120},
-			{header: '상태', name: 'sale_status', width: 80}
+			{header: '상태', name: 'buy_status', width: 80}
 		]
 	});
 	
@@ -185,8 +222,8 @@ $(function() {
 			.then(function (response) {
 			  const detailData = response.data;
 			  
-			  grid2.resetData(detailData);
-			  grid2.refreshLayout();
+			  grid3.resetData(detailData);
+			  grid3.refreshLayout();
 			})
 			.catch(function (error) {
 			  console.error('Error fetching order detail:', error);
@@ -268,6 +305,9 @@ $(function() {
 		      // "취소"를 누르면 아무 동작 없이 닫힘 (기본 동작)
 		  });
 	}
+	
+	
+	
 	
 
 });	// 돔 로드 이벤트
