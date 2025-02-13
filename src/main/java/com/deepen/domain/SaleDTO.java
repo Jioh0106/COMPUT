@@ -24,7 +24,6 @@ public class SaleDTO {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date sale_deadline;
 	
-	private String required_materials;
 	private String sale_status;
 	
 	// ==============================

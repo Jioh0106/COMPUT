@@ -357,11 +357,19 @@
 		}; // selectInfo 함수 끝
 		
 		// 검색 조건 입력 조회
-		function searchSelect(searchId){
-			const value = document.getElementById(searchId).value;
-			var data = {value: value};
+		function searchSelect(){
+			const name = document.getElementById("searchInput").value;
+			const month = document.getElementById("searchSelected").value;
+			
+			var selectedStts = [];
+			// 체크된 체크박스의 값을 배열에 추가
+			$('input[type="checkbox"]:checked').each(function () {
+				selectedStts.push($(this).val());
+			});
+
+			var data = {checkboxes: selectedStts, name: name, month:month};
 			$.ajax({
-				url: "/eqpSearchSelect",
+				url: "/eqpHstrySearchSelect",
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				type: 'POST',

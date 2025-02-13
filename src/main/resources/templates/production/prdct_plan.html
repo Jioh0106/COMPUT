@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
@@ -78,12 +78,8 @@
 							<div style="display: flex; align-items: center;" class="ms-3">
 								<span style="font-size: 1rem; line-height: 2rem;"> 상태 </span>
 								<div class="ms-3">
-									<select class="form-select deptArea" id="deptSelect" name="deptSelect" >
-										<option value="" selected>전체</option>
-										<option value="" >등록</option>
-										<option value="" >생산중</option>
-										<option value="" >완료</option>
-										<option value="" >중단</option>
+									<select class="form-select deptArea" id="statusSelect" name="statusSelect" >
+										<option value="all" selected>전체</option>
 									</select>
 								</div>
 							</div>
@@ -99,7 +95,12 @@
 						</div>
 					</section>
 					<!-- 그리드 끝 -->
-
+					<div class="d-flex justify-content-end">
+						<input type="button" class="btn btn-outline-success ms-2 deleteBtn" id="delete" value="저장">
+						<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+							<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+						</div>
+					</div>
 					
 				</div> <!-- card-body -->
 			</div> <!-- card -->

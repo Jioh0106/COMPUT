@@ -4,6 +4,132 @@
 
 <mapper namespace="com.deepen.mapper.InboundMapper">
 
+    <!-- 조건부 검색 -->
+    <select id="selectByConditions" parameterType="map" resultType="com.deepen.domain.InboundDTO">
+        SELECT 
+            i.*,
+            w.warehouse_name,
+            w.zone,
+            CASE 
+                WHEN p.product_name IS NOT NULL THEN p.product_name 
+                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name 
+            END as item_name,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN '완제품'
+                WHEN m.mtr_no IS NOT NULL THEN '자재'
+            END as item_type,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN TO_CHAR(p.product_no)
+                WHEN m.mtr_no IS NOT NULL THEN TO_CHAR(m.mtr_no)
+            END as item_code,
+            COALESCE(
+            	(SELECT cd.common_detail_name 
+            	FROM COMMON_DETAIL cd 
+            	WHERE cd.common_detail_code =
+            		CASE
+            			WHEN p.product_no IS NOT NULL THEN p.product_unit
+            			WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+            		END
+            	AND cd.common_detail_status = 'Y'
+            	),
+            	CASE
+           			WHEN p.product_no IS NOT NULL THEN p.product_unit
+           			WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+            	END
+            ) as item_unit
+        FROM INBOUND i
+        LEFT JOIN WAREHOUSE w ON i.warehouse_id = w.warehouse_id
+        LEFT JOIN PRODUCT p ON i.inventory_no = p.product_no
+        LEFT JOIN MATERIAL m ON i.inventory_no = m.mtr_no
+		<where>
+		    <if test="inNo != null">
+		        AND i.in_no = #{inNo}
+		    </if>
+		    <if test="startDate != null and startDate != ''">
+		        AND i.in_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+		    </if>
+		    <if test="endDate != null and endDate != ''">
+		        AND i.in_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		    </if>
+		    <if test="status != null and status != ''">
+		        AND i.status = #{status}
+		    </if>
+		    <if test="keyword != null and keyword != ''">
+		        AND (
+		            w.warehouse_name LIKE '%' || #{keyword} || '%'
+		            OR p.product_name LIKE '%' || #{keyword} || '%'
+		            OR m.mtr_name LIKE '%' || #{keyword} || '%'
+		            OR TO_CHAR(i.in_no) LIKE '%' || #{keyword} || '%'
+		        )
+		    </if>
+		</where>
+        ORDER BY i.in_no DESC
+    </select>
+    
+    <!-- 품목 검색 -->
+    <select id="searchItems" resultType="map">
+        SELECT 
+            TO_CHAR(mtr_no) as item_code,
+            mtr_name as item_name,
+            '자재' as item_type
+        FROM MATERIAL
+        WHERE mtr_name LIKE '%' || #{keyword} || '%'
+        UNION ALL
+        SELECT 
+            TO_CHAR(product_no) as item_code,
+            product_name as item_name,
+            '완제품' as item_type
+        FROM PRODUCT
+        WHERE product_name LIKE '%' || #{keyword} || '%'
+    </select>
+    
+    <!-- 창고 검색 -->
+    <select id="searchWarehouses" resultType="map">
+        SELECT 
+            warehouse_id,
+            warehouse_name,
+            warehouse_type,
+            zone
+        FROM WAREHOUSE
+        WHERE warehouse_name LIKE '%' || #{keyword} || '%'
+    </select>
+    
+    <!-- 구역 조회 -->
+    <select id="selectWarehouseZones" resultType="string">
+        SELECT zone 
+        FROM WAREHOUSE 
+        WHERE warehouse_id = #{warehouseCode}
+        AND zone IS NOT NULL
+    </select>
+    
+<insert id="insertInventory" parameterType="map">
+    MERGE INTO INVENTORY i
+    USING DUAL 
+    ON (i.item_no = #{inventory_no, jdbcType=INTEGER} 
+        AND i.warehouse_id = #{warehouse_id, jdbcType=VARCHAR} 
+        AND i.zone = #{zone, jdbcType=VARCHAR})
+    WHEN MATCHED THEN
+        UPDATE SET 
+            i.inventory_qty = i.inventory_qty + #{in_qty, jdbcType=INTEGER}
+    WHEN NOT MATCHED THEN
+        INSERT (
+            item_no,
+            warehouse_id,
+            zone,
+            inventory_qty,
+            inventory_type
+        ) VALUES (
+            #{inventory_no, jdbcType=INTEGER},
+            #{warehouse_id, jdbcType=VARCHAR},
+            #{zone, jdbcType=VARCHAR},
+            #{in_qty, jdbcType=INTEGER},
+            (SELECT 
+                CASE 
+                    WHEN EXISTS (SELECT 1 FROM PRODUCT WHERE product_no = #{inventory_no}) THEN '완제품'
+                    WHEN EXISTS (SELECT 1 FROM MATERIAL WHERE mtr_no = #{inventory_no}) THEN '자재'
+                END
+            FROM DUAL)
+        )
+</insert>
+    
 </mapper>
-
-
