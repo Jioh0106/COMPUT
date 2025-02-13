@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deepen.mapper.QualityInspectionMapper">
+
+    <!-- 검사대상 LOT 조회 -->
+    <select id="selectInspectionLots" resultType="com.deepen.domain.QualityInspectionDTO$LotInspectionDTO">
+        SELECT 
+            lm.lot_no,
+            lm.wi_no,
+            lm.product_no,
+            p.product_name,
+            lm.process_no,
+            pi.process_name,
+            lm.lot_status,
+            lm.create_time
+        FROM lot_master lm
+        JOIN product p ON lm.product_no = p.product_no
+        JOIN process_info pi ON lm.process_no = pi.process_no
+        WHERE 1=1
+        AND lm.lot_status IN ('LTST002', 'LTST003')  /* 진행중, 검사대기 상태 */
+        <if test="lotNo != null and lotNo != ''">
+            AND lm.lot_no = #{lotNo}
+        </if>
+        <if test="wiNo != null and wiNo != ''">
+            AND lm.wi_no = #{wiNo}
+        </if>
+        <if test="processNo != null">
+            AND lm.process_no = #{processNo}
+        </if>
+        ORDER BY lm.create_time DESC
+    </select>
+
+    <!-- LOT별 검사항목 조회 -->
+    <select id="selectQcItems" resultType="com.deepen.domain.QualityInspectionDTO$QcItemDTO">
+        SELECT 
+            qm.qc_code,
+            qm.qc_name,
+            qm.target_value,
+            qm.ucl,
+            qm.lcl,
+            qm.unit,
+            qcl.measure_value,
+            qcl.judgement as judgment,
+            qcl.inspector,
+            qcl.check_time
+        FROM lot_master lm
+        JOIN qc_master qm ON lm.product_no = qm.product_no 
+            AND lm.process_no = qm.process_no
+        LEFT JOIN lot_qc_log qcl ON lm.lot_no = qcl.lot_no 
+            AND qm.qc_code = qcl.qc_code
+        WHERE lm.lot_no = #{lotNo}
+        AND qm.use_yn = 'Y'
+        ORDER BY qm.qc_code
+    </select>
+
+    <!-- 검사결과 저장 -->
+    <insert id="insertQcResult">
+        INSERT INTO lot_qc_log (
+            qc_log_no,
+            lot_no,
+            process_no,
+            qc_code,
+            measure_value,
+            judgement,
+            inspector,
+            check_time,
+            create_user,
+            create_time
+        ) VALUES (
+            seq_qc_log_id.NEXTVAL,
+            #{lotNo},
+            (SELECT process_no FROM lot_master WHERE lot_no = #{lotNo}),
+            #{qcCode},
+            #{measureValue},
+            #{judgment},
+            #{inspector},
+            SYSDATE,
+            #{inspector},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- LOT 상태 업데이트 -->
+<!--     <update id="updateLotStatus"> -->
+<!--         UPDATE lot_master -->
+<!--         SET lot_status = #{status}, -->
+<!--             update_user = #{inspector}, -->
+<!--             update_time = SYSDATE -->
+<!--         WHERE lot_no = #{lotNo} -->
+<!--     </update> -->
+</mapper>
