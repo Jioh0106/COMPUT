@@ -122,6 +122,7 @@ function createWorkInstructionGrid(){
 				{header: '품목', name: 'product_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
 				{header: '수량', name: 'vol', width:50},
 				{header: '단위', name: 'unit_name', width:50},
+				{header: '공정', name: 'process_name', width:80, filter : 'select'},
 				{header: '라인', name: 'line_name', width:100, filter : 'select', editor: {
 																	            	type: 'select',
 																	            	options: {
@@ -130,7 +131,6 @@ function createWorkInstructionGrid(){
 																	                	{ text: 'N', value: 'N' }
 																	              	]
 													        				 }}},
-				{header: '공정', name: 'process_name', width:80, filter : 'select'},
 				{header: '공정 상태', name: 'wi_status_name', width:90, filter : 'select'},
 				{header: '검사 상태', name: 'qc_status_name', width:100, filter : 'select'},
 				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
@@ -250,13 +250,13 @@ document.getElementById('large').addEventListener('shown.bs.modal', () => {
 		scrollY: true,
 		bodyHeight: 280,
 		columns: [
-			{header: '계획번호', name: 'PLAN_ID'},
-			{header: '품목번호', name: 'PRODUCT_NO'},
-			{header: '품목', name: 'PRODUCT_NAME'},
-			{header: '수량', name: 'SALE_VOL'},
-			{header: '생산 시작 예정일', name: 'PLAN_START_DATE'},
-			{header: '생산 완료 목표일', name: 'PLAN_END_DATE'},
-			{header: ' ', name: 'PLAN_PRIORITY'}
+			{header: '계획번호', name: 'PLAN_ID', filter: { type: 'text', showApplyBtn: true, showClearBtn: true },sortable: true},
+			{header: '품목번호', name: 'PRODUCT_NO', filter: { type: 'text', showApplyBtn: true, showClearBtn: true },sortable: true},
+			{header: '품목', name: 'PRODUCT_NAME', filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+			{header: '수량', name: 'SALE_VOL', sortable: true},
+			{header: '생산 시작 예정일', name: 'PLAN_START_DATE', sortable: true},
+			{header: '생산 완료 목표일', name: 'PLAN_END_DATE', sortable: true},
+			{header: ' ', name: 'PLAN_PRIORITY', filter : 'select'}
 		],
 		data: [],
 		columnOptions: {
