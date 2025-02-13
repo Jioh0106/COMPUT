@@ -105,24 +105,83 @@
 								</div>
 								<!-- 검색 조건 끝-->
 								
-								<!--재고현황 그리드-->										   
-								<div id="inventoryGrid" class="mb-3 mt-2"></div>
-								
-								<!-- 버튼 시작 -->
-								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
-									<div class="float-end">
-										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
-									</div>
-								<!--</div>-->
-								<!-- 버튼 끝 -->
+								<!--전체/완제품/자재 탭 시작-->
+					          <ul class="nav nav-tabs" id="myTab" role="tablist">
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link active" id="all" data-bs-toggle="tab" href="#home" role="tab"
+					                      aria-controls="home" aria-selected="true">전체</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="product" data-bs-toggle="tab" href="#profile" role="tab"
+					                      aria-controls="profile" aria-selected="false">완제품</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="material" data-bs-toggle="tab" href="#contact" role="tab"
+					                      aria-controls="contact" aria-selected="false">자재</a>
+					              </li>
+					          </ul>
+					          <div class="tab-content" id="myTabContent">
+					              <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="home-tab">
+									
+									<!--재고현황 그리드-->										   
+									<div id="inventoryGrid" class="mb-3 mt-2"></div> 
+	
+					              </div>
+					              <div class="tab-pane fade" id="product" role="tabpanel" aria-labelledby="profile-tab">
+					                 
+					                 <!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					              <div class="tab-pane fade" id="material" role="tabpanel" aria-labelledby="contact-tab">
+					                  
+									<!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					          </div>
+							  <!--전체/받은요청/보낸요청 탭 끝-->
+							  
+							  <!-- 버튼 시작 -->
+  								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+  									<div class="float-end">
+  										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick="saveAllChanges()">
+  									</div>
+  								<!--</div>-->
+  								<!-- 버튼 끝 -->
 							</form>
 						</div>
 					</section>
 					<!-- 그리드 끝  -->
-
+					
 				</div> <!-- card-body -->
 			</div> <!-- card -->
 			
+			<!-- 재고현황 - 실재고량 변경 이력 모달창 시작 -->
+		    <div class="modal fade text-left w-100" id="history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
+		           
+		            <div class="modal-content">
+		                <div class="modal-header">
+		                    <h4 class="modal-title" id="myModalLabel17"> 실재고량 변경 이력 </h4>
+		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		                </div>
+		                <div class="modal-body">
+							<div class="row" id="basic-table">
+								<!-- 그리드 시작 -->
+								<div id="historyGrid"></div>
+								<!-- 그리드 끝 -->
+								<div class="d-flex justify-content-end">
+									<input type="button" class="btn btn-outline-secondary ms-2" id="append" value="추가">
+									<input type="button" class="btn btn-outline-success ms-2" id="modalSave" value="저장">
+<!-- 									<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"> -->
+										<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+<!-- 									</div> -->
+								</div>
+							</div>
+		                </div>
+		            </div>
+		        </div>
+		    </div> 
+		    <!-- 재고현황 - 실재고량 변경 이력 모달창 끝 -->
 			
 		
 	
@@ -146,20 +205,23 @@
 
 	 	var Grid = tui.Grid;
 		
+	 	//재고현황 그리드
 		const inventoryGrid = new Grid({
 			el: document.getElementById('inventoryGrid'),
 			columns: [
 				{header: '재고번호',	name: 'inventory_no', width: 100},
 				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
-				{header: '자재/완제품번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
-				{header: '품목명',		name: 'item_name', editor: 'text', sortable: true, width: 100},
-				{header: '재고량',	name: 'inventory_qty',	editor: 'text', sortable: true, width: 150},
-				{header: '실재고량',	name: 'inventory_count',	editor: 'text', sortable: true, width: 150},
+				{header: '품목명',		name: 'item_name', editor: 'text', sortable: true, width: 200},
+				{header: '재고량',	name: 'inventory_qty',	editor: 'text', sortable: true, width: 100},
+				
+				{header: '실재고량',	name: 'inventory_count',	editor: 'text', sortable: true, width: 150,
+				 defaultValue: 0,
+				 formatter: ({ value }) => `<span style="color: #dc3545;">${value}</span>`},
+				
 				{header: '단위',	name: 'unit',	editor: 'text', sortable: true, width: 150},
 				{header: '창고',	name: 'warehouse_id',	editor: 'text', sortable: true, width: 150},
-				{header: '구역',	name: 'zon',	editor: 'text', sortable: true, width: 150},
-				{header: '수정자',	name: 'mod_user',	editor: 'text', sortable: true, width: 150},
-				{header: '수정일',	name: 'mod_date',	editor: 'text', sortable: true, width: 150}
+				{header: '구역',	name: 'zone',	editor: 'text', sortable: true, width: 150},
+				{header: '재고량변경일',	name: 'inventory_change_date',	editor: 'text', sortable: true, width: 150}
 				
 			],
 			data: [],
@@ -168,6 +230,152 @@
 			}
 		});
 		
+		
+		const reasonChangeList = /*[[${reasonChangeList}]]*/ []; // 변경사유공통코드
+		console.log('변경사유 공통코드 :', reasonChangeList);
+		
+		// 실재고량 변경 이력 모달 그리드
+		const historyGrid = new tui.Grid({
+			el: document.getElementById('historyGrid'),
+			data: [], // 서버에서 전달받은 데이터
+			rowHeaders: ['checkbox'],
+			columns: [
+				{header: '번호', name: 'history_no', hidden: true, width: 60},
+				{header: '변경 전 실재고량', name: 'prev_count', width: 100},
+				{header: '변경 후 실재고량', name: 'new_count', width: 100},
+				{header: '변경사유', name: 'change_reason', width: 120,
+					formatter: 'listItemText', editor: {
+			            type: 'select',
+			            options: {
+			              listItems: reasonChangeList.map(reason => ({
+		                    text: reason.name, // 변경사유 이름(name과 code는 매퍼 AS "name", AS "code")
+		                    value: reason.code // 변경사유 코드
+			               }))
+			            }}, },
+				{header: '기타사유', name: 'reason_detail', width: 200},
+				{header: '수정자', name: 'mod_user', width: 100},
+				{header: '수정일', name: 'mod_date', width: 100}
+				
+			]
+		});
+		
+		
+		
+		let allData = []; // 전체 데이터를 저장할 변수
+
+		
+		document.addEventListener("DOMContentLoaded", function() {
+			//재고현황테이블 조회
+			function loadInventoryData() {
+		        $.ajax({
+		            url: "/api/inventory/list", 
+		            type: "GET",
+		            contentType: "application/json",
+		            dataType: "json",
+		            beforeSend: function(xhr) {
+		                xhr.setRequestHeader(header, token);  
+		            },
+		            success: function(response) {
+		            	allData = response; // 전체 데이터 저장
+		                console.log("재고 데이터 로드 성공:", response);
+		                inventoryGrid.resetData(response);  // Grid에 데이터 삽입
+		            },
+		            error: function(xhr, status, error) {
+		                console.error("재고 데이터 로드 실패:", status, error);
+		            }
+		        });
+		    }
+
+		    //페이지 로드 후 즉시 데이터 로드
+		    loadInventoryData();
+			
+			
+			 const tabs = {
+				        전체: document.getElementById('all'),
+				        완제품: document.getElementById('product'),
+				        자재: document.getElementById('material')
+				    };
+			
+			 			
+			// 탭 클릭 이벤트 등록
+	        Object.keys(tabs).forEach(tabName => {
+	            tabs[tabName].addEventListener('click', () => {
+	                let filteredData;
+	                if (tabName === '전체') {
+	                    filteredData = allData; // 전체 데이터
+	                } else {
+	                    filteredData = allData.filter(item => item.inventory_type === tabName); // 요청구분에 따른 필터링
+	                }
+
+	                inventoryGrid.resetData(filteredData); // 필터링된 데이터를 TOAST UI Grid에 적용
+	                inventoryGrid.refreshLayout(); // 레이아웃 새로고침
+	            });
+	        });	
+				
+	});
+			
+	
+	//--------------------------------------------------------실재고량 변경이력 모달창 시작
+		
+	
+		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
+		let inventory_no = null; // 클릭한 행의 재고번호
+		let inventory_count = null; // 클릭한 행의 실재고량
+	
+		inventoryGrid.on('click', function (ev) {
+			  // 클릭된 row 데이터 가져오기
+	        	const rowData = ev.instance.getRow(ev.rowKey);
+	        	inventory_no = rowData.inventory_no;
+	        	inventory_count = rowData.inventory_count;
+	        	
+				console.log('로그인한 사번 : ', emp_id);	        
+				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
+				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
+	        $('#history').modal('show');
+		    
+// 			axios.get('/api/order/detail/sale', {
+// 				params: {
+// 					inventory_no: rowData.inventory_no  
+// 				}
+// 			})
+// 			.then(function (response) {
+// 			  const detailData = response.data;
+			  
+// 			  historyGrid.resetData(detailData);
+// 			  historyGrid.refreshLayout();
+// 			})
+// 			.catch(function (error) {
+// 			  console.error('Error fetching order detail:', error);
+// 			});
+	        
+		});
+		
+	
+		// "추가" 버튼 클릭 이벤트
+		$('#append').on('click', function (e) {
+			e.preventDefault(); // 기본 동작 방지
+			
+			// 기본값으로 새 행 데이터 생성
+			const newRow = {
+				history_no: '',
+				prev_count: inventory_count,
+				new_count: '',
+				change_reason: '', 
+				reason_detail: '', 
+				mod_user: emp_id, 
+				mod_date: '' 
+			};
+			
+			// 새 행을 TOAST UI Grid에 추가
+			historyGrid.prependRow(newRow, {
+				focus: true // 추가된 행에 포커스
+			});
+			
+		}); // 추가 버튼 이벤트
+	
+		
+			
+			
 		
 		
 	</script>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.InventoryHistoryMapper">
+
+<!-- 변경사유 공통코드 select박스 조회 -->
+	<select id="reasonChangeList" resultType="java.util.Map">
+	SELECT common_detail_code AS "code", common_detail_name AS "name"
+	FROM common_detail
+	WHERE SUBSTR(common_detail_code,1,4) 
+		IN('RSFC')
+		AND common_detail_status ='Y' 
+	</select>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

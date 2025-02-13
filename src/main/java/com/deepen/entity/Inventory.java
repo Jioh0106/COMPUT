@@ -27,11 +27,14 @@ public class Inventory {
 	@Column(name = "item_no")
 	private Integer item_no; //품목번호
 	
-	@Column(name = " warehouse_id")
+	@Column(name = "warehouse_id")
 	private String warehouse_id; //창고id
 	
 	@Column(name = "inventory_qty")
 	private Integer inventory_qty; //재고량
+	
+	@Column(name = "inventory_count")
+	private Integer inventory_count; //실재고량
 	
 	@Column(name = "mod_user")
 	private String mod_user; //수정자

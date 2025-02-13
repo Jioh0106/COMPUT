@@ -1,19 +1,17 @@
 package com.deepen.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import com.deepen.domain.InventoryDTO;
-
 @Mapper
 @Repository
-public interface InventoryMapper {
+public interface InventoryHistoryMapper {
 	
-	//재고현황 조회
-	List<InventoryDTO> inventoryStatus();
-	
+	//변경사유 공통코드
+	List<Map<String, Object>> reasonChangeList();
 	
 	
 }
