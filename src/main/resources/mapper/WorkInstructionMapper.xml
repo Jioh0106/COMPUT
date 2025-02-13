@@ -73,7 +73,7 @@
 		    CASE 
 		        WHEN b.MTRPRODUCT_NO IS NOT NULL THEN pdw.product_name  
 		        ELSE m.MTR_NAME  
-		    END AS product_name,--반재품/원자재 이름,
+		    END AS product_name,
 		    TO_NUMBER(NVL2(b.mtrproduct_no, b.bom_quantity, s.sale_vol)) AS vol,
 		    TO_CHAR(p.plan_start_date, 'YYYY-MM-DD') AS "PLAN_START_DATE",
 		    TO_CHAR(p.plan_end_date, 'YYYY-MM-DD') AS "PLAN_END_DATE",
@@ -124,16 +124,22 @@
 			plan_id,
 			product_no,
 			product_name,
-			quantity
+			quantity,
+			process_no,
+			process_name
+<!-- 			,emp_id -->
 		) VALUES (
 			#{PLAN_ID},
 			#{PRODUCT_NO},
 			#{PRODUCT_NAME},
-			#{VOL}
+			#{VOL},
+			#{PROCESS_NO},
+        	#{PROCESS_NAME}
+<!--         	,#{EMP_ID} -->
 		)
 	</insert>
 	
-	<select id="selectDeduplicateProcessesNo" parameterType="Integer" resultType="Integer">
+	<select id="selectDeduplicateProcessesNo" parameterType="Integer" resultType="String">
 		WITH process_split AS (
 		    SELECT DISTINCT
 		        p.product_no AS productNo,
@@ -147,10 +153,9 @@
 		        AND PRIOR SYS_GUID() IS NOT NULL
 		)
 		SELECT 
-		    ps.productNo,  -- 완제품의 product_no를 출력
 		    LISTAGG(ps.process_no, '/') WITHIN GROUP (
 		        ORDER BY 
-		            DECODE(ps.process_no, '1', 1, '2', 2, '3', 3, '4', 4)  -- 공정 번호에 따른 순서 지정
+		            DECODE(ps.process_no, '1', 1, '2', 2, '3', 3, '4', 4)
 		    ) AS process_no_list
 		FROM process_split ps
 		GROUP BY ps.productNo
@@ -195,11 +200,10 @@
 		    wi.product_no AS "product_no",
 		    wi.product_name AS "product_name",
 		    wi.quantity AS "vol",
-		    --s.sale_unit AS "unit",
 		    pd.product_unit AS "unit",
 		    cdu.common_detail_name AS "unit_name",
 		    wi.process_no AS "process_no",
-		    pi.process_name AS "process_name",
+		    wi.process_name AS "process_name",
 		    wi.line_no AS "line_no",
 		    li.line_name AS "line_name",
 		    wi.wi_status AS "wi_status",
@@ -219,8 +223,6 @@
 		    AND REGEXP_SUBSTR(p.plan_id, '[^-]+', 1, 3) = s.product_no
 		JOIN PRODUCT pd
 		    ON pd.product_no = s.product_no
-		LEFT JOIN process_info pi
-			ON pi.process_no = wi.process_no
 		LEFT JOIN line_info li
 			ON li.line_no = wi.line_no
 		LEFT JOIN common_detail cdu
@@ -236,6 +238,53 @@
 		WHERE o.order_type = '수주'
 		ORDER BY wi.wi_no
 	</select>
+	
+	<select id="selectMaterialsByProductNo" resultType="java.util.Map">
+		SELECT
+			i.inventory_no AS "invenNO", 
+			b.mtr_no AS "mtlNo",
+			m.mtr_name AS "mtlName",
+			i.warehouse_id AS "warehouseId",
+			w.warehouse_name AS "warehouse",
+			i.zone AS "zone",
+			b.bom_quantity AS "qty",
+			b.bom_unit AS "unit",
+			cd.common_detail_name AS "unitName"
+		FROM bom b
+		JOIN product p
+			ON p.product_no = b.product_no
+		JOIN material m
+			ON m.mtr_no = b.mtr_no
+		LEFT JOIN inventory i
+			ON i.item_no = m.mtr_no
+		LEFT JOIN warehouse w
+			ON w.warehouse_id = i.warehouse_id
+		LEFT JOIN common_detail cd
+		    ON cd.common_detail_code LIKE 'UNIT%'
+		    AND cd.common_detail_code = b.bom_unit
+		    AND cd.common_detail_status = 'Y'
+		LEFT JOIN product p2
+		    ON p2.product_no = b.mtr_no
+		WHERE p.product_no = #{productNo}
+		AND b.mtr_no IS NOT NULL
+	</select>
+	
+	<insert id="insertMaterialInWareHouse" parameterType="Map">
+		INSERT INTO outbound (
+			inventory_no,
+			out_qty,
+			wi_no,
+			warehouse_id,
+			zone
+			
+		) VALUES (
+			#{invenNO},
+			#{calculatedQty},
+			#{wiNo},
+			#{warehouseId},
+			#{zone}
+		)
+	</insert>
 </mapper>
 
 

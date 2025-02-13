@@ -95,8 +95,8 @@ window.onload = function () {
 empListGrid.on('click', function (ev) {
 	
 	const target = ev.nativeEvent.target;
-	//console.log(target);
 	const columnName = ev.columnName;
+	console.log(columnName);
 	
 	if(target.type === 'checkbox' || columnName === '_checked'){
 		return;

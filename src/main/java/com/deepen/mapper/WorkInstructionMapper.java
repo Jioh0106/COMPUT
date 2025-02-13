@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.LineInfoDTO;
@@ -43,4 +42,9 @@ public interface WorkInstructionMapper {
 	
 	// 작업지시 테이블 정보
 	List<Map<String, Object>> selectWorkInstruction();
+	
+	//품목번호에 해당하는 자재 조회
+	List<Map<String, Object>> selectMaterialsByProductNo(String productNo);
+	
+	void insertMaterialInWareHouse(Map<String, Object> insertData);
 }
