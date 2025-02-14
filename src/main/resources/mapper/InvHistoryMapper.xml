@@ -22,7 +22,8 @@
 		   c.common_detail_name AS change_reason,
 		   i.reason_detail,
 		   i.mod_user,
-		   TO_CHAR(i.mod_date, 'YYYY-MM-DD HH24:MI:SS') AS mod_date
+		   TO_CHAR(i.mod_date, 'YYYY-MM-DD HH24:MI:SS') AS mod_date,
+		   i.diff_count
 	FROM inventory_history i
 	LEFT JOIN common_detail c
 	ON i.change_reason = c.common_detail_code

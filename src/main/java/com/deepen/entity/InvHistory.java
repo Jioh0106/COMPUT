@@ -42,5 +42,8 @@ public class InvHistory {
 	@Column(name ="MOD_DATE" )
 	private LocalDateTime mod_date;//수정일
 	
+	@Column(name ="DIFF_COUNT" )
+	private Integer diff_count; // 변경후실재고량 - 변경전실재고량
+	
 	
 }

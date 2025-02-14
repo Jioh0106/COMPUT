@@ -43,6 +43,7 @@ public class InvHistoryService {
 			invHistory.setChange_reason(dto.getChange_reason());
 			invHistory.setReason_detail(dto.getReason_detail());
 			invHistory.setMod_date(LocalDateTime.now());
+			invHistory.setDiff_count(dto.getDiff_count()); 
 			
 			invhRepository.save(invHistory);//변경이력테이블에 저장
 			

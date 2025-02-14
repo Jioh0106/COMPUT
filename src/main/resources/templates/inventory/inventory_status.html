@@ -243,6 +243,7 @@
 				{header: '번호', name: 'HISTORY_NO', hidden: true, width: 60},
 				{header: '변경 전 실재고량', name: 'PREV_COUNT', width: 100},
 				{header: '변경 후 실재고량', name: 'NEW_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '차이값', name: 'DIFF_COUNT', editor: 'text', sortable: true, width: 100},
 				{header: '변경사유', name: 'CHANGE_REASON', width: 120,
 					formatter: ({ value }) => {
 				        const reason = reasonChangeList.find(item => item.code === value);
@@ -327,9 +328,14 @@
 		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
 		let inventory_no = null; // 클릭한 행의 재고번호
 		let inventory_count = null; // 클릭한 행의 실재고량
-	
+		
+		//모달창 열릴때
 		inventoryGrid.on('click', function (ev) {
-			  // 클릭된 row 데이터 가져오기
+			 
+			    //모달창 초기화
+			    historyGrid.resetData([]);
+			    
+			    // 클릭된 row 데이터 가져오기
 	        	const rowData = ev.instance.getRow(ev.rowKey);
 	        	inventory_no = rowData.inventory_no;
 	        	inventory_count = rowData.inventory_count;
@@ -337,17 +343,25 @@
 				console.log('로그인한 사번 : ', emp_id);	        
 				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
 				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
+				
 				$('#history').modal('show');
-			
+				
+
 			//변경이력 데이터 조회 요청 (GET /api/inventory/history/{inventory_no})
 			$('#history').on('shown.bs.modal', function () {
 			fetch(`/api/inventory/history/${inventory_no}`)
 			        .then(response => response.json())
 			        .then(data => {
 			            console.log("불러온 변경이력 데이터:", data);
+			            
+			            // ✅ 변경 후 실재고량 - 변경 전 실재고량 계산 후 업데이트
+		                const updatedData = data.map(row => ({
+		                    ...row,
+		                    DIFF_COUNT: row.NEW_COUNT - row.PREV_COUNT
+		                }));
 
-			            // ✅ 변경이력 데이터를 TOAST UI Grid에 적용
-			            historyGrid.resetData(data);
+			            //변경이력 데이터를 TOAST UI Grid에 적용
+			            historyGrid.resetData(updatedData);
 			            historyGrid.refreshLayout();
 						
 			        })
@@ -357,7 +371,20 @@
 	        	});
 			});
 		
-	
+		
+		//차이값 자동입력
+		historyGrid.on('afterChange', (ev) => {
+		    ev.changes.forEach(change => {
+		        if (change.columnName === 'NEW_COUNT') {
+		            const rowKey = change.rowKey;
+		            const newCount = historyGrid.getValue(rowKey, 'NEW_COUNT') || 0;
+		            const prevCount = historyGrid.getValue(rowKey, 'PREV_COUNT') || 0;
+		
+		            historyGrid.setValue(rowKey, 'DIFF_COUNT', newCount - prevCount);
+		        }
+		    });
+		});
+
 			
 		// "추가" 버튼 클릭 이벤트
 		$('#append').on('click', function (e) {
@@ -369,21 +396,24 @@
 			   }
 
 			   console.log('추가 버튼 클릭: inventory_no =', inventory_no, ', inventory_count =', inventory_count);
-			// 기본값으로 새 행 데이터 생성
-			const newRow = {
-				history_no: '',
-				prev_count: inventory_count,
-				new_count: '',
-				change_reason: '', 
-				reason_detail: '', 
-				mod_user: emp_id, 
-				mod_date: '' 
-			};
 			
+		    // 기본값으로 새 행 데이터 생성
+			const newRow = {
+				HISTORY_NO: '',
+				PREV_COUNT: inventory_count,
+				NEW_COUNT: '',
+				CHANGO_REASON: '', 
+				REASON_DETAIL: '', 
+				MOD_USER: emp_id, 
+				MOD_DATE: '' ,
+				DIFF_COUNT: ''
+			};
+		
 			// 새 행을 TOAST UI Grid에 추가
 			historyGrid.prependRow(newRow, {
 				focus: true // 추가된 행에 포커스
 			});
+			historyGrid.refreshLayout();
 			
 		}); // 추가 버튼 이벤트
 	
@@ -391,10 +421,14 @@
 		// "저장" 버튼 클릭 이벤트
 			$('#modalSave').on('click', async function () {
 				
-				const checkedColumns = ['prev_count', 'new_count', 'change_reason', 'mod_user']
+				const checkedColumns = ['PREV_COUNT', 'NEW_COUNT', 'CHANGE_REASON', 'MOD_USER']
 				// 모든 행 데이터 가져오기
-				  const rows = historyGrid.getData();
-
+				  let rows = historyGrid.getData();
+				
+				// 기존 행(`HISTORY_NO`가 있는 경우) 제외하고 새로운 행만 필터링
+			    rows = rows.filter(row => !row.HISTORY_NO && row.NEW_COUNT !== "");
+				
+				
 				  // 빈 값이 있는지 확인
 				  for (const row of rows) {
 				      for (const column of checkedColumns) {
@@ -404,14 +438,16 @@
 				          }
 				      }
 				  }
-				  
-				  const data = rows.map(row =>({
+				  	
+				  	let date  = [];
+				  	data = rows.map(row =>({
 					inventory_no: inventory_no, //전역변수 클릭한 행의 재고번호
-					prev_count: inventory_count, //전역변수 클릭한 행의 실재고량
-					new_count: row.new_count,
-					change_reason: row.change_reason || null,
-					reason_detail: row.reason_detail,
-					mod_user: emp_id //전역변수
+					prev_count: row.PREV_COUNT,
+					new_count: row.NEW_COUNT,
+					change_reason: row.CHANGE_REASON || null,
+					reason_detail: row.REASON_DETAIL,
+					mod_user: emp_id, //전역변수
+					diff_count: row.DIFF_COUNT
 					
 				  }));
 				  
@@ -428,6 +464,8 @@
 				   
 				   if (response.ok) {
 				              alert('저장 완료!');
+				              $('#history').modal('hide');
+				              location.reload(true); // 페이지 새로고침
 				          } else {
 				              alert('저장 실패');
 				          }

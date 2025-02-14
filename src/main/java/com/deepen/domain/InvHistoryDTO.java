@@ -16,6 +16,7 @@ public class InvHistoryDTO {
 	private String reason_detail; //기타사유
 	private String mod_user; //수정자
 	private LocalDateTime mod_date;//수정일
+	private Integer diff_count; //변경후 실재고량 - 변경전 실재고량
 	
 	
 }
