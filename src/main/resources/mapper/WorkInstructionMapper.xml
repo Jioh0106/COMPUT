@@ -285,6 +285,12 @@
 			#{zone}
 		)
 	</insert>
+	
+	<update id="updateWorkStartInfo" parameterType="Map">
+		UPDATE work_instruction SET 
+			line_no = 'PRGR005' 
+		WHERE plan_id = #{PLAN_ID}
+	</update>
 </mapper>
 
 

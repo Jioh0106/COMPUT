@@ -97,4 +97,11 @@ public class WorkInstructionRestController {
 		log.info("자재 인서트 준비");
 		wiService.insertMaterialInWareHouse(insertMaterialData);
 	}
+	
+	@PostMapping("update-by-workStartInfo")
+	public void updateByworkStartBtn(@RequestBody List<Map<String, Object>> updateData) {
+		log.info("작업 시작 정보 update 준비");
+		wiService.updateWorkStartInfo(updateData);
+	}
+	
 }

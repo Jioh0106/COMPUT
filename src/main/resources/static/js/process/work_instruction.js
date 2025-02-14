@@ -70,6 +70,8 @@ async function fetchLineInfoList(){
 			value: item.value
 		}));
 		
+		console.log("라인정보 확인",gridLineListItems);
+		
 		// selectBox 생성
 		//selectBox("#lineSelectBox","라인 선택",lineData);
 		
@@ -140,7 +142,9 @@ function createWorkInstructionGrid(gridLineListItems = []){
 																	              	listItems: gridLineListItems 
 													        				 }},
 																		 	formatter: ({ value }) => {
+																				console.log("라인 매칭 값 (원본):", value); 
 																		        const selectedItem = gridLineListItems.find(item => item.value == value);
+																				console.log("라인 매칭 값:", value, selectedItem);
 																		        return selectedItem ? selectedItem.text : value;  // 존재하면 text(공정 1라인), 없으면 기본값
 																		    }},
 				{header: '공정', name: 'process_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
@@ -149,6 +153,7 @@ function createWorkInstructionGrid(gridLineListItems = []){
 				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
 				{header: '작업 종료일', name: 'end_date', width:120, sortable: true},
 				{header: '작업 담당자', name: 'emp_name', width:110, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }}
+				//{header: '작업 아이디', name: 'emp_id',width:110}
 			],
 			data: [],
 			columnOptions: {
@@ -157,6 +162,8 @@ function createWorkInstructionGrid(gridLineListItems = []){
 			
 		});
 		
+		//workInstructionGrid.hideColumn("emp_id");
+		
 		workInstructionGrid.on('click',() => {
 			fetchMaterialsByRowSelection();
 		});
@@ -164,6 +171,7 @@ function createWorkInstructionGrid(gridLineListItems = []){
 		
 		// 데이터 fetch
 		fetchWorkInstruction();
+		
 		
 };
 
@@ -421,6 +429,95 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 });
 
 async function insertOB(url,data){
+	try{
+		const response = await fetch(url,{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		//location.reload(true);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+};
+
+// 작업담당자 추가 버튼 이벤트
+document.getElementById('addBtn').addEventListener('click', () => {
+	const checkedWorkerGrid = workerGrid.getCheckedRows();
+	    const checkedWiGrid = workInstructionGrid.getCheckedRows();
+	    
+	    if (checkedWorkerGrid.length === 0) {
+	        console.warn("작업담당자를 선택하세요.");
+	        return;
+	    }
+	    
+	    if (checkedWiGrid.length === 0) {
+	        console.warn("작업지시를 선택하세요.");
+	        return;
+	    }
+
+	    const selectedWorker = checkedWorkerGrid[0]; // 첫 번째 체크된 작업자
+	    const selectedWorkerName = selectedWorker.name;
+
+	    checkedWiGrid.forEach(row => {
+	        // UI에서 직접 셀 업데이트
+	        workInstructionGrid.setValue(row.rowKey, 'emp_name', selectedWorkerName);
+	    });
+
+	    console.log("담당자 배정 완료:", selectedWorkerName);
+});
+
+// 작업담당자 삭제 버튼 이벤트
+document.getElementById('deleteBtn').addEventListener('click', () => {
+    const checkedWiGrid = workInstructionGrid.getCheckedRows();
+
+    if (checkedWiGrid.length === 0) {
+        console.warn("작업지시를 선택하세요.");
+        return;
+    }
+
+    checkedWiGrid.forEach(row => {
+        // 작업 담당자 정보 제거
+        workInstructionGrid.setValue(row.rowKey, 'emp_name', '');
+    });
+
+    console.log("작업 담당자 삭제 완료");
+});
+
+// 작업시작 버튼 동작
+document.getElementById('workStartBtn').addEventListener('click', () => {
+	const checkedWiGrid = workInstructionGrid.getCheckedRows();
+	const checkedWorkerRows = workerGrid.getCheckedRows().map(item => item.no);
+	console.log("추가할 사원아이디",checkedWorkerRows);
+	
+	if (checkedWiGrid.length === 0) {
+	       console.warn("작업지시 항목이 선택되지 않았습니다.");
+	       return;
+	}
+	
+   	const fWiNo = checkedWorkerRows[0]; // 첫 번째 선택된 사원번호 가져오기
+	
+   	// 각 작업지시 데이터에 firstWiNo 추가
+   	const updateWiData = checkedWiGrid.map(row => ({
+	       ...row,
+	       wiNo: fWiNo
+   	}));
+	
+	console.log("사원아이디 추가한 작업 시작 row ",updateWiData);
+	
+	workStartBtn('/api/update-by-workStartInfo',updateWiData);
+	
+});
+
+async function workStartBtn(url,data){
 	try{
 		const response = await fetch(url,{
 			method: 'POST',

@@ -163,9 +163,10 @@
 				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 시작 -->
 				    <div class="row h-75 py-1">
 				        <div class="col d-flex justify-content-end ">
-				            <button class="btn btn-outline-primary btn-sm align-items-center justify-content-center me-1" id="workStart">작업시작</button>
-				            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center me-1" id="defectCheck">품질검사</button>
-				            <button class="btn btn-outline-secondary btn-sm align-items-center justify-content-center" id="workEnd">작업종료</button>
+				            <button class="btn btn-outline-primary btn-sm align-items-center justify-content-center me-1" id="workStartBtn">작업시작</button>
+				            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center me-1" id="processFinishBtn">공정완료</button>
+				            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center me-1" id="defectCheckBtn">품질검사</button>
+				            <button class="btn btn-outline-secondary btn-sm align-items-center justify-content-center" id="workEndBtn">작업종료</button>
 				        </div>
 				    </div>
 				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 끝 -->
@@ -194,8 +195,8 @@
 				    <div class="tab-content mt-2">
 				        <div class="tab-pane active" id="tab-worker" role="tabpanel">
 				        	<div class="text-end mb-1">
-					            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center">추가</button>
-					            <button class="btn btn-outline-danger btn-sm align-items-center justify-content-center">삭제</button>
+					            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center" id="addBtn">추가</button>
+					            <button class="btn btn-outline-danger btn-sm align-items-center justify-content-center" id="deleteBtn">삭제</button>
 				        	</div>
 				            <div class="grid-height" id="workerGrid" ></div>
 				        </div>

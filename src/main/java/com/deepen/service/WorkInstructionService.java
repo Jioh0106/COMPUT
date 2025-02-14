@@ -110,15 +110,6 @@ public class WorkInstructionService {
 	// 작업 지시 정보 조회
 	public List<Map<String, Object>> getWorkInstruction() {
 		
-		// 가공/표면처리/조립
-		// 처음 공정인 가공이 insert 되고
-		// 가공 품질검사 시작 => lot 공정 이력 인서트
-		// 가공 검사완료 => 작업지시 테이블 공정 표면처리로 update
-		// 표면처리 품질검사 시작 => lot 공정 이력 인서트
-		// 표면처리 검사 완료 => 작업지시 테이블 공정 조립으로 update
-		// 조립 품질검사 시작 =>  lot 공정 이력 인서트
-		// 조립 검사 완료 => 공정 상태 완료
-		
 		List<Map<String, Object>> selectList = wiMapper.selectWorkInstruction();
 		
 		return selectList;
@@ -168,6 +159,11 @@ public class WorkInstructionService {
 			wiMapper.insertMaterialInWareHouse(materialData);
 			log.info("인서트한 정보 : "+materialData.toString());
 		}
+		
+	}
+	
+	public void updateWorkStartInfo(List<Map<String, Object>> updateData) {
+		log.info("업데이트할 작업시작 정보 : "+updateData);
 		
 	}
 	
