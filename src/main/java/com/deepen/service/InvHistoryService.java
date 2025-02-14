@@ -67,5 +67,21 @@ public class InvHistoryService {
 	}
 	
 	
+	//변경이력 삭제 후 재고현황 테이블 업데이트 처리
+	public void deleteAndUpdateInv(List<Integer> historyNoList, Integer inventoryNo) {
+		if(historyNoList == null || historyNoList.isEmpty()) {
+			throw new IllegalArgumentException("삭제할 변경이력이 없습니다.");
+		}
+		
+		//삭제처리
+		invhMapper.deleteHistory(historyNoList);
+		log.info("삭제된 히스토리번호 : "+ historyNoList);
+		//업데이트처리
+		invhMapper.updateInv(inventoryNo);
+		log.info("업데이트된 재고번호 : "+ inventoryNo);
+	}
+	
+	
+	
 	
 }

@@ -476,6 +476,49 @@
 				
 			}); // 저장 클릭 이벤트
 			
+		
+			
+			
+			
+		//"삭제" 버튼 클릭 이벤트
+		$('#delete').on('click', async function () {
+		    const selectedRows = historyGrid.getCheckedRows();
+		    
+		    if (selectedRows.length === 0) {
+		        alert("삭제할 변경 이력을 선택하세요.");
+		        return;
+		    }
+
+		    const historyNoList = selectedRows.map(row => row.HISTORY_NO); // 선택된 PK 리스트
+		    console.log("삭제할 변경 이력 목록:", historyNoList);
+
+		    try {
+		        const response = await fetch('/api/inventory/history/delete', {
+		            method: 'POST',
+		            headers: { 
+		                'Content-Type': 'application/json',
+		                [header]: token
+		            },
+		            body: JSON.stringify({
+		                historyNoList: historyNoList,
+		                inventoryNo: inventory_no  // 전역 변수 사용
+		            })
+		        });
+
+		        if (response.ok) {
+		            alert('삭제 완료 및 재고 현황 업데이트 완료');
+		            $('#history').modal('hide'); // 모달 닫기
+		            location.reload(); // 새로고침하여 UI 반영
+		        } else {
+		            alert('삭제 실패');
+		        }
+		    } catch (error) {
+		        console.error('삭제 오류:', error);
+		        alert('삭제 중 오류 발생');
+		    }
+		});
+
+			
 			
 		
 		

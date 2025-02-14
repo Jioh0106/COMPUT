@@ -32,8 +32,44 @@
 	</select>
 
 
+<!--변경이력 삭제-->
+	<delete id="deleteHistory" parameterType="list">
+        DELETE FROM inventory_history
+        WHERE history_no IN
+        <foreach collection="historyNoList" item="history_no" open="(" separator="," close=")">
+            #{history_no}
+        </foreach>
+    </delete>
+	
 
-
+<!--변경이력 최신수정일에 해당하는 값으로 재고현황 테이블 업데이트-->
+	<update id="updateInv" parameterType="java.util.Map">
+	 UPDATE inventory i
+	 SET 
+	    i.inventory_qty = NVL( 
+	        (SELECT new_count
+	         FROM (
+	             SELECT h.new_count
+	             FROM inventory_history h
+	             WHERE h.inventory_no = i.inventory_no
+	             ORDER BY h.mod_date DESC
+	         ) WHERE ROWNUM = 1  
+	        ),
+	        i.inventory_qty  
+	    ),
+	    i.inventory_count = NVL( 
+	        (SELECT new_count
+	         FROM (
+	             SELECT h.new_count
+	             FROM inventory_history h
+	             WHERE h.inventory_no = i.inventory_no
+	             ORDER BY h.mod_date DESC
+	         ) WHERE ROWNUM = 1  
+	        ),
+	        i.inventory_qty  
+	    )
+	 WHERE i.inventory_no = #{inventory_no}
+	</update>
 
 
 

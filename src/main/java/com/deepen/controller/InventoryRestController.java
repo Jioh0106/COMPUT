@@ -79,7 +79,17 @@ public class InventoryRestController {
 		return invhService.historyList(inventory_no);
 	}
 	
-	
+	//변경이력 삭제
+	@PostMapping("/history/delete")
+	public ResponseEntity<?> deleteHistory(@RequestBody Map<String, Object> request){
+		List<Integer> historyNoList = (List<Integer>)request.get("historyNoList");
+		Integer inventoryNo = (Integer)request.get("inventoryNo");
+		
+		invhService.deleteAndUpdateInv(historyNoList, inventoryNo);
+		
+		return ResponseEntity.ok("삭제 완료 및 재고 현황 업데이트 완료");
+		
+	}
 	
 	
 	
