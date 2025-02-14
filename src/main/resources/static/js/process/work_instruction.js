@@ -57,7 +57,6 @@ async function fetchLineInfoList(){
 		}
 		
 		const lineInfoList = await response.json();
-		console.log("lineInfoList",lineInfoList);
 		
 		const lineData = lineInfoList.map(item =>({
 			label: item.lineName,
@@ -96,6 +95,7 @@ window.onload = async function() {
 	//fetchProcessInfoList();
 	//fetchLineInfoList();
 	const gridLineListItems = await fetchLineInfoList();
+	console.log("gridLineListItems",gridLineListItems);
 	
 	// 그리드 생성
 	createWorkInstructionGrid(gridLineListItems);
@@ -142,9 +142,9 @@ function createWorkInstructionGrid(gridLineListItems = []){
 																	              	listItems: gridLineListItems 
 													        				 }},
 																		 	formatter: ({ value }) => {
-																				console.log("라인 매칭 값 (원본):", value); 
+																				//console.log("라인 매칭 값 (원본):", value); 
 																		        const selectedItem = gridLineListItems.find(item => item.value == value);
-																				console.log("라인 매칭 값:", value, selectedItem);
+																				//console.log("라인 매칭 값:", value, selectedItem);
 																		        return selectedItem ? selectedItem.text : value;  // 존재하면 text(공정 1라인), 없으면 기본값
 																		    }},
 				{header: '공정', name: 'process_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
@@ -164,14 +164,12 @@ function createWorkInstructionGrid(gridLineListItems = []){
 		
 		//workInstructionGrid.hideColumn("emp_id");
 		
-		workInstructionGrid.on('click',() => {
-			fetchMaterialsByRowSelection();
-		});
-		
-		
 		// 데이터 fetch
 		fetchWorkInstruction();
 		
+		workInstructionGrid.on('click',() => {
+			fetchMaterialsByRowSelection();
+		});
 		
 };
 
@@ -493,8 +491,8 @@ document.getElementById('deleteBtn').addEventListener('click', () => {
 });
 
 // 작업시작 버튼 동작
-document.getElementById('workStartBtn').addEventListener('click', () => {
-	const checkedWiGrid = workInstructionGrid.getCheckedRows();
+document.getElementById('workStartBtn').addEventListener('click', async () => {
+	const checkedWiGrid = workInstructionGrid.getModifiedRows().updatedRows;
 	const checkedWorkerRows = workerGrid.getCheckedRows().map(item => item.no);
 	console.log("추가할 사원아이디",checkedWorkerRows);
 	
@@ -508,12 +506,13 @@ document.getElementById('workStartBtn').addEventListener('click', () => {
    	// 각 작업지시 데이터에 firstWiNo 추가
    	const updateWiData = checkedWiGrid.map(row => ({
 	       ...row,
-	       wiNo: fWiNo
+	       empId: fWiNo,
+		   //line_name: workInstructionGrid.getValue(row.rowKey, 'line_name')
    	}));
 	
-	console.log("사원아이디 추가한 작업 시작 row ",updateWiData);
+	console.log("updateData ",updateWiData);
 	
-	workStartBtn('/api/update-by-workStartInfo',updateWiData);
+	workStartBtn('/api/start-work-instruction',updateWiData);
 	
 });
 
@@ -537,3 +536,13 @@ async function workStartBtn(url,data){
 		console.log("error",error);
 	}
 };
+
+// 공정완료 버튼 동작
+document.getElementById('processFinishBtn').addEventListener('click', async () => {
+	console.log("공정 완료 버튼");
+	
+	const response = await fetch('/api/work-instruction-info');
+	const fetchWorkInstructionInfo = response.json();
+	console.log("공정완료동작을위한 정보",fetchWorkInstructionInfo);
+	
+});

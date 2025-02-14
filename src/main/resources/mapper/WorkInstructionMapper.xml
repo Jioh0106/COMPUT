@@ -209,8 +209,8 @@
 		    wi.wi_status AS "wi_status",
 		    cdw.common_detail_name AS "wi_status_name",
 		    wi.qc_status AS "qc_status",
-		    wi.wi_start_date AS "start_date",
-		    wi.wi_end_date AS "end_date",
+		    TO_CHAR(wi.wi_start_date, 'YYYY-MM-DD') AS "start_date",
+		    TO_CHAR(wi.wi_end_date, 'YYYY-MM-DD') AS "end_date",
 		    wi.emp_id AS "emp_id",
 		    e.emp_name AS "emp_name"
 		FROM work_instruction wi 
@@ -288,8 +288,11 @@
 	
 	<update id="updateWorkStartInfo" parameterType="Map">
 		UPDATE work_instruction SET 
-			line_no = 'PRGR005' 
-		WHERE plan_id = #{PLAN_ID}
+			line_no = #{line_name},
+			wi_status = 'PRGR002',
+			wi_start_date = sysdate,
+			emp_id = #{empId}
+		WHERE wi_no = #{wi_no}
 	</update>
 </mapper>
 

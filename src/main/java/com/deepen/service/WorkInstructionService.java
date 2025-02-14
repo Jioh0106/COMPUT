@@ -136,7 +136,7 @@ public class WorkInstructionService {
 			
 			String qtyStr = (String)materialData.get("qty");
 			try {
-	            int qty = Integer.parseInt(qtyStr); // 자재 수량을 double로 변환
+	            int qty = Integer.parseInt(qtyStr); // 자재 수량을 int로 변환
 	            int calculatedQty = qty * volume; // 자재 수량과 vol을 곱한 값
 	            
 	            log.info("자재 수량: " + qty + ", 곱할 양: " + volume + ", 계산된 자재량: " + calculatedQty);
@@ -162,8 +162,16 @@ public class WorkInstructionService {
 		
 	}
 	
-	public void updateWorkStartInfo(List<Map<String, Object>> updateData) {
-		log.info("업데이트할 작업시작 정보 : "+updateData);
+	public void startWorkInstruction(List<Map<String, Object>> updateDataList, String empId) {
+		log.info("작업시작 정보 : "+updateDataList);
+		
+		// 작업 시작 정보 update
+//		for(Map<String, Object> updateData : updateDataList) {
+//			wiMapper.updateWorkStartInfo(updateData);
+//		}
+		log.info("작업 지시 정보 업데이트 완료");
+		
+		// 공정 lot insert
 		
 	}
 	
