@@ -14,6 +14,7 @@
     <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
     <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="icon" href="images/favicon.png" type="images/png">
     
     <!-- CSRF 토큰 -->
     <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
@@ -36,10 +37,10 @@
             content: " *";
             color: red;
         }
-        #qcGrid, #defectGrid {
-            margin-top: 20px;
-            min-height: 400px;
-        }
+/*         #qcGrid, #defectGrid { */
+/*             margin-top: 20px; */
+/*             min-height: 400px; */
+/*         } */
     </style>
 </head>
 
@@ -75,37 +76,38 @@
                                     </div>
                                 </div>
 
-                                <!-- 탭 메뉴 -->
-                                <ul class="nav nav-tabs" id="qualityTab" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="qc-tab" 
-                                                data-bs-toggle="tab" data-bs-target="#qc" 
-                                                type="button" role="tab">품질검사 기준</button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="defect-tab" 
-                                                data-bs-toggle="tab" data-bs-target="#defect" 
-                                                type="button" role="tab">불량검사 기준</button>
-                                    </li>
-                                </ul>
-
-                                <!-- 탭 콘텐츠 -->
-                                <div class="tab-content mt-3" id="qualityTabContent">
-                                    <div class="tab-pane fade show active" id="qc" role="tabpanel">
-                                        <div id="qcGrid"></div>
-                                    </div>
-                                    <div class="tab-pane fade" id="defect" role="tabpanel">
-                                        <div id="defectGrid"></div>
-                                    </div>
-                                </div>
-
-                                <!-- 버튼 그룹 -->
-                                <div class="float-end mt-3">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="addNewRow()">추가</button>
-                                    <button type="button" class="btn btn-outline-success" onclick="saveData()">저장</button>
-                                    <button type="button" class="btn btn-outline-secondary" id="editBtn" onclick="toggleEditMode()">수정</button>
-                                    <button type="button" class="btn btn-outline-danger" onclick="deleteSelectedRows()">삭제</button>
-                                </div>
+							    <!-- 품질검사 기준 -->
+							    <div class="row">
+							        <div class="col-md-12">
+							            <h5>품질검사 기준</h5>
+							            <div id="qcGrid"></div>
+							        </div>
+							    </div>
+							    
+							    <div class="row mt-3">
+							        <div class="col-md-12 text-end">
+							            <button type="button" class="btn btn-outline-secondary" onclick="addNewRow('qc')">추가</button>
+							        </div>
+							    </div>
+							
+							    <hr>
+							
+							    <!-- 상품별 상세 기준 -->
+							    <div class="row">
+							        <div class="col-md-12">
+							            <h5>상품별 상세 기준</h5>
+							            <div id="qcProductGrid"></div>
+							        </div>
+							    </div>
+							
+							    <!-- 버튼 그룹 -->
+							    <div class="row mt-3">
+							        <div class="col-md-12 text-end">
+							            <button type="button" class="btn btn-outline-secondary" onclick="addNewRow('qcProduct')">추가</button>
+							            <button type="button" class="btn btn-outline-success" id="saveBtn" onclick="saveData()">저장</button>
+							            <button type="button" class="btn btn-outline-danger" id="deleteBtn" onclick="deleteSelectedRows()">삭제</button>
+							        </div>
+							    </div>
                             </form>
                         </div>
                     </section>

@@ -1,18 +1,21 @@
 package com.deepen.service;
 
 import com.deepen.entity.QcMaster;
-import com.deepen.domain.DefectMasterDTO;
+import com.deepen.entity.QcProductMapping;
 import com.deepen.domain.QcMasterDTO;
+import com.deepen.domain.QcProductMappingDTO;
 import com.deepen.entity.CommonDetail;
-import com.deepen.entity.DefectMaster;
 import com.deepen.entity.ProcessInfo;
+import com.deepen.entity.Product;
 import com.deepen.repository.QcMasterRepository;
+import com.deepen.repository.QcProductMappingRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.deepen.repository.CommonDetailRepository;
-import com.deepen.repository.DefectMasterRepository;
 import com.deepen.repository.ProcessInfoRepository;
+import com.deepen.repository.ProductRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +27,16 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class QualityService {
     
     private final QcMasterRepository qcMasterRepository;
-    private final DefectMasterRepository defectMasterRepository;
+    private final QcProductMappingRepository qcProductMappingRepository;
     private final ProcessInfoRepository processInfoRepository;
     private final CommonDetailRepository commonDetailRepository;
+    private final ProductRepository productRepository;
     
+    // 기준정보 관련 메서드
     public List<QcMasterDTO> getQcList() {
         return qcMasterRepository.findBySearchConditions(null, null)
                                 .stream()
@@ -38,90 +44,44 @@ public class QualityService {
                                 .collect(Collectors.toList());
     }
     
-    public List<DefectMasterDTO> getDefectList() {
-        return defectMasterRepository.findBySearchConditions(null, null)
-                                   .stream()
-                                   .map(this::convertToDefectDTO)
-                                   .collect(Collectors.toList());
-    }
-
-    // Process 목록 조회
     public List<ProcessInfo> getProcessList() {
         return processInfoRepository.findByIsActive("Y");
     }
     
-    // 단위 목록 조회
+    public List<Product> getProductList() {
+    	return productRepository.findAll();
+    }
+    
     public List<CommonDetail> getUnitList() {
         return commonDetailRepository.findByCommonCode("UNIT");
     }
     
-    private QcMasterDTO convertToQcDTO(QcMaster entity) {
-        QcMasterDTO dto = new QcMasterDTO();
-        dto.setQcCode(entity.getQcCode());
-        dto.setQcName(entity.getQcName());
-        
-        // Process 정보
-        if(entity.getProcess() != null) {
-            dto.setProcess(entity.getProcess().getProcessNo());
-        }
-        
-        dto.setTargetValue(entity.getTargetValue());
-        dto.setUcl(entity.getUcl());
-        dto.setLcl(entity.getLcl());
-        dto.setQcMethod(entity.getQcMethod());
-        
-        // Unit 정보
-        if(entity.getUnit() != null) {
-            dto.setUnit(entity.getUnit().getCommon_detail_code());
-        }
-        
-        dto.setUseYn(entity.getUseYn());
-        dto.setCreateTime(entity.getCreateTime());
-        dto.setUpdateTime(entity.getUpdateTime());
-        
-        return dto;
+    // 제품별 품질기준 관련 메서드
+    public List<QcProductMappingDTO> getProductQcList(String qcCode) {
+        return qcProductMappingRepository.findByQcMaster_QcCode(qcCode)
+                                       .stream()
+                                       .map(this::convertToProductQcDTO)
+                                       .collect(Collectors.toList());
     }
     
-    private DefectMasterDTO convertToDefectDTO(DefectMaster entity) {
-        DefectMasterDTO dto = new DefectMasterDTO();
-        dto.setDefectCode(entity.getDefectCode());
-        dto.setDefectName(entity.getDefectName());
-        
-        // Process 정보
-        if(entity.getProcess() != null) {
-            dto.setProcess(entity.getProcess().getProcessNo());
-        }
-        
-        dto.setDefectType(entity.getDefectType());
-        dto.setDefectLevel(entity.getDefectLevel());
-        dto.setJudgmentCriteria(entity.getJudgmentCriteria());
-        dto.setUseYn(entity.getUseYn());
-        dto.setCreateTime(entity.getCreateTime());
-        dto.setUpdateTime(entity.getUpdateTime());
-        
-        return dto;
-    }
-    
+    // QC 마스터 저장
     @Transactional
     public QcMasterDTO createQc(QcMasterDTO dto) {
         QcMaster entity = new QcMaster();
         entity.setQcCode(generateQcCode());
         entity.setQcName(dto.getQcName());
         
-        // Process 설정
         ProcessInfo process = processInfoRepository.findById(dto.getProcess())
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
-        entity.setTargetValue(dto.getTargetValue());
-        entity.setUcl(dto.getUcl());
-        entity.setLcl(dto.getLcl());
         entity.setQcMethod(dto.getQcMethod());
         
-        // Unit 설정
-        CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
-            .orElseThrow(() -> new RuntimeException("Unit not found"));
-        entity.setUnit(unit);
+        if (dto.getUnit() != null) {
+            CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
+                .orElseThrow(() -> new RuntimeException("Unit not found"));
+            entity.setUnit(unit);
+        }
         
         entity.setUseYn(dto.getUseYn());
         entity.setCreateTime(LocalDateTime.now());
@@ -129,42 +89,27 @@ public class QualityService {
         return convertToQcDTO(qcMasterRepository.save(entity));
     }
 
+    // 제품별 QC 기준 저장
     @Transactional
-    public DefectMasterDTO createDefect(DefectMasterDTO dto) {
-        DefectMaster entity = new DefectMaster();
-        entity.setDefectCode(generateDefectCode());
-        entity.setDefectName(dto.getDefectName());
+    public QcProductMappingDTO createProductQc(QcProductMappingDTO dto) {
+        QcProductMapping entity = new QcProductMapping();
         
-        // Process 설정
-        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
-            .orElseThrow(() -> new RuntimeException("Process not found"));
-        entity.setProcess(process);
+        QcMaster qcMaster = qcMasterRepository.findById(dto.getQcCode())
+            .orElseThrow(() -> new RuntimeException("QC not found"));
+        entity.setQcMaster(qcMaster);
         
-        entity.setDefectType(dto.getDefectType());
-        entity.setDefectLevel(dto.getDefectLevel());
-        entity.setJudgmentCriteria(dto.getJudgmentCriteria());
-        entity.setUseYn(dto.getUseYn());
+        Product product = productRepository.findById(dto.getProduct_no())
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+        entity.setProduct(product);
+        
+        entity.setTargetValue(dto.getTargetValue());
+        entity.setUcl(dto.getUcl());
+        entity.setLcl(dto.getLcl());
+        entity.setUseYn("Y");
         entity.setCreateTime(LocalDateTime.now());
+        entity.setCreateUser(dto.getCreateUser());
         
-        return convertToDefectDTO(defectMasterRepository.save(entity));
-    }
-
-    private String generateQcCode() {
-        String lastCode = qcMasterRepository.findTopByOrderByQcCodeDesc()
-                .map(QcMaster::getQcCode)
-                .orElse("QC000");
-        
-        int sequence = Integer.parseInt(lastCode.replace("QC", "")) + 1;
-        return String.format("QC%03d", sequence);
-    }
-
-    private String generateDefectCode() {
-        String lastCode = defectMasterRepository.findTopByOrderByDefectCodeDesc()
-                .map(DefectMaster::getDefectCode)
-                .orElse("DF000");
-        
-        int sequence = Integer.parseInt(lastCode.replace("DF", "")) + 1;
-        return String.format("DF%03d", sequence);
+        return convertToProductQcDTO(qcProductMappingRepository.save(entity));
     }
     
     @Transactional
@@ -178,14 +123,13 @@ public class QualityService {
             .orElseThrow(() -> new RuntimeException("Process not found"));
         entity.setProcess(process);
         
-        entity.setTargetValue(dto.getTargetValue());
-        entity.setUcl(dto.getUcl());
-        entity.setLcl(dto.getLcl());
         entity.setQcMethod(dto.getQcMethod());
         
-        CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
-            .orElseThrow(() -> new RuntimeException("Unit not found"));
-        entity.setUnit(unit);
+        if (dto.getUnit() != null) {
+            CommonDetail unit = commonDetailRepository.findById(dto.getUnit())
+                .orElseThrow(() -> new RuntimeException("Unit not found"));
+            entity.setUnit(unit);
+        }
         
         entity.setUseYn(dto.getUseYn());
         entity.setUpdateTime(LocalDateTime.now());
@@ -194,32 +138,78 @@ public class QualityService {
     }
 
     @Transactional
-    public DefectMasterDTO updateDefect(DefectMasterDTO dto) {
-        DefectMaster entity = defectMasterRepository.findById(dto.getDefectCode())
-            .orElseThrow(() -> new RuntimeException("Defect not found"));
-            
-        entity.setDefectName(dto.getDefectName());
+    public QcProductMappingDTO updateProductQc(QcProductMappingDTO dto) {
+        QcProductMapping entity = qcProductMappingRepository.findById(dto.getMappingId())
+            .orElseThrow(() -> new RuntimeException("Product QC mapping not found"));
         
-        ProcessInfo process = processInfoRepository.findById(dto.getProcess())
-            .orElseThrow(() -> new RuntimeException("Process not found"));
-        entity.setProcess(process);
-        
-        entity.setDefectType(dto.getDefectType());
-        entity.setDefectLevel(dto.getDefectLevel());
-        entity.setJudgmentCriteria(dto.getJudgmentCriteria());
+        entity.setTargetValue(dto.getTargetValue());
+        entity.setUcl(dto.getUcl());
+        entity.setLcl(dto.getLcl());
         entity.setUseYn(dto.getUseYn());
         entity.setUpdateTime(LocalDateTime.now());
+        entity.setUpdateUser(dto.getUpdateUser());
         
-        return convertToDefectDTO(defectMasterRepository.save(entity));
+        return convertToProductQcDTO(qcProductMappingRepository.save(entity));
     }
     
     @Transactional
     public void deleteQc(String qcCode) {
+        if (!qcMasterRepository.existsById(qcCode)) {
+            throw new RuntimeException("삭제할 QC 코드가 존재하지 않습니다: " + qcCode);
+        }
         qcMasterRepository.deleteById(qcCode);
     }
 
+    private String generateQcCode() {
+        String lastCode = qcMasterRepository.findTopByOrderByQcCodeDesc()
+                .map(QcMaster::getQcCode)
+                .orElse("QC000");
+        
+        int sequence = Integer.parseInt(lastCode.replace("QC", "")) + 1;
+        return String.format("QC%03d", sequence);
+    }
+    
     @Transactional
-    public void deleteDefect(String defectCode) {
-        defectMasterRepository.deleteById(defectCode);
+    public void deleteProductQc(Integer mappingId) {
+        if (!qcProductMappingRepository.existsById(mappingId)) {
+            throw new RuntimeException("삭제할 매핑 ID가 존재하지 않습니다: " + mappingId);
+        }
+        qcProductMappingRepository.deleteById(mappingId);
+    }
+    
+    // DTO 변환 메서드들
+    private QcMasterDTO convertToQcDTO(QcMaster entity) {
+        QcMasterDTO dto = new QcMasterDTO();
+        dto.setQcCode(entity.getQcCode());
+        dto.setQcName(entity.getQcName());
+        if(entity.getProcess() != null) {
+            dto.setProcess(entity.getProcess().getProcessNo());
+        }
+        if(entity.getUnit() != null) {
+            dto.setUnit(entity.getUnit().getCommon_detail_code());
+        }
+        dto.setQcMethod(entity.getQcMethod());
+        dto.setUseYn(entity.getUseYn());
+        dto.setCreateTime(entity.getCreateTime());
+        dto.setUpdateTime(entity.getUpdateTime());
+        return dto;
+    }
+    
+    private QcProductMappingDTO convertToProductQcDTO(QcProductMapping entity) {
+        QcProductMappingDTO dto = new QcProductMappingDTO();
+        dto.setMappingId(entity.getMappingId());
+        dto.setQcCode(entity.getQcMaster().getQcCode());
+        dto.setQcName(entity.getQcMaster().getQcName());
+        dto.setProduct_no(entity.getProduct().getProduct_no());
+        dto.setProduct_name(entity.getProduct().getProduct_name());
+        dto.setTargetValue(entity.getTargetValue());
+        dto.setUcl(entity.getUcl());
+        dto.setLcl(entity.getLcl());
+        dto.setUseYn(entity.getUseYn());
+        dto.setCreateTime(entity.getCreateTime());
+        dto.setCreateUser(entity.getCreateUser());
+        dto.setUpdateTime(entity.getUpdateTime());
+        dto.setUpdateUser(entity.getUpdateUser());
+        return dto;
     }
 }
