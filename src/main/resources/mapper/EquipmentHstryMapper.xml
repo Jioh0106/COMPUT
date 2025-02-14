@@ -59,44 +59,47 @@
 			<if test="yearMonth != null and yearMonth != ''">
 				 AND TO_CHAR(hsty_date, 'YYYY-MM') = #{yearMonth}
 		 	</if>
-			<if test="name != null and name != '' or month != null and month != '' or chkListSize != 0">
-      AND (
-         <choose>
-            <when test="name != null and name != '' and month != null and month != '' and chkListSize != 0">
-               (
-                  TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
-                  AND (SELECT info_nm 
-                       FROM equipment_info 
-                       WHERE info_no = equipment_history.info_no) 
-                       LIKE '%' || #{name} || '%'
-                  AND hsty_type IN
-                  <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
-                     #{item}
-                  </foreach>
-               )
-            </when>
-            <otherwise>
-               (
-                  <if test="month != null and month != ''">
-                     TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
-                  </if>
-                  <if test="name != null and name != ''">
-                     OR (SELECT info_nm 
-                         FROM equipment_info 
-                         WHERE info_no = equipment_history.info_no) 
-                         LIKE '%' || #{name} || '%'
-                  </if>
-                  <if test="chkListSize != 0">
-                     OR hsty_type IN
-                     <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
-                        #{item}
-                     </foreach>
-                  </if>
-               )
-            </otherwise>
-         </choose>
-      )
-   </if>
+		 	<if test="name != null and name != '' or month != null and month != '' or chkListSize != 0">
+			 	 <choose>
+			 		<when test="name != null and name != '' and month != null and month != '' and chkListSize != 0">
+			 			AND (
+	                        (SELECT info_nm 
+			                   FROM equipment_info 
+			                   WHERE info_no = equipment_history.info_no) 
+			                   LIKE '%' || #{name} || '%'
+	                        AND TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
+	                        AND hsty_type IN
+	                        <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+	                            #{item}
+	                        </foreach>
+	                    )
+			 		</when>
+			 		<!-- 셋 중 하나만 해당할 경우 OR -->
+	                <otherwise>
+	                        <if test="name != null and name != ''">
+	                            (SELECT info_nm 
+			                   FROM equipment_info 
+			                   WHERE info_no = equipment_history.info_no) 
+			                   LIKE '%' || #{name} || '%'
+	                        </if>
+	                        <if test="name != null and name != '' and chkListSize != 0">
+	                            AND
+	                        </if>
+	                        <if test="chkList != null and chkList.size() > 0">
+	                            hsty_type IN
+		                        <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+		                            #{item}
+		                        </foreach>
+	                        </if>
+	                        <if test="(chkListSize != 0 or (name != null and name != '')) and (month != null and month != '')">
+						        AND
+						    </if>
+						    <if test="month != null and month != ''">
+						        TO_CHAR(hsty_date, 'YYYY-MM') = #{month}
+						    </if>
+	                </otherwise>
+			 	</choose>
+		 	</if>
 		</where>
 		ORDER BY
 			hsty_date DESC
