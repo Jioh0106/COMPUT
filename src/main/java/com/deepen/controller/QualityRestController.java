@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deepen.domain.DefectMasterDTO;
 import com.deepen.domain.QcMasterDTO;
+import com.deepen.domain.QcProductMappingDTO;
 import com.deepen.entity.CommonDetail;
 import com.deepen.entity.ProcessInfo;
+import com.deepen.entity.Product;
 import com.deepen.service.QualityService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,55 +30,70 @@ public class QualityRestController {
     
     private final QualityService qualityService;
     
+    // QC 기준정보 목록 조회
     @GetMapping("/qc/list")
     public ResponseEntity<List<QcMasterDTO>> getQcList() {
         return ResponseEntity.ok(qualityService.getQcList());
     }
     
-    @GetMapping("/defect/list")
-    public ResponseEntity<List<DefectMasterDTO>> getDefectList() {
-        return ResponseEntity.ok(qualityService.getDefectList());
-    }
-    
+    // 공정 목록 조회
     @GetMapping("/common/process")
     public ResponseEntity<List<ProcessInfo>> getProcessList() {
         return ResponseEntity.ok(qualityService.getProcessList());
     }
     
+    // 단위 목록 조회
     @GetMapping("/common/unit")
     public ResponseEntity<List<CommonDetail>> getUnitList() {
         return ResponseEntity.ok(qualityService.getUnitList());
     }
     
+    // 제품별 QC 기준 조회
+    @GetMapping("/qc/{qcCode}/products")
+    public ResponseEntity<List<QcProductMappingDTO>> getProductQcList(@PathVariable("qcCode") String qcCode) {
+        return ResponseEntity.ok(qualityService.getProductQcList(qcCode));
+    }
+    
+    // QC 기준정보 등록
     @PostMapping("/qc")
     public ResponseEntity<QcMasterDTO> createQc(@RequestBody QcMasterDTO qcMasterDTO) {
         return ResponseEntity.ok(qualityService.createQc(qcMasterDTO));
     }
-
-    @PostMapping("/defect")
-    public ResponseEntity<DefectMasterDTO> createDefect(@RequestBody DefectMasterDTO defectMasterDTO) {
-        return ResponseEntity.ok(qualityService.createDefect(defectMasterDTO));
+    
+    // 제품별 QC 기준 등록
+    @PostMapping("/qc/product")
+    public ResponseEntity<QcProductMappingDTO> createProductQc(@RequestBody QcProductMappingDTO productQcDTO) {
+        return ResponseEntity.ok(qualityService.createProductQc(productQcDTO));
     }
     
+    // QC 기준정보 수정
     @PutMapping("/qc/update")
     public ResponseEntity<QcMasterDTO> updateQc(@RequestBody QcMasterDTO qcMasterDTO) {
         return ResponseEntity.ok(qualityService.updateQc(qcMasterDTO));
     }
-
-    @PutMapping("/defect/update")
-    public ResponseEntity<DefectMasterDTO> updateDefect(@RequestBody DefectMasterDTO defectMasterDTO) {
-        return ResponseEntity.ok(qualityService.updateDefect(defectMasterDTO));
+    
+    // 제품별 QC 기준 수정
+    @PutMapping("/qc/product/update")
+    public ResponseEntity<QcProductMappingDTO> updateProductQc(@RequestBody QcProductMappingDTO productQcDTO) {
+        return ResponseEntity.ok(qualityService.updateProductQc(productQcDTO));
     }
     
+    // QC 기준정보 삭제
     @DeleteMapping("/qc/{qcCode}")
     public ResponseEntity<Void> deleteQc(@PathVariable(name = "qcCode") String qcCode) {
         qualityService.deleteQc(qcCode);
         return ResponseEntity.ok().build();
     }
-
-    @DeleteMapping("/defect/{defectCode}")
-    public ResponseEntity<Void> deleteDefect(@PathVariable(name = "defectCode") String defectCode) {
-        qualityService.deleteDefect(defectCode);
+    
+    // 제품별 QC 기준 삭제
+    @DeleteMapping("/qc/product/{mappingId}")
+    public ResponseEntity<Void> deleteProductQc(@PathVariable(name = "mappingId") Integer mappingId) {
+        qualityService.deleteProductQc(mappingId);
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/product/list")
+    public List<Product> getProductList() {
+        return qualityService.getProductList();
     }
 }
