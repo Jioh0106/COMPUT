@@ -270,20 +270,19 @@
 	</select>
 	
 	<insert id="insertMaterialInWareHouse" parameterType="Map">
-		INSERT INTO outbound (
-			inventory_no,
-			out_qty,
-			wi_no,
-			warehouse_id,
-			zone
-			
-		) VALUES (
-			#{invenNO},
-			#{calculatedQty},
-			#{wiNo},
-			#{warehouseId},
-			#{zone}
-		)
+    	INSERT INTO outbound (
+	        item_no,         
+	        out_qty,
+	        wi_no,
+	        warehouse_id,
+	        zone
+	    ) VALUES (
+	        #{mtlNo},       
+	        #{calculatedQty},
+	        #{wiNo},
+	        #{warehouseId},
+	        #{zone}
+	    )
 	</insert>
 </mapper>
 

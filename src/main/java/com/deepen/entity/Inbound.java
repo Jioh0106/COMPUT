@@ -21,7 +21,7 @@ public class Inbound {
     @Column(name = "in_no")
     private int in_no; // 입고번호
 
-    @Column(name = "inventory_no", nullable = false)
+    @Column(name = "inventory_no")
     private int inventory_no; // 재고번호
 
     @Column(name = "in_date", nullable = false)
@@ -48,4 +48,7 @@ public class Inbound {
     @Column(name = "buy_no")
     private int buy_no; // 발주번호
 
+    @Column(name = "item_no")
+    private int item_no; // 품목번호
+    
 }

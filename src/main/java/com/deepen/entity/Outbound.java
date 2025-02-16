@@ -21,8 +21,8 @@ public class Outbound {
     @Column(name = "out_no", nullable = false)
     private int out_no; // 출고번호
     
-    @Column(name = "inventory_no", nullable = false)
-    private int inventory_no; // 재고번호
+    @Column(name = "inventory_no")
+    private Integer inventory_no; // 재고번호
     
     @Column(name = "out_date", nullable = false)
     private LocalDate out_date; // 출고일
@@ -47,5 +47,8 @@ public class Outbound {
     
     @Column(name = "zone", length = 20)
     private String zone; // 구역
+    
+    @Column(name = "item_no", nullable = false)
+    private int item_no;	// 품목번호
     
 }
