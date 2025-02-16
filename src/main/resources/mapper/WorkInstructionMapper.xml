@@ -271,18 +271,19 @@
 	
 	<insert id="insertMaterialInWareHouse" parameterType="Map">
 		INSERT INTO outbound (
-			inventory_no,
+			item_no,
 			out_qty,
 			wi_no,
 			warehouse_id,
-			zone
-			
+			zone,
+			status
 		) VALUES (
-			#{invenNO},
+			#{mtlNo},
 			#{calculatedQty},
 			#{wiNo},
 			#{warehouseId},
-			#{zone}
+			#{zone},
+			'대기'
 		)
 	</insert>
 	
