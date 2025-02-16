@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.PlansDTO;
+import com.deepen.domain.SaleDTO;
 import com.deepen.service.PlanService;
 
 import jakarta.servlet.http.HttpSession;
@@ -59,6 +60,29 @@ public class PlanRestController {
 		return ResponseEntity.ok(list);
         
 	} // getPlanSerchList
+	
+	
+	/* 생산계획 등록 가능 목록 조회 */
+	@GetMapping("/reg/list")
+	public ResponseEntity<List<SaleDTO>> getRegPlanList() {
+		
+		List<SaleDTO> list = service.getRegPlanList();
+		
+		return ResponseEntity.ok(list);
+        
+	} // getRegPlanList
+	
+	/* 생산계획 그리드 정보 저장 */
+	@GetMapping("/check/mtr")
+	public boolean checkMtr(@RequestParam("product_no") int product_no, 
+							@RequestParam("sale_vol") int sale_vol) {
+		System.out.println("product_no = " + product_no);
+		System.out.println("sale_vol = " + sale_vol);
+		boolean isCheckMtr = service.checkMtr(product_no, sale_vol);
+		
+		return isCheckMtr;
+        
+	} // checkMtr
 	
 	
 	/* 생산계획 그리드 정보 저장 */
