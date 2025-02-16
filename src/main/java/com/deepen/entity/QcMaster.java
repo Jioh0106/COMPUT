@@ -1,6 +1,5 @@
 package com.deepen.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -25,15 +24,6 @@ public class QcMaster {
     @ManyToOne
     @JoinColumn(name = "process_no")
     private ProcessInfo process;
-    
-    @Column(name = "target_value", precision = 10, scale = 2)
-    private BigDecimal targetValue;
-    
-    @Column(name = "ucl", precision = 10, scale = 2)
-    private BigDecimal ucl;
-    
-    @Column(name = "lcl", precision = 10, scale = 2)
-    private BigDecimal lcl;
     
     @ManyToOne
     @JoinColumn(name = "unit", referencedColumnName = "common_detail_code")

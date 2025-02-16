@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+
+    <!-- TOAST Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+    <!-- Bootstrap & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="icon" href="images/favicon.png" type="images/png">
+    
+    <!-- CSRF 토큰 -->
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+        .tui-grid-cell { 
+            background-color: #ffffff !important; 
+        }
+        .display-flex { 
+            display: flex; 
+        }
+        .buttons { 
+            margin-left: auto; 
+        }
+        .mb-4 { 
+            margin-bottom: 1.5rem !important; 
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <div class="display-flex">
+                <h3>품질검사</h3>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <section class="section">
+                        <div class="row" id="basic-table">
+                            <form>
+                                <!-- 검색 조건 -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <label for="lotNo" class="form-label">LOT 번호</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="lotNo" 
+                                                   placeholder="LOT 번호를 입력하세요" 
+                                                   onkeyup="updateGrids()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="wiNo" class="form-label">작업지시번호</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="wiNo" 
+                                                   placeholder="작업지시번호를 입력하세요" 
+                                                   onkeyup="updateGrids()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="processNo" class="form-label">공정</label>
+                                        <select id="processNo" class="form-control" onchange="updateGrids()">
+                                            <option value="">전체</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- LOT 그리드 -->
+                                <div class="mb-4">
+                                    <h5>검사대상 LOT</h5>
+                                    <div id="lotGrid"></div>
+                                </div>
+
+                                <!-- 검사항목 그리드 -->
+                                <div>
+                                    <h5>검사항목</h5>
+                                    <div id="inspectionGrid"></div>
+                                </div>
+
+                                <!-- 버튼 그룹 -->
+                                <div class="float-end mt-3">
+                                    <button type="button" class="btn btn-primary" onclick="startInspection()">검사시작</button>
+                                    <button type="button" class="btn btn-success" onclick="saveInspection()">검사완료</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script th:src="@{/js/quality/inspection.js}"></script>
+</body>
+</html>

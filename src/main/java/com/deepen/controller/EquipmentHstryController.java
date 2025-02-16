@@ -64,6 +64,20 @@ public class EquipmentHstryController {
 	}
 	
 	/**
+	 * 검색 조건 조회
+	 * @param searchMap
+	 * @return List
+	 */
+	@PostMapping("/eqpHstrySearchSelect")
+	@ResponseBody
+	public List<Map<String, Object>> eqpSearchSelect(@RequestBody Map<String, Object> searchMap) {
+
+		List<Map<String, Object>> equipmentList = service.equipmentHstry(searchMap);
+
+		return equipmentList;
+	}
+	
+	/**
 	 * 저장
 	 * @param saveDataList
 	 * @return int

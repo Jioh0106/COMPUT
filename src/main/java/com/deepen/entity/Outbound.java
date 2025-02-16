@@ -2,7 +2,6 @@ package com.deepen.entity;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "INBOUND")
+@Table(name = "OUTBOUND")
 @Data
 public class Outbound {
 	
@@ -40,18 +39,13 @@ public class Outbound {
     @Column(name = "status", nullable = false, length = 20)
     private String status; // 상태
     
-    @Column(name = "note", length = 500)
-    private String note; // 비고
+    @Column(name = "reg_user",length = 50)
+    private String reg_user; // 승인자
     
-    @Column(name = "reg_user", nullable = false, length = 50)
-    private String reg_user; // 등록자
+    @Column(name = "reg_date")
+    private LocalDate reg_date; // 승인일
     
-    @Column(name = "reg_date", nullable = false)
-    private LocalDate reg_date; // 등록일
+    @Column(name = "zone", length = 20)
+    private String zone; // 구역
     
-    @Column(name = "mod_user", length = 50)
-    private String mod_user; // 수정자
-    
-    @Column(name = "mod_date")
-    private LocalDate mod_date; // 수정일
 }

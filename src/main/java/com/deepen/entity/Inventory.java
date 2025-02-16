@@ -42,7 +42,8 @@ public class Inventory {
 	@Column(name = "mod_date")
 	private  LocalDateTime mod_date; //수정일자
 	
-	
+	@Column(name = "zone", length = 20)
+    private String zone; // 구역
 	
 	
 	

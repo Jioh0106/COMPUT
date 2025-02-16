@@ -59,6 +59,13 @@
 	display: inline-flex;
 	gap: 40px;
 }
+
+/* 테이블 스크롤 */
+.table-responsive {
+	height: 500px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
 </style>
 
 </head>
@@ -149,7 +156,7 @@
 								<!-- 검색 조건 끝-->
 
 								<!-- 그리드 -->
-								<div id="grid" class="mb-3 mt-2"></div>
+								<div id="grid" class="mb-3 mt-2 table-responsive"></div>
 								<input type="hidden" class="form-control serch-content" id="emp_name" th:value="${session.sEmp.EMP_NAME}">
 								<input type="hidden" class="form-control serch-content" id="emp_id" th:value="${session.sEmp.EMP_ID}">
 								<input type="hidden" class="form-control serch-content" id="emp_role" th:value="${session.sEmp.EMP_ROLE}">
@@ -157,11 +164,10 @@
 								<!-- 버튼 시작 -->
 								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
 								<div class="float-end">
-									<input type="button" class="btn btn-outline-secondary" id="add"
-										value="추가"> <input type="button"
-										class="btn btn-outline-success" id="save" value="저장"
-										onclick="saveData()"> <input type="button"
-										class="btn btn-outline-danger" id="del" value="삭제">
+									<input type="button" class="btn btn-outline-secondary" id="add" value="추가"> 
+									<input type="button" class="btn btn-outline-success" id="save" value="저장" onclick="saveData()"> 
+									<input type="button" class="btn btn-outline-danger" id="del" value="삭제">
+									<input type="button" class="btn btn-outline-info" id="excel" value="엑셀" onclick="exportExcel()">
 								</div>
 								<!--</div>-->
 								<!-- 버튼 끝 -->
@@ -186,8 +192,8 @@
 	<script th:src="@{/assets/js/main.js}"></script>
 
 	<!-- TOAST UI CDN -->
-	<script
-		src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
 	
 	<!-- sweetAlert CDN -->
@@ -237,7 +243,7 @@
 														               options: {
 														                   format: 'yyyy-MM-dd',
 																		language: 'ko'
-														               	}}, 	sortable: true},
+														               	}}, 	sortable: true, validation: { required: true }},
 					{header: '설비',		name: 'infoNo',		formatter: 'listItemText', editor: {
 															            type: 'select',
 															            options: {
@@ -245,7 +251,7 @@
 														                    text: infoMap.name, // 설비종류 이름
 														                    value: String(infoMap.no) // 설비종류 코드
 															               }))
-															            }}, 	sortable: true},
+															            }}, 	sortable: true, validation: { required: true }},
 					{header: '관리유형',	name: 'hstyType',	formatter: 'listItemText', editor: {
 														            type: 'select',
 														            options: {
@@ -253,7 +259,7 @@
 													                    text: stts.name, // 설비종류 이름
 													                    value: stts.code // 설비종류 코드
 														               }))
-														            }}, 	sortable: true},
+														            }}, 	sortable: true, validation: { required: true }},
 					{header: '상세내용',	name: 'hstyDtl',    editor: 'text', 	sortable: true},
 					{header: '확인자',		name: 'hstyPrfr', sortable: true},
 					{header: '등록일',		name: 'regDate', sortable: true},
@@ -272,15 +278,10 @@
 			
 			// 추가 버튼 이벤트
 			add.addEventListener('click', () => {
-				let today = new Date();   
-
-				let year = today.getFullYear(); // 년도
-				let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
-				let date = today.getDate();  // 날짜
 				
 				grid.appendRow({
 					"hstyPrfr": empId,
-					"regDate": year + "-" + month + "-" + date,
+					"regDate": today(),
 					"rowType": "insert"
 				},
 					{
@@ -294,6 +295,44 @@
 			// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
 			save.addEventListener('mousedown', () => {
 				grid.blur(); // 포커스 해제
+				
+				// 그리드 데이터 확인
+				const data = grid.getData();
+				const columns = grid.getColumns(); // 그리드의 컬럼 정보 가져오기
+				let hasEmptyValue = false;
+				let emptyColumnName = ''; // 빈 값이 발견된 컬럼 이름 저장
+				
+				// 유효성 검사할 컬럼 이름 목록
+				const requiredColumns = ['hstyDate', 'infoNo', 'hstyType', 'hstyDtl']; // 관리일자, 설비, 관리유형 컬럼의 name
+
+				// 빈 값 확인
+				data.forEach(row => {
+				    for (const key in row) {
+				        // 유효성 검사할 컬럼만 체크
+				        if (requiredColumns.includes(key)) {
+				            if (row[key] === null || row[key] === undefined || row[key] === '') {
+				                hasEmptyValue = true;
+
+				                // 빈 값의 컬럼 이름 찾기
+				                const column = columns.find(col => col.name === key);
+				                if (column) {
+				                    emptyColumnName = column.header; // 컬럼의 header 값 가져오기
+				                }
+
+				                break; // 한 개만 발견되면 종료
+				            }
+				        }
+				    }
+				    if (hasEmptyValue) {
+				        return; // 더 이상 검사하지 않음
+				    }
+				});
+
+				// 빈 값이 있으면 알림창 띄우고 저장 중단
+				if (hasEmptyValue) {
+					swal(`${emptyColumnName}를 입력해 주세요.`);
+				    return; // 저장 동작 중단
+				}
 
 				// 수정된 행일 경우 rowType을 update로 변경
 				const updatedRows = grid.getModifiedRows().updatedRows;
@@ -357,11 +396,19 @@
 		}; // selectInfo 함수 끝
 		
 		// 검색 조건 입력 조회
-		function searchSelect(searchId){
-			const value = document.getElementById(searchId).value;
-			var data = {value: value};
+		function searchSelect(){
+			const name = document.getElementById("searchInput").value;
+			const month = document.getElementById("searchSelected").value;
+			
+			var selectedStts = [];
+			// 체크된 체크박스의 값을 배열에 추가
+			$('input[type="checkbox"]:checked').each(function () {
+				selectedStts.push($(this).val());
+			});
+
+			var data = {checkboxes: selectedStts, name: name, month:month};
 			$.ajax({
-				url: "/eqpSearchSelect",
+				url: "/eqpHstrySearchSelect",
 				contentType: "application/json",
 				data: JSON.stringify(data),
 				type: 'POST',
@@ -422,6 +469,19 @@
 				}
 			});
 		}; // save 함수 끝
+		
+		function exportExcel(){
+			grid.export('xlsx', { fileName : '설비이력_' + today(), useFormattedValue:true});
+		}
+		
+		function today(){
+			let now = new Date(); 
+			let year = now.getFullYear(); // 년도
+			let month = String(now.getMonth() + 1).padStart(2, "0");  // 월
+			let date = now.getDate();  // 날짜
+
+			return year + "-" + month + "-" + date;
+		}
 
 	</script>
 
