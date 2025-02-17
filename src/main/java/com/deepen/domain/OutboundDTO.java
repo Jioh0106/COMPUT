@@ -8,6 +8,7 @@ import lombok.Data;
 public class OutboundDTO {
 	
 	private int out_no; 			// 출고번호
+	private int item_no;            // 품목번호
     private int inventory_no; 		// 재고번호
     private LocalDate out_date;		// 출고일
     private int out_qty; 			// 출고수량

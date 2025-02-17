@@ -8,6 +8,7 @@ import lombok.Data;
 public class InboundDTO {
 	
 	private int in_no; 					// 입고번호
+	private int item_no;                // 품목번호
     private int inventory_no; 			// 재고번호
     private LocalDate in_date; 			// 입고일자
     private int in_qty; 				// 입고수량

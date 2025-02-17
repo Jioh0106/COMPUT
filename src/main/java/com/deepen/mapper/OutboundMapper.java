@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.OutboundDTO;
-import com.deepen.entity.Outbound;
 
 @Mapper
 @Repository

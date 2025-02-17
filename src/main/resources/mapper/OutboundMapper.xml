@@ -3,52 +3,53 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.deepen.mapper.OutboundMapper">
-
     <!-- 조건부 검색 -->
     <select id="selectByConditions" parameterType="map" resultType="com.deepen.domain.OutboundDTO">
-        SELECT 
+        SELECT
             o.*,
             w.warehouse_name,
             i.zone as zone,
             i.inventory_qty,
-            CASE 
-                WHEN p.product_name IS NOT NULL THEN p.product_name 
-                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name 
+            wi.wi_no as wi_no,
+            CASE
+                WHEN p.product_name IS NOT NULL THEN p.product_name
+                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name
             END as item_name,
-            CASE 
+            CASE
                 WHEN p.product_no IS NOT NULL THEN '완제품'
                 WHEN m.mtr_no IS NOT NULL THEN '자재'
             END as item_type,
             COALESCE(
-            	(SELECT cd.common_detail_name 
-            	FROM COMMON_DETAIL cd 
-            	WHERE cd.common_detail_code =
-            		CASE
-            			WHEN p.product_no IS NOT NULL THEN p.product_unit
-            			WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
-            		END
-            	AND cd.common_detail_status = 'Y'
-            	),
-            	CASE
-           			WHEN p.product_no IS NOT NULL THEN p.product_unit
-           			WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
-            	END
+                (SELECT cd.common_detail_name
+                FROM COMMON_DETAIL cd
+                WHERE cd.common_detail_code =
+                    CASE
+                        WHEN p.product_no IS NOT NULL THEN p.product_unit
+                        WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+                    END
+                AND cd.common_detail_status = 'Y'),
+                CASE
+                    WHEN p.product_no IS NOT NULL THEN p.product_unit
+                    WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+                END
             ) as item_unit
         FROM OUTBOUND o
         LEFT JOIN WAREHOUSE w ON o.warehouse_id = w.warehouse_id
-        LEFT JOIN PRODUCT p ON o.inventory_no = p.product_no
-        LEFT JOIN MATERIAL m ON o.inventory_no = m.mtr_no
-        LEFT JOIN INVENTORY i ON o.inventory_no = i.inventory_no 
-        	AND o.warehouse_id = i.warehouse_id
+        LEFT JOIN WORK_INSTRUCTION wi ON o.wi_no = wi.wi_no
+        LEFT JOIN INVENTORY i ON o.item_no = i.item_no
+            AND o.warehouse_id = i.warehouse_id
+            AND (o.zone = i.zone OR (o.zone IS NULL AND i.zone IS NULL))
+        LEFT JOIN MATERIAL m ON i.item_no = m.mtr_no
+        LEFT JOIN PRODUCT p ON i.item_no = p.product_no
         <where>
             <if test="outNo != null">
                 AND o.out_no = #{outNo}
             </if>
             <if test="startDate != null and startDate != ''">
-                AND o.out_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                AND TRUNC(o.out_date) >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
             </if>
             <if test="endDate != null and endDate != ''">
-                AND o.out_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+                AND TRUNC(o.out_date) &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
             </if>
             <if test="status != null and status != ''">
                 AND o.status = #{status}
@@ -64,78 +65,72 @@
         </where>
         ORDER BY o.out_no DESC
     </select>
-    
+
     <!-- 품목 및 재고 검색 -->
     <select id="searchItemsWithStock" resultType="map">
-    SELECT 
-        i.item_no as item_code,
-        CASE 
-            WHEN p.product_name IS NOT NULL THEN p.product_name
-            WHEN m.mtr_name IS NOT NULL THEN m.mtr_name
-        END as item_name,
-        SUM(i.inventory_qty) as inventory_qty,
-        CASE 
-            WHEN p.product_no IS NOT NULL THEN '완제품'
-            WHEN m.mtr_no IS NOT NULL THEN '자재'
-        END as item_type
-    FROM INVENTORY i
-    LEFT JOIN PRODUCT p ON i.item_no = p.product_no
-    LEFT JOIN MATERIAL m ON i.item_no = m.mtr_no
-    WHERE p.product_name LIKE '%' || #{keyword} || '%'
-       OR m.mtr_name LIKE '%' || #{keyword} || '%'
-    GROUP BY 
-        i.item_no,
-        CASE 
-            WHEN p.product_name IS NOT NULL THEN p.product_name
-            WHEN m.mtr_name IS NOT NULL THEN m.mtr_name
-        END,
-        CASE 
-            WHEN p.product_no IS NOT NULL THEN '완제품'
-            WHEN m.mtr_no IS NOT NULL THEN '자재'
-        END 
+        SELECT 
+            i.item_no as item_code,
+            CASE 
+                WHEN p.product_name IS NOT NULL THEN p.product_name
+                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name
+            END as item_name,
+            SUM(i.inventory_qty) as inventory_qty,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN '완제품'
+                WHEN m.mtr_no IS NOT NULL THEN '자재'
+            END as item_type
+        FROM INVENTORY i
+        LEFT JOIN PRODUCT p ON i.item_no = p.product_no
+        LEFT JOIN MATERIAL m ON i.item_no = m.mtr_no
+        WHERE p.product_name LIKE '%' || #{keyword} || '%'
+            OR m.mtr_name LIKE '%' || #{keyword} || '%'
+        GROUP BY 
+            i.item_no,
+            CASE 
+                WHEN p.product_name IS NOT NULL THEN p.product_name
+                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name
+            END,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN '완제품'
+                WHEN m.mtr_no IS NOT NULL THEN '자재'
+            END 
     </select>
-    
-    <!-- 창고별 재고 검색 -->
-<select id="searchWarehousesWithStock" resultType="map">
-    SELECT 
-        w.warehouse_id,
-        w.warehouse_name,
-        w.warehouse_type,
-        i.zone as zone,
-        NVL(i.inventory_qty, 0) as available_stock
-    FROM WAREHOUSE w
-    INNER JOIN INVENTORY i ON w.warehouse_id = i.warehouse_id 
-        AND i.item_no = #{itemNo}
-        AND i.inventory_qty > 0
-    WHERE (w.warehouse_name LIKE '%' || #{keyword} || '%' OR #{keyword} IS NULL)
-    ORDER BY w.warehouse_name, i.zone
-</select>
-    
- <!-- 재고 차감 -->
-<update id="updateInventory" parameterType="map">
-    UPDATE INVENTORY i
-    SET i.inventory_qty = i.inventory_qty - #{out_qty}
-    WHERE i.item_no = #{inventory_no}
-    AND i.warehouse_id = #{warehouse_id}
-    AND (i.zone = #{zone} OR (#{zone} IS NULL AND i.zone IS NULL))
-</update>
 
-<!-- 현재 재고 수량 조회 -->
-<select id="getCurrentStock" parameterType="map" resultType="java.lang.Integer">
-    SELECT inventory_qty
-    FROM INVENTORY
-    WHERE 1=1
-        AND item_no = #{inventory_no}
-        AND warehouse_id = #{warehouse_id}
-        AND (
-            zone = #{zone, jdbcType=VARCHAR} 
-            OR (#{zone, jdbcType=VARCHAR} IS NULL AND zone IS NULL)
-        )
-</select>
-    
-    
-    
-    
-    
-    
+    <!-- 창고별 재고 검색 -->
+    <select id="searchWarehousesWithStock" resultType="map">
+        SELECT 
+            w.warehouse_id,
+            w.warehouse_name,
+            w.warehouse_type,
+            i.zone as zone,
+            NVL(i.inventory_qty, 0) as available_stock
+        FROM WAREHOUSE w
+        INNER JOIN INVENTORY i ON w.warehouse_id = i.warehouse_id 
+            AND i.item_no = #{itemNo}
+            AND i.inventory_qty > 0
+        WHERE (w.warehouse_name LIKE '%' || #{keyword} || '%' OR #{keyword} IS NULL)
+        ORDER BY w.warehouse_name, i.zone
+    </select>
+
+    <!-- 재고 차감 -->
+    <update id="updateInventory" parameterType="map">
+        UPDATE INVENTORY i
+        SET i.inventory_qty = i.inventory_qty - #{out_qty},
+            i.inventory_count = i.inventory_count - #{out_qty}
+        WHERE i.item_no = #{item_no} 
+            AND i.warehouse_id = #{warehouse_id}
+            AND (i.zone = #{zone} OR (#{zone} IS NULL AND i.zone IS NULL))
+    </update>
+
+    <!-- 현재 재고 수량 조회 -->
+    <select id="getCurrentStock" parameterType="map" resultType="java.lang.Integer">
+        SELECT i.inventory_qty
+        FROM INVENTORY i
+        WHERE i.item_no = #{item_no}  
+            AND i.warehouse_id = #{warehouse_id}
+            AND (
+                i.zone = #{zone} 
+                OR (#{zone} IS NULL AND i.zone IS NULL)
+            )
+    </select>
 </mapper>
