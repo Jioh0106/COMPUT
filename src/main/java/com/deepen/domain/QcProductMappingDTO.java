@@ -14,6 +14,8 @@ public class QcProductMappingDTO {
     private BigDecimal ucl;
     private BigDecimal lcl;
     private String useYn;
+    private String unit;
+    private String unitName;
     private LocalDateTime createTime;
     private String createUser;
     private LocalDateTime updateTime;
