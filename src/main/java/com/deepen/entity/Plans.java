@@ -28,6 +28,9 @@ public class Plans {
 	@Column(name = "order_id", length = 30, nullable = false)
 	private String order_id;
 	
+	@Column(name = "sale_no", nullable = false)
+	private Integer sale_no;
+	
 	@Column(name = "emp_id", length = 30, nullable = false)
 	private String emp_id;
 	

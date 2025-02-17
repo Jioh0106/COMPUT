@@ -2,7 +2,7 @@
 function openView(type) {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
 	var url = '/reg-plan';
-	var popupW = 1000;
+	var popupW = 1200;
 	var popupH = 600;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
@@ -87,7 +87,7 @@ $(function() {
 	}
 	
 	
-	// ======================================================================\
+	// ======================================================================
 	
 	// 생산 계획 그리드
 	
@@ -96,11 +96,11 @@ $(function() {
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
 		columns: [
-			{ header: '주문번호', name: 'order_id' },
-			{ header: '생산계획번호', name: 'plan_id' },
-			{ header: '등록 직원', name: 'emp_name' },
-			{ header: '상태', name: 'status_name' },
-			{ header: '우선순위', name: 'plan_priority' },
+			{ header: '생산계획번호', name: 'plan_id', width: 150 },
+			{ header: '수주번호', name: 'sale_no', width: 80 },
+			{ header: '등록 직원', name: 'emp_name', width: 100},
+			{ header: '상태', name: 'status_name', width: 80 },
+			{ header: '우선순위', name: 'plan_priority', width: 80 },
 			{ header: '생산 시작 예정일', name: 'plan_start_date' },
 			{ header: '생산 완료 목표일', name: 'plan_end_date' },
 			{ header: '등록 일자', name: 'plan_date' },

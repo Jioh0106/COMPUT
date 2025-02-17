@@ -14,6 +14,7 @@ public class PlansDTO {
 
 	private String plan_id; 
 	private String order_id;
+	private Integer sale_no;
 	private String emp_id;
 	private String plan_status;
 	private String plan_priority;
