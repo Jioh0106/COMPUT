@@ -222,6 +222,9 @@
 		const productGrid = new Grid({
 				el: document.getElementById('productGrid'),
 				rowHeaders: ['checkbox'],
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 280,
 				columns: [
 					{header: '상품번호',	name: 'PRODUCT_NO', editor: 'text', sortable: true},
 					{header: '상품유형',	
