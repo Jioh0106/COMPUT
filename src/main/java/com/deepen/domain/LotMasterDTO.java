@@ -9,7 +9,7 @@ public class LotMasterDTO {
     private String lotNo;
     private String parentLotNo;
     private String processType;
-    private String wiNo;
+    private Integer wiNo;
     private Integer productNo;
     private Integer processNo;
     private String productName;
