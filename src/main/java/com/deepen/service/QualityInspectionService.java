@@ -43,11 +43,31 @@ public class QualityInspectionService {
      */
     public List<QcProductMappingDTO> getInspectionItemsByLotNo(String lotNo) {
         LotMasterDTO lotMaster = qualityInspectionMapper.selectLotMasterByNo(lotNo);
+        if (lotMaster == null) {
+            throw new IllegalArgumentException("LOT 정보를 찾을 수 없습니다: " + lotNo);
+        }
         
         return qualityInspectionMapper.selectQcProductMappingByProductAndProcess(
             lotMaster.getProductNo(), 
             lotMaster.getProcessNo()
         );
+    }
+    
+    /**
+     * 검사 시작
+     */
+    @Transactional
+    public void startInspection(String lotNo) {
+        LotMasterDTO lotMaster = qualityInspectionMapper.selectLotMasterByNo(lotNo);
+        if (lotMaster == null) {
+            throw new IllegalArgumentException("LOT 정보를 찾을 수 없습니다: " + lotNo);
+        }
+        
+        if (!"LTST003".equals(lotMaster.getLotStatus())) {
+            throw new IllegalStateException("검사 대기 상태의 LOT만 검사를 시작할 수 있습니다.");
+        }
+        
+        qualityInspectionMapper.updateLotStatusAndResult(lotNo, "LTST004"); // 검사 진행중
     }
     
     /**
@@ -59,65 +79,136 @@ public class QualityInspectionService {
             throw new IllegalArgumentException("검사 결과가 없습니다.");
         }
 
-        String lotNo = inspectionResults.get(0).getLotNo();
-        LotMasterDTO lotMaster = qualityInspectionMapper.selectLotMasterByNo(lotNo);
+        String originalLotNo = inspectionResults.get(0).getLotNo();
+        LotMasterDTO originalLot = qualityInspectionMapper.selectLotMasterByNo(originalLotNo);
         
-        if (lotMaster == null) {
-            throw new IllegalArgumentException("LOT 정보를 찾을 수 없습니다: " + lotNo);
+        if (originalLot == null) {
+            throw new IllegalArgumentException("LOT 정보를 찾을 수 없습니다: " + originalLotNo);
         }
 
         try {
-            // 검사 결과 저장
+            // 현재 날짜
+            String currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            boolean allPassed = true;
+            
             for (QualityInspectionDTO result : inspectionResults) {
-                if (result.getMeasureValue() == null) {
-                    throw new IllegalArgumentException("측정값이 누락되었습니다.");
-                }
-                
-                // ProcessNo 설정
-                result.setProcessNo(lotMaster.getProcessNo());
-                
-                // 시간 변환 및 로깅
-                LocalDateTime checkTime = convertToLocalDateTime(result.getCheckTime());
-                LocalDateTime endTime = convertToLocalDateTime(result.getEndTime());
-                
-                checkTime = syncToSystemTimeZone(checkTime);
-                endTime = syncToSystemTimeZone(endTime);
-                
-                log.info("원본 시간 - CheckTime: {}, EndTime: {}", 
-                    result.getCheckTime(), result.getEndTime());
-                
-                log.info("변환된 시간 - CheckTime: {}, EndTime: {}", 
-                    checkTime, endTime);
-                
-                result.setCheckTime(checkTime);
-                result.setEndTime(endTime);
-                
-                // 판정값 체크 및 범위 검사 (이 부분 추가)
-                if (result.getJudgement() == null) {
-                    double measureValue = result.getMeasureValue().doubleValue();
-                    double ucl = result.getUcl() != null ? result.getUcl().doubleValue() : Double.MAX_VALUE;
-                    double lcl = result.getLcl() != null ? result.getLcl().doubleValue() : Double.MIN_VALUE;
+                try {
+                    // 1. 기본 데이터 검증 및 설정
+                    validateAndPrepareResult(result, originalLot);
                     
-                    result.setJudgement(measureValue >= lcl && measureValue <= ucl ? "Y" : "N");
+                    // 2. QC_LOG 시퀀스 획득
+                    Integer nextQcLogNo = qualityInspectionMapper.getNextQcLogNo();
+                    result.setQcLogNo(nextQcLogNo);
+                    
+                    // 3. 새로운 LOT 번호 생성
+                    String newLotNo = generateNewLotNo(currentDate, originalLot.getWiNo(), nextQcLogNo);
+                    
+                    // 4. 새로운 LOT_MASTER 생성 및 저장
+                    LotMasterDTO newLot = createNewLotMaster(originalLot, newLotNo, result);
+                    qualityInspectionMapper.insertLotMaster(newLot);
+                    
+                    // 5. QC_LOG에 검사 결과 저장 (새로운 LOT 번호 사용)
+                    result.setLotNo(newLotNo);
+                    qualityInspectionMapper.insertQualityInspection(result);
+                    
+                    if (!"Y".equals(result.getJudgement())) {
+                        allPassed = false;
+                    }
+                    
+                    log.info("Created new LOT and QC_LOG: {} with QC_LOG_NO: {}", newLotNo, nextQcLogNo);
+                    
+                } catch (Exception e) {
+                    log.error("Error processing inspection result: {}", result, e);
+                    throw e;
                 }
-
-                result.setQcLogNo(null);
-                qualityInspectionMapper.insertQualityInspection(result);
             }
 
-            // 모든 검사가 합격인지 확인
-            boolean allPassed = inspectionResults.stream()
-                .allMatch(result -> "Y".equals(result.getJudgement()));
+            // 6. 원본 LOT 상태 업데이트
+            String newStatus = allPassed ? "LTST005" : "LTST006";
+            qualityInspectionMapper.updateLotStatusAndResult(originalLotNo, newStatus);
 
-            // LOT 상태 업데이트
-            String newStatus = allPassed ? "LTST005" : "LTST006";  // 검사완료 or 불합격
-            qualityInspectionMapper.updateLotStatusAndResult(lotNo, newStatus);
-
-            log.info("Successfully saved inspection results for LOT: {}, Status: {}", lotNo, newStatus);
+            log.info("Successfully saved inspection results for LOT: {}, Status: {}", 
+                     originalLotNo, newStatus);
         } catch (Exception e) {
             log.error("Error while saving inspection results", e);
             throw e;
         }
+    }
+    
+    /**
+     * 검사 결과 데이터 검증 및 준비
+     */
+    private void validateAndPrepareResult(QualityInspectionDTO result, LotMasterDTO lot) {
+        // 측정값 필수 체크
+        if (result.getMeasureValue() == null) {
+            throw new IllegalArgumentException("측정값이 누락되었습니다.");
+        }
+        
+        // ProcessNo 설정
+        result.setProcessNo(lot.getProcessNo());
+        
+        // 시간 정보 처리 (현재 시스템 시간 사용)
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 시작 시간이 없으면 현재 시간으로
+        if (result.getCheckTime() == null) {
+            result.setCheckTime(now);
+        }
+        
+        // 종료 시간은 무조건 현재 시간으로
+        result.setEndTime(now);
+        
+        log.info("설정된 시간 - CheckTime: {}, EndTime: {}", 
+            result.getCheckTime(), result.getEndTime());
+        
+        // 판정값 체크 및 범위 검사
+        if (result.getJudgement() == null) {
+            double measureValue = result.getMeasureValue().doubleValue();
+            double ucl = result.getUcl() != null ? result.getUcl().doubleValue() : Double.MAX_VALUE;
+            double lcl = result.getLcl() != null ? result.getLcl().doubleValue() : Double.MIN_VALUE;
+            
+            result.setJudgement(measureValue >= lcl && measureValue <= ucl ? "Y" : "N");
+        }
+    }
+    
+    /**
+     * 새로운 LOT 번호 생성
+     */
+    private String generateNewLotNo(String currentDate, Integer wiNo, Integer qcLogNo) {
+        try {
+            // 현재 날짜 기준 순차 번호 조회
+            int sequence = qualityInspectionMapper.getNextLotSequence(currentDate);
+            
+            // LOT 번호 생성: yyyyMMdd-W작업지시번호-Q품질검사이력번호-순차번호
+            return String.format("%s-W%d-Q%d-%03d", 
+                               currentDate, 
+                               wiNo, 
+                               qcLogNo, 
+                               sequence);
+        } catch (Exception e) {
+            log.error("Error generating new LOT number", e);
+            throw new IllegalArgumentException("LOT 번호 생성 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 새로운 LOT_MASTER 생성
+     */
+    private LotMasterDTO createNewLotMaster(LotMasterDTO originalLot, String newLotNo, 
+                                          QualityInspectionDTO result) {
+        LotMasterDTO newLot = new LotMasterDTO();
+        newLot.setLotNo(newLotNo);
+        newLot.setParentLotNo(originalLot.getLotNo());
+        newLot.setProcessType(originalLot.getProcessType());
+        newLot.setWiNo(originalLot.getWiNo());
+        newLot.setProductNo(originalLot.getProductNo());
+        newLot.setProcessNo(originalLot.getProcessNo());
+        newLot.setLineNo(originalLot.getLineNo());
+        newLot.setLotStatus(result.getJudgement().equals("Y") ? "LTST005" : "LTST006");
+        newLot.setStartTime(result.getCheckTime());
+        newLot.setEndTime(result.getEndTime());
+        
+        return newLot;
     }
     
     /**
@@ -146,57 +237,14 @@ public class QualityInspectionService {
         }
     }
     
+    /**
+     * 시스템 시간대로 동기화
+     */
     private LocalDateTime syncToSystemTimeZone(LocalDateTime inputTime) {
         if (inputTime == null) {
             return LocalDateTime.now();
         }
-        
-        // 시스템 기본 시간대로 변환
         return inputTime.atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-    
-    /**
-     * 다음 공정 LOT 생성
-     */
-    @Transactional
-    public void createNextProcessLot(String currentLotNo, String judgement) {
-        // 합격인 경우에만 다음 공정 LOT 생성
-        if (!"Y".equals(judgement)) {
-            log.info("Skip creating next process LOT - judgement is not passed: {}", judgement);
-            return;
-        }
-
-        LotMasterDTO currentLot = qualityInspectionMapper.selectLotMasterByNo(currentLotNo);
-        ProcessInfoDTO nextProcess = qualityInspectionMapper.selectNextProcess(currentLot.getProcessNo());
-        
-        if (nextProcess != null) {
-            String newLotNo = generateNewLotNo(nextProcess.getProcessNo());
-            
-            LotMasterDTO newLot = new LotMasterDTO();
-            newLot.setLotNo(newLotNo);
-            newLot.setParentLotNo(currentLotNo);
-            newLot.setProcessType(currentLot.getProcessType());
-            newLot.setWiNo(currentLot.getWiNo());
-            newLot.setProductNo(currentLot.getProductNo());
-            newLot.setProcessNo(nextProcess.getProcessNo());
-            newLot.setLotStatus("LTST003"); // 검사 대기 상태
-            
-            qualityInspectionMapper.insertLotMaster(newLot);
-            qualityInspectionMapper.insertLotRelationship(currentLotNo, newLotNo);
-            
-            log.info("Created next process LOT: {} for parent LOT: {}", newLotNo, currentLotNo);
-        } else {
-            log.info("No next process found for LOT: {}", currentLotNo);
-        }
-    }
-    
-    /**
-     * LOT 상태 업데이트
-     */
-    @Transactional
-    public void updateLotStatusAndResult(String lotNo, String lotStatus) {
-        qualityInspectionMapper.updateLotStatusAndResult(lotNo, lotStatus);
-        log.info("Updated LOT status: {} to {}", lotNo, lotStatus);
     }
     
     /**
@@ -212,14 +260,6 @@ public class QualityInspectionService {
     public List<ProcessInfoDTO> getAllProcessInfo() {
         return qualityInspectionMapper.selectAllProcessInfo();
     }
-    
-    /**
-     * 새로운 LOT 번호 생성
-     */
-    private String generateNewLotNo(Integer processNo) {
-        String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        return String.format("L%s%03d", dateStr, processNo);
-    }
 
     /**
      * 검사 이력 조회
@@ -232,11 +272,7 @@ public class QualityInspectionService {
     /**
      * 검사 통계 조회
      */
-    public InspectionStatsDTO getInspectionStats(
-        String fromDate, 
-        String toDate, 
-        Integer processNo
-    ) {
+    public InspectionStatsDTO getInspectionStats(String fromDate, String toDate, Integer processNo) {
         log.info("Fetching inspection statistics - date range: {} ~ {}, processNo: {}", 
                  fromDate, toDate, processNo);
                  
@@ -245,33 +281,44 @@ public class QualityInspectionService {
         );
 
         // 전체 통계 계산
-        InspectionStatsDTO totalStats = new InspectionStatsDTO();
-        
-        // 전체 합계 계산
-        totalStats.setTotalCount(inspections.size());
-        totalStats.setPassCount(
+        InspectionStatsDTO stats = new InspectionStatsDTO();
+        calculateTotalStats(stats, inspections);
+        calculateProcessStats(stats, inspections);
+
+        return stats;
+    }
+    
+    /**
+     * 전체 통계 계산
+     */
+    private void calculateTotalStats(InspectionStatsDTO stats, List<InspectionHistoryDTO> inspections) {
+        stats.setTotalCount(inspections.size());
+        stats.setPassCount(
             inspections.stream()
                 .filter(i -> "Y".equals(i.getJudgement()))
                 .count()
         );
-        totalStats.setFailCount(
+        stats.setFailCount(
             inspections.stream()
                 .filter(i -> "N".equals(i.getJudgement()))
                 .count()
         );
 
-        // 전체 비율 계산
-        if (totalStats.getTotalCount() > 0) {
-            totalStats.setPassRate(
-                (double) totalStats.getPassCount() / totalStats.getTotalCount() * 100
+        if (stats.getTotalCount() > 0) {
+            stats.setPassRate(
+                (double) stats.getPassCount() / stats.getTotalCount() * 100
             );
-            totalStats.setFailRate(
-                (double) totalStats.getFailCount() / totalStats.getTotalCount() * 100
+            stats.setFailRate(
+                (double) stats.getFailCount() / stats.getTotalCount() * 100
             );
         }
-
-        // 공정별 통계 계산
-        totalStats.setProcessStats(
+    }
+    
+    /**
+     * 공정별 통계 계산
+     */
+    private void calculateProcessStats(InspectionStatsDTO stats, List<InspectionHistoryDTO> inspections) {
+        stats.setProcessStats(
             inspections.stream()
                 .collect(Collectors.groupingBy(InspectionHistoryDTO::getProcessNo))
                 .entrySet().stream()
@@ -306,15 +353,68 @@ public class QualityInspectionService {
                 })
                 .collect(Collectors.toList())
         );
-
-        return totalStats;
     }
     
+    /**
+     * 검색 DTO 생성
+     */
     private InspectionSearchDTO createSearchDTO(String fromDate, String toDate, Integer processNo) {
         InspectionSearchDTO search = new InspectionSearchDTO();
         search.setFromDate(fromDate);
         search.setToDate(toDate);
         search.setProcessNo(processNo);
         return search;
+    }
+
+    /**
+     * LOT 상태 업데이트
+     */
+    @Transactional
+    public void updateLotStatusAndResult(String lotNo, String lotStatus) {
+        qualityInspectionMapper.updateLotStatusAndResult(lotNo, lotStatus);
+        log.info("Updated LOT status: {} to {}", lotNo, lotStatus);
+    }
+
+    /**
+     * 다음 공정 LOT 생성
+     */
+    @Transactional
+    public void createNextProcessLot(String currentLotNo, String judgement) {
+        // 합격인 경우에만 다음 공정 LOT 생성
+        if (!"Y".equals(judgement)) {
+            log.info("Skip creating next process LOT - judgement is not passed: {}", judgement);
+            return;
+        }
+
+        LotMasterDTO currentLot = qualityInspectionMapper.selectLotMasterByNo(currentLotNo);
+        ProcessInfoDTO nextProcess = qualityInspectionMapper.selectNextProcess(currentLot.getProcessNo());
+        
+        if (nextProcess != null) {
+            // 현재 날짜 기준 순차 번호 조회
+            String currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            int sequence = qualityInspectionMapper.getNextLotSequence(currentDate);
+            
+            // 새로운 LOT 번호 생성
+            String newLotNo = String.format("%s-NP%d-%03d", 
+                                          currentDate, 
+                                          nextProcess.getProcessNo(), 
+                                          sequence);
+            
+            LotMasterDTO newLot = new LotMasterDTO();
+            newLot.setLotNo(newLotNo);
+            newLot.setParentLotNo(currentLotNo);
+            newLot.setProcessType(currentLot.getProcessType());
+            newLot.setWiNo(currentLot.getWiNo());
+            newLot.setProductNo(currentLot.getProductNo());
+            newLot.setProcessNo(nextProcess.getProcessNo());
+            newLot.setLotStatus("LTST003"); // 검사 대기 상태
+            newLot.setStartTime(LocalDateTime.now());
+            
+            qualityInspectionMapper.insertLotMaster(newLot);
+            
+            log.info("Created next process LOT: {} for parent LOT: {}", newLotNo, currentLotNo);
+        } else {
+            log.info("No next process found for LOT: {}", currentLotNo);
+        }
     }
 }

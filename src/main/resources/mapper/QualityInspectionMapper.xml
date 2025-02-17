@@ -47,8 +47,61 @@
         WHERE lot_no = #{lotNo}
     </select>
 
+    <!-- 현재 날짜 기준 순차 번호 조회 -->
+    <select id="getNextLotSequence" resultType="java.lang.Integer">
+        SELECT NVL(MAX(TO_NUMBER(SUBSTR(lot_no, -3))), 0) + 1
+        FROM lot_master
+        WHERE lot_no LIKE #{date} || '%'
+    </select>
+
+    <!-- LOT 마스터 정보 저장 -->
+    <insert id="insertLotMaster">
+        INSERT INTO lot_master (
+            lot_no,
+            parent_lot_no,
+            process_type,
+            wi_no,
+            product_no,
+            process_no,
+            line_no,
+            lot_status,
+            start_time,
+            end_time,
+            create_user,
+            create_time
+        ) VALUES (
+            #{lotNo},
+            #{parentLotNo},
+            #{processType},
+            #{wiNo},
+            #{productNo},
+            #{processNo},
+            #{lineNo},
+            #{lotStatus},
+            #{startTime},
+            #{endTime},
+            'SYSTEM',
+            SYSDATE
+        )
+    </insert>
+
+    <!-- LOT 상태 업데이트 -->
+    <update id="updateLotStatusAndResult">
+        UPDATE lot_master 
+        SET lot_status = #{status},
+            end_time = CASE 
+                WHEN #{status} IN ('LTST005', 'LTST006') 
+                THEN SYSDATE 
+                ELSE end_time 
+            END,
+            update_time = SYSDATE,
+            update_user = 'SYSTEM'
+        WHERE lot_no = #{lotNo}
+    </update>
+
     <!-- 검사 항목 조회 -->
-    <select id="selectQcProductMappingByProductAndProcess" resultType="com.deepen.domain.QcProductMappingDTO">
+    <select id="selectQcProductMappingByProductAndProcess" 
+            resultType="com.deepen.domain.QcProductMappingDTO">
         SELECT 
             qpm.mapping_id AS mappingId,
             qpm.qc_code AS qcCode,
@@ -90,25 +143,26 @@
             create_time
         ) VALUES (
             #{qcLogNo},
-            #{lotNo,jdbcType=VARCHAR},
-            #{processNo,jdbcType=NUMERIC},
-            #{qcCode,jdbcType=VARCHAR},
-            #{qcName,jdbcType=VARCHAR},
-            #{targetValue,jdbcType=NUMERIC},
-            #{ucl,jdbcType=NUMERIC},
-            #{lcl,jdbcType=NUMERIC},
-            #{measureValue,jdbcType=NUMERIC},
-            #{judgement,jdbcType=VARCHAR},
-            #{inspector,jdbcType=VARCHAR},
-            #{checkTime,jdbcType=TIMESTAMP},
-            #{endTime,jdbcType=TIMESTAMP},
-            #{inspector,jdbcType=VARCHAR},
+            #{lotNo},
+            #{processNo},
+            #{qcCode},
+            #{qcName},
+            #{targetValue},
+            #{ucl},
+            #{lcl},
+            #{measureValue},
+            #{judgement},
+            #{inspector},
+            #{checkTime},
+            #{endTime},
+            #{inspector},
             SYSDATE
         )
     </insert>
 
     <!-- 품질검사 이력 조회 -->
-    <select id="selectQualityInspectionByLotNo" resultType="com.deepen.domain.QualityInspectionDTO">
+    <select id="selectQualityInspectionByLotNo" 
+            resultType="com.deepen.domain.QualityInspectionDTO">
         SELECT
             l.qc_log_no AS qcLogNo,
             l.lot_no AS lotNo,
@@ -128,61 +182,20 @@
         ORDER BY l.check_time DESC
     </select>
 
-    <!-- LOT 상태 업데이트 -->
-    <update id="updateLotStatusAndResult">
-        UPDATE lot_master 
-        SET lot_status = #{status,jdbcType=VARCHAR},
-            end_time = CASE 
-                WHEN #{status,jdbcType=VARCHAR} IN ('LTST005', 'LTST006') 
-                THEN SYSDATE 
-                ELSE end_time 
-            END,
-            update_time = SYSDATE,
-            update_user = 'SYSTEM'
-        WHERE lot_no = #{lotNo,jdbcType=VARCHAR}
-    </update>
-
-    <!-- 새로운 LOT 생성 -->
-    <insert id="insertLotMaster">
-        INSERT INTO lot_master (
-            lot_no,
-            parent_lot_no,
-            process_type,
-            wi_no,
-            product_no,
-            process_no,
-            lot_status,
-            start_time,
-            create_user,
-            create_time
-        ) VALUES (
-            #{lotNo},
-            #{parentLotNo},
-            #{processType},
-            #{wiNo},
-            #{productNo},
-            #{processNo},
-            #{lotStatus},
-            SYSDATE,
-            'SYSTEM',
-            SYSDATE
-        )
-    </insert>
-
-    <!-- LOT 관계 생성 -->
-    <insert id="insertLotRelationship">
-        INSERT INTO lot_relationship (
-            parent_lot_no,
-            child_lot_no,
-            create_user,
-            create_time
-        ) VALUES (
-            #{parentLotNo},
-            #{childLotNo},
-            'SYSTEM',
-            SYSDATE
-        )
-    </insert>
+    <!-- 공정 정보 조회 -->
+    <select id="selectAllProcessInfo" resultType="com.deepen.domain.ProcessInfoDTO">
+        SELECT
+            process_no AS processNo,
+            process_name AS processName,
+            description,
+            is_active AS isActive,
+            process_priority AS processPriority,
+            created_date AS createdDate,
+            updated_date AS updatedDate
+        FROM process_info
+        WHERE is_active = 'Y'
+        ORDER BY process_priority
+    </select>
 
     <!-- 다음 공정 조회 -->
     <select id="selectNextProcess" resultType="com.deepen.domain.ProcessInfoDTO">
@@ -202,23 +215,9 @@
         FETCH FIRST 1 ROW ONLY
     </select>
 
-    <!-- 모든 공정 정보 조회 -->
-    <select id="selectAllProcessInfo" resultType="com.deepen.domain.ProcessInfoDTO">
-        SELECT
-            process_no AS processNo,
-            process_name AS processName,
-            description,
-            is_active AS isActive,
-            process_priority AS processPriority,
-            created_date AS createdDate,
-            updated_date AS updatedDate
-        FROM process_info
-        WHERE is_active = 'Y'
-        ORDER BY process_priority
-    </select>
-    
     <!-- 검사 이력 조회 -->
-    <select id="selectInspectionHistory" resultType="com.deepen.domain.InspectionHistoryDTO">
+    <select id="selectInspectionHistory" 
+            resultType="com.deepen.domain.InspectionHistoryDTO">
         SELECT
             l.qc_log_no AS qcLogNo,
             l.lot_no AS lotNo,
@@ -254,8 +253,9 @@
         ORDER BY l.check_time DESC
     </select>
 
-    <!-- 통계 정보 조회 -->
-    <select id="selectInspectionStats" resultType="com.deepen.domain.InspectionStatsDTO">
+    <!-- 검사 통계 조회 -->
+    <select id="selectInspectionStats" 
+            resultType="com.deepen.domain.InspectionStatsDTO">
         WITH stats AS (
             SELECT
                 l.process_no,
@@ -288,4 +288,15 @@
         FROM stats s
         ORDER BY s.process_no
     </select>
+    
+    <update id="updateQcLogLotNo">
+	    UPDATE lot_qc_log 
+	    SET lot_no = #{lotNo}
+	    WHERE qc_log_no = #{qcLogNo}
+	</update>
+
+
+	<select id="getNextQcLogNo" resultType="java.lang.Integer">
+	    SELECT SEQ_QC_LOG_ID.NEXTVAL FROM DUAL
+	</select>
 </mapper>
