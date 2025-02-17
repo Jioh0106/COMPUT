@@ -96,20 +96,6 @@ public class OrderRestController {
 		
 	} // getDetailBuy
 	
-	/* 주문관리 그리드 정보 삭제 */
-	@PostMapping("/delete")
-	public ResponseEntity<String> deleteOrder(@RequestBody List<String> deleteList) {
-		
-		log.info("deleteList - " + deleteList.toString());
-		
-		try {
-			service.deleteOrders(deleteList);
-			return ResponseEntity.ok("삭제가 완료되었습니다.");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
-		}
-	} // deleteOrder
-	
 	
 	/* 거래처 검색 정보 가져오기 */
 	@GetMapping("/serch/client")
@@ -226,4 +212,35 @@ public class OrderRestController {
 		
 	} // saveBuy
 	
+	/* 주문관리 그리드 정보 삭제 */
+	@PostMapping("/delete")
+	public ResponseEntity<String> deleteOrder(@RequestBody List<String> deleteList) {
+		
+		log.info("deleteList - " + deleteList.toString());
+		
+		try {
+			service.deleteOrders(deleteList);
+			return ResponseEntity.ok("삭제가 완료되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
+		}
+	} // deleteOrder
+	
+	/* 수주 그리드 정보 추가/수정 */
+	
+	
+	
+	
+	
+	/* 발주 그리드 정보 추가/수정 */
+	
+	
+	
+	
+	
+	
+	
+	
 } // PlanRestController
+
+

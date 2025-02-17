@@ -28,6 +28,17 @@ public class PlanController {
 		return "production/prdct_plan";
 		
 	}
+	/**
+	 * 생산 계획 등록 화면
+	 * @view model
+	 * @return String
+	 */
+	@GetMapping("/reg-plan")
+	public String regPlan(Model model) {
+		
+		return "production/reg_plan";
+		
+	}
 	
 	
 	

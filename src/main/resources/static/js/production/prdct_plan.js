@@ -1,23 +1,15 @@
-
-// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
-function datePickerReplace(id) {
-	$(document).ready(function () {
-		// 숫자가 아닌 정규식
-		var replaceNotInt = /[^0-9]/gi;
-
-		$(`#${id}`).on("focusout", function () {
-			var x = $(this).val();
-			if (x.length > 0) {
-				if (x.match(replaceNotInt)) {
-					x = x.replace(replaceNotInt, "");
-				}
-				$(this).val(x);
-			}
-		}).on("keyup", function () {
-			$(this).val($(this).val().replace(replaceNotInt, ""));
-		});
-	});
+// 팝업창 가운데 위치(듀얼모니터 포함)
+function openView(type) {
+	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
+	var url = '/reg-plan';
+	var popupW = 1000;
+	var popupH = 600;
+	var left = (document.body.clientWidth / 2) - (popupW / 2);
+	left += window.screenLeft;	 //듀얼 모니터
+	var top = (screen.availHeight / 2) - (popupH / 2);
+	window.open(url, 'popup', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
+// =========================================================================
 
 
 // 첫 번째 DatePicker 초기화
@@ -49,6 +41,9 @@ const instance2 = new tui.DatePicker(container2, {
 
 
 $(function() {	
+	var toastElement = document.querySelector(".toast");
+    var toast = new bootstrap.Toast(toastElement);
+    toast.show();
 	
 	// 부서 셀렉트 박스 
 	$('#statusSelect').on('click', function () {
@@ -91,35 +86,34 @@ $(function() {
 	        });
 	}
 	
+	
 	// ======================================================================\
 	
-	// 주문관리 그리드
+	// 생산 계획 그리드
+	
+	
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '주문번호', name: 'order_id'},
-			{header: '생산계획번호', name: 'plan_id'},
-			{header: '등록 직원', name: 'emp_id'},
-			{header: '상태', name: 'plan_status'},
-			{header: '최초등록일자', name: 'plan_date'},
-			{header: '최종수정일자', name: 'plan_update'},
-			{header: '생산시작예정일', name: 'plan_start_date'},
-			{header: '우선순위', name: 'plan_end_date'}
+			{ header: '주문번호', name: 'order_id' },
+			{ header: '생산계획번호', name: 'plan_id' },
+			{ header: '등록 직원', name: 'emp_name' },
+			{ header: '상태', name: 'status_name' },
+			{ header: '우선순위', name: 'plan_priority' },
+			{ header: '생산 시작 예정일', name: 'plan_start_date' },
+			{ header: '생산 완료 목표일', name: 'plan_end_date' },
+			{ header: '등록 일자', name: 'plan_date' },
+			{ header: '수정 일자', name: 'plan_update' },
 		],
 		data: [] // 서버에서 전달받은 데이터
 	});
+	
 
 	// ------------------------------------------------
-	// 주문 관리 그리드 데이터 초기화
-	let reg_date = '';
-	console.log("등록일자 : "  + reg_date);
+	// 생산 계획 그리드 데이터 초기화
 
-	axios.get('/api/order/list', {
-		params: {
-			reg_date: reg_date,
-		},
-	})
+	axios.get('/api/plan/list')
 	.then(function (response) {
 		const data = response.data; // 데이터 로드
 		console.log('Fetched data:', data);
@@ -134,3 +128,23 @@ $(function() {
 	
 	
 });	// 돔 로드 이벤트
+
+// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
+function datePickerReplace(id) {
+	$(document).ready(function () {
+		// 숫자가 아닌 정규식
+		var replaceNotInt = /[^0-9]/gi;
+
+		$(`#${id}`).on("focusout", function () {
+			var x = $(this).val();
+			if (x.length > 0) {
+				if (x.match(replaceNotInt)) {
+					x = x.replace(replaceNotInt, "");
+				}
+				$(this).val(x);
+			}
+		}).on("keyup", function () {
+			$(this).val($(this).val().replace(replaceNotInt, ""));
+		});
+	});
+}

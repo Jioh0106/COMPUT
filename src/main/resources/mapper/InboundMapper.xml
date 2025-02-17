@@ -1,9 +1,176 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.deepen.mapper.InboundMapper">
+    <!-- 조건부 검색 -->
+    <select id="selectByConditions" parameterType="map" resultType="com.deepen.domain.InboundDTO">
+        SELECT 
+            i.*,
+            w.warehouse_name,
+            w.zone,
+            CASE 
+                WHEN p.product_name IS NOT NULL THEN p.product_name 
+                WHEN m.mtr_name IS NOT NULL THEN m.mtr_name 
+            END as item_name,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN '완제품'
+                WHEN m.mtr_no IS NOT NULL THEN '자재'
+            END as item_type,
+            CASE 
+                WHEN p.product_no IS NOT NULL THEN TO_CHAR(p.product_no)
+                WHEN m.mtr_no IS NOT NULL THEN TO_CHAR(m.mtr_no)
+            END as item_code,
+            COALESCE(
+                (SELECT cd.common_detail_name 
+                FROM COMMON_DETAIL cd 
+                WHERE cd.common_detail_code =
+                    CASE
+                        WHEN p.product_no IS NOT NULL THEN p.product_unit
+                        WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+                    END
+                AND cd.common_detail_status = 'Y'),
+                CASE
+                    WHEN p.product_no IS NOT NULL THEN p.product_unit
+                    WHEN m.mtr_no IS NOT NULL THEN m.mtr_unit
+                END
+            ) as item_unit
+        FROM INBOUND i
+        LEFT JOIN WAREHOUSE w ON i.warehouse_id = w.warehouse_id
+        LEFT JOIN PRODUCT p ON i.item_no = p.product_no
+        LEFT JOIN MATERIAL m ON i.item_no = m.mtr_no
+        <where>
+            <if test="inNo != null">
+                AND i.in_no = #{inNo}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND i.in_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND i.in_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="status != null and status != ''">
+                AND i.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    w.warehouse_name LIKE '%' || #{keyword} || '%'
+                    OR p.product_name LIKE '%' || #{keyword} || '%'
+                    OR m.mtr_name LIKE '%' || #{keyword} || '%'
+                    OR TO_CHAR(i.in_no) LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+        </where>
+        ORDER BY i.in_no DESC
+    </select>
 
+    <!-- 품목 검색 -->
+    <select id="searchItems" resultType="map">
+        SELECT 
+            TO_CHAR(mtr_no) as item_code,
+            mtr_name as item_name,
+            '자재' as item_type
+        FROM MATERIAL
+        WHERE mtr_name LIKE '%' || #{keyword} || '%'
+        UNION ALL
+        SELECT 
+            TO_CHAR(product_no) as item_code,
+            product_name as item_name,
+            '완제품' as item_type
+        FROM PRODUCT
+        WHERE product_name LIKE '%' || #{keyword} || '%'
+    </select>
+
+    <!-- 창고 검색 -->
+    <select id="searchWarehouses" resultType="hashmap">
+        WITH ExistingZone AS (
+            SELECT DISTINCT 
+                warehouse_id,
+                zone
+            FROM INVENTORY
+            WHERE item_no = #{itemNo}
+        )
+        SELECT DISTINCT
+            w.warehouse_id,
+            w.warehouse_name,
+            w.warehouse_type,
+            COALESCE(ez.zone, w.zone) as zone,
+            CASE 
+                WHEN ez.warehouse_id IS NOT NULL THEN '1'
+                ELSE '0'
+            END as has_existing_item
+        FROM WAREHOUSE w
+        LEFT JOIN ExistingZone ez ON w.warehouse_id = ez.warehouse_id
+        WHERE 
+            (
+                w.warehouse_name LIKE '%' || #{keyword} || '%'
+                OR #{keyword} = ''
+            )
+            AND 
+            (
+                w.warehouse_type = #{itemType}
+            )
+        ORDER BY has_existing_item DESC, w.warehouse_name ASC
+    </select>
+
+    <!-- 구역 조회 -->
+    <select id="selectWarehouseZones" resultType="string">
+        WITH Zones AS (
+            SELECT DISTINCT zone
+            FROM INVENTORY
+            WHERE warehouse_id = #{warehouseCode}
+                AND item_no = #{itemNo}
+        ),
+        SplitZones AS (
+            SELECT DISTINCT regexp_substr(w.zone, '[^,]+', 1, LEVEL) as zone
+            FROM WAREHOUSE w
+            WHERE w.warehouse_id = #{warehouseCode}
+                AND w.zone IS NOT NULL
+            CONNECT BY regexp_substr(w.zone, '[^,]+', 1, LEVEL) IS NOT NULL
+        )
+        SELECT zone
+        FROM (
+            SELECT zone FROM Zones
+            WHERE EXISTS (SELECT 1 FROM Zones)
+            UNION ALL
+            SELECT zone FROM SplitZones
+            WHERE NOT EXISTS (SELECT 1 FROM Zones)
+                AND zone IS NOT NULL
+        )
+        ORDER BY zone
+    </select>
+
+    <!-- 재고 등록/수정 -->
+    <insert id="insertInventory" parameterType="map">
+        MERGE INTO INVENTORY i
+        USING DUAL 
+        ON (i.item_no = #{item_no} 
+            AND i.warehouse_id = #{warehouse_id} 
+            AND i.zone = #{zone})
+        WHEN MATCHED THEN
+            UPDATE SET 
+                i.inventory_qty = i.inventory_qty + #{in_qty},
+                i.inventory_count = i.inventory_count + #{in_qty}
+        WHEN NOT MATCHED THEN
+            INSERT (
+                item_no,
+                warehouse_id,
+                zone,
+                inventory_qty,
+                inventory_count,
+                inventory_type
+            ) VALUES (
+                #{item_no},
+                #{warehouse_id},
+                #{zone},
+                #{in_qty},
+                #{in_qty},
+                (SELECT 
+                    CASE 
+                        WHEN EXISTS (SELECT 1 FROM PRODUCT WHERE product_no = #{item_no}) 
+                        THEN '완제품'
+                        ELSE '자재'
+                    END
+                FROM DUAL)
+            )
+    </insert>
 </mapper>
-
-

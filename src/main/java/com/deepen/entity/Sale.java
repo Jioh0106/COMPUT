@@ -34,9 +34,6 @@ public class Sale {
 	@Column(name = "sale_vol", nullable = false)
 	private Integer sale_vol;
 	
-	@Column(name = "required_materials", length = 30)
-	private String required_materials;
-	
 	@Column(name = "sale_status", length = 30)
 	private String sale_status;
 	

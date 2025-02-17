@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>출고 등록</title>
-
+    <title>COMPUT.</title>
+	<link rel="icon" href="images/favicon.png" type="images/png">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/bootstrap.css">
@@ -82,22 +82,7 @@
                         <div class="child-input2">
                             <label>재고수량</label>
                             <div class="form-group">
-                                <input type="number" id="stockQty" class="form-control" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="display-flex">
-                        <div class="child-input1">
-                            <label>출고수량</label>
-                            <div class="form-group">
-                                <input type="number" id="outQty" class="form-control" min="1">
-                            </div>
-                        </div>
-                        <div class="child-input2">
-                            <label>상태</label>
-                            <div class="form-group">
-                                <input type="text" id="status" class="form-control" value="대기" readonly>
+                                <input type="number" id="inventoryQty" class="form-control" readonly>
                             </div>
                         </div>
                     </div>
@@ -120,6 +105,21 @@
                                 <select class="form-select" id="zone" disabled>
                                     <option value="">구역 선택</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="display-flex">
+                        <div class="child-input1">
+                            <label>출고수량</label>
+                            <div class="form-group">
+                                <input type="number" id="outQty" class="form-control" min="1">
+                            </div>
+                        </div>
+                        <div class="child-input2">
+                            <label>상태</label>
+                            <div class="form-group">
+                                <input type="text" id="status" class="form-control" value="대기" readonly>
                             </div>
                         </div>
                     </div>
@@ -168,6 +168,9 @@
         </div>
     </div>
 
+	<!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <!-- 스크립트 -->
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
@@ -178,8 +181,7 @@
     <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
     <script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script>
     
-    <!-- jQuery -->
-    <script src="assets/js/jquery-3.7.1.js"></script>
+   
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -26,9 +26,25 @@ public interface WorkInstructionMapper {
 	// 작업지시등록을 위한 정보
 	List<Map<String, Object>> selectRegWorkInstruction();
 	
+	//계획번호에 해당하는 품목 조회(반재품을 분리시켜서 조회)
+	List<Map<String, Object>> selectPlanItemsWithSeparatedSemiProducts(Map<String, Object> insertList);
+	
 	// 계획에서 가져온 작업지시정보 insert
 	void insertWorkInstruction(Map<String, Object> insertData);
 	
+	// 작업계획 상태 변경('PRGR005'== 대기중)
+	void updatePlanStatus(Map<String, Object> selectData);
+	
+	//상품번호로 공정 정보 조회
+	String selectDeduplicateProcessesName(int productNo);
+	
+	String selectDeduplicateProcessesNo(int productNo);
+	
 	// 작업지시 테이블 정보
 	List<Map<String, Object>> selectWorkInstruction();
+	
+	//품목번호에 해당하는 자재 조회
+	List<Map<String, Object>> selectMaterialsByProductNo(String productNo);
+	
+	void insertMaterialInWareHouse(Map<String, Object> insertData);
 }

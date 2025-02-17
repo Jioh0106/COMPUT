@@ -59,19 +59,28 @@ async function fetchLineInfoList(){
 		const lineInfoList = await response.json();
 		console.log("lineInfoList",lineInfoList);
 		
-		const lineDate = lineInfoList.map(item =>({
+		const lineData = lineInfoList.map(item =>({
 			label: item.lineName,
 			value: item.lineNo
 		}));
 		
+		// 그리드에서 사용할 listItems 생성
+		const gridLineListItems = lineData.map(item => ({
+			text: item.label,
+			value: item.value
+		}));
+		
 		// selectBox 생성
-		selectBox("#lineSelectBox","라인 선택",lineDate);
+		//selectBox("#lineSelectBox","라인 선택",lineData);
+		
+		// 그리드 생성할 때 동적으로 listItems 적용
+		createWorkInstructionGrid(gridLineListItems);
 	}catch(error){
 		console.error("error",error);
 	}
 };
 
-window.onload = function() { 
+window.onload = async function() { 
 	
 	// 데이트 피커 생성
 	const startDatePicker = datePiker('#tui-date-picker-container1','#startDate');
@@ -82,12 +91,15 @@ window.onload = function() {
 	endDatePicker.setNull();
 	
 	// 서버에서 받은 데이터로 select box 생성
-	fetchProcessInfoList();
-	fetchLineInfoList();
+	//fetchProcessInfoList();
+	//fetchLineInfoList();
+	const gridLineListItems = await fetchLineInfoList();
 	
 	// 그리드 생성
-	createWorkInstructionGrid();
+	createWorkInstructionGrid(gridLineListItems);
+	//createMaterialGrid();
 	createWorkerGrid();
+	//document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
 	document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
 };
 
@@ -97,11 +109,11 @@ let workerGrid = "";
 let materialGrid = "";
 let regGrid = "";
 
-function createWorkInstructionGrid(){
+function createWorkInstructionGrid(gridLineListItems = []){
 		//const data = [];//processList;
 		//console.log("processList:", data);
 		var Grid = tui.Grid;
-
+		Grid.applyTheme('clean');
 		if (workInstructionGrid) {
 			// 이미 생성된 경우 destroy하지 않고 재사용
 			workInstructionGrid.refreshLayout();
@@ -125,12 +137,13 @@ function createWorkInstructionGrid(){
 				{header: '라인', name: 'line_name', width:100, filter : 'select', editor: {
 																	            	type: 'select',
 																	            	options: {
-																	              	listItems: [
-																	                	{ text: 'Y', value: 'Y' },
-																	                	{ text: 'N', value: 'N' }
-																	              	]
-													        				 }}},
-				{header: '공정', name: 'process_name', width:80, filter : 'select'},
+																	              	listItems: gridLineListItems 
+													        				 }},
+																		 	formatter: ({ value }) => {
+																		        const selectedItem = gridLineListItems.find(item => item.value == value);
+																		        return selectedItem ? selectedItem.text : value;  // 존재하면 text(공정 1라인), 없으면 기본값
+																		    }},
+				{header: '공정', name: 'process_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
 				{header: '공정 상태', name: 'wi_status_name', width:90, filter : 'select'},
 				{header: '검사 상태', name: 'qc_status_name', width:100, filter : 'select'},
 				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
@@ -144,11 +157,14 @@ function createWorkInstructionGrid(){
 			
 		});
 		
+		workInstructionGrid.on('click',() => {
+			fetchMaterialsByRowSelection();
+		});
+		
+		
 		// 데이터 fetch
 		fetchWorkInstruction();
 		
-		// id 및 rowType 숨기기
-		//workInstructionGrid.hideColumn("no");
 };
 
 function createWorkerGrid(){
@@ -194,7 +210,6 @@ function createWorkerGrid(){
 			  resizable: true
 			},
 		});
-		//workInstructionGrid.hideColumn("no");
 };
 
 function createMaterialGrid(){
@@ -219,11 +234,13 @@ function createMaterialGrid(){
 			scrollY: true,
 			bodyHeight: 280,
 			columns: [
-				{header: '자재번호', name: 'mtl_no', sortable: true},
-				{header: '자재명', name: 'mtl_name', sortable: true},
+				{header: '재고번호', name: 'invenNO', sortable: true},
+				{header: '자재번호', name: 'mtlNo', sortable: true},
+				{header: '자재명', name: 'mtlName', sortable: true},
 				{header: '창고', name: 'warehouse', sortable: true},
 				{header: '구역', name: 'zone', sortable: true},
-				{header: '출고수량', name: 'out_qty', sortable: true}
+				{header: '출고수량', name: 'calculatedQty', sortable: true},
+				{header: '단위', name: 'unitName', sortable: true}
 			],
 			data: [],
 			columnOptions: {
@@ -231,7 +248,7 @@ function createMaterialGrid(){
 			},
 		});
 		
-		//materialGrid.hideColumn("no");
+		materialGrid.hideColumn("invenNO");
 };
 
 document.getElementById('large').addEventListener('shown.bs.modal', () => {	
@@ -250,13 +267,13 @@ document.getElementById('large').addEventListener('shown.bs.modal', () => {
 		scrollY: true,
 		bodyHeight: 280,
 		columns: [
-			{header: '계획번호', name: 'PLAN_ID'},
-			{header: '품목번호', name: 'PRODUCT_NO'},
-			{header: '품목', name: 'PRODUCT_NAME'},
-			{header: '수량', name: 'SALE_VOL'},
-			{header: '생산 시작 예정일', name: 'PLAN_START_DATE'},
-			{header: '생산 완료 목표일', name: 'PLAN_END_DATE'},
-			{header: ' ', name: 'PLAN_PRIORITY'}
+			{header: '계획번호', name: 'PLAN_ID', filter: { type: 'text', showApplyBtn: true, showClearBtn: true },sortable: true},
+			{header: '품목번호', name: 'PRODUCT_NO', filter: { type: 'text', showApplyBtn: true, showClearBtn: true },sortable: true},
+			{header: '품목', name: 'PRODUCT_NAME', filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+			{header: '수량', name: 'SALE_VOL', sortable: true},
+			{header: '생산 시작 예정일', name: 'PLAN_START_DATE', sortable: true},
+			{header: '생산 완료 목표일', name: 'PLAN_END_DATE', sortable: true},
+			{header: ' ', name: 'PLAN_PRIORITY', filter : 'select'}
 		],
 		data: [],
 		columnOptions: {
@@ -339,23 +356,87 @@ async function fetchWorkInstruction(){
 		console.log("error",error);
 	}
 };
+
+
 /**
  * 클릭한 로우의 품목을 만드는데 필요한 자재 정보 조회
  */
-workInstructionGrid.on('click',() => {
-	fetchMaterialsByRowSelection();
-});
-
 async function fetchMaterialsByRowSelection(){
 	try{
-		const response = await fetch("/api//material-info-by-row-selection");
+		// 1️.체크된 행 가져오기 (한 개만 선택)
+      	const checkedRows = workInstructionGrid.getCheckedRows();
+		console.log("checkedRows",checkedRows);
+      	if (checkedRows.length === 0) {
+	          console.warn("선택된 품목이 없습니다.");
+	          return;
+      	}
+	
+      	// 단일 품목번호, 수량 가져오기
+      	const productNo = checkedRows[0].product_no; 
+      	const vol = checkedRows[0].vol; 
+	
+  		console.log("선택된 품목번호:", productNo);
+  		console.log("선택된 수량:", vol);
+	
+      	const response = await fetch(`/api/material-info-by-row-selection?productNo=${productNo}&vol=${vol}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
-		//const result = await response.json();
-	}catch(error){
 		
+		// 3️. 서버에서 받은 데이터 materialGrid에 적용
+        const materialList = await response.json();
+        console.log("조회된 BOM 정보:", materialList);
+
+        materialGrid.resetData(materialList);
+	}catch(error){
+		console.error("BOM 정보 조회 실패:", error);
 	}
 };
 
+/**
+ * 자재 투입 버튼 클릭시 재고 출고 대기에 insert
+ */
+document.getElementById('inputMaterial').addEventListener('click',() => {
+	const checkedMaterialRows = materialGrid.getCheckedRows();
+	const checkedWiRows = workInstructionGrid.getCheckedRows().map(row => row.wi_no);
+	console.log("checkedMaterialRows",checkedMaterialRows);
+	console.log("checkedWiRows",checkedWiRows);
+	
+	if (checkedWiRows.length === 0) {
+	       console.warn("작업지시 항목이 선택되지 않았습니다.");
+	       return;
+	}
+	
+   	const fWiNo = checkedWiRows[0]; // 첫 번째 선택된 wi_no 가져오기
+	
+   	// 각 자재 데이터에 firstWiNo 추가
+   	const insertMaterialData = checkedMaterialRows.map(row => ({
+	       ...row,
+	       wiNo: fWiNo
+   	}));
+	
+	   console.log("updatedMaterialRows (wi_no 추가됨)", insertMaterialData);
+	
+	insertOB('/api/insert-material-warehouse',insertMaterialData);
+});
 
+async function insertOB(url,data){
+	try{
+		const response = await fetch(url,{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(data)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		//location.reload(true);
+		
+	}catch(error){
+		console.log("error",error);
+	}
+};

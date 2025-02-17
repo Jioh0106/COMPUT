@@ -2,7 +2,6 @@ package com.deepen.entity;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,11 +21,11 @@ public class Inbound {
     @Column(name = "in_no")
     private int in_no; // 입고번호
 
-    @Column(name = "inventory_no", nullable = false)
+    @Column(name = "inventory_no")
     private int inventory_no; // 재고번호
 
     @Column(name = "in_date", nullable = false)
-    private LocalDateTime in_date; // 입고일자
+    private LocalDate in_date; // 입고일자
 
     @Column(name = "in_qty", nullable = false)
     private int in_qty; // 입고수량
@@ -34,27 +33,22 @@ public class Inbound {
     @Column(name = "warehouse_id", nullable = false, length = 20)
     private String warehouse_id; // 창고 ID
 
-    @Column(name = "inspector", length = 50)
-    private String inspector; // 검수자
-
-    @Column(name = "inspection_result", length = 20)
-    private String inspection_result; // 검수 결과
-
+    @Column(name = "zone", length = 20)
+    private String zone; // 구역
+    
     @Column(name = "status", nullable = false, length = 20)
     private String status; // 상태
 
-    @Column(name = "note", length = 500)
-    private String note; // 비고
+    @Column(name = "reg_user", length = 50)
+    private String reg_user; // 승인자
 
-    @Column(name = "reg_user", nullable = false, length = 50)
-    private String reg_user; // 등록자
+    @Column(name = "reg_date")
+    private LocalDate reg_date; // 승인일
+    
+    @Column(name = "buy_no")
+    private int buy_no; // 발주번호
 
-    @Column(name = "reg_date", nullable = false)
-    private LocalDate reg_date; // 등록일
-
-    @Column(name = "mod_user", length = 50)
-    private String mod_user; // 수정자
-
-    @Column(name = "mod_date")
-    private LocalDate mod_date; // 수정일
+    @Column(name = "item_no")
+    private int item_no; // 품목번호
+    
 }

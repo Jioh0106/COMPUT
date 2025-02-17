@@ -157,7 +157,6 @@ $(function() {
 			{header: '직원번호', name: 'order_emp', width: 100},
 			{header: '등록직원', name: 'emp_name', width: 100},
 			{header: '등록일자', name: 'order_date', width: 120},
-			{header: '필요자재여부', name: 'required_materials', width: 80},
 			{header: '상태', name: 'sale_status', width: 80}
 		]
 	});

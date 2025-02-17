@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
@@ -27,6 +27,21 @@
 	
 	<!--근무 관리 CSS -->
 	<link rel="stylesheet" href="/css/work_mng.css">
+	
+	<style type="text/css">
+		#sirenImg {
+			width: 20px;
+			height: auto;
+		}
+		
+		.toast {
+		    position: absolute;  
+		    top: 90px;          
+		    right: 150px;
+		    z-index: 1050;       
+		}
+			
+	</style>
 </head>
 <body>
 		
@@ -37,10 +52,21 @@
 		
 		<!-- 메인 content -->
 		<div id="main">
-			
+			<!--  생산계획 등록 토스트 알림 -->
+			<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+				<div class="toast-header">
+					<img src="/images/siren.png" class="rounded me-2 " id="sirenImg" >
+					<strong class="me-auto">생산 계획 등록 알림</strong>
+	<!-- 								<small>11 mins ago</small> -->
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+				<div class="toast-body">
+					생산 계획 등록이 필요한 주문 건이 있습니다.<br>
+					등록을 진행해 주세요. 
+				</div>
+			</div>
 			<div class="d-flex justify-content-between">
 				<h3>생산 계획</h3>
-				
 				<div class="buttons">
 					<button type="button" class="btn btn-primary" onclick="openView()">계획 등록</button>
 				</div>
@@ -50,7 +76,7 @@
 			<div class="card">
 				<div class="card-body">
 					<!-- 데이트 피커 시작 -->
-					<section class="section mb-4">
+					<section class="section mb-4 d-flex justify-content-between">
 						<div style="display: flex; align-items: center; gap: 0.5rem;">
 							<!-- 첫 번째 데이트 피커 -->
 							<div>
@@ -85,6 +111,7 @@
 							</div>
 							
 						</div>
+						
 					</section>
 					<!-- 데이트 피커 끝 -->
 
@@ -95,7 +122,12 @@
 						</div>
 					</section>
 					<!-- 그리드 끝 -->
-
+					<div class="d-flex justify-content-end">
+						<input type="button" class="btn btn-outline-success ms-2 deleteBtn" id="delete" value="저장">
+						<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
+							<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+						</div>
+					</div>
 					
 				</div> <!-- card-body -->
 			</div> <!-- card -->
