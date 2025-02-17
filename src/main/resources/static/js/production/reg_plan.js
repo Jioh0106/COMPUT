@@ -1,40 +1,42 @@
 $(function() {	
 	// 등록일자는 오늘 날짜로 고정
-	const today = new Date();
-	const yyyy = today.getFullYear();
-	const mm = String(today.getMonth() + 1).padStart(2, '0');
-	const dd = String(today.getDate()).padStart(2, '0');
-	const formattedDate = yyyy + '-' + mm + '-' + dd;
-	$('#plan_date').val(formattedDate);
+//	const today = new Date();
+//	const yyyy = today.getFullYear();
+//	const mm = String(today.getMonth() + 1).padStart(2, '0');
+//	const dd = String(today.getDate()).padStart(2, '0');
+//	const formattedDate = yyyy + '-' + mm + '-' + dd;
+//	$('#plan_date').val(formattedDate);
 
 
 	// 첫 번째 DatePicker 초기화
-	const container1 = document.getElementById('tui-date-picker-container-1');
-	const target1 = document.getElementById('tui-date-picker-target-1');
-	const instance1 = new tui.DatePicker(container1, {
-		language: 'ko',
-		input: {
-			element: target1,
-			format: 'yyyy-MM-dd'
-		}
-	});
+//	const container1 = document.getElementById('tui-date-picker-container-1');
+//	const target1 = document.getElementById('tui-date-picker-target-1');
+//	const instance1 = new tui.DatePicker(container1, {
+//		language: 'ko',
+//		input: {
+//			element: target1,
+//			format: 'yyyy-MM-dd'
+//		}
+//	});
 
 	// 두 번째 DatePicker 초기화
-	const container2 = document.getElementById('tui-date-picker-container-2');
-	const target2 = document.getElementById('tui-date-picker-target-2');
-	const instance2 = new tui.DatePicker(container2, {
-		language: 'ko',
-		input: {
-			element: target2,
-			format: 'yyyy-MM-dd'
-		}
-	});
+//	const container2 = document.getElementById('tui-date-picker-container-2');
+//	const target2 = document.getElementById('tui-date-picker-target-2');
+//	const instance2 = new tui.DatePicker(container2, {
+//		language: 'ko',
+//		input: {
+//			element: target2,
+//			format: 'yyyy-MM-dd'
+//		}
+//	});
 
 
 	
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
+		height: 400,
+		bodyHeight: 350,
 		columns: [
 			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true },
 			{ header: '주문번호', name: 'order_id', width: 100, sortingType: 'asc', sortable: true},
