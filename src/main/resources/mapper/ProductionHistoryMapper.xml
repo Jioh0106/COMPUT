@@ -7,16 +7,27 @@
 <!-- 생산이력 뷰 -->
 <select id="historyList" resultType="java.util.Map">
 	SELECT 
-	plan_id AS planId,
-	wi_no AS wiNo,
-	process_name AS processName,
-	line_no AS lineNo,
-	judgement,
-	end_time AS endTime,
-	product_name AS productName,
-	product_type AS productType
-	FROM
-	prdct_history
+    plan_id AS planId,
+    wi_no AS wiNo,
+    process_name AS processName,
+    line_no AS lineNo,
+    judgement,
+    end_time AS endTime,
+    product_name AS productName,
+    product_type AS productType
+FROM
+    prdct_history
+ORDER BY 
+    
+    CASE 
+        WHEN REGEXP_LIKE(SUBSTR(plan_id, 2, 8), '^[0-9]{8}$') THEN 
+            TO_DATE(SUBSTR(plan_id, 2, 8), 'YYYYMMDD') 
+        ELSE 
+            NULL 
+    END DESC,  
+   
+    TO_NUMBER(REGEXP_SUBSTR(plan_id, '[0-9]+$', 1, 1)) ASC
+
 </select>
 
 

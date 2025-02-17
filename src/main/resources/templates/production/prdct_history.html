@@ -93,13 +93,13 @@
 							<form>
 								<!-- 검색 조건 시작 -->
 								<div class="row mb-4 align-items-center">
-								    <!-- 상품명 -->
+								    <!-- 생산계획번호 -->
 									<div class="col-md-4">
-										<label for="nameSearch" class="form-label">상품명 검색</label>
+										<label for="nameSearch" class="form-label">생산계획번호 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
-												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+											<input type="text" class="form-control" id="searchPlanId" placeholder="생산계획번호를 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="filterGrid()">
 										</div>
 									</div>
 								</div>
@@ -175,6 +175,30 @@
 			  resizable: true
 			}
 		});
+		
+		
+		
+		//생산계획번호 검색
+		function filterGrid() {
+		    var searchText = document.getElementById("searchPlanId").value.trim();
+
+		    if (searchText === "") {
+		        // 검색어가 없으면 원래 데이터로 복원
+		        productionGrid.resetData(historyList);
+		        return;
+		    }
+
+		    var filteredData = historyList.filter(row => row.PLANID.includes(searchText));
+		    productionGrid.resetData(filteredData);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
