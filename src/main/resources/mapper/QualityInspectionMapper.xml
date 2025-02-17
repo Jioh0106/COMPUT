@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deepen.mapper.QualityInspectionMapper">
+
+    <!-- 검사 대상 LOT 조회 -->
+    <select id="selectInspectionLots" resultType="com.deepen.domain.LotMasterDTO">
+        SELECT 
+            lm.lot_no AS lotNo,
+            lm.wi_no AS wiNo,
+            lm.product_no AS productNo,
+            lm.process_no AS processNo,
+            p.product_name AS productName,
+            pi.process_name AS processName,
+            lm.lot_status AS lotStatus,
+            lm.start_time AS startTime
+        FROM lot_master lm
+        LEFT JOIN product p ON lm.product_no = p.product_no
+        LEFT JOIN process_info pi ON lm.process_no = pi.process_no
+        WHERE 1=1
+        <if test="lotNo != null and lotNo != ''">
+            AND lm.lot_no LIKE '%' || #{lotNo} || '%'
+        </if>
+        <if test="wiNo != null">
+            AND lm.wi_no = #{wiNo}
+        </if>
+        <if test="processNo != null">
+            AND lm.process_no = #{processNo}
+        </if>
+        AND lm.lot_status IN ('LTST003', 'LTST004')
+        ORDER BY lm.start_time DESC
+    </select>
+
+    <!-- LOT 마스터 정보 조회 -->
+    <select id="selectLotMasterByNo" resultType="com.deepen.domain.LotMasterDTO">
+        SELECT 
+            lot_no AS lotNo,
+            parent_lot_no AS parentLotNo,
+            process_type AS processType,
+            wi_no AS wiNo,
+            product_no AS productNo,
+            process_no AS processNo,
+            line_no AS lineNo,
+            lot_status AS lotStatus,
+            start_time AS startTime,
+            end_time AS endTime
+        FROM lot_master
+        WHERE lot_no = #{lotNo}
+    </select>
+
+    <!-- 검사 항목 조회 -->
+    <select id="selectQcProductMappingByProductAndProcess" resultType="com.deepen.domain.QcProductMappingDTO">
+        SELECT 
+            qpm.mapping_id AS mappingId,
+            qpm.qc_code AS qcCode,
+            qm.qc_name AS qcName,
+            qpm.target_value AS targetValue,
+            qpm.ucl AS ucl,
+            qpm.lcl AS lcl,
+            qm.unit AS unit,
+            cd.common_detail_name AS unitName
+        FROM qc_product_mapping qpm
+        JOIN qc_master qm ON qpm.qc_code = qm.qc_code
+        LEFT JOIN common_detail cd ON qm.unit = cd.common_detail_code
+        WHERE qpm.product_no = #{productNo}
+        AND qm.process_no = #{processNo}
+        AND qpm.use_yn = 'Y'
+        AND qm.use_yn = 'Y'
+    </select>
+
+    <!-- 품질검사 결과 저장 -->
+    <insert id="insertQualityInspection">
+        <selectKey keyProperty="qcLogNo" resultType="java.lang.Integer" order="BEFORE">
+            SELECT SEQ_QC_LOG_ID.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO lot_qc_log (
+            qc_log_no,
+            lot_no,
+            process_no,
+            qc_code,
+            qc_name,
+            target_value,
+            ucl,
+            lcl,
+            measure_value,
+            judgement,
+            inspector,
+            check_time,
+            end_time,
+            create_user,
+            create_time
+        ) VALUES (
+            #{qcLogNo},
+            #{lotNo,jdbcType=VARCHAR},
+            #{processNo,jdbcType=NUMERIC},
+            #{qcCode,jdbcType=VARCHAR},
+            #{qcName,jdbcType=VARCHAR},
+            #{targetValue,jdbcType=NUMERIC},
+            #{ucl,jdbcType=NUMERIC},
+            #{lcl,jdbcType=NUMERIC},
+            #{measureValue,jdbcType=NUMERIC},
+            #{judgement,jdbcType=VARCHAR},
+            #{inspector,jdbcType=VARCHAR},
+            #{checkTime,jdbcType=TIMESTAMP},
+            #{endTime,jdbcType=TIMESTAMP},
+            #{inspector,jdbcType=VARCHAR},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 품질검사 이력 조회 -->
+    <select id="selectQualityInspectionByLotNo" resultType="com.deepen.domain.QualityInspectionDTO">
+        SELECT
+            l.qc_log_no AS qcLogNo,
+            l.lot_no AS lotNo,
+            l.process_no AS processNo,
+            l.qc_code AS qcCode,
+            l.qc_name AS qcName,
+            l.target_value AS targetValue,
+            l.ucl AS ucl,
+            l.lcl AS lcl,
+            l.measure_value AS measureValue,
+            l.judgement,
+            l.inspector,
+            l.check_time AS checkTime,
+            l.end_time AS endTime
+        FROM lot_qc_log l
+        WHERE l.lot_no = #{lotNo}
+        ORDER BY l.check_time DESC
+    </select>
+
+    <!-- LOT 상태 업데이트 -->
+    <update id="updateLotStatusAndResult">
+        UPDATE lot_master 
+        SET lot_status = #{status,jdbcType=VARCHAR},
+            end_time = CASE 
+                WHEN #{status,jdbcType=VARCHAR} IN ('LTST005', 'LTST006') 
+                THEN SYSDATE 
+                ELSE end_time 
+            END,
+            update_time = SYSDATE,
+            update_user = 'SYSTEM'
+        WHERE lot_no = #{lotNo,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 새로운 LOT 생성 -->
+    <insert id="insertLotMaster">
+        INSERT INTO lot_master (
+            lot_no,
+            parent_lot_no,
+            process_type,
+            wi_no,
+            product_no,
+            process_no,
+            lot_status,
+            start_time,
+            create_user,
+            create_time
+        ) VALUES (
+            #{lotNo},
+            #{parentLotNo},
+            #{processType},
+            #{wiNo},
+            #{productNo},
+            #{processNo},
+            #{lotStatus},
+            SYSDATE,
+            'SYSTEM',
+            SYSDATE
+        )
+    </insert>
+
+    <!-- LOT 관계 생성 -->
+    <insert id="insertLotRelationship">
+        INSERT INTO lot_relationship (
+            parent_lot_no,
+            child_lot_no,
+            create_user,
+            create_time
+        ) VALUES (
+            #{parentLotNo},
+            #{childLotNo},
+            'SYSTEM',
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 다음 공정 조회 -->
+    <select id="selectNextProcess" resultType="com.deepen.domain.ProcessInfoDTO">
+        SELECT 
+            process_no AS processNo,
+            process_name AS processName,
+            process_priority AS processPriority,
+            description
+        FROM process_info
+        WHERE process_priority > (
+            SELECT process_priority 
+            FROM process_info 
+            WHERE process_no = #{currentProcessNo}
+        )
+        AND is_active = 'Y'
+        ORDER BY process_priority 
+        FETCH FIRST 1 ROW ONLY
+    </select>
+
+    <!-- 모든 공정 정보 조회 -->
+    <select id="selectAllProcessInfo" resultType="com.deepen.domain.ProcessInfoDTO">
+        SELECT
+            process_no AS processNo,
+            process_name AS processName,
+            description,
+            is_active AS isActive,
+            process_priority AS processPriority,
+            created_date AS createdDate,
+            updated_date AS updatedDate
+        FROM process_info
+        WHERE is_active = 'Y'
+        ORDER BY process_priority
+    </select>
+    
+    <!-- 검사 이력 조회 -->
+    <select id="selectInspectionHistory" resultType="com.deepen.domain.InspectionHistoryDTO">
+        SELECT
+            l.qc_log_no AS qcLogNo,
+            l.lot_no AS lotNo,
+            l.process_no AS processNo,
+            p.process_name AS processName,
+            l.qc_code AS qcCode,
+            l.qc_name AS qcName,
+            l.target_value AS targetValue,
+            l.ucl AS ucl,
+            l.lcl AS lcl,
+            l.measure_value AS measureValue,
+            l.judgement,
+            l.inspector,
+            l.check_time AS checkTime
+        FROM lot_qc_log l
+        LEFT JOIN process_info p ON l.process_no = p.process_no
+        WHERE 1=1
+        <if test="lotNo != null and lotNo != ''">
+            AND l.lot_no LIKE '%' || #{lotNo} || '%'
+        </if>
+        <if test="fromDate != null and fromDate != ''">
+            AND l.check_time >= TO_DATE(#{fromDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="toDate != null and toDate != ''">
+            AND l.check_time &lt; TO_DATE(#{toDate}, 'YYYY-MM-DD') + 1
+        </if>
+        <if test="processNo != null">
+            AND l.process_no = #{processNo}
+        </if>
+        <if test="judgement != null and judgement != ''">
+            AND l.judgement = #{judgement}
+        </if>
+        ORDER BY l.check_time DESC
+    </select>
+
+    <!-- 통계 정보 조회 -->
+    <select id="selectInspectionStats" resultType="com.deepen.domain.InspectionStatsDTO">
+        WITH stats AS (
+            SELECT
+                l.process_no,
+                p.process_name,
+                COUNT(*) as total_count,
+                SUM(CASE WHEN l.judgement = 'Y' THEN 1 ELSE 0 END) as pass_count,
+                SUM(CASE WHEN l.judgement = 'N' THEN 1 ELSE 0 END) as fail_count
+            FROM lot_qc_log l
+            LEFT JOIN process_info p ON l.process_no = p.process_no
+            WHERE 1=1
+            <if test="fromDate != null and fromDate != ''">
+                AND l.check_time >= TO_DATE(#{fromDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="toDate != null and toDate != ''">
+                AND l.check_time &lt; TO_DATE(#{toDate}, 'YYYY-MM-DD') + 1
+            </if>
+            <if test="processNo != null">
+                AND l.process_no = #{processNo}
+            </if>
+            GROUP BY l.process_no, p.process_name
+        )
+        SELECT
+            s.process_no AS processNo,
+            s.process_name AS processName,
+            s.total_count AS totalCount,
+            s.pass_count AS passCount,
+            s.fail_count AS failCount,
+            ROUND(s.pass_count * 100.0 / s.total_count, 2) AS passRate,
+            ROUND(s.fail_count * 100.0 / s.total_count, 2) AS failRate
+        FROM stats s
+        ORDER BY s.process_no
+    </select>
+</mapper>

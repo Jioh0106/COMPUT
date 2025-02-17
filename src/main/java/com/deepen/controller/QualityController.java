@@ -15,10 +15,4 @@ public class QualityController {
     public String qualityInfo(Model model) {
         return "info/quality_info";
     }
-    
-    // 품질검사
-    @GetMapping("/quality-inspection")
-    public String qualityInspection(Model model) {
-        return "quality/inspection";
-    }
 }
