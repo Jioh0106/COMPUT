@@ -95,10 +95,10 @@
 								<div class="row mb-4 align-items-center">
 								    <!-- 상품명 -->
 									<div class="col-md-4">
-										<label for="nameSearch" class="form-label">품명 검색</label>
+										<label for="nameSearch" class="form-label">상품명 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
+											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
 												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
 										</div>
 									</div>
@@ -110,9 +110,9 @@
 								
 								<!-- 버튼 시작 -->
 								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
-									<div class="float-end">
-										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
-									</div>
+<!--									<div class="float-end">-->
+<!--										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">-->
+<!--									</div>-->
 								<!--</div>-->
 								<!-- 버튼 끝 -->
 							</form>
@@ -150,8 +150,9 @@
 				{header: '번호',	name: 'inventory_no', width: 100},
 				{header: '생산계획번호',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
 				{header: '작업지시번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
-				{header: '품명',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '공정',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
+				{header: '상품구분',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+				{header: '상품명',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
+				{header: '투입량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
 				{header: '불량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
 				{header: '생산량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
 				{header: '생산날짜',	name: 'bom_date',	editor: 'text', sortable: true, width: 150}

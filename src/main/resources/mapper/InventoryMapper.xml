@@ -30,8 +30,53 @@
 		            WHEN i.inventory_type = '완제품' THEN p.product_unit 
 		            WHEN i.inventory_type = '자재' THEN m.mtr_unit
 		        END) = c.common_detail_code
+		WHERE 1=1
+	    <if test="warehouse_id != null and warehouse_id != ''">
+	        AND i.warehouse_id = #{warehouse_id}
+	    </if>
+	    <if test="zone != null and zone != ''">
+	        AND i.zone = #{zone}
+	    </if>
+	    <if test="item_name != null and item_name != ''">
+        AND (
+            (i.inventory_type = '완제품' AND p.product_name LIKE '%' || #{item_name} || '%')
+            OR 
+            (i.inventory_type = '자재' AND m.mtr_name LIKE '%' || #{item_name} || '%')
+        )
+    	</if>        
 	</select>
 
+	
+	<!--창고 조회-->
+	<select id="warehouseSelect" resultType="com.deepen.domain.WarehouseDTO">
+		SELECT warehouse_id, warehouse_name
+		FROM warehouse
+	</select>
+	
+	<!--구역 조회-->
+	<select id="zoneSelect" resultType="string">
+		SELECT zone
+		FROM warehouse
+		WHERE warehouse_id = #{warehouse_id}
+	</select>
+	
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 </mapper>

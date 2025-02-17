@@ -98,10 +98,28 @@
 										<label for="nameSearch" class="form-label">품목명 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
-												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+											<input type="text" class="form-control" id="searchItem" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2">
 										</div>
 									</div>
+									
+									
+									<!-- 첫 번째 SELECT 박스: 창고 선택 -->
+									<div class="col-md-4">
+									  <label for="warehouse">창고 선택</label>
+									  <select class="form-select deptArea" id="warehouse">
+									      <option value="">창고를 선택하세요</option>
+									  </select>
+									</div>
+									
+									  <!-- 두 번째 SELECT 박스: 구역 선택 -->
+									  <div class="col-md-4">
+									  <label for="zone">구역 선택</label>
+									  <select class="form-select deptArea" id="zone">
+  										<option value="">구역을 선택하세요</option>
+  									  </select>
+									  </div>
+									
 								</div>
 								<!-- 검색 조건 끝-->
 								
@@ -240,21 +258,28 @@
 			data: [], // 서버에서 전달받은 데이터
 			rowHeaders: ['checkbox'],
 			columns: [
-				{header: '번호', name: 'history_no', hidden: true, width: 60},
-				{header: '변경 전 실재고량', name: 'prev_count', width: 100},
-				{header: '변경 후 실재고량', name: 'new_count', width: 100},
-				{header: '변경사유', name: 'change_reason', width: 120,
-					formatter: 'listItemText', editor: {
+				{header: '번호', name: 'HISTORY_NO', hidden: true, width: 60},
+				{header: '변경 전 실재고량', name: 'PREV_COUNT', width: 100},
+				{header: '변경 후 실재고량', name: 'NEW_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '차이값', name: 'DIFF_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '변경사유', name: 'CHANGE_REASON', width: 120,
+					formatter: ({ value }) => {
+				        const reason = reasonChangeList.find(item => item.code === value);
+				        return reason ? reason.name : value; // 매칭되는 name이 있으면 출력, 없으면 value 그대로 표시
+				    },
+					editor: {
 			            type: 'select',
 			            options: {
 			              listItems: reasonChangeList.map(reason => ({
 		                    text: reason.name, // 변경사유 이름(name과 code는 매퍼 AS "name", AS "code")
 		                    value: reason.code // 변경사유 코드
 			               }))
-			            }}, },
-				{header: '기타사유', name: 'reason_detail', width: 200},
-				{header: '수정자', name: 'mod_user', width: 100},
-				{header: '수정일', name: 'mod_date', width: 100}
+			            }
+					}, 
+					},
+				{header: '기타사유', name: 'REASON_DETAIL', editor: 'text', sortable: true, width: 200},
+				{header: '수정자', name: 'MOD_USER', width: 100},
+				{header: '수정일', name: 'MOD_DATE', width: 150}
 				
 			]
 		});
@@ -264,14 +289,21 @@
 		let allData = []; // 전체 데이터를 저장할 변수
 
 		
-		document.addEventListener("DOMContentLoaded", function() {
 			//재고현황테이블 조회
 			function loadInventoryData() {
+				 
+				 let warehouseId = $("#warehouse").val();  //선택한 창고값
+					console.log('선택한창고값', warehouseId);
+				 let zone = $("#zone").val(); //선택한 구역값
+				 let itemName = $("#searchItem").val(); //품목검색
+				 	console.log('검색명', itemName)
+				
 		        $.ajax({
 		            url: "/api/inventory/list", 
 		            type: "GET",
 		            contentType: "application/json",
 		            dataType: "json",
+					data: {warehouse_id: warehouseId, zone: zone, item_name: itemName },  // 필터 값 전달
 		            beforeSend: function(xhr) {
 		                xhr.setRequestHeader(header, token);  
 		            },
@@ -312,7 +344,7 @@
 	            });
 	        });	
 				
-	});
+	
 			
 	
 	//--------------------------------------------------------실재고량 변경이력 모달창 시작
@@ -321,9 +353,14 @@
 		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
 		let inventory_no = null; // 클릭한 행의 재고번호
 		let inventory_count = null; // 클릭한 행의 실재고량
-	
+		
+		//모달창 열릴때
 		inventoryGrid.on('click', function (ev) {
-			  // 클릭된 row 데이터 가져오기
+			 
+			    //모달창 초기화
+			    historyGrid.resetData([]);
+			    
+			    // 클릭된 row 데이터 가져오기
 	        	const rowData = ev.instance.getRow(ev.rowKey);
 	        	inventory_no = rowData.inventory_no;
 	        	inventory_count = rowData.inventory_count;
@@ -331,50 +368,237 @@
 				console.log('로그인한 사번 : ', emp_id);	        
 				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
 				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
-	        $('#history').modal('show');
-		    
-// 			axios.get('/api/order/detail/sale', {
-// 				params: {
-// 					inventory_no: rowData.inventory_no  
-// 				}
-// 			})
-// 			.then(function (response) {
-// 			  const detailData = response.data;
-			  
-// 			  historyGrid.resetData(detailData);
-// 			  historyGrid.refreshLayout();
-// 			})
-// 			.catch(function (error) {
-// 			  console.error('Error fetching order detail:', error);
-// 			});
-	        
-		});
+				
+				$('#history').modal('show');
+				
+
+			//변경이력 데이터 조회 요청 (GET /api/inventory/history/{inventory_no})
+			$('#history').on('shown.bs.modal', function () {
+			fetch(`/api/inventory/history/${inventory_no}`)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("불러온 변경이력 데이터:", data);
+			            
+			            // ✅ 변경 후 실재고량 - 변경 전 실재고량 계산 후 업데이트
+		                const updatedData = data.map(row => ({
+		                    ...row,
+		                    DIFF_COUNT: row.NEW_COUNT - row.PREV_COUNT
+		                }));
+
+			            //변경이력 데이터를 TOAST UI Grid에 적용
+			            historyGrid.resetData(updatedData);
+			            historyGrid.refreshLayout();
+						
+			        })
+			        .catch(error => {
+			            console.error("Error fetching history data:", error);
+			        });
+	        	});
+			});
 		
-	
+		
+		//차이값 자동입력
+		historyGrid.on('afterChange', (ev) => {
+		    ev.changes.forEach(change => {
+		        if (change.columnName === 'NEW_COUNT') {
+		            const rowKey = change.rowKey;
+		            const newCount = historyGrid.getValue(rowKey, 'NEW_COUNT') || 0;
+		            const prevCount = historyGrid.getValue(rowKey, 'PREV_COUNT') || 0;
+		
+		            historyGrid.setValue(rowKey, 'DIFF_COUNT', newCount - prevCount);
+		        }
+		    });
+		});
+
+			
 		// "추가" 버튼 클릭 이벤트
 		$('#append').on('click', function (e) {
 			e.preventDefault(); // 기본 동작 방지
 			
-			// 기본값으로 새 행 데이터 생성
-			const newRow = {
-				history_no: '',
-				prev_count: inventory_count,
-				new_count: '',
-				change_reason: '', 
-				reason_detail: '', 
-				mod_user: emp_id, 
-				mod_date: '' 
-			};
+			if (!inventory_no || inventory_no === null) {
+			       alert("재고번호를 선택해야함");
+			       return;
+			   }
+
+			   console.log('추가 버튼 클릭: inventory_no =', inventory_no, ', inventory_count =', inventory_count);
 			
+		    // 기본값으로 새 행 데이터 생성
+			const newRow = {
+				HISTORY_NO: '',
+				PREV_COUNT: inventory_count,
+				NEW_COUNT: '',
+				CHANGO_REASON: '', 
+				REASON_DETAIL: '', 
+				MOD_USER: emp_id, 
+				MOD_DATE: '' ,
+				DIFF_COUNT: ''
+			};
+		
 			// 새 행을 TOAST UI Grid에 추가
 			historyGrid.prependRow(newRow, {
 				focus: true // 추가된 행에 포커스
 			});
+			historyGrid.refreshLayout();
 			
 		}); // 추가 버튼 이벤트
 	
 		
+		// "저장" 버튼 클릭 이벤트
+			$('#modalSave').on('click', async function () {
+				
+				const checkedColumns = ['PREV_COUNT', 'NEW_COUNT', 'CHANGE_REASON', 'MOD_USER']
+				// 모든 행 데이터 가져오기
+				  let rows = historyGrid.getData();
+				
+				// 기존 행(`HISTORY_NO`가 있는 경우) 제외하고 새로운 행만 필터링
+			    rows = rows.filter(row => !row.HISTORY_NO && row.NEW_COUNT !== "");
+				
+				
+				  // 빈 값이 있는지 확인
+				  for (const row of rows) {
+				      for (const column of checkedColumns) {
+				          if (row[column] === null || row[column] === undefined || row[column] === '') {
+				              alert(`"${column}" 값이 비어 있습니다. 모든 필드를 입력해주세요.`);
+				              return; // 저장 중단
+				          }
+				      }
+				  }
+				  	
+				  	let date  = [];
+				  	data = rows.map(row =>({
+					inventory_no: inventory_no, //전역변수 클릭한 행의 재고번호
+					prev_count: row.PREV_COUNT,
+					new_count: row.NEW_COUNT,
+					change_reason: row.CHANGE_REASON || null,
+					reason_detail: row.REASON_DETAIL,
+					mod_user: emp_id, //전역변수
+					diff_count: row.DIFF_COUNT
+					
+				  }));
+				  
+				  console.log("@전송 데이터:", JSON.stringify(data));
+				  
+				  // 모든 값이 입력된 경우, 저장 로직 실행
+			     try {
+					const response = await fetch('/api/inventory/history/save', {
+			           method: 'POST',
+			           headers: { 'Content-Type': 'application/json',
+				   	    [header]: token },
+			           body: JSON.stringify(data)
+			       });
+				   
+				   if (response.ok) {
+				              alert('저장 완료!');
+				              $('#history').modal('hide');
+				              location.reload(true); // 페이지 새로고침
+				          } else {
+				              alert('저장 실패');
+				          }
+			     } catch (error) {
+			         console.error('저장 실패:', error);
+			         alert('저장 중 오류가 발생했습니다.');
+			     }
+				
+			}); // 저장 클릭 이벤트
 			
+		
+			
+			
+			
+		//"삭제" 버튼 클릭 이벤트
+		$('#delete').on('click', async function () {
+		    const selectedRows = historyGrid.getCheckedRows();
+		    
+		    if (selectedRows.length === 0) {
+		        alert("삭제할 변경 이력을 선택하세요.");
+		        return;
+		    }
+
+		    const historyNoList = selectedRows.map(row => row.HISTORY_NO); // 선택된 PK 리스트
+		    console.log("삭제할 변경 이력 목록:", historyNoList);
+
+		    try {
+		        const response = await fetch('/api/inventory/history/delete', {
+		            method: 'POST',
+		            headers: { 
+		                'Content-Type': 'application/json',
+		                [header]: token
+		            },
+		            body: JSON.stringify({
+		                historyNoList: historyNoList,
+		                inventoryNo: inventory_no  // 전역 변수 사용
+		            })
+		        });
+
+		        if (response.ok) {
+		            alert('삭제 완료 및 재고 현황 업데이트 완료');
+		            $('#history').modal('hide'); // 모달 닫기
+		            location.reload(); // 새로고침하여 UI 반영
+		        } else {
+		            alert('삭제 실패');
+		        }
+		    } catch (error) {
+		        console.error('삭제 오류:', error);
+		        alert('삭제 중 오류 발생');
+		    }
+		});
+
+			
+		
+		//select박스 창고조회, 구역조회
+		$(document).ready(function(){
+			
+		   // 창고 목록 불러오기
+           $.get("/api/inventory", function (data) {
+               data.forEach(wh => {
+                   $('#warehouse').append(`<option value="${wh.warehouse_id}">${wh.warehouse_name}</option>`);
+               });
+           });
+		
+		   // 창고 선택 시 구역 불러오기
+           $('#warehouse').change(function () {
+               let warehouseId = $(this).val();
+               $('#zone').html('<option value="">구역 선택</option>');
+
+               if (warehouseId) {
+                   $.get(`/api/inventory/${warehouseId}/zone`, function (data) {
+                       data.forEach(zone => {
+                           $('#zone').append(`<option value="${zone}">${zone}</option>`);
+                       });
+                   });
+               }
+		   		
+			   loadInventoryData();  // 창고 선택 시 데이터 조회
+           });
+		   
+		   // 구역 선택 시 필터링된 재고 데이터 조회
+		      $('#zone').change(function() {
+		          loadInventoryData();  // 구역 선택 시 데이터 조회
+		      });
+			  
+		  //품목명 검색 데이터 조회
+			  $("#searchItem").on("keyup", function() {
+			         loadInventoryData(); // 🔥 검색 입력할 때마다 데이터 로드
+			     });  	
+				 
+		      // 초기 데이터 로드
+		      loadInventoryData();  
+		   
+		});// document.ready 끝
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 			
 		
 		

@@ -1,11 +1,13 @@
 package com.deepen.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.InventoryDTO;
+import com.deepen.domain.WarehouseDTO;
 import com.deepen.mapper.InventoryMapper;
 import com.deepen.repository.InventoryRepository;
 
@@ -22,15 +24,32 @@ public class InventoryService {
 	
 	
 	//재고현황 리스트
-	public List<InventoryDTO> inventoryStatus() {
-		return ivMapper.inventoryStatus();
+	public List<InventoryDTO> inventoryStatus(String warehouse_id, String zone, String item_name) {
+		return ivMapper.inventoryStatus(warehouse_id, zone, item_name);
+	}
+ 
+	
+	//창고 조회
+	public List<WarehouseDTO> warehouseSelect(){
+		return ivMapper.warehouseSelect();
 	}
 	
-	//재고현황 업데이트
-	 public void updateInventory(Integer inventory_no, Integer inventory_count, String mod_user) {
-        LocalDateTime now = LocalDateTime.now(); 
-        ivRepository.updateInventory(inventory_no, inventory_count, mod_user, now);
-    } 
+	
+	//구역 조회(쉼표로 구분된 구역을 List로 변환)
+	public List<String> zoneSelect(String warehouse_id){
+		String zone = ivMapper.zoneSelect(warehouse_id);
+		return Arrays.asList(zone.split("\\s*,\\s*")); //쉼표 앞 뒤의 공백을 무시하고 문자열을 나눈다.
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
