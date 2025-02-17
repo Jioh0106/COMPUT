@@ -49,8 +49,8 @@
 		 ORDER BY s.SALE_NO
 	</select>
 	
-	<!-- 상품 BOM  -->
-	<select id="getUseBoMList" resultType="com.deepen.domain.SaleDTO" >
+	<!-- 상품에 해당하는 BOM 전부 탐색 -->
+	<select id="getUseBoMList" resultType="Map" >
 		SELECT BOM_NO 
 			 , PRODUCT_NO 
 			 , MTRPRODUCT_NO 
@@ -58,11 +58,29 @@
 			 , BOM_UNIT 
 			 , BOM_QUANTITY 
 			 , PROCESS_NAME
-		  FROM BOM
+		  FROM BOM b
 		 WHERE BOM_STATUS = 'Y'
 		 START WITH PRODUCT_NO = #{product_no}
-	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO;
+	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
 	</select>
+	
+	<select id="sumProcessTime" resultType="int">
+	    SELECT SUM(PROCESS_TIME) 
+	      FROM PROCESS_INFO
+	     WHERE PROCESS_NO IN (
+					SELECT REGEXP_SUBSTR(#{PROCESS_NAME}, '[^/]+', 1, LEVEL)
+					FROM DUAL
+					CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{PROCESS_NAME}, '/') + 1
+	           )
+	</select>
+	
+	<select id="getInventort">
+		SELECT ITEM_NO, SUM(INVENTORY_QTY) AS INVENTORY_QTY
+		FROM INVENTORY 
+		WHERE INVENTORY_TYPE = '자재'
+		GROUP BY ITEM_NO;
+	</select>
+	
 	
 </mapper>
 

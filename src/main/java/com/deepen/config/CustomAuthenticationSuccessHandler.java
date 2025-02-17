@@ -35,6 +35,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         
         HttpSession session = request.getSession();
         session.setAttribute("sEmp", emp);
+        session.setMaxInactiveInterval(-1);
         System.out.println("sEmp = " + session.getAttribute("sEmp"));
         
         // 로그인 성공 후 "/" 메인 페이지로 리다이렉트

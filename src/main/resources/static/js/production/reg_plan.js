@@ -44,6 +44,7 @@ $(function() {
 			{ header: '주문량', name: 'sale_vol', width: 80, sortingType: 'asc', sortable: true },
 			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true },
 			{ header: '거래처', name: 'client_name', width: 100, sortingType: 'asc', sortable: true },
+			{ header: '소요시간', name: 'time_sum', width: 100 },
 			{ 
 	            header: '재고 조회', 
 	            name: 'check_mtr',

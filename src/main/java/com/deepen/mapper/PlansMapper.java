@@ -1,11 +1,11 @@
 package com.deepen.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import com.deepen.domain.BomDTO;
 import com.deepen.domain.PlansDTO;
 import com.deepen.domain.SaleDTO;
 
@@ -18,7 +18,12 @@ public interface PlansMapper {
 
 	List<SaleDTO> getRegPlanList();
 
-	List<BomDTO> getUseBoMList(int product_no);
+	List<Map<String, Object>> getUseBoMList(int product_no);
+
+	int sumProcessTime(String string);
+
+	List<Map<String, Integer>> getInventort();
+
 	
 	
 
