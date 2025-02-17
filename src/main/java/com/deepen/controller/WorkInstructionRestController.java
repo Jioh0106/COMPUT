@@ -57,14 +57,8 @@ public class WorkInstructionRestController {
 	 * @param planIdList
 	 */
 	@PostMapping("/insert-work-instruction")
-	public void insertWorkInstruction(@RequestBody List<Map<String, Object>> planIdList,
-									HttpServletRequest request) {
-		
-		HttpSession session = request.getSession();
-		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
-		String empId = (String) empInfo.get("EMP_ID");
-		
-		wiService.regWorkInstruction(planIdList,empId);
+	public void insertWorkInstruction(@RequestBody List<Map<String, Object>> planIdList) {
+		wiService.regWorkInstruction(planIdList);
 	}
 	
 	/**
@@ -73,8 +67,6 @@ public class WorkInstructionRestController {
 	 */
 	@GetMapping("/work-instruction-info")
 	public List<Map<String, Object>> getWorkInstruction(){
-		
-		// 품목 bom에 해당하는 공정 중복값 처리 후 우선순위가 높은 공정 insert
 		
 		List<Map<String, Object>> list = wiService.getWorkInstruction();
 		return list;
@@ -97,4 +89,17 @@ public class WorkInstructionRestController {
 		log.info("자재 인서트 준비");
 		wiService.insertMaterialInWareHouse(insertMaterialData);
 	}
+	
+	@PostMapping("/start-work-instruction")
+	public void startWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
+									HttpServletRequest request) {
+		
+		HttpSession session = request.getSession();
+		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
+		String sessionEmpId = (String) empInfo.get("EMP_ID");
+		
+		log.info("작업 시작 동작 준비");
+		wiService.startWorkInstruction(updateDataList,sessionEmpId);
+	}
+	
 }
