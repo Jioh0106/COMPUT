@@ -98,10 +98,28 @@
 										<label for="nameSearch" class="form-label">품목명 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
-												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+											<input type="text" class="form-control" id="searchItem" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2">
 										</div>
 									</div>
+									
+									
+									<!-- 첫 번째 SELECT 박스: 창고 선택 -->
+									<div class="col-md-4">
+									  <label for="warehouse">창고 선택</label>
+									  <select class="form-select deptArea" id="warehouse">
+									      <option value="">창고를 선택하세요</option>
+									  </select>
+									</div>
+									
+									  <!-- 두 번째 SELECT 박스: 구역 선택 -->
+									  <div class="col-md-4">
+									  <label for="zone">구역 선택</label>
+									  <select class="form-select deptArea" id="zone">
+  										<option value="">구역을 선택하세요</option>
+  									  </select>
+									  </div>
+									
 								</div>
 								<!-- 검색 조건 끝-->
 								
@@ -271,14 +289,21 @@
 		let allData = []; // 전체 데이터를 저장할 변수
 
 		
-		document.addEventListener("DOMContentLoaded", function() {
 			//재고현황테이블 조회
 			function loadInventoryData() {
+				 
+				 let warehouseId = $("#warehouse").val();  //선택한 창고값
+					console.log('선택한창고값', warehouseId);
+				 let zone = $("#zone").val(); //선택한 구역값
+				 let itemName = $("#searchItem").val(); //품목검색
+				 	console.log('검색명', itemName)
+				
 		        $.ajax({
 		            url: "/api/inventory/list", 
 		            type: "GET",
 		            contentType: "application/json",
 		            dataType: "json",
+					data: {warehouse_id: warehouseId, zone: zone, item_name: itemName },  // 필터 값 전달
 		            beforeSend: function(xhr) {
 		                xhr.setRequestHeader(header, token);  
 		            },
@@ -319,7 +344,7 @@
 	            });
 	        });	
 				
-	});
+	
 			
 	
 	//--------------------------------------------------------실재고량 변경이력 모달창 시작
@@ -519,6 +544,61 @@
 		});
 
 			
+		
+		//select박스 창고조회, 구역조회
+		$(document).ready(function(){
+			
+		   // 창고 목록 불러오기
+           $.get("/api/inventory", function (data) {
+               data.forEach(wh => {
+                   $('#warehouse').append(`<option value="${wh.warehouse_id}">${wh.warehouse_name}</option>`);
+               });
+           });
+		
+		   // 창고 선택 시 구역 불러오기
+           $('#warehouse').change(function () {
+               let warehouseId = $(this).val();
+               $('#zone').html('<option value="">구역 선택</option>');
+
+               if (warehouseId) {
+                   $.get(`/api/inventory/${warehouseId}/zone`, function (data) {
+                       data.forEach(zone => {
+                           $('#zone').append(`<option value="${zone}">${zone}</option>`);
+                       });
+                   });
+               }
+		   		
+			   loadInventoryData();  // 창고 선택 시 데이터 조회
+           });
+		   
+		   // 구역 선택 시 필터링된 재고 데이터 조회
+		      $('#zone').change(function() {
+		          loadInventoryData();  // 구역 선택 시 데이터 조회
+		      });
+			  
+		  //품목명 검색 데이터 조회
+			  $("#searchItem").on("keyup", function() {
+			         loadInventoryData(); // 🔥 검색 입력할 때마다 데이터 로드
+			     });  	
+				 
+		      // 초기 데이터 로드
+		      loadInventoryData();  
+		   
+		});// document.ready 끝
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 			
 		
 		

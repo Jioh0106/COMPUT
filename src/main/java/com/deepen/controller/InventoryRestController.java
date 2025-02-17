@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.InvHistoryDTO;
 import com.deepen.domain.InventoryDTO;
+import com.deepen.domain.WarehouseDTO;
 import com.deepen.service.InvHistoryService;
 import com.deepen.service.InventoryService;
 
@@ -34,35 +35,17 @@ public class InventoryRestController {
 	
 	//재고현황 조회
 	@GetMapping("/list")
-	public List<InventoryDTO> inventoryStatus(){
-		return ivService.inventoryStatus();
+	public List<InventoryDTO> inventoryStatus(@RequestParam(value = "warehouse_id", required = false) 
+											  String warehouse_id,
+											  @RequestParam(value = "zone", required = false) 
+											  String zone,
+											  @RequestParam(value = "item_name", required = false) 
+											  String item_name) {
+		
+		return ivService.inventoryStatus(warehouse_id, zone, item_name);
 	}
 	
-	//재고현황 업데이트
-//	@PostMapping("/update")
-//	public void updateInventory(@RequestBody List<InventoryDTO> modifiedRows, HttpSession session) {
-//	 
-//		Map<String, Object> emp = (Map<String, Object>) session.getAttribute("sEmp");
-//		String emp_id = (String)emp.get("EMP_ID");
-//		
-//		
-//	    log.info("@@로그인한 사번:"+ emp_id);
-//	    System.out.println("수정한 행"+modifiedRows.toString());
-//	    for (InventoryDTO row : modifiedRows) {
-//	        Integer inventory_no = ((InventoryDTO) row).getInventory_no();
-//	        Integer inventory_count = row.getInventory_count();
-//	        row.setMod_user(emp_id);
-//	        String mod_user = row.getMod_user();
-//	        
-//	        if (inventory_no != null && inventory_count != null && mod_user !=null) {
-//	            ivService.updateInventory(inventory_no, inventory_count, emp_id);
-//	            log.info(" 업데이트 완료: 재고번호({}), 실재고량({})"+ inventory_no + " " +inventory_count);
-//	        } else {
-//	            log.info(" 유효하지 않은 데이터: "+ row);
-//	        }
-//	    }
-//	}
-//	
+	
 	
 	//---------------------------------실재고변경 이력 모달창 시작
 	
@@ -91,9 +74,19 @@ public class InventoryRestController {
 		
 	}
 	
+	//---------------------------------------------------
 	
+	//창고 조회
+	@GetMapping
+	public ResponseEntity<List<WarehouseDTO>> warehousSelect(){
+		return ResponseEntity.ok(ivService.warehouseSelect());
+	}
 	
-	
+	//구역 조회
+	@GetMapping("/{warehouse_id}/zone")
+	public ResponseEntity<List<String>> zoneSelect(@PathVariable("warehouse_id")String warehouse_id){
+		return ResponseEntity.ok(ivService.zoneSelect(warehouse_id));
+	}
 	
 	
 	

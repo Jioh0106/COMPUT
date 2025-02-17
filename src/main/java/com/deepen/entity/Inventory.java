@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Data;
 
 @Table(name = "INVENTORY")
@@ -39,7 +40,9 @@ public class Inventory {
 	@Column(name = "inventory_change_date")
 	private LocalDateTime inventory_change_date; //재고량변경일
 	
-	
+	@Version
+	@Column(name = "version")
+	private  Integer version; //낙관적락
 	
 	
 }
