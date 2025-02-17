@@ -99,10 +99,10 @@ window.onload = async function() {
 	
 	// 그리드 생성
 	createWorkInstructionGrid(gridLineListItems);
-	//createMaterialGrid();
-	createWorkerGrid();
-	//document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
-	document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
+	createMaterialGrid();
+	//createWorkerGrid();
+	document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
+	//document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
 };
 
 // 그리드 초기값
@@ -142,9 +142,7 @@ function createWorkInstructionGrid(gridLineListItems = []){
 																	              	listItems: gridLineListItems 
 													        				 }},
 																		 	formatter: ({ value }) => {
-																				//console.log("라인 매칭 값 (원본):", value); 
 																		        const selectedItem = gridLineListItems.find(item => item.value == value);
-																				//console.log("라인 매칭 값:", value, selectedItem);
 																		        return selectedItem ? selectedItem.text : value;  // 존재하면 text(공정 1라인), 없으면 기본값
 																		    }},
 				{header: '공정', name: 'process_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
@@ -152,8 +150,8 @@ function createWorkInstructionGrid(gridLineListItems = []){
 				{header: '검사 상태', name: 'qc_status_name', width:100, filter : 'select'},
 				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
 				{header: '작업 종료일', name: 'end_date', width:120, sortable: true},
-				{header: '작업 담당자', name: 'emp_name', width:110, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }}
-				//{header: '작업 아이디', name: 'emp_id',width:110}
+				{header: '작업 담당자', name: 'emp_name', width:110, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '작업 아이디', name: 'emp_id',width:110}
 			],
 			data: [],
 			columnOptions: {
@@ -463,14 +461,17 @@ document.getElementById('addBtn').addEventListener('click', () => {
 	    }
 
 	    const selectedWorker = checkedWorkerGrid[0]; // 첫 번째 체크된 작업자
+	    const selectedWorkerNo = selectedWorker.no;
 	    const selectedWorkerName = selectedWorker.name;
 
 	    checkedWiGrid.forEach(row => {
 	        // UI에서 직접 셀 업데이트
+	        workInstructionGrid.setValue(row.rowKey, 'emp_id', selectedWorkerNo);
 	        workInstructionGrid.setValue(row.rowKey, 'emp_name', selectedWorkerName);
 	    });
 
-	    console.log("담당자 배정 완료:", selectedWorkerName);
+	    console.log("담당자 배정 사원번호:", selectedWorkerNo);
+	    console.log("담당자 배정 사원이름:", selectedWorkerName);
 });
 
 // 작업담당자 삭제 버튼 이벤트
@@ -485,6 +486,7 @@ document.getElementById('deleteBtn').addEventListener('click', () => {
     checkedWiGrid.forEach(row => {
         // 작업 담당자 정보 제거
         workInstructionGrid.setValue(row.rowKey, 'emp_name', '');
+        workInstructionGrid.setValue(row.rowKey, 'emp_id', '');
     });
 
     console.log("작업 담당자 삭제 완료");
@@ -492,22 +494,47 @@ document.getElementById('deleteBtn').addEventListener('click', () => {
 
 // 작업시작 버튼 동작
 document.getElementById('workStartBtn').addEventListener('click', async () => {
-	const checkedWiGrid = workInstructionGrid.getModifiedRows().updatedRows;
-	const checkedWorkerRows = workerGrid.getCheckedRows().map(item => item.no);
-	console.log("추가할 사원아이디",checkedWorkerRows);
+	//const checkedWiGrid = workInstructionGrid.getModifiedRows().updatedRows;
+	const checkedWiGrid = workInstructionGrid.getCheckedRows();
+	console.log("checkedWiGrid",checkedWiGrid);
+//	const checkedWorkerRows = workerGrid.getCheckedRows().map(item => item.no);
+//	console.log("추가할 사원아이디",checkedWorkerRows);
 	
 	if (checkedWiGrid.length === 0) {
 	       console.warn("작업지시 항목이 선택되지 않았습니다.");
 	       return;
 	}
 	
-   	const fWiNo = checkedWorkerRows[0]; // 첫 번째 선택된 사원번호 가져오기
+	for (let row of checkedWiGrid) {
+       	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
+       	const lineName = workInstructionGrid.getValue(row.rowKey, 'line_name');
+        console.log("lineName : ",lineName);
+       	if (!lineName) {
+           	console.warn("라인을 선택해주세요");
+			alert("라인을 선택해주세요");
+           	return;
+       	}
+   	}
+	
+	console.log('라인 선택완료!');
+	
+	for (let row of checkedWiGrid) {
+       	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
+       	const lineName = workInstructionGrid.getValue(row.rowKey, 'emp_id');
+        console.log("lineName : ",lineName);
+       	if (!lineName) {
+           	console.warn("담당자을 선택해주세요");
+			alert("담당자을 선택해주세요");
+           	return;
+       	}
+   	}
+	
+	console.log('담당자 선택완료!');
 	
    	// 각 작업지시 데이터에 firstWiNo 추가
    	const updateWiData = checkedWiGrid.map(row => ({
 	       ...row,
-	       empId: fWiNo,
-		   //line_name: workInstructionGrid.getValue(row.rowKey, 'line_name')
+		   line_name: workInstructionGrid.getValue(row.rowKey, 'line_name')
    	}));
 	
 	console.log("updateData ",updateWiData);

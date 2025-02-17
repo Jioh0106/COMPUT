@@ -57,14 +57,8 @@ public class WorkInstructionRestController {
 	 * @param planIdList
 	 */
 	@PostMapping("/insert-work-instruction")
-	public void insertWorkInstruction(@RequestBody List<Map<String, Object>> planIdList,
-									HttpServletRequest request) {
-		
-		HttpSession session = request.getSession();
-		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
-		String empId = (String) empInfo.get("EMP_ID");
-		
-		wiService.regWorkInstruction(planIdList,empId);
+	public void insertWorkInstruction(@RequestBody List<Map<String, Object>> planIdList) {
+		wiService.regWorkInstruction(planIdList);
 	}
 	
 	/**
@@ -102,10 +96,10 @@ public class WorkInstructionRestController {
 		
 		HttpSession session = request.getSession();
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
-		String empId = (String) empInfo.get("EMP_ID");
+		String sessionEmpId = (String) empInfo.get("EMP_ID");
 		
 		log.info("작업 시작 동작 준비");
-		wiService.startWorkInstruction(updateDataList,empId);
+		wiService.startWorkInstruction(updateDataList,sessionEmpId);
 	}
 	
 }

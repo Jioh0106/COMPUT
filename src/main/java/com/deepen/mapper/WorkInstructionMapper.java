@@ -40,8 +40,11 @@ public interface WorkInstructionMapper {
 	
 	String selectDeduplicateProcessesNo(int productNo);
 	
-	// 작업지시 테이블 정보
+	// 작업지시 테이블 정보 조회
 	List<Map<String, Object>> selectWorkInstruction();
+	
+	// 작업지시 테이블 정보 조회(where =  작업 지시 번호)
+	Map<String, Object> selectWorkInstructionByWiNo(int wiNo);
 	
 	//품목번호에 해당하는 자재 조회
 	List<Map<String, Object>> selectMaterialsByProductNo(String productNo);
