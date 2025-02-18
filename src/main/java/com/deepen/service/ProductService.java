@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.deepen.domain.BomDTO;
 import com.deepen.domain.CommonDetailDTO;
@@ -30,8 +33,9 @@ public class ProductService {
 	private final ProductRepository pdRepository;
 	private final ProductMapper pdMapper;
 	private final BomRepository bomRepository;
+	private final ExcelService excelService;
 	
-	//상품등록
+	//상품등록 - 단일상품 등록
 	public Integer saveProduct (ProductDTO productDto) {
 		
 		Product product = new Product();
@@ -45,6 +49,40 @@ public class ProductService {
 		
 		return product.getProduct_no();
 	}
+	
+	
+	//상품등록 - 엑셀파일로 대량등록(상품테이블에 저장)
+	public int saveExcel(MultipartFile file){
+		List<ProductDTO> productDTOList = excelService.readexcelfile(file);
+		
+		int saveCount = 0;
+		for(ProductDTO productDto : productDTOList) {
+			Product product = new Product();
+			product.setProduct_name(productDto.getProduct_name());
+			product.setProduct_unit(productDto.getProduct_unit());
+			product.setProduct_type(productDto.getProduct_type());
+			product.setProduct_date(LocalDateTime.now());
+			
+			pdRepository.save(product);
+			saveCount ++;
+			
+		}
+		
+		return saveCount;
+	}
+	
+	//업로드된 엑셀파일을 다운받아서 saveExcel을 실행하는 메서드
+	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file ){
+		try {
+			int insertCount = saveExcel(file);
+			return ResponseEntity.ok(insertCount +"개 성공");
+			
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("오류발생" + e.toString());
+		 
+		}
+	}
+	
 	
 	
 	//상품 리스트
