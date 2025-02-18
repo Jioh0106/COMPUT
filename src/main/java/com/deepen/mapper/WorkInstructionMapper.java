@@ -54,4 +54,18 @@ public interface WorkInstructionMapper {
 	
 	// 작업시작 정보 update
 	void updateWorkStartInfo(Map<String, Object> updateData);
+	
+	// 작업계획 상태 변경('PRGR002'== 생산중)
+	void updatePlanStatusStart(Map<String, Object> updateData);
+	
+	// 공정 lot_no 조회(where = 작업 지시 번호) 
+	List<Map<String, Object>> selectProcessLotNoByWiNo(int wiNo);
+	
+	// 공정 lot 순차 순번 select
+	Integer getLastLotSequence();
+	
+	// 공정 lot_log 테이블 insert
+	void insertProcessLot(Map<String, Object> lotData);
+	
+	
 }

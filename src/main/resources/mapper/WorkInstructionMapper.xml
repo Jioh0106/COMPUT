@@ -343,6 +343,44 @@
 			emp_id = #{emp_id}
 		WHERE wi_no = #{wi_no}
 	</update>
+	
+	<select id="getLastLotSequence">
+		SELECT 
+			MAX(REGEXP_SUBSTR(lot_no,'[^-]+',1,4)) AS "lastSequence"
+		FROM lot_process_log
+	</select>
+	
+	<insert id="insertProcessLot" parameterType="Map">
+		INSERT INTO lot_process_log (
+			lot_no,
+			process_no,
+			line_no,
+			input_qty,
+			create_user,
+			wi_no
+		) VALUES (
+			#{lotNo},
+			#{processNo},
+			#{lineNo},
+			#{vol},
+			#{createUser},
+			#{wiNo}
+		)
+	</insert>
+	
+	<update id="updatePlanStatusStart" parameterType="Map">
+		UPDATE plans SET 
+			plan_status = 'PRGR002' 
+		WHERE plan_id = #{plan_id}
+	</update>
+	
+	<select id="selectProcessLotNoByWiNo" resultType="java.util.Map">
+		SELECT 
+			wi_no,
+			lot_no
+		FROM LOT_PROCESS_LOG
+		WHERE wi_no = #{wiNo}
+	</select>
 </mapper>
 
 

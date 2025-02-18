@@ -520,9 +520,9 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
 	
 	for (let row of checkedWiGrid) {
        	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
-       	const lineName = workInstructionGrid.getValue(row.rowKey, 'emp_id');
-        console.log("lineName : ",lineName);
-       	if (!lineName) {
+       	const empId = workInstructionGrid.getValue(row.rowKey, 'emp_id');
+        console.log("empId : ",empId);
+       	if (!empId) {
            	console.warn("담당자을 선택해주세요");
 			alert("담당자을 선택해주세요");
            	return;
