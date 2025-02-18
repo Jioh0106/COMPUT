@@ -26,9 +26,6 @@ public class Product {
 	@Column(name = "product_unit", length = 20 )
 	private String product_unit; //단위
 	
-	@Column(name = "product_price", length = 20 )
-	private Integer product_price; //가격 
- 	
 	@Column(name = "product_date")
 	private LocalDateTime product_date; //등록일
 	
