@@ -1,6 +1,7 @@
 package com.deepen.service;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.deepen.domain.LineInfoDTO;
 import com.deepen.domain.ProcessInfoDTO;
-import com.deepen.domain.WorkInstructionDTO;
 import com.deepen.mapper.WorkInstructionMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -181,57 +181,7 @@ public class WorkInstructionService {
 		//createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
 		// lot master insert
-		//createAndInsertLotMaster(updateDataList,sessionEmpId);
-		
-	}
-	
-	/**
-	 * lot_master에 insert
-	 * lot_master에 넣을 정보 불러오기
-	 * 하나의 작업지시 번호에 여러개의 공정 lot
-	 */
-	private void createAndInsertLotMaster(List<Map<String, Object>> updateDataList, String sessionEmpId) {
-		// 작업 지시 번호 추출
-		int wiNo = (int) updateDataList.get(0).get("wi_no");
-		// 지시 번호에 해당하는 로트 번호 조회
-		List<Map<String, Object>> processLotNo = wiMapper.selectProcessLotNoByWiNo(wiNo);
-		log.info("지시 번호에 해당하는 로트 번호 : "+processLotNo);
-		Map<String, Object> selectInfoByWiNo =  wiMapper.selectWorkInstructionByWiNo(wiNo);
-		log.info("lot_master에 넣을 작업 지시 정보 : "+selectInfoByWiNo);
-		
-		String[] processNos = selectInfoByWiNo.get("process_no").toString().split("/");
-	    int productNo = (int) selectInfoByWiNo.get("product_no");
-	    int lineNo = (int) selectInfoByWiNo.get("line_no");
-	    String lotStatus = "LTST002"; // 진행중 상태 코드
-	    String processType = "PRTP001"; // 공정 유형 (예제 값 설정)
-	    Date startTime = (Date) selectInfoByWiNo.get("start_date");
-	    
-	    String parentLotNo = null;
-	    
-	    for (int i = 0; i < processLotNo.size(); i++) {
-	        Map<String, Object> lotData = processLotNo.get(i);
-	        String lotNo = (String) lotData.get("LOT_NO");
-	        int processNo = Integer.parseInt(processNos[i]);
-	        
-	        Map<String, Object> insertData = new HashMap<>();
-	        insertData.put("LOT_NO", lotNo);
-	        insertData.put("PARENT_LOT_NO", parentLotNo);
-	        insertData.put("PROCESS_TYPE", processType);
-	        insertData.put("WI_NO", wiNo);
-	        insertData.put("PRODUCT_NO", productNo);
-	        insertData.put("PROCESS_NO", processNo);
-	        insertData.put("LINE_NO", lineNo);
-	        insertData.put("LOT_STATUS", lotStatus);
-	        insertData.put("START_TIME", startTime);
-	        insertData.put("CREATE_USER", sessionEmpId);
-	        //insertData.put("CREATE_TIME", new Date());
-	        
-	        //wiMapper.insertLotMaster(insertData);
-	        
-	        // 현재 LOT 번호를 다음 LOT의 부모로 설정
-	        parentLotNo = lotNo;
-	    }
-		
+		createAndInsertLotMaster(updateDataList,sessionEmpId);
 		
 	}
 	
@@ -243,18 +193,14 @@ public class WorkInstructionService {
 	private void createAndInsertProcessLot(List<Map<String, Object>> updateDataList, String sessionEmpId) {
 		//작업 지시 번호 추출
 		int wiNo = (int) updateDataList.get(0).get("wi_no");
-		log.info("공정 lot에 넣을 작업 지시 정보를 위한 작업지시번호 : "+wiNo);
-		
 		Map<String, Object> selectInfoByWiNo =  wiMapper.selectWorkInstructionByWiNo(wiNo);
 		log.info("공정 lot에 넣을 작업 지시 정보 : "+selectInfoByWiNo);
 		
 		// 공정 lot 테이블이 넣기
 		String startDate = selectInfoByWiNo.get("start_date").toString().replace("-", "");
-		log.info("오늘 날짜 : "+startDate);
 		String processNos = selectInfoByWiNo.get("process_no").toString(); // 공정 번호 문자열
-		log.info("공정 번호들 : "+processNos);
 		int vol = Integer.parseInt(selectInfoByWiNo.get("vol").toString()); // 투입 수량
-		log.info("투입 수량 : "+vol);
+		log.info("오늘 날짜 : "+startDate+", 공정 번호들 : "+processNos+", 투입 수량 : "+vol);
 		
 		String[] processNoArr = processNos.split("/"); // 공정 번호 분리
 		int sequence = 1; // 순차 번호 초기화
@@ -264,7 +210,6 @@ public class WorkInstructionService {
 	        
 	        // 기존 LOT 번호 중 가장 큰 순차번호 가져오기
 	        Integer lastSequence = wiMapper.getLastLotSequence();
-	        log.info("마지막 순차 순번 : "+lastSequence);
 	        int nextSequence = (lastSequence == null) ? sequence : lastSequence + 1;
 	        
 	        // 최종 LOT 번호 생성
@@ -285,6 +230,73 @@ public class WorkInstructionService {
 	        
 	        sequence++; // 순차 번호 증가
 	    }
+	}
+	
+	/**
+	 * lot_master에 insert
+	 * lot_master에 넣을 정보 불러오기
+	 * 하나의 작업지시 번호에 여러개의 공정 lot
+	 */
+	private void createAndInsertLotMaster(List<Map<String, Object>> updateDataList, String sessionEmpId) {
+		// 작업 지시 번호 추출
+		int wiNo = (int) updateDataList.get(0).get("wi_no");
+		// 지시 번호에 해당하는 로트 번호 조회
+		List<Map<String, Object>> processLotNo = wiMapper.selectProcessLotNoByWiNo(wiNo);
+		log.info("지시 번호에 해당하는 로트 번호 : "+processLotNo);
+		Map<String, Object> selectInfoByWiNo =  wiMapper.selectWorkInstructionByWiNo(wiNo);
+		log.info("lot_master에 넣을 작업 지시 정보 : "+selectInfoByWiNo);
+		
+		String[] processNos = selectInfoByWiNo.get("process_no").toString().split("/");
+	    int productNo = ((Number) selectInfoByWiNo.get("product_no")).intValue();
+	    //int productNo = (int)selectInfoByWiNo.get("product_no");
+	    int lineNo = ((Number) selectInfoByWiNo.get("line_no")).intValue();
+	    //int lineNo = (int)selectInfoByWiNo.get("line_no");
+	    String lotStatus = "LTST002"; // 진행중 상태 코드
+	    String processType = "PRTP001"; // 공정 유형
+	    
+	    //java.sql.Date startTime = new java.sql.Date(((Timestamp) selectInfoByWiNo.get("start_date")).getTime());
+	    //Timestamp startTime = (Timestamp) selectInfoByWiNo.get("start_date");
+	    // 시간 정보까지 포함하는 날짜 및 시간 문자열 생성
+	    Timestamp timestamp = (Timestamp) selectInfoByWiNo.get("start_date");
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    String startTimeStr = sdf.format(timestamp);
+	    
+	    String parentLotNo = null;
+	    
+	    for (int i = 0; i < processLotNo.size(); i++) {
+	        Map<String, Object> lotData = processLotNo.get(i);
+	        String lotNo = (String) lotData.get("LOT_NO");
+	        int processNo = Integer.parseInt(processNos[i]);
+	        
+	        Map<String, Object> insertData = new HashMap<>();
+	        insertData.put("lotNo", lotNo);
+	        insertData.put("parentLotNo", parentLotNo);
+	        insertData.put("processType", processType);
+	        insertData.put("wiNo", String.valueOf(wiNo));
+	        insertData.put("productNo", productNo);
+	        insertData.put("processNo", processNo);
+	        insertData.put("lineNo", lineNo);
+	        insertData.put("lotStatus", lotStatus);
+	        insertData.put("startTime", startTimeStr);
+	        insertData.put("createUser", sessionEmpId);
+	        
+//	        if (parentLotNo != null) {
+//	            insertData.put("updateUser", sessionEmpId);
+//	            insertData.put("updateTime", new Timestamp(System.currentTimeMillis()));
+//	        }else {
+//	        	insertData.put("updateUser", null);
+//	        	insertData.put("updateTime", null);
+//	        }
+	        log.info("lot_master에 넣을 데이터 : "+insertData.toString());
+	        
+	        wiMapper.insertLotMaster(insertData);
+	        
+	        // 현재 LOT 번호를 다음 LOT의 부모로 설정
+	        parentLotNo = lotNo;
+	    }
+		
+	    log.info("lot_master insert 완료");
+		
 	}
 	
 }

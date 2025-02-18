@@ -257,8 +257,8 @@
 		    wi.wi_status AS "wi_status",
 		    cdw.common_detail_name AS "wi_status_name",
 		    wi.qc_status AS "qc_status",
-		    TO_CHAR(wi.wi_start_date, 'YYYY-MM-DD') AS "start_date",
-		    TO_CHAR(wi.wi_end_date, 'YYYY-MM-DD') AS "end_date",
+		    wi.wi_start_date AS "start_date",
+		    wi.wi_end_date AS "end_date",
 		    wi.emp_id AS "emp_id",
 		    e.emp_name AS "emp_name"
 		FROM work_instruction wi 
@@ -344,6 +344,12 @@
 		WHERE wi_no = #{wi_no}
 	</update>
 	
+	<update id="updatePlanStatusStart" parameterType="Map">
+		UPDATE plans SET 
+			plan_status = 'PRGR002' 
+		WHERE plan_id = #{plan_id}
+	</update>
+	
 	<select id="getLastLotSequence">
 		SELECT 
 			MAX(REGEXP_SUBSTR(lot_no,'[^-]+',1,4)) AS "lastSequence"
@@ -368,12 +374,6 @@
 		)
 	</insert>
 	
-	<update id="updatePlanStatusStart" parameterType="Map">
-		UPDATE plans SET 
-			plan_status = 'PRGR002' 
-		WHERE plan_id = #{plan_id}
-	</update>
-	
 	<select id="selectProcessLotNoByWiNo" resultType="java.util.Map">
 		SELECT 
 			wi_no,
@@ -381,6 +381,38 @@
 		FROM LOT_PROCESS_LOG
 		WHERE wi_no = #{wiNo}
 	</select>
+	
+	<insert id="insertLotMaster" parameterType="Map">
+	    INSERT INTO lot_master (
+	        lot_no,
+	        parent_lot_no,
+	        process_type,
+	        wi_no,
+	        product_no,
+	        process_no,
+	        line_no,
+	        lot_status,
+	        start_time,
+	        create_user
+<!-- 	        , -->
+<!-- 	        update_user, -->
+<!-- 	        update_time -->
+	    ) VALUES (
+	        #{lotNo},
+	        #{parentLotNo},
+	        #{processType},
+	        #{wiNo},
+	        #{productNo},
+	        #{processNo},
+	        #{lineNo},
+	        #{lotStatus},
+	        TO_DATE(#{startTime}, 'YYYY-MM-DD HH24:MI:SS'),
+	        #{createUser}
+<!-- 	        , -->
+<!-- 	        #{updateUser}, -->
+<!-- 	        NVL(TO_DATE(#{updateTime}, 'YYYY-MM-DD HH24:MI:SS'), NULL) -->
+	    )
+	</insert>
 </mapper>
 
 

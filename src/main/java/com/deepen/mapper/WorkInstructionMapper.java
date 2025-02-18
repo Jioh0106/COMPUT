@@ -67,5 +67,7 @@ public interface WorkInstructionMapper {
 	// 공정 lot_log 테이블 insert
 	void insertProcessLot(Map<String, Object> lotData);
 	
+	// lot_master 테이블에 insert
+	void insertLotMaster(Map<String, Object> insertData);
 	
 }
