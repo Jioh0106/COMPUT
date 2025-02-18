@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deepen.mapper.LotTrackingMapper">
+    
+    <!-- LOT 마스터 정보 조회 (작업지시별) -->
+    <select id="selectLotByWorkOrder" resultType="com.deepen.domain.LotMasterDTO">
+        SELECT 
+            lm.lot_no,
+            lm.process_type,
+            lm.wi_no,
+            p.product_no,
+            p.product_name,
+            pi.process_no,
+            pi.process_name,
+            li.line_no,
+            li.line_name,
+            lm.lot_status,
+            lm.start_time,
+            lm.end_time,
+            lm.create_user,
+            lm.create_time
+        FROM lot_master lm
+        INNER JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+        INNER JOIN product p ON wi.product_no = p.product_no
+        INNER JOIN process_info pi ON lm.process_no = pi.process_no
+        LEFT JOIN line_info li ON lm.line_no = li.line_no
+        WHERE lm.wi_no = #{wiNo}
+        ORDER BY lm.start_time DESC
+    </select>
+    
+    <!-- LOT 마스터 정보 조회 (제품별) -->
+    <select id="selectLotByProduct" resultType="com.deepen.domain.LotMasterDTO">
+        SELECT 
+            lm.lot_no,
+            lm.process_type,
+            lm.wi_no,
+            p.product_no,
+            p.product_name,
+            pi.process_no,
+            pi.process_name,
+            li.line_no,
+            li.line_name,
+            lm.lot_status,
+            lm.start_time,
+            lm.end_time,
+            lm.create_user,
+            lm.create_time
+        FROM lot_master lm
+        INNER JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+        INNER JOIN product p ON wi.product_no = p.product_no
+        INNER JOIN process_info pi ON lm.process_no = pi.process_no
+        LEFT JOIN line_info li ON lm.line_no = li.line_no
+        WHERE p.product_no = #{productNo}
+        ORDER BY lm.start_time DESC
+    </select>
+    
+    <!-- LOT 공정 이력 조회 -->
+    <select id="selectLotProcessHistory" resultType="com.deepen.domain.LotProcessDTO">
+        SELECT 
+            lpl.process_log_no,
+            lpl.lot_no,
+            lpl.wi_no,
+            pi.process_no,
+            pi.process_name,
+            li.line_no,
+            li.line_name,
+            lpl.action_type,
+            lpl.input_qty,
+            lpl.output_qty,
+            lpl.create_user,
+            lpl.create_time
+        FROM lot_process_log lpl
+        INNER JOIN process_info pi ON lpl.process_no = pi.process_no
+        LEFT JOIN line_info li ON lpl.line_no = li.line_no
+        WHERE lpl.lot_no = #{lotNo}
+        ORDER BY lpl.process_log_no DESC
+    </select>
+    
+    <!-- LOT 품질검사 이력 조회 -->
+    <select id="selectLotQcHistory" resultType="com.deepen.domain.LotQcDTO">
+        SELECT 
+            lql.qc_log_no,
+            lql.lot_no,
+            pi.process_no,
+            pi.process_name,
+            qm.qc_code,
+            qm.qc_name,
+            lql.measure_value,
+            lql.judgement,
+            lql.inspector,
+            lql.check_time,
+            lql.create_user,
+            lql.create_time
+        FROM lot_qc_log lql
+        INNER JOIN process_info pi ON lql.process_no = pi.process_no
+        INNER JOIN qc_master qm ON lql.qc_code = qm.qc_code
+        WHERE lql.lot_no = #{lotNo}
+        ORDER BY lql.qc_log_no DESC
+    </select>
+</mapper>

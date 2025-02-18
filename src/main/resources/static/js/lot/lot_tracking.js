@@ -1,258 +1,836 @@
 document.addEventListener('DOMContentLoaded', function() {
-    class LotTrackingController {
-        constructor() {
-            this.workOrderManager = new WorkOrderManager(this);
-            this.lotTreeManager = new LotTreeManager(this);
-            this.gridManager = new GridManager(this);
-            this.setupEventListeners();
+    class LotTrackingAPI {
+        static ENDPOINTS = {
+            WORK_ORDER: '/api/lot/work-order',
+            PRODUCT: '/api/lot/product',
+            LOT: '/api/lot'
+        };
+
+        static getCSRFToken() {
+            const token = document.querySelector("meta[name='_csrf']");
+            return token ? token.content : null;
         }
 
-        setupEventListeners() {
-            $('#searchBtn').on('click', () => this.handleSearch());
+        static getCSRFHeaderName() {
+            const header = document.querySelector("meta[name='_csrf_header']");
+            return header ? header.content : null;
         }
 
-        handleSearch() {
-            const searchParams = {
-                wiNo: $('#searchWiNo').val(),
-                lotNo: $('#searchLotNo').val(),
-                productNo: $('#searchProduct').val()
-            };
-            console.log('Search params:', searchParams);
-            
-            this.workOrderManager.updateWorkOrders();
+        static async fetchWithConfig(url, options = {}) {
+            try {
+                const csrfToken = this.getCSRFToken();
+                const csrfHeader = this.getCSRFHeaderName();
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken;
+                }
+
+                const defaultOptions = {
+                    headers,
+                    credentials: 'same-origin'
+                };
+
+                console.log('API Call:', url);
+                const response = await fetch(url, { ...defaultOptions, ...options });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                return data;
+            } catch (error) {
+                console.error('API Request Failed:', error);
+                throw error;
+            }
         }
 
-        // 작업지시 선택 시 호출
-        handleWorkOrderSelect(workOrderData) {
-            this.lotTreeManager.updateLotTree(workOrderData);
-            this.gridManager.updateGrid(workOrderData);
+        static async getByWorkOrder(wiNo) {
+            console.log('Fetching by work order:', wiNo);
+            return this.fetchWithConfig(`${this.ENDPOINTS.WORK_ORDER}/${wiNo || 0}`);
+        }
+
+        static async getByProduct(productNo) {
+            console.log('Fetching by product:', productNo);
+            return this.fetchWithConfig(`${this.ENDPOINTS.PRODUCT}/${productNo || 0}`);
+        }
+
+        static async getLotDetail(lotNo) {
+            console.log('Fetching lot detail:', lotNo);
+            return this.fetchWithConfig(`${this.ENDPOINTS.LOT}/${lotNo}`);
         }
     }
 
-    class WorkOrderManager {
-        constructor(controller) {
-            this.controller = controller;
-            this.container = $('#workOrderTree');
-            this.initialize();
+    class LotTrackingController {
+        constructor() {
+            console.log('Initializing LotTrackingController');
+            this.initializeComponents();
+            this.setupEventListeners();
+            this.loadInitialData();
         }
 
-        initialize() {
-            this.updateWorkOrders();
-            this.addEventListeners();
+        initializeComponents() {
+            this.productList = new ProductListManager(this);
+            this.workOrderList = new WorkOrderListManager(this);
+            this.lotFlow = new LotFlowManager(this);
+            this.historyGrid = new HistoryGridManager(this);
         }
 
-        updateWorkOrders() {
-            // 테스트 데이터
-            const workOrders = [
-                {
-                    id: 'wo1',
-                    title: '작업지시 WO2024001',
-                    product: '금형A',
-                    date: '2024-02-18',
-                    status: 'progress'
-                },
-                {
-                    id: 'wo2',
-                    title: '작업지시 WO2024002',
-                    product: '금형B',
-                    date: '2024-02-18',
-                    status: 'pending'
+        setupEventListeners() {
+            // 검색 버튼 이벤트
+            const searchBtn = document.getElementById('searchBtn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => this.handleSearch());
+            } else {
+                console.warn('Search button not found');
+            }
+
+            // 검색어 입력 이벤트
+            const listSearchInput = document.getElementById('listSearchInput');
+            if (listSearchInput) {
+                listSearchInput.addEventListener('input', 
+                    _.debounce(() => this.handleSearch(), 300)
+                );
+            } else {
+                console.warn('List search input not found');
+            }
+
+            // 탭 변경 이벤트
+            const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+            tabs.forEach(tab => {
+                tab.addEventListener('shown.bs.tab', (event) => {
+                    this.handleTabChange(event.target.getAttribute('data-bs-target'));
+                });
+            });
+
+            // 필터 변경 이벤트
+            ['statusFilter', 'processFilter'].forEach(id => {
+                const filter = document.getElementById(id);
+                if (filter) {
+                    filter.addEventListener('change', () => this.handleFilterChange());
+                } else {
+                    console.warn(`Filter ${id} not found`);
                 }
-            ];
-
-            this.container.empty();
-            workOrders.forEach(wo => {
-                this.container.append(this.createWorkOrderItem(wo));
             });
         }
 
-        createWorkOrderItem(workOrder) {
+        async loadInitialData() {
+            try {
+                console.log('Loading initial data');
+                const data = await LotTrackingAPI.getByProduct(0);
+                if (data) {
+                    this.productList.renderList(data);
+                }
+            } catch (error) {
+                console.error('Initial data load failed:', error);
+                this.showError('초기 데이터 로드에 실패했습니다.');
+            }
+        }
+
+        async handleTabChange(tabId) {
+            try {
+                console.log('Tab changed to:', tabId);
+                if (tabId === '#productTab') {
+                    const data = await LotTrackingAPI.getByProduct(0);
+                    this.productList.renderList(data || []);
+                } else if (tabId === '#workOrderTab') {
+                    const data = await LotTrackingAPI.getByWorkOrder(0);
+                    this.workOrderList.renderList(data || []);
+                }
+            } catch (error) {
+                console.error('Tab change data load failed:', error);
+                this.showError('데이터 로드에 실패했습니다.');
+            }
+        }
+		
+		async handleSearch() {
+            try {
+                const searchParams = this.getSearchParams();
+                console.log('Search params:', searchParams);
+
+                const activeTab = document.querySelector('.nav-link.active');
+                if (!activeTab) {
+                    console.warn('No active tab found');
+                    return;
+                }
+
+                const tabTarget = activeTab.getAttribute('data-bs-target');
+                let data = [];
+
+                if (tabTarget === '#productTab') {
+                    data = await LotTrackingAPI.getByProduct(searchParams.productNo || 0);
+                    this.productList.renderList(data || []);
+                } else {
+                    data = await LotTrackingAPI.getByWorkOrder(searchParams.wiNo || 0);
+                    this.workOrderList.renderList(data || []);
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
+                this.showError('검색에 실패했습니다.');
+            }
+        }
+
+        getSearchParams() {
+            return {
+                wiNo: document.getElementById('searchWiNo')?.value || '',
+                lotNo: document.getElementById('searchLotNo')?.value || '',
+                productNo: document.getElementById('searchProduct')?.value || ''
+            };
+        }
+
+        handleFilterChange() {
+            this.handleSearch();
+        }
+
+        async handleProductSelect(lotData) {
+            if (!lotData?.lotNo) {
+                console.warn('No lot number provided for product selection');
+                return;
+            }
+            
+            try {
+                console.log('Selected product lot:', lotData.lotNo);
+                const detail = await LotTrackingAPI.getLotDetail(lotData.lotNo);
+                
+                if (detail) {
+                    this.updateDetailView(detail, detail.productName);
+                }
+            } catch (error) {
+                console.error('Product detail load failed:', error);
+                this.showError('상세 정보 조회에 실패했습니다.');
+            }
+        }
+
+        async handleWorkOrderSelect(lotData) {
+            if (!lotData?.lotNo) {
+                console.warn('No lot number provided for work order selection');
+                return;
+            }
+            
+            try {
+                console.log('Selected work order lot:', lotData.lotNo);
+                const detail = await LotTrackingAPI.getLotDetail(lotData.lotNo);
+                
+                if (detail) {
+                    this.updateDetailView(detail, `작업지시 ${detail.wiNo}`);
+                }
+            } catch (error) {
+                console.error('Work order detail load failed:', error);
+                this.showError('상세 정보 조회에 실패했습니다.');
+            }
+        }
+
+        updateDetailView(detail, title) {
+            const titleElement = document.getElementById('selectedItemTitle');
+            if (titleElement) {
+                titleElement.textContent = title;
+            }
+            
+            this.lotFlow.updateFlow(detail);
+            this.historyGrid.loadData(detail);
+        }
+
+        showError(message) {
+            console.error('Error:', message);
+            alert(message);
+        }
+    }
+
+    class ProductListManager {
+        constructor(controller) {
+            console.log('Initializing ProductListManager');
+            this.controller = controller;
+            this.container = document.getElementById('productList');
+            
+            if (!this.container) {
+                console.error('Product list container not found');
+            }
+        }
+
+        renderList(lots) {
+            if (!this.container) {
+                console.error('Cannot render product list: container not found');
+                return;
+            }
+            
+            console.log('Rendering product list:', lots);
+            
+            try {
+                if (!lots || lots.length === 0) {
+                    this.renderEmptyState();
+                    return;
+                }
+
+                this.container.innerHTML = lots.map(lot => this.createProductCard(lot)).join('');
+                this.addEventListeners();
+            } catch (error) {
+                console.error('Product list render error:', error);
+                this.renderError();
+            }
+        }
+
+        renderEmptyState() {
+            this.container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-inbox fs-2"></i>
+                    <p class="mt-2 mb-0">데이터가 없습니다.</p>
+                </div>
+            `;
+        }
+
+        renderError() {
+            this.container.innerHTML = `
+                <div class="text-center text-danger py-3">
+                    <i class="bi bi-exclamation-triangle fs-2"></i>
+                    <p class="mt-2 mb-0">데이터 표시 중 오류가 발생했습니다.</p>
+                </div>
+            `;
+        }
+
+        createProductCard(lot) {
             return `
-                <div class="work-order-item" data-id="${workOrder.id}">
-                    <div class="item-header">
-                        <i class="bi bi-file-text"></i>
-                        <span class="item-title">${workOrder.title}</span>
+                <div class="item-card" data-id="${lot.lotNo}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">${this.escapeHtml(lot.productName)}</h6>
+                            <div class="text-muted small">작업지시: ${lot.wiNo}</div>
+                        </div>
+                        <span class="status-badge status-${(lot.lotStatus || '').toLowerCase()}">
+                            ${this.getStatusText(lot.lotStatus)}
+                        </span>
                     </div>
-                    <div class="item-info">
-                        <div>제품: ${workOrder.product}</div>
-                        <div>작업일: ${workOrder.date}</div>
+                    <div class="process-info mt-2 pt-2 border-top">
+                        <div class="small mb-1">
+                            <div class="d-flex justify-content-between">
+                                <span>공정: ${this.escapeHtml(lot.processName || '-')}</span>
+                                <span class="text-muted">${this.formatDate(lot.startTime)}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
         addEventListeners() {
-            this.container.on('click', '.work-order-item', (e) => {
-                const item = $(e.currentTarget);
-                $('.work-order-item.selected').removeClass('selected');
-                item.addClass('selected');
-
-                const workOrderId = item.data('id');
-                this.controller.handleWorkOrderSelect({
-                    id: workOrderId,
-                    title: item.find('.item-title').text()
+            this.container.querySelectorAll('.item-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    this.handleCardClick(card);
                 });
             });
         }
+
+        handleCardClick(card) {
+            // 선택 효과 처리
+            this.container.querySelectorAll('.item-card').forEach(c => 
+                c.classList.remove('selected')
+            );
+            card.classList.add('selected');
+            
+            // 컨트롤러에 선택 이벤트 전달
+            const lotNo = card.dataset.id;
+            if (lotNo) {
+                this.controller.handleProductSelect({ lotNo });
+            } else {
+                console.warn('Card clicked but no lot number found');
+            }
+        }
+
+        getStatusText(status) {
+            const statusMap = {
+                'WAIT': '대기',
+                'PROGRESS': '진행중',
+                'COMPLETE': '완료'
+            };
+            return statusMap[status] || status || '-';
+        }
+
+        formatDate(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                return '-';
+            }
+        }
+
+        escapeHtml(str) {
+            if (!str) return '-';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
     }
-
-    class LotTreeManager {
+	
+	class WorkOrderListManager {
         constructor(controller) {
+            console.log('Initializing WorkOrderListManager');
             this.controller = controller;
-            this.container = $('#lotTree');
+            this.container = document.getElementById('workOrderList');
+            
+            if (!this.container) {
+                console.error('Work order list container not found');
+            }
         }
 
-        updateLotTree(workOrderData) {
-            // 선택된 작업지시에 대한 LOT 트리 데이터
-            const lotData = [
-                {
-                    id: 'wi001',
-                    title: '작업지시',
-                    lotNo: 'W2024001',
-                    status: 'complete',
-                    worker: '홍길동',
-                    date: '2024-02-18 09:00'
-                },
-                {
-                    id: 'p001',
-                    title: '가공공정',
-                    lotNo: 'L2024001',
-                    status: 'progress',
-                    worker: '김가공',
-                    date: '2024-02-18 10:00'
-                },
-                {
-                    id: 'q001',
-                    title: '품질검사',
-                    lotNo: 'Q2024001',
-                    status: 'pending',
-                    worker: '이검사',
-                    date: '2024-02-18 11:00'
+        renderList(lots) {
+            if (!this.container) {
+                console.error('Cannot render work order list: container not found');
+                return;
+            }
+            
+            console.log('Rendering work order list:', lots);
+            
+            try {
+                if (!lots || lots.length === 0) {
+                    this.renderEmptyState();
+                    return;
                 }
-            ];
 
-            this.container.empty();
-            lotData.forEach(lot => {
-                this.container.append(this.createLotNode(lot));
-            });
+                this.container.innerHTML = lots.map(lot => this.createWorkOrderCard(lot)).join('');
+                this.addEventListeners();
+            } catch (error) {
+                console.error('Work order list render error:', error);
+                this.renderError();
+            }
         }
 
-        createLotNode(lot) {
+        renderEmptyState() {
+            this.container.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-inbox fs-2"></i>
+                    <p class="mt-2 mb-0">데이터가 없습니다.</p>
+                </div>
+            `;
+        }
+
+        renderError() {
+            this.container.innerHTML = `
+                <div class="text-center text-danger py-3">
+                    <i class="bi bi-exclamation-triangle fs-2"></i>
+                    <p class="mt-2 mb-0">데이터 표시 중 오류가 발생했습니다.</p>
+                </div>
+            `;
+        }
+
+        createWorkOrderCard(lot) {
             return `
-                <div class="lot-node" data-id="${lot.id}">
-                    <div class="lot-title">
-                        <i class="bi ${this.getNodeIcon(lot.title)} me-2"></i>
-                        ${lot.title}
+                <div class="item-card" data-id="${lot.lotNo}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">작업지시 ${lot.wiNo}</h6>
+                            <div class="text-muted small">
+                                <span class="me-2">${this.escapeHtml(lot.productName)}</span>
+                                <span>${this.formatDate(lot.startTime)}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-${(lot.lotStatus || '').toLowerCase()}">
+                            ${this.getStatusText(lot.lotStatus)}
+                        </span>
                     </div>
-                    <div class="lot-info">
-                        <div>${lot.lotNo}</div>
-                        <div>${lot.worker}</div>
-                        <div>${lot.date}</div>
-                    </div>
-                    <div class="lot-status ${lot.status}">
-                        ${this.getStatusText(lot.status)}
+                    <div class="process-info mt-2 pt-2 border-top">
+                        <div class="small mb-1">
+                            <div class="d-flex justify-content-between">
+                                <span>공정: ${this.escapeHtml(lot.processName || '-')}</span>
+                                <span class="text-muted">라인: ${this.escapeHtml(lot.lineName || '-')}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
+        addEventListeners() {
+            this.container.querySelectorAll('.item-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    this.handleCardClick(card);
+                });
+            });
+        }
+
+        handleCardClick(card) {
+            // 선택 효과 처리
+            this.container.querySelectorAll('.item-card').forEach(c => 
+                c.classList.remove('selected')
+            );
+            card.classList.add('selected');
+            
+            // 컨트롤러에 선택 이벤트 전달
+            const lotNo = card.dataset.id;
+            if (lotNo) {
+                this.controller.handleWorkOrderSelect({ lotNo });
+            } else {
+                console.warn('Card clicked but no lot number found');
+            }
+        }
+
+        getStatusText(status) {
+            const statusMap = {
+                'WAIT': '대기',
+                'PROGRESS': '진행중',
+                'COMPLETE': '완료'
+            };
+            return statusMap[status] || status || '-';
+        }
+
+        formatDate(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                return '-';
+            }
+        }
+
+        escapeHtml(str) {
+            if (!str) return '-';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    }
+
+    class LotFlowManager {
+        constructor(controller) {
+            console.log('Initializing LotFlowManager');
+            this.controller = controller;
+            this.container = document.getElementById('lotFlow');
+            
+            if (!this.container) {
+                console.error('Lot flow container not found');
+            }
+        }
+
+        updateFlow(lotData) {
+            if (!this.container || !lotData) {
+                console.error('Cannot update lot flow: container or data missing');
+                return;
+            }
+            
+            console.log('Updating lot flow:', lotData);
+            
+            try {
+                const processNodes = this.generateProcessNodes(lotData);
+                this.renderFlow(processNodes);
+            } catch (error) {
+                console.error('Lot flow update error:', error);
+                this.renderError();
+            }
+        }
+
+        renderError() {
+            this.container.innerHTML = `
+                <div class="text-center text-danger py-3">
+                    <i class="bi bi-exclamation-triangle fs-2"></i>
+                    <p class="mt-2 mb-0">공정 흐름도 표시 중 오류가 발생했습니다.</p>
+                </div>
+            `;
+        }
+
+        generateProcessNodes(lotData) {
+            const nodes = [];
+            
+            // 작업지시 노드
+            nodes.push({
+                title: '작업지시',
+                id: lotData.wiNo,
+                status: lotData.lotStatus,
+                children: []
+            });
+
+            // 공정 이력 노드들
+            if (lotData.processHistory && Array.isArray(lotData.processHistory)) {
+                lotData.processHistory.forEach(process => {
+                    nodes[0].children.push({
+                        title: process.processName,
+                        id: process.processLogNo,
+                        status: this.getProcessStatus(process),
+                        info: `${process.actionType} (${process.inputQty || 0}/${process.outputQty || 0})`
+                    });
+                });
+            }
+
+            return nodes;
+        }
+
+        getProcessStatus(process) {
+            if (!process) return 'WAIT';
+            if (process.outputQty > 0) return 'COMPLETE';
+            if (process.inputQty > 0) return 'PROGRESS';
+            return 'WAIT';
+        }
+
+        renderFlow(nodes) {
+            this.container.innerHTML = nodes.map(node => this.createFlowNode(node)).join('');
+        }
+
+        createFlowNode(node) {
+            let html = `
+                <div class="lot-node">
+                    <div class="lot-title">
+                        <i class="bi ${this.getNodeIcon(node.title)}"></i>
+                        ${this.escapeHtml(node.title)}
+                    </div>
+                    <div class="lot-info">${node.id || '-'}</div>
+                    <div class="status-badge status-${(node.status || '').toLowerCase()}">
+                        ${this.getStatusText(node.status)}
+                    </div>
+                    ${node.info ? `<div class="lot-detail">${this.escapeHtml(node.info)}</div>` : ''}
+                </div>
+            `;
+
+            if (node.children && node.children.length > 0) {
+                html += `
+                    <div class="lot-children">
+                        ${node.children.map(child => this.createFlowNode(child)).join('')}
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
         getNodeIcon(title) {
             const iconMap = {
                 '작업지시': 'bi-file-text',
-                '가공공정': 'bi-gear',
-                '품질검사': 'bi-clipboard-check'
+                '가공': 'bi-gear',
+                '조립': 'bi-tools',
+                '검사': 'bi-check-circle',
+                '열처리': 'bi-thermometer-high',
+                '표면처리': 'bi-brush'
             };
             return iconMap[title] || 'bi-circle';
         }
 
         getStatusText(status) {
             const statusMap = {
-                'complete': '완료',
-                'progress': '진행중',
-                'pending': '대기'
+                'WAIT': '대기',
+                'PROGRESS': '진행중',
+                'COMPLETE': '완료'
             };
-            return statusMap[status] || status;
+            return statusMap[status] || status || '-';
+        }
+
+        escapeHtml(str) {
+            if (!str) return '-';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
     }
-
-    class GridManager {
+	
+	class HistoryGridManager {
         constructor(controller) {
+            console.log('Initializing HistoryGridManager');
             this.controller = controller;
             this.initialize();
         }
 
         initialize() {
-            this.grid = new tui.Grid({
-                el: document.getElementById('historyGrid'),
-                scrollX: true,
-                scrollY: true,
-                rowHeaders: ['rowNum'],
-                columns: [
-                    {
-                        header: '처리시간',
-                        name: 'processTime',
-                        width: 150,
-                        align: 'center'
-                    },
-                    {
-                        header: '공정명',
-                        name: 'processName',
-                        width: 120
-                    },
-                    {
-                        header: 'LOT번호',
-                        name: 'lotNo',
-                        width: 120,
-                        align: 'center'
-                    },
-                    {
-                        header: '작업자',
-                        name: 'worker',
-                        width: 100,
-                        align: 'center'
-                    },
-                    {
-                        header: '상태',
-                        name: 'status',
-                        width: 100,
-                        align: 'center',
-                        formatter: ({value}) => {
-                            const statusMap = {
-                                'complete': { text: '완료', class: 'complete' },
-                                'progress': { text: '진행중', class: 'progress' },
-                                'pending': { text: '대기', class: 'pending' }
-                            };
-                            const status = statusMap[value] || { text: value, class: '' };
-                            return `<span class="lot-status ${status.class}">${status.text}</span>`;
+            const el = document.getElementById('historyGrid');
+            if (!el) {
+                console.error('History grid container not found');
+                return;
+            }
+
+            try {
+                this.grid = new tui.Grid({
+                    el,
+                    scrollX: true,
+                    scrollY: true,
+                    rowHeaders: ['rowNum'],
+                    columns: [
+                        {
+                            header: '처리시간',
+                            name: 'processTime',
+                            width: 150,
+                            align: 'center',
+                            formatter: ({ value }) => this.formatDateTime(value)
+                        },
+                        {
+                            header: '구분',
+                            name: 'type',
+                            width: 100,
+                            align: 'center'
+                        },
+                        {
+                            header: 'LOT번호',
+                            name: 'lotNo',
+                            width: 120,
+                            align: 'center'
+                        },
+                        {
+                            header: '공정/작업',
+                            name: 'process',
+                            width: 150
+                        },
+                        {
+                            header: '작업자',
+                            name: 'worker',
+                            width: 100,
+                            align: 'center'
+                        },
+                        {
+                            header: '상태',
+                            name: 'status',
+                            width: 100,
+                            align: 'center',
+                            formatter: ({ value }) => {
+                                const statusMap = {
+                                    'WAIT': { text: '대기', class: 'wait' },
+                                    'PROGRESS': { text: '진행중', class: 'progress' },
+                                    'COMPLETE': { text: '완료', class: 'complete' }
+                                };
+                                const status = statusMap[value] || { text: value || '-', class: '' };
+                                return `<span class="status-badge status-${status.class}">${status.text}</span>`;
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                });
+                console.log('History grid initialized');
+            } catch (error) {
+                console.error('History grid initialization error:', error);
+                el.innerHTML = `
+                    <div class="text-center text-danger py-3">
+                        <i class="bi bi-exclamation-triangle fs-2"></i>
+                        <p class="mt-2 mb-0">그리드 초기화 중 오류가 발생했습니다.</p>
+                    </div>
+                `;
+            }
         }
 
-        updateGrid(workOrderData) {
-            // 선택된 작업지시에 대한 이력 데이터
-            const historyData = [
-                {
-                    processTime: '2024-02-18 09:00:00',
-                    processName: '작업지시',
-                    lotNo: 'W2024001',
-                    worker: '홍길동',
-                    status: 'complete'
-                },
-                {
-                    processTime: '2024-02-18 10:00:00',
-                    processName: '가공공정',
-                    lotNo: 'L2024001',
-                    worker: '김가공',
-                    status: 'progress'
-                }
-            ];
+        loadData(lotData) {
+            if (!this.grid || !lotData) {
+                console.error('Cannot load data: grid or data missing');
+                return;
+            }
 
-            this.grid.resetData(historyData);
+            try {
+                const historyData = this.transformHistoryData(lotData);
+                this.grid.resetData(historyData);
+            } catch (error) {
+                console.error('History grid data load error:', error);
+                this.grid.resetData([]);
+            }
         }
-    }
 
-    // 컨트롤러 초기화
-    window.controller = new LotTrackingController();
-});
+        transformHistoryData(lotData) {
+            const history = [];
+
+            // LOT 생성 이력
+            if (lotData.createTime) {
+                history.push({
+                    processTime: lotData.createTime,
+                    type: 'LOT생성',
+                    lotNo: lotData.lotNo,
+                    process: '작업지시 등록',
+                    worker: lotData.createUser,
+                    status: lotData.lotStatus
+                });
+            }
+
+            // 공정 이력 추가
+            if (lotData.processHistory && Array.isArray(lotData.processHistory)) {
+                lotData.processHistory.forEach(process => {
+                    history.push({
+                        processTime: process.createTime,
+                        type: '공정',
+                        lotNo: process.lotNo,
+                        process: `${process.processName} (${process.actionType})`,
+                        worker: process.createUser,
+                        status: this.getProcessStatus(process)
+                    });
+                });
+            }
+
+            // 품질검사 이력 추가
+            if (lotData.qcHistory && Array.isArray(lotData.qcHistory)) {
+                lotData.qcHistory.forEach(qc => {
+                    history.push({
+                        processTime: qc.checkTime,
+                        type: '품질검사',
+                        lotNo: qc.lotNo,
+                        process: `${qc.processName} - ${qc.qcName}`,
+                        worker: qc.inspector,
+                        status: qc.judgement
+                    });
+                });
+            }
+
+            return _.orderBy(history, ['processTime'], ['desc']);
+        }
+
+        getProcessStatus(process) {
+            if (!process) return 'WAIT';
+            if (process.outputQty > 0) return 'COMPLETE';
+            if (process.inputQty > 0) return 'PROGRESS';
+            return 'WAIT';
+        }
+
+		formatDateTime(dateStr) {
+		            if (!dateStr) return '-';
+		            try {
+		                const date = new Date(dateStr);
+		                return date.toLocaleString('ko-KR', {
+		                    year: 'numeric',
+		                    month: '2-digit',
+		                    day: '2-digit',
+		                    hour: '2-digit',
+		                    minute: '2-digit',
+		                    hour12: false
+		                });
+		            } catch (error) {
+		                console.error('DateTime formatting error:', error);
+		                return '-';
+		            }
+		        }
+		    }
+
+		    // 전역 에러 핸들러 설정
+		    window.onerror = function(message, source, lineno, colno, error) {
+		        console.error('Global error:', { message, source, lineno, colno, error });
+		        return false;
+		    };
+
+		    // 비동기 에러 핸들러 설정
+		    window.addEventListener('unhandledrejection', function(event) {
+		        console.error('Unhandled promise rejection:', event.reason);
+		    });
+
+		    // 컨트롤러 초기화
+		    try {
+		        console.log('Initializing application...');
+		        window.controller = new LotTrackingController();
+		        console.log('Application initialized successfully');
+		    } catch (error) {
+		        console.error('Application initialization failed:', error);
+		        alert('애플리케이션 초기화 중 오류가 발생했습니다.');
+		    }
+		});
