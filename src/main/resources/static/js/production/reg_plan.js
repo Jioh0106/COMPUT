@@ -51,7 +51,11 @@ $(function() {
 	            header: '재고 조회', 
 	            name: 'check_mtr',
 				width: 80, 
-				formatter: () => '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>',
+				formatter: (cellData) => {
+	                return cellData.value === "등록 가능" || cellData.value === "재고 부족" 
+	                    ? cellData.value 
+	                    : '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>';
+	            },
 	            align: 'center'
 	        }
 		],
@@ -75,20 +79,25 @@ $(function() {
 	grid.on('click', (ev) => {
 	    if (ev.columnName === 'check_mtr') {
 	        const rowData = grid.getRow(ev.rowKey);
-	        alert(`재고 조회 요청: 상품번호 ${rowData.product_no}, 상품명 ${rowData.product_name}`);
-	        // 여기서 서버에 재고 조회 요청을 보낼 수 있음
-			axios.get('/api/plan/check/mtr', {
-				params: {
-					product_no: rowData.product_no,
-					sale_vol : rowData.sale_vol
-				},
-			})
-			.then(function (response) {
-				console.log('Fetched data:', data);
-			})
-			.catch(function (error) {
-			    console.error('Error fetching data:', error);
-			});
+	        
+	        axios.get('/api/plan/check/mtr', {
+	            params: {
+	                product_no: rowData.product_no,
+	                sale_vol : rowData.sale_vol
+	            },
+	        })
+	        .then(function (response) {
+	            const isAvailable = response.data; // 서버에서 boolean 값이 반환된다고 가정
+	            
+	            // 결과에 따라 텍스트 변경
+	            const newValue = isAvailable ? "등록 가능" : "재고 부족";
+
+	            // Grid에 값 업데이트
+	            grid.setValue(ev.rowKey, 'check_mtr', newValue);
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+	        });
 	    }
 	});
 	

@@ -3,7 +3,7 @@ function openView(type) {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
 	var url = '/reg-plan';
 	var popupW = 1200;
-	var popupH = 600;
+	var popupH = 650;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);

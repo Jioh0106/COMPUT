@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,14 +106,27 @@ public class OrderService {
 		order.setOrder_emp((String)map.get("emp_id"));
 		order.setOrder_type("발주");
 		
+		// 주문 테이블 추가
 		mapper.insertOrders(order);
 		
 		List<BuyDTO> createdRows = (List<BuyDTO>) map.get("createdRows");
 		
 		for(BuyDTO buy : createdRows) {
+			// 발주 테이블 추가
 			buy.setOrder_id(order_id);
 			mapper.insertBuy(buy);
+			
+			// 입고 대기 추가
+			Map<String, Object> inbound = new HashMap<>();
+			inbound.put("in_qty", buy.getBuy_vol());
+			inbound.put("buy_no", buy.getBuy_no());
+			inbound.put("item_no", buy.getMtr_no());
+			inbound.put("warehouse_id", "미정");
+			
+			mapper.insertInbound(inbound);
 		}
+		
+		
 		
 	}
 
