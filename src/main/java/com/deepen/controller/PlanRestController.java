@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,9 @@ import com.deepen.service.PlanService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -85,7 +89,19 @@ public class PlanRestController {
 	} // checkMtr
 	
 	
-	/* 생산계획 그리드 정보 저장 */
+	/* 생산계획 등록 */
+	@PostMapping("/save")
+	public ResponseEntity<String> savePlans(@RequestBody List<Map<String, Object>> selectedRows) {
+		System.out.println("selectedRows = " + selectedRows);
+		
+		try {
+			service.savePlans(selectedRows);
+			return ResponseEntity.ok("생산계획 등록이 완료되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("생산계획 등록 중 오류 발생");
+		}
+	}
 	
 	
 	

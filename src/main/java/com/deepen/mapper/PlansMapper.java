@@ -26,6 +26,10 @@ public interface PlansMapper {
 
 	List<Map<String, Object>> getPlanBomList();
 
+	void savePlan(PlansDTO plan);
+
+	String getPlanOrderId(String order_id);
+
 	
 	
 

@@ -102,6 +102,38 @@
 			                        WHERE PLAN_STATUS IN ('PRGR001', 'PRGR005'))
 	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
 	</select>
+	
+	<insert id="savePlan">
+		INSERT INTO PLANS(
+			   PLAN_ID
+			 , ORDER_ID 
+			 , EMP_ID 
+			 , PLAN_STATUS 
+			 , PLAN_DATE 
+			 , PLAN_START_DATE 
+			 , PLAN_END_DATE 
+			 , PLAN_PRIORITY 
+			 , SALE_NO 
+		) VALUS (
+			   #{plan_id}
+			 , #{order_id}
+			 , #{emp_id}
+			 , #{plan_status}
+			 , CURRENT_DATE
+			 , #{plan_start_date}
+			 , #{plan_end_date}
+			 , #{plan_priority}
+			 , #{sale_no}
+		)
+	</insert>
+	
+	<select id="getPlanOrderId" >
+		SELECT plan_id
+		  FROM plans
+		 WHERE plan_id Like #{order_id} || '%'
+		 ORDER BY plan_id DESC
+		 FETCH FIRST 1 ROW ONLY
+	</select>
 </mapper>
 
 

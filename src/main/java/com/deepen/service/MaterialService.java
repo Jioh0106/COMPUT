@@ -1,5 +1,7 @@
 package com.deepen.service;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class MaterialService {
 	/** 자재 항목 수정 **/
 	public void updateMaterial(List<Material> updatedRows) {
 		for(Material row : updatedRows) {
+			row.setMtr_mod_data(new Date(System.currentTimeMillis()));
 			repository.save(row);
 		}
 	}
