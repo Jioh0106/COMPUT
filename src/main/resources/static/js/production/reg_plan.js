@@ -1,40 +1,42 @@
 $(function() {	
 	// 등록일자는 오늘 날짜로 고정
-	const today = new Date();
-	const yyyy = today.getFullYear();
-	const mm = String(today.getMonth() + 1).padStart(2, '0');
-	const dd = String(today.getDate()).padStart(2, '0');
-	const formattedDate = yyyy + '-' + mm + '-' + dd;
-	$('#plan_date').val(formattedDate);
+//	const today = new Date();
+//	const yyyy = today.getFullYear();
+//	const mm = String(today.getMonth() + 1).padStart(2, '0');
+//	const dd = String(today.getDate()).padStart(2, '0');
+//	const formattedDate = yyyy + '-' + mm + '-' + dd;
+//	$('#plan_date').val(formattedDate);
 
 
 	// 첫 번째 DatePicker 초기화
-	const container1 = document.getElementById('tui-date-picker-container-1');
-	const target1 = document.getElementById('tui-date-picker-target-1');
-	const instance1 = new tui.DatePicker(container1, {
-		language: 'ko',
-		input: {
-			element: target1,
-			format: 'yyyy-MM-dd'
-		}
-	});
+//	const container1 = document.getElementById('tui-date-picker-container-1');
+//	const target1 = document.getElementById('tui-date-picker-target-1');
+//	const instance1 = new tui.DatePicker(container1, {
+//		language: 'ko',
+//		input: {
+//			element: target1,
+//			format: 'yyyy-MM-dd'
+//		}
+//	});
 
 	// 두 번째 DatePicker 초기화
-	const container2 = document.getElementById('tui-date-picker-container-2');
-	const target2 = document.getElementById('tui-date-picker-target-2');
-	const instance2 = new tui.DatePicker(container2, {
-		language: 'ko',
-		input: {
-			element: target2,
-			format: 'yyyy-MM-dd'
-		}
-	});
+//	const container2 = document.getElementById('tui-date-picker-container-2');
+//	const target2 = document.getElementById('tui-date-picker-target-2');
+//	const instance2 = new tui.DatePicker(container2, {
+//		language: 'ko',
+//		input: {
+//			element: target2,
+//			format: 'yyyy-MM-dd'
+//		}
+//	});
 
 
 	
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
+		height: 400,
+		bodyHeight: 350,
 		columns: [
 			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true },
 			{ header: '주문번호', name: 'order_id', width: 100, sortingType: 'asc', sortable: true},
@@ -49,7 +51,11 @@ $(function() {
 	            header: '재고 조회', 
 	            name: 'check_mtr',
 				width: 80, 
-				formatter: () => '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>',
+				formatter: (cellData) => {
+	                return cellData.value === "등록 가능" || cellData.value === "재고 부족" 
+	                    ? cellData.value 
+	                    : '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>';
+	            },
 	            align: 'center'
 	        }
 		],
@@ -73,20 +79,25 @@ $(function() {
 	grid.on('click', (ev) => {
 	    if (ev.columnName === 'check_mtr') {
 	        const rowData = grid.getRow(ev.rowKey);
-	        alert(`재고 조회 요청: 상품번호 ${rowData.product_no}, 상품명 ${rowData.product_name}`);
-	        // 여기서 서버에 재고 조회 요청을 보낼 수 있음
-			axios.get('/api/plan/check/mtr', {
-				params: {
-					product_no: rowData.product_no,
-					sale_vol : rowData.sale_vol
-				},
-			})
-			.then(function (response) {
-				console.log('Fetched data:', data);
-			})
-			.catch(function (error) {
-			    console.error('Error fetching data:', error);
-			});
+	        
+	        axios.get('/api/plan/check/mtr', {
+	            params: {
+	                product_no: rowData.product_no,
+	                sale_vol : rowData.sale_vol
+	            },
+	        })
+	        .then(function (response) {
+	            const isAvailable = response.data; // 서버에서 boolean 값이 반환된다고 가정
+	            
+	            // 결과에 따라 텍스트 변경
+	            const newValue = isAvailable ? "등록 가능" : "재고 부족";
+
+	            // Grid에 값 업데이트
+	            grid.setValue(ev.rowKey, 'check_mtr', newValue);
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+	        });
 	    }
 	});
 	

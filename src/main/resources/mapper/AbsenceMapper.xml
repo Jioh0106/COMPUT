@@ -79,7 +79,7 @@
 					ABSENCE_REMARK = #{ABSENCE_REMARK},
 				</if>
 	           HIGH_APPROVAL = #{HIGH_APPROVAL},
-	           UPDATE_DATE = SYSTIMESTAMP,
+	           UPDATE_DATE = CURRENT_TIMESTAMP,
 	           UPDATE_EMP_ID = #{UPDATE_EMP_ID}
          WHERE ABSENCE_NO = #{ABSENCE_NO}
     </update>
