@@ -267,7 +267,22 @@
 		$(function () {
 			let emp_role = /*[[${emp.emp_role}]]*/'';
 			console.log("emp_role : " + emp_role); 
-			
+			tui.DatePicker.localeTexts.ko = {
+				titles: {
+					// days
+					DD: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+					// daysShort
+					D: ['일', '월', '화', '수', '목', '금', '토'],
+					// months
+					MMMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+					// monthsShort
+					MMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+				},
+				titleFormat: 'yyyy년 MMM',
+				todayFormat: '오늘: yyyy년 MMMM dd일 DD',
+				date: 'Date',
+				time: 'Time'
+			};
 			// 모달창 휴직 구분 공통코드 불러오기
 			$('#loabSelect').on('click', function () {
 			    // 이미 데이터가 로드된 경우 추가 요청 방지
@@ -438,10 +453,7 @@
 				console.log('선택된 데이터:', selectedRows);
 				
 				if (selectedRows.length === 0) {
-					Swal.fire({
-					        icon: "warning",
-					        title: "삭제할 항목을 선택하세요."
-					})
+					Swal.fire({icon: "warning",title: "삭제할 항목을 선택하세요."})
 			        return;
 			    }
 				
@@ -462,20 +474,12 @@
 					    }
 				})
 		        .then(function (response) {
-					Swal.fire(
-					        'Success',
-					        '삭제가 완료되었습니다.',
-					        'success'
-					      )
+					Swal.fire('Success','삭제가 완료되었습니다.', 'success')
 		            window.location.reload();
 		        })
 		        .catch(function (error) {
 		            console.error('삭제 중 오류 발생:', error);
-					Swal.fire(
-					        'Error',
-					        '삭제 중 문제가 발생했습니다.',
-					        'error'
-					      )
+					Swal.fire('Error', '삭제 중 문제가 발생했습니다.', 'error')
 		        });
 				
 			}); // 삭제 버튼 이벤트
@@ -494,11 +498,7 @@
 		        })
 		        .catch(function (error) {
 		            console.error('Error fetching data:', error);
-					Swal.fire(
-					        'Error',
-					        '데이터를 가져오는 중 문제가 발생했습니다.',
-					        'error'
-					      )
+					Swal.fire('Error','데이터를 가져오는 중 문제가 발생했습니다.','error')
 		            return []; // 에러 발생 시 빈 배열 반환
 		        });
 				
@@ -513,11 +513,7 @@
 		        })
 		        .catch(function (error) {
 		            console.error('Error fetching data:', error);
-					Swal.fire(
-					        'Error',
-					        '데이터를 가져오는 중 문제가 발생했습니다.',
-					        'error'
-					      )
+					Swal.fire('Error','데이터를 가져오는 중 문제가 발생했습니다.', 'error' )
 		            return []; // 에러 발생 시 빈 배열 반환
 		        });
 				
@@ -532,11 +528,7 @@
 			        })
 			        .catch(function (error) {
 			            console.error('Error fetching data:', error);
-						Swal.fire(
-						        'Error',
-						        '데이터를 가져오는 중 문제가 발생했습니다.',
-						        'error'
-						      )
+						Swal.fire('Error','데이터를 가져오는 중 문제가 발생했습니다.','error')
 			            return []; // 에러 발생 시 빈 배열 반환
 			        });
 			}
@@ -599,14 +591,10 @@
 							header: '종류', 
 							name: 'ABSENCE_TYPE',
 							width: 100,
-							editor: isEditable
-								? {
+							editor: isEditable ? {
 								type: 'select',
-								options: {
-									listItems: data.loabCommon
-								}
-						    }
-							: null,
+								options: {listItems: data.loabCommon}
+						    } : null,
 							filter: 'select'
 						},
 						
@@ -614,19 +602,16 @@
 							header: '휴직 시작일', 
 							name: 'ABSENCE_START',
 							width: 120,
-							editor: isEditable
-								? {
+							editor: isEditable ? {
 				                type: 'datePicker',
 				                options: {
-				                    format: 'yyyy-MM-dd'
+				                    format: 'yyyy-MM-dd',
+				                    language: 'ko'
 				                }
-				            }
-							: null,
+				            } : null,
 				            filter: {
 				                type: 'date',
-				                options: {
-				                    format: 'yyyy-MM-dd'
-				                }
+				                options: {format: 'yyyy-MM-dd', language: 'ko'}
 				            }
 				        },
 				        { 
@@ -636,15 +621,13 @@
 							editor: isEditable 
 								? {
 				                type: 'datePicker',
-				                options: {
-				                    format: 'yyyy-MM-dd'
-				                }
-				            }
-							: null,
+				                options: { format: 'yyyy-MM-dd', language: 'ko'}
+				            }: null,
 				            filter: {
 				                type: 'date',
 				                options: {
-				                    format: 'yyyy-MM-dd'
+				                    format: 'yyyy-MM-dd',
+				                    language: 'ko'
 				                }
 				            }
 				        },
@@ -652,20 +635,13 @@
 				            header: '신청일', 
 				            name: 'REQUEST_DATE',
 							width: 150,
-				            editor: isEditable 
-				                ? {
-				                    type: 'datePicker',
-				                    options: {
-				                        format: 'yyyy-MM-dd hh:mm', 
-										timepicker: true
-				                    }
-				                }
-				                : null,
+				            editor: isEditable ? {
+			                    type: 'datePicker',
+			                    options: {format: 'yyyy-MM-dd hh:mm', language: 'ko',timepicker: true }
+			                } : null,
 				            filter: {
 				                type: 'date',
-				                options: {
-				                    format: 'yyyy-MM-dd hh:mm', 
-				                }
+				                options: {format: 'yyyy-MM-dd hh:mm', language: 'ko'}
 				            }
 				        },
 				        { 
@@ -673,14 +649,10 @@
 							name: 'HIGH_APPROVAL', 
 							width: 160,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-							editor: isEditable
-								? {
+							editor: isEditable ? {
 								type: 'select',
-								options: {
-									listItems: data.highList
-								}
-						    }
-							: null,
+								options: {listItems: data.highList}
+						    } : null,
 							filter: 'select'
 						},
 						{ 

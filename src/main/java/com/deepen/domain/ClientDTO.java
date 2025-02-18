@@ -1,5 +1,6 @@
 package com.deepen.domain;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,8 +19,8 @@ public class ClientDTO {
 	private String client_adrress;
 	private String client_type;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate client_date;
+	private Date client_date;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate client_update;
+	private Date client_update;
 	private String client_memo;
 }

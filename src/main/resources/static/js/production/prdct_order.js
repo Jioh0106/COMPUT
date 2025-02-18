@@ -261,10 +261,7 @@ $(function() {
 	
 	function deleteRow(selectedRows) {
 		if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
-			Swal.fire({
-		        icon: "warning",
-		        title: "삭제할 항목을 선택하세요."
-			})
+			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
 	    }
 		

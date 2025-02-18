@@ -1,5 +1,6 @@
 package com.deepen.domain;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,9 +21,9 @@ public class MaterialDTO {
 	private String mtr_use;
 	private String mtr_unit;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate mtr_reg_data;
+	private Date mtr_reg_data;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate mtr_mod_data;
+	private Date mtr_mod_data;
 	private String mtr_status;
 	
 }
