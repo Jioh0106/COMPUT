@@ -51,12 +51,13 @@ public class ExcelService {
 				productDTO.setProduct_type(getCellValue(row.getCell(2))); //상품유형(완제품,반제품)
 				
 				productList.add(productDTO);
-				
+				  log.info("엑셀 데이터 읽음: " + productDTO.toString()); // 추가
 			}
 			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		}
 		
 		return productList;

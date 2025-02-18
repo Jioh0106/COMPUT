@@ -7,12 +7,14 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.deepen.domain.BomDTO;
 import com.deepen.domain.CommonDetailDTO;
@@ -136,6 +138,23 @@ public class ProductRestController {
 		List<CommonDetailDTO> unitList = pdService.selectUnit();
 		return unitList;
 	}
+	
+	
+	//업로드된 엑셀파일을 다운받아서 saveExcel을 실행하는 메서드
+	@CrossOrigin(origins = "*")
+	@PostMapping("/upload")
+	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file ){
+		try {
+			int insertCount = pdService.saveExcel(file);
+			return ResponseEntity.ok(insertCount +"개 성공");
+			
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("오류발생" + e.getMessage());
+		 
+		}
+	}
+		
+	
 	
 	
 	

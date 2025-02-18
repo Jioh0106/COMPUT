@@ -111,11 +111,28 @@
 								</div>
 								<!-- 검색 조건 끝-->
 								
+								<!--단일상품 등록 버튼-->
 								<div class="float-end mb-3">
-								<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
+									<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
 <!-- 								<input type="file" id="fileInput" accept=".xlsx"> -->
-<!-- 								<button onclick="fileUpload">엑셀파일업로드</button> -->
+<!-- 								<button type="button" onclick="fileUpload()">엑셀파일업로드</button> -->
 								</div>
+								
+								<!--엑셀파일 업로드 -> 상품등록 -->
+								<div class="col-md-4 mb-1">
+                                    <fieldset>
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="fileInput" accept=".xlsx"
+                                                aria-describedby="inputGroupFileAddon04"
+                                                aria-label="Upload">
+                                            <button class="btn btn-primary" type="button" onclick="fileUpload()"
+                                                id="inputGroupFileAddon04">엑셀 파일 업로드</button>
+                                        </div>
+                                    </fieldset>
+                                </div>		
+								
+								<br>
+								
 								<h4>상품</h4>
 								<!--상품그리드-->										   
 								<div id="productGrid" class="mb-3 mt-2"></div>
@@ -698,6 +715,40 @@
 				         console.error('BOM 업데이트 오류:', error);
 				     });
 			}
+			
+			
+			//엑셀파일 업로드 함수
+			function fileUpload(){
+				let fileInput = document.getElementById("fileInput");
+				
+				if (fileInput.files.length === 0) {
+		               alert("파일을 선택해주세요!");
+		               return;
+		           }
+			  
+			    let file = fileInput.files[0];
+		              let formData = new FormData();
+		              formData.append("file", file);
+
+		              fetch('/api/product/upload', { 
+		                  method: "POST",
+						  headers: {
+						         [header]: token 
+						     },
+		                  body: formData
+		              })
+		              .then(response => response.text())
+		              .then(data => {
+		                  alert("업로드 성공: " + data);
+						   location.reload(true); // 페이지 새로고침
+		              })
+		        
+					  .catch(error => {
+	  			         console.error('업로드 오류', error);
+						 alert("파일 업로드 중 오류 발생! " + error.message);
+	  			     }); 
+				
+				 }
 			
 			
 		

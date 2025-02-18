@@ -34,6 +34,7 @@ public class ProductService {
 	private final ProductMapper pdMapper;
 	private final BomRepository bomRepository;
 	private final ExcelService excelService;
+	 
 	
 	//상품등록 - 단일상품 등록
 	public Integer saveProduct (ProductDTO productDto) {
@@ -59,29 +60,20 @@ public class ProductService {
 		for(ProductDTO productDto : productDTOList) {
 			Product product = new Product();
 			product.setProduct_name(productDto.getProduct_name());
-			product.setProduct_unit(productDto.getProduct_unit());
+			//이름으로 공통코드 조회(단위공통코드) - 엑셀파일에 이름으로 값 넣으면 공통코드로 테이블에 들어감!
+			product.setProduct_unit(cdRepository.findCommonDetailCodeByName(productDto.getProduct_unit()));
 			product.setProduct_type(productDto.getProduct_type());
 			product.setProduct_date(LocalDateTime.now());
 			
 			pdRepository.save(product);
 			saveCount ++;
+			log.info("행 개수 :"+ saveCount);
 			
 		}
 		
 		return saveCount;
 	}
 	
-	//업로드된 엑셀파일을 다운받아서 saveExcel을 실행하는 메서드
-	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file ){
-		try {
-			int insertCount = saveExcel(file);
-			return ResponseEntity.ok(insertCount +"개 성공");
-			
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body("오류발생" + e.toString());
-		 
-		}
-	}
 	
 	
 	
