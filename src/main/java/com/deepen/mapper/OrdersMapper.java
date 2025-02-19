@@ -41,6 +41,8 @@ public interface OrdersMapper {
 
 	void insertInbound(Map<String, Object> inbound);
 
+	List<Map<String, Object>> getgetBomList(int product_no);
+
 	
 
 

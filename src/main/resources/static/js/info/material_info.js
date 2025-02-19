@@ -11,8 +11,8 @@ $(function() {
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		data: data, 
-		height: 700,
-		bodyHeight: 650,
+		height: 600,
+		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true},

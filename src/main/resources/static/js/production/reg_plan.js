@@ -183,7 +183,7 @@ $(function() {
 		  }).then((result) => {
 		      if (result.isConfirmed) { 
 	
-				  axios.post('/api/plan/save', selectedRows, {
+				  axios.post('/api/plan/reg', selectedRows, {
 			  			headers: {
 			  		        'X-CSRF-TOKEN': csrfToken
 			  		    }

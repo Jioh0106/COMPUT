@@ -12,6 +12,8 @@ $(function() {
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		data: data, 
+		height: 600,
+		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},

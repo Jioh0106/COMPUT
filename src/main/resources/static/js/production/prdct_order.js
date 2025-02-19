@@ -72,6 +72,8 @@ $(function() {
 	// 주문관리 그리드
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
+		height: 600,
+		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '주문번호', name: 'order_id', sortingType: 'asc', sortable: true},
@@ -184,6 +186,10 @@ $(function() {
 	
 	// 주문 관리 상세 모달 열기
 	grid.on('click', function (ev) {
+		if (ev.targetType  === 'rowHeader') {
+	       return; 
+	   }
+		
 		if (typeof ev.rowKey !== 'undefined' && ev.rowKey !== null) {
 			const rowData = grid.getRow(ev.rowKey);
 			
