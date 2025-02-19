@@ -142,7 +142,7 @@
 			common_detail_display
 	</select>
 	
-	<select id="selectEmpInfo" resultType="map" parameterType="String">
+	<select id="selectEmpInfo" resultType="map" parameterType="hashMap">
 		SELECT 
 			  emp_id AS "empId"
 			, emp_no AS "empNo"
@@ -154,13 +154,16 @@
 				FROM vacation v
 				LEFT JOIN request r
 				ON v.request_no = r.request_no
-				WHERE vacation_leave = #{value}
+				WHERE vacation_leave = #{empId}
+				<if test="type != null and type != ''">
+					AND vacation_type = #{type}
+				</if>
 				AND r.request_status = 'RQST005'
 				AND EXTRACT(YEAR FROM vacation_start) = EXTRACT(YEAR FROM SYSDATE)) AS "total"
 		FROM 
 			employees
 		WHERE 
-			emp_id = #{value}
+			emp_id = #{empId}
 	</select>
 	
 	<select id="vctnDays" resultType="map" parameterType="String">

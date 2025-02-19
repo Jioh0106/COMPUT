@@ -18,7 +18,7 @@ public interface VacationMapper {
 	
 	List<Map<String, Object>> selectCommonDtl();
 
-	Map<String, Object> selectEmpInfo(String userId);
+	Map<String, Object> selectEmpInfo(Map<String, Object> vctnType);
 
 	List<Map<String, Object>> selectAprvr(String role);
 
