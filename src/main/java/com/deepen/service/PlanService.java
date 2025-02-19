@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.PlansDTO;
 import com.deepen.domain.SaleDTO;
+import com.deepen.entity.Client;
 import com.deepen.entity.Plans;
 import com.deepen.mapper.PlansMapper;
 import com.deepen.repository.PlansRepository;
@@ -119,7 +121,7 @@ public class PlanService {
 	} // checkMtr 
 		
 
-	public void savePlans(List<Map<String, Object>> regList) {
+	public void regPlans(List<Map<String, Object>> regList) {
 		Map<String, Object> emp = (Map<String, Object>) session.getAttribute("sEmp");
 		String emp_id = (String) emp.get("EMP_ID");
 		
@@ -171,6 +173,17 @@ public class PlanService {
 
 		String plan_id = order_id + "-" + product_no + "-" + rast;
 		return plan_id;
+	}
+
+	public void deletePlans(List<String> deleteList) {
+		repository.deleteAllById(deleteList);
+	}
+
+	public void updatePlans(List<Plans> updatedRows) {
+		for(Plans row : updatedRows) {
+			row.setPlan_update(new Timestamp(System.currentTimeMillis()));
+			repository.save(row);
+		}
 	}
 	
 	

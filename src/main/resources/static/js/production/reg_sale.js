@@ -68,9 +68,7 @@ $(function() {
 					width: 100,
 					editor : {
 						type: 'select',
-						options: {
-							listItems: data.unitCommon
-		                }
+						options: {listItems: data.unitCommon }
 					}
 				},
 				{
@@ -85,9 +83,7 @@ $(function() {
 					width: 120,
 					editor: {
 	                    type: 'datePicker',
-	                    options: {
-	                        format: 'yyyy-MM-dd', 
-	                    }
+	                    options: { format: 'yyyy-MM-dd', language: 'ko'}
 	                }
 				},
 				{
@@ -249,7 +245,9 @@ $(function() {
 		
 		if (!modalGrid2) {
 		    modalGrid2 = new tui.Grid({
-		        el: document.getElementById('modal-grid2'), 
+		        el: document.getElementById('modal-grid2'),
+				height: 350,
+				bodyHeight: 300, 
 		        data: [],
 		        columns: [
 		            { header: '상품번호', name: 'product_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },

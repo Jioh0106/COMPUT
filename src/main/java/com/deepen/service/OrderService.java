@@ -126,8 +126,6 @@ public class OrderService {
 			mapper.insertInbound(inbound);
 		}
 		
-		
-		
 	}
 
 	
@@ -149,6 +147,12 @@ public class OrderService {
 		System.out.println("makeOrderID - order_id = " + order_id);
 		
 		return order_id;
+	}
+
+	public List<Map<String, Object>> getBomList(int product_no) {
+		List<Map<String, Object>> bomList = mapper.getgetBomList(product_no);
+		log.info("bomList = " + bomList.toString());
+		return bomList;
 	}
 
 

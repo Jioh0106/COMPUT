@@ -226,6 +226,21 @@ public class OrderRestController {
 		}
 	} // deleteOrder
 	
+	/* 상품별 BOM 정보 조회 */
+	@GetMapping("/serch/bom")
+	public ResponseEntity<List<Map<String, Object>>> getBomList(@RequestParam("product_no") int product_no)  {
+		
+		List<Map<String, Object>> bomList = service.getBomList(product_no);
+		
+		if (bomList == null || bomList.isEmpty()) {
+	        return ResponseEntity.ok(Collections.emptyList()); // 빈 배열 반환
+	    }
+		log.info("getClientSerch : " + bomList.toString());
+		return ResponseEntity.ok(bomList);
+		
+	} // getBomList
+	
+	
 	/* 수주 그리드 정보 추가/수정 */
 	
 	
