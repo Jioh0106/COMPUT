@@ -393,10 +393,10 @@
 	        line_no,
 	        lot_status,
 	        start_time,
-	        create_user
-<!-- 	        , -->
-<!-- 	        update_user, -->
-<!-- 	        update_time -->
+	        create_user,
+	        create_time,
+	        update_user,
+	        update_time
 	    ) VALUES (
 	        #{lotNo},
 	        #{parentLotNo},
@@ -407,12 +407,48 @@
 	        #{lineNo},
 	        #{lotStatus},
 	        TO_DATE(#{startTime}, 'YYYY-MM-DD HH24:MI:SS'),
-	        #{createUser}
-<!-- 	        , -->
-<!-- 	        #{updateUser}, -->
-<!-- 	        NVL(TO_DATE(#{updateTime}, 'YYYY-MM-DD HH24:MI:SS'), NULL) -->
+	        #{createUser},
+	        sysdate,
+	        #{updateUser},
+			<choose>
+				<when test="updateTime eq null">NULL</when>
+				<otherwise>TO_DATE(#{updateTime}, 'YYYY-MM-DD HH24:MI:SS')</otherwise>
+			</choose>
 	    )
 	</insert>
+	
+	<update id="updateWiStatusByWiNoToComplete">
+		UPDATE work_instruction SET 
+			wi_status = 'PRGR003'
+		WHERE wi_no = #{wiNo}
+	</update>
+	
+	<update id="updatePlanStatusByWiNoToComplete">
+		UPDATE plans SET 
+			plan_status = 'PRGR003' 
+		WHERE plan_id = #{planId}
+	</update>
+	
+	<update id="updateLotMasterStatusByWiNoToComplete">
+		UPDATE lot_master SET 
+			lot_status = 'LTST007',
+			update_user = #{sessionEmpId},
+			update_time = sysdate 
+		WHERE wi_no = #{wiNo}
+	</update>
+	
+	<update id="updateLotProcessLogStatusByWiNoToComplete">
+		UPDATE lot_process_log SET 
+			action_type = 'PRGR003' 
+		WHERE wi_no = #{wiNo}
+	</update>
+	
+	<update id="updateWiStatusByWiNoToEnd">
+		UPDATE work_instruction SET 
+			wi_status = 'PRGR006',
+			wi_end_date = sysdate
+		WHERE wi_no = #{wiNo}
+	</update>
 </mapper>
 
 

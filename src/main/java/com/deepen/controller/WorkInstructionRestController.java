@@ -78,7 +78,6 @@ public class WorkInstructionRestController {
 	@GetMapping("/material-info-by-row-selection")
 	public List<Map<String, Object>> getMaterialsByRowSelection(@RequestParam("productNo") String productNo,
 																@RequestParam("vol") String vol){
-		log.info("자재 정보 연결 준비 : "+productNo+", "+vol);
 		
 		List<Map<String, Object>> materialsList  = wiService.getMaterialsByProductNo(productNo,vol);
 		return materialsList;
@@ -86,7 +85,6 @@ public class WorkInstructionRestController {
 	
 	@PostMapping("/insert-material-warehouse")
 	public void insertMaterialInWarehouse(@RequestBody List<Map<String, Object>> insertMaterialData) {
-		log.info("자재 인서트 준비");
 		wiService.insertMaterialInWareHouse(insertMaterialData);
 	}
 	
@@ -98,8 +96,28 @@ public class WorkInstructionRestController {
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
 		String sessionEmpId = (String) empInfo.get("EMP_ID");
 		
-		log.info("작업 시작 동작 준비");
 		wiService.startWorkInstruction(updateDataList,sessionEmpId);
 	}
 	
+	@PostMapping("/complete-process")
+	public void processComplete(@RequestBody List<Map<String, Object>> updateDataList,
+								HttpServletRequest request) {
+		log.info("공정 완료 준비");
+		
+		HttpSession session = request.getSession();
+		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
+		String sessionEmpId = (String) empInfo.get("EMP_ID");
+		
+		wiService.completeProcess(updateDataList,sessionEmpId);
+		
+	}
+	
+	@PostMapping("/end-work-instruction")
+	public void endWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
+								HttpServletRequest request) {
+		log.info("작업 종료 준비");
+		
+		wiService.endWorkInstruction(updateDataList);
+		
+	}
 }

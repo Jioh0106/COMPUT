@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.LineInfoDTO;
@@ -69,5 +70,20 @@ public interface WorkInstructionMapper {
 	
 	// lot_master 테이블에 insert
 	void insertLotMaster(Map<String, Object> insertData);
+	
+	
+	// 공정 완료 시 상태 update 할 목록들
+	void updateWiStatusByWiNoToComplete(int wiNo);
+
+	void updatePlanStatusByWiNoToComplete(String plandId);
+
+	void updateLotMasterStatusByWiNoToComplete(@Param("wiNo") int wiNo,@Param("sessionEmpId") String sessionEmpId);
+
+	void updateLotProcessLogStatusByWiNoToComplete(int wiNo);
+	
+	// 작업 완료 시 상태 작업 지시 상태 update
+	void updateWiStatusByWiNoToEnd(int wiNo);
+	
+	
 	
 }

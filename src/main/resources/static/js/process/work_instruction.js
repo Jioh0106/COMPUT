@@ -407,7 +407,14 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	console.log("checkedWiRows",checkedWiRows);
 	
 	if (checkedWiRows.length === 0) {
-	       console.warn("작업지시 항목이 선택되지 않았습니다.");
+	       console.warn("작업지시 항목을 선택해주세요.");
+	       alert("작업지시 항목을 선택해주세요.");
+	       return;
+	}
+	
+	if (checkedMaterialRows.length === 0) {
+	       console.warn("자재 항목을 선택해주세요.");
+	       alert("자재 항목을 선택해주세요.");
 	       return;
 	}
 	
@@ -422,6 +429,8 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	   console.log("updatedMaterialRows (wi_no 추가됨)", insertMaterialData);
 	
 	insertOB('/api/insert-material-warehouse',insertMaterialData);
+	
+	alert("자재 투입 완료");
 });
 
 async function insertOB(url,data){
@@ -452,11 +461,13 @@ document.getElementById('addBtn').addEventListener('click', () => {
 	    
 	    if (checkedWorkerGrid.length === 0) {
 	        console.warn("작업담당자를 선택하세요.");
+			alert("작업담당자를 선택하세요.");
 	        return;
 	    }
 	    
 	    if (checkedWiGrid.length === 0) {
-	        console.warn("작업지시를 선택하세요.");
+	        console.warn("작업 담당자를 넣을 작업지시를 선택하세요.");
+	        alert("작업 담당자를 넣을 작업지시를 선택하세요.");
 	        return;
 	    }
 
@@ -566,10 +577,67 @@ async function workStartBtn(url,data){
 
 // 공정완료 버튼 동작
 document.getElementById('processFinishBtn').addEventListener('click', async () => {
-	console.log("공정 완료 버튼");
-	
-	const response = await fetch('/api/work-instruction-info');
-	const fetchWorkInstructionInfo = response.json();
-	console.log("공정완료동작을위한 정보",fetchWorkInstructionInfo);
+	try{
+		console.log("공정 완료 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("공정완료 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("완료할 작업 지시를 선택해주세요");
+      		alert("완료할 작업 지시를 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/complete-process",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+				
+		console.log("공정 완료!");
+	}catch(error){
+		console.log("error",error);
+	}
 	
 });
+
+// 공정완료 버튼 동작
+document.getElementById('workEndBtn').addEventListener('click', async () => {
+	try{
+		console.log("작업 종료 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("작업종료 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("종료할 작업 지시를 선택해주세요");
+      		alert("종료할 작업 지시를 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/end-work-instruction",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+				
+		console.log("작업 종료!");
+	}catch(error){
+		console.log("error",error);
+	}
+	
+});
+

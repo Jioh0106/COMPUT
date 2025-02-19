@@ -2,6 +2,8 @@ package com.deepen.service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,17 +170,17 @@ public class WorkInstructionService {
 		log.info("작업시작 정보 : "+updateDataList);
 		
 		// 작업 시작 정보 update
-//		for(Map<String, Object> updateData : updateDataList) {
-//			wiMapper.updateWorkStartInfo(updateData);
-//			
-//			// 작업 계획 상태 업데이트
-//			wiMapper.updatePlanStatusStart(updateData);
-//		}
+		for(Map<String, Object> updateData : updateDataList) {
+			wiMapper.updateWorkStartInfo(updateData);
+			
+			// 작업 계획 상태 업데이트
+			wiMapper.updatePlanStatusStart(updateData);
+		}
 		
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
 		
 		// 공정 lot insert
-		//createAndInsertProcessLot(updateDataList,sessionEmpId);
+		createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
 		// lot master insert
 		createAndInsertLotMaster(updateDataList,sessionEmpId);
@@ -197,7 +199,7 @@ public class WorkInstructionService {
 		log.info("공정 lot에 넣을 작업 지시 정보 : "+selectInfoByWiNo);
 		
 		// 공정 lot 테이블이 넣기
-		String startDate = selectInfoByWiNo.get("start_date").toString().replace("-", "");
+		String startDate = selectInfoByWiNo.get("start_date").toString().split(" ")[0].replace("-", "");
 		String processNos = selectInfoByWiNo.get("process_no").toString(); // 공정 번호 문자열
 		int vol = Integer.parseInt(selectInfoByWiNo.get("vol").toString()); // 투입 수량
 		log.info("오늘 날짜 : "+startDate+", 공정 번호들 : "+processNos+", 투입 수량 : "+vol);
@@ -240,28 +242,27 @@ public class WorkInstructionService {
 	private void createAndInsertLotMaster(List<Map<String, Object>> updateDataList, String sessionEmpId) {
 		// 작업 지시 번호 추출
 		int wiNo = (int) updateDataList.get(0).get("wi_no");
-		// 지시 번호에 해당하는 로트 번호 조회
 		List<Map<String, Object>> processLotNo = wiMapper.selectProcessLotNoByWiNo(wiNo);
 		log.info("지시 번호에 해당하는 로트 번호 : "+processLotNo);
 		Map<String, Object> selectInfoByWiNo =  wiMapper.selectWorkInstructionByWiNo(wiNo);
 		log.info("lot_master에 넣을 작업 지시 정보 : "+selectInfoByWiNo);
 		
 		String[] processNos = selectInfoByWiNo.get("process_no").toString().split("/");
-	    int productNo = ((Number) selectInfoByWiNo.get("product_no")).intValue();
-	    //int productNo = (int)selectInfoByWiNo.get("product_no");
+	    int productNo = ((Number) selectInfoByWiNo.get("product_no")).intValue(); 
 	    int lineNo = ((Number) selectInfoByWiNo.get("line_no")).intValue();
-	    //int lineNo = (int)selectInfoByWiNo.get("line_no");
 	    String lotStatus = "LTST002"; // 진행중 상태 코드
 	    String processType = "PRTP001"; // 공정 유형
 	    
-	    //java.sql.Date startTime = new java.sql.Date(((Timestamp) selectInfoByWiNo.get("start_date")).getTime());
-	    //Timestamp startTime = (Timestamp) selectInfoByWiNo.get("start_date");
 	    // 시간 정보까지 포함하는 날짜 및 시간 문자열 생성
-	    Timestamp timestamp = (Timestamp) selectInfoByWiNo.get("start_date");
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    String startTimeStr = sdf.format(timestamp);
+	    Timestamp startTime = (Timestamp) selectInfoByWiNo.get("start_date");
+	    LocalDateTime startDateTime = startTime.toLocalDateTime();
+	    String startTimeStr = startDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+	    LocalDateTime updateDateTime = LocalDateTime.now();
+	    String updateTimeStr = updateDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	    
-	    String parentLotNo = null;
+	    String parentLotNo = (String) processLotNo.get(0).get("LOT_NO");
+	    //String parentLotNo = "DUMMY";
 	    
 	    for (int i = 0; i < processLotNo.size(); i++) {
 	        Map<String, Object> lotData = processLotNo.get(i);
@@ -280,13 +281,14 @@ public class WorkInstructionService {
 	        insertData.put("startTime", startTimeStr);
 	        insertData.put("createUser", sessionEmpId);
 	        
-//	        if (parentLotNo != null) {
-//	            insertData.put("updateUser", sessionEmpId);
-//	            insertData.put("updateTime", new Timestamp(System.currentTimeMillis()));
-//	        }else {
-//	        	insertData.put("updateUser", null);
-//	        	insertData.put("updateTime", null);
-//	        }
+	        if (parentLotNo != null) {
+	            insertData.put("updateUser", sessionEmpId);
+	            insertData.put("updateTime", updateTimeStr);
+	        }else {
+	        	insertData.put("updateUser", null);
+	        	insertData.put("updateTime", null);
+	        }
+	        
 	        log.info("lot_master에 넣을 데이터 : "+insertData.toString());
 	        
 	        wiMapper.insertLotMaster(insertData);
@@ -296,6 +298,49 @@ public class WorkInstructionService {
 	    }
 		
 	    log.info("lot_master insert 완료");
+		
+	}
+
+	/**
+	 * 공정 완료 로직
+	 * @param List<Map<String, Object>> updateDataList,sessionEmpId
+	 */
+	public void completeProcess(List<Map<String, Object>> updateDataList, String sessionEmpId) {
+		log.info("공정 완료 시작");
+		log.info("updateDataList : "+updateDataList.toString());
+		
+		// 상태 변경할 목록(작업 지시 번호에 정보를)
+		// 작업지시테이블 상태(=>완료="PRGR003"), 생산계획 상태(=>완료="PRGR003"), lot_master(=>공정 완료="LTST007") lot_process_log(=>완료="PRGR003")
+		for(Map<String, Object> updateData :updateDataList ) {
+			int wiNo = (int)updateData.get("wi_no");
+			log.info("update기준 작업지시 번호 : "+ wiNo);
+			String plandId = (String) updateData.get("plan_id");
+			log.info("update기준 계획번호 : "+ plandId);
+			wiMapper.updateWiStatusByWiNoToComplete(wiNo);
+			log.info("작업 지시 상태 업데이트 완료!");
+			wiMapper.updatePlanStatusByWiNoToComplete(plandId);
+			log.info("생산 계획 상태 업데이트 완료!");
+			wiMapper.updateLotMasterStatusByWiNoToComplete(wiNo,sessionEmpId);
+			log.info("lot_master 상태 업데이트 완료!");
+			wiMapper.updateLotProcessLogStatusByWiNoToComplete(wiNo);
+			log.info("lot_process_log 상태 업데이트 완료!");
+		}
+		
+		
+	}
+	
+	/**
+	 * 공정 완료 로직
+	 * @param List<Map<String, Object>> updateDataList,sessionEmpId
+	 */
+	public void endWorkInstruction(List<Map<String, Object>> updateDataList) {
+		log.info("작업 종료 동작 시작");
+		for(Map<String, Object> updateData :updateDataList ) {
+			int wiNo = (int)updateData.get("wi_no");
+			log.info("update기준 작업지시 번호 : "+ wiNo);
+			wiMapper.updateWiStatusByWiNoToEnd(wiNo);
+			log.info("작업 지시 상태 업데이트 완료!");
+		}
 		
 	}
 	
