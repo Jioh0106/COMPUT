@@ -24,7 +24,7 @@ public class VacationService {
 	
 	public List<Map<String, Object>> selectUseVctnList(Map<String, Object> athrMapList) {
 		
-		Map<String, Object> map = mapper.selectEmpInfo(String.valueOf(athrMapList.get("empId")));
+		Map<String, Object> map = mapper.selectEmpInfo(athrMapList);
 
 		// 역에 의한 계산으로 입사일~현재 근속연수 구하기
 		String hireDate = (String) map.get("hireDate");
@@ -81,7 +81,14 @@ public class VacationService {
 		List<Map<String, Object>> vctnDaysList = mapper.selectVctnDaysList(athrMapList);
 		
 		for(Map<String, Object> vctnDays : vctnDaysList) {
-			vctnDays.put("vctnDays", workDays(athrMapList));
+			
+			// 잔여일수가 사원마다 달라야 하므로 정보를 개별적으로 workDays 메서드에 전달
+			Map<String, Object> empData = new HashMap<>(athrMapList);
+	        empData.put("empId", vctnDays.get("empId"));
+	        // 연월차 한정으로 보유 현황을 보여 주기 위해 휴가 종류를 연월차 코드로 고정
+	        empData.put("type", "VCTN001");
+	        
+			vctnDays.put("vctnDays", workDays(empData));
 		}
 		
 		return vctnDaysList;
@@ -91,8 +98,8 @@ public class VacationService {
 		return mapper.selectCommonDtl();
 	}
 
-	public Map<String, Object> selectEmpInfo(String userId) {
-		Map<String, Object> map = mapper.selectEmpInfo(userId);
+	public Map<String, Object> selectEmpInfo(Map<String, Object> empMap) {
+		Map<String, Object> map = mapper.selectEmpInfo(empMap);
 
 		return map;
 	}
@@ -129,11 +136,11 @@ public class VacationService {
 	}
 	
 	public int workDays(Map<String, Object> vctnType) {
-		String userId = String.valueOf(vctnType.get("empId"));
-		Map<String, Object> map = mapper.selectEmpInfo(userId);
+		
+		Map<String, Object> map = mapper.selectEmpInfo(vctnType);
 
 		// 역에 의한 계산으로 입사일~현재 근속연수 구하기
-		String hireDate = (String) map.get("hireDate");
+		String hireDate = String.valueOf(map.get("hireDate"));
 		int total = Integer.valueOf(String.valueOf(map.get("total")));
 
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
