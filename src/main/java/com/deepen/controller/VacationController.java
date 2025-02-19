@@ -120,6 +120,18 @@ public class VacationController {
 
 		return "attendance/vctn_appform";
 	}
+	
+	/**
+	 * 휴가 구분에 따른 잔여일수
+	 * @param vctnType
+	 * @return int
+	 */
+	@PostMapping("/vctnDays")
+	@ResponseBody
+	public int vctnDays(@RequestBody Map<String, Object> vctnType) {
+		System.out.println(vctnType.toString());
+		return service.workDays(vctnType);
+	}
 
 	/**
 	 * 휴가 및 요청내역 테이블 삽입
