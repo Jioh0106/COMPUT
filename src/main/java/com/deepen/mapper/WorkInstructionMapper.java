@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.LineInfoDTO;
@@ -41,7 +42,7 @@ public interface WorkInstructionMapper {
 	String selectDeduplicateProcessesNo(int productNo);
 	
 	// 작업지시 테이블 정보 조회
-	List<Map<String, Object>> selectWorkInstruction();
+	List<Map<String, Object>> selectWorkInstruction(Map<String, Object> params);
 	
 	// 작업지시 테이블 정보 조회(where =  작업 지시 번호)
 	Map<String, Object> selectWorkInstructionByWiNo(int wiNo);
@@ -54,4 +55,35 @@ public interface WorkInstructionMapper {
 	
 	// 작업시작 정보 update
 	void updateWorkStartInfo(Map<String, Object> updateData);
+	
+	// 작업계획 상태 변경('PRGR002'== 생산중)
+	void updatePlanStatusStart(Map<String, Object> updateData);
+	
+	// 공정 lot_no 조회(where = 작업 지시 번호) 
+	List<Map<String, Object>> selectProcessLotNoByWiNo(int wiNo);
+	
+	// 공정 lot 순차 순번 select
+	Integer getLastLotSequence();
+	
+	// 공정 lot_log 테이블 insert
+	void insertProcessLot(Map<String, Object> lotData);
+	
+	// lot_master 테이블에 insert
+	void insertLotMaster(Map<String, Object> insertData);
+	
+	
+	// 공정 완료 시 상태 update 할 목록들
+	void updateWiStatusByWiNoToComplete(int wiNo);
+
+	void updatePlanStatusByWiNoToComplete(String plandId);
+
+	void updateLotMasterStatusByWiNoToComplete(@Param("wiNo") int wiNo,@Param("sessionEmpId") String sessionEmpId);
+
+	void updateLotProcessLogStatusByWiNoToComplete(int wiNo);
+	
+	// 작업 완료 시 상태 작업 지시 상태 update
+	void updateWiStatusByWiNoToEnd(int wiNo);
+	
+	
+	
 }
