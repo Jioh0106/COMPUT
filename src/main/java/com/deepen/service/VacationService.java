@@ -81,7 +81,7 @@ public class VacationService {
 		List<Map<String, Object>> vctnDaysList = mapper.selectVctnDaysList(athrMapList);
 		
 		for(Map<String, Object> vctnDays : vctnDaysList) {
-			vctnDays.put("vctnDays", workDays(String.valueOf(athrMapList.get("empId"))));
+			vctnDays.put("vctnDays", workDays(athrMapList));
 		}
 		
 		return vctnDaysList;
@@ -93,8 +93,6 @@ public class VacationService {
 
 	public Map<String, Object> selectEmpInfo(String userId) {
 		Map<String, Object> map = mapper.selectEmpInfo(userId);
-		
-		map.put("vctnDays", workDays(userId));
 
 		return map;
 	}
@@ -130,7 +128,8 @@ public class VacationService {
 		return result;
 	}
 	
-	public int workDays(String userId) {
+	public int workDays(Map<String, Object> vctnType) {
+		String userId = String.valueOf(vctnType.get("empId"));
 		Map<String, Object> map = mapper.selectEmpInfo(userId);
 
 		// 역에 의한 계산으로 입사일~현재 근속연수 구하기
