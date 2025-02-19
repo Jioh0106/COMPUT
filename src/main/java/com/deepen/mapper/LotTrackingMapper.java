@@ -13,7 +13,7 @@ public interface LotTrackingMapper {
     // LOT 마스터 정보 조회
     List<LotMasterDTO> selectLotByWorkOrder(Integer wiNo);
     List<LotMasterDTO> selectLotByProduct(Integer productNo);
-    LotMasterDTO selectLotDetail(String lotNo);
+    List<LotMasterDTO> selectLotDetail(String lotNo);
     
  // LOT 공정 이력 조회
     List<LotProcessDTO> selectLotProcessHistory(String lotNo);

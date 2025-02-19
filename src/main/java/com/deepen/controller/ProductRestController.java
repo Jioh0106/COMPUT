@@ -137,6 +137,11 @@ public class ProductRestController {
 		return unitList;
 	}
 	
+	@GetMapping
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(pdService.getAllProducts());
+    }
+	
 	
 	
 }

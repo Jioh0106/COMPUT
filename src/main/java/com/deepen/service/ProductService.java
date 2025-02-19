@@ -185,6 +185,12 @@ public class ProductService {
 		List<CommonDetailDTO> unitList = pdMapper.selectUnit();
 		return unitList;
 	}
+
+
+	public List<ProductDTO> getAllProducts() {
+        log.info("Getting all products");
+        return pdMapper.selectAllProducts();
+    }
 	
 	
 	
