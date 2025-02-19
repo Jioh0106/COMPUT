@@ -55,6 +55,8 @@ $(function() {
 	mainFetchData().then(function (data) {  
 		grid = new tui.Grid({
 			el: document.getElementById('grid'),
+			height: 300,
+			bodyHeight: 250,
 			data: [], 
 			columns: [
 				{ header: 'No', name: 'buy_no' },
@@ -156,6 +158,8 @@ $(function() {
 		if (!modalGrid1) {
 		    modalGrid1 = new tui.Grid({
 		        el: document.getElementById('modal-grid1'), 
+				height: 350,
+				bodyHeight: 300,
 		        data: [],
 		        columns: [
 		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
@@ -163,7 +167,6 @@ $(function() {
 		            { header: '연락처', name: 'client_tel', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
 		            { header: '대표자명', name: 'client_boss', width: 80,filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
 		            { header: '담당자명', name: 'client_emp', width: 80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '우편번호', name: 'client_postcode', width: 80 },
 		            { 
 						header: '등록일자', 
 						name: 'client_date', 
@@ -175,6 +178,7 @@ $(function() {
 					        }
 					    }
  					},
+		            { header: '우편번호', name: 'client_postcode', width: 80 },
 		            { header: '주소', name: 'client_adrress', width: 300}
 		        ]
 		    });

@@ -41,10 +41,17 @@ const instance2 = new tui.DatePicker(container2, {
 
 
 $(function() {	
-	var toastElement = document.querySelector(".toast");
-    var toast = new bootstrap.Toast(toastElement);
-    toast.show();
 	
+	axios.get('/api/plan/reg/list')
+	.then(function (response) {
+		var toastElement = document.querySelector(".toast");
+	    var toast = new bootstrap.Toast(toastElement);
+	    toast.show();
+	})
+	.catch(function (error) {
+	    console.error('Error fetching data:', error);
+	});
+
 	// 부서 셀렉트 박스 
 	$('#statusSelect').on('click', function () {
 	    // 이미 데이터가 로드된 경우 추가 요청 방지
@@ -99,8 +106,9 @@ $(function() {
 			{ header: '생산계획번호', name: 'plan_id', width: 150, sortingType: 'asc', sortable: true  },
 			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true  },
 			{ header: '등록 직원', name: 'emp_name', width: 100 },
-			{ header: '상태', name: 'status_name', width: 80 },
-			{ header: '우선순위', name: 'plan_priority', width: 80 },
+			{ header: '등록 직원', name: 'emp_name', width: 100 },
+			{ header: '상태', name: 'status_name', width: 80,filter: 'select' },
+			{ header: '우선순위', name: 'plan_priority', width: 80, editor:'text' },
 			{ header: '생산 시작 예정일', name: 'plan_start_date', sortingType: 'asc', sortable: true  },
 			{ header: '생산 완료 목표일', name: 'plan_end_date', sortingType: 'asc', sortable: true  },
 			{ header: '등록 일자', name: 'plan_date', sortingType: 'asc', sortable: true  },
@@ -123,7 +131,8 @@ $(function() {
 	.catch(function (error) {
 	    console.error('Error fetching data:', error);
 	});
-
+	
+	
 	
 	
 	
