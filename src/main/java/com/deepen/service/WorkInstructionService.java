@@ -112,9 +112,9 @@ public class WorkInstructionService {
 	}
 	
 	// 작업 지시 정보 조회
-	public List<Map<String, Object>> getWorkInstruction() {
+	public List<Map<String, Object>> getWorkInstruction(Map<String, Object> params) {
 		
-		List<Map<String, Object>> selectList = wiMapper.selectWorkInstruction();
+		List<Map<String, Object>> selectList = wiMapper.selectWorkInstruction(params);
 		
 		return selectList;
 	}

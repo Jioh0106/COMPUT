@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +63,27 @@ public class WorkInstructionRestController {
 	}
 	
 	/**
-	 * 작업 지시 테이블 조회
+	 * 작업 지시 테이블 검색 조회
 	 * @param
 	 */
 	@GetMapping("/work-instruction-info")
-	public List<Map<String, Object>> getWorkInstruction(){
+	public List<Map<String, Object>> getWorkInstruction(
+			@RequestParam(value = "planNo", required = false) String planNo,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "processNo", required = false) String processNo,
+			@RequestParam(value = "lineNo", required = false) String lineNo){
 		
-		List<Map<String, Object>> list = wiService.getWorkInstruction();
+		Map<String, Object> params =  new HashMap<>();
+		params.put("planNo", planNo);
+		params.put("startDate", startDate);
+		params.put("endDate", endDate);
+		params.put("processNo", processNo);
+		params.put("lineNo", lineNo);
+		
+		log.info("필터 검색 조회 : "+params.toString());
+		
+		List<Map<String, Object>> list = wiService.getWorkInstruction(params);
 		return list;
 	}
 	

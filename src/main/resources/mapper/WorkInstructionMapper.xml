@@ -195,7 +195,7 @@
 		WHERE plan_id = #{PLAN_ID}
 	</update>
 	
-	<select id="selectWorkInstruction">
+	<select id="selectWorkInstruction" parameterType="Map">
 		SELECT 
 			wi.wi_no AS "wi_no",
 		    wi.plan_id AS "plan_id",
@@ -238,6 +238,21 @@
 		LEFT JOIN employees e
 			ON wi.emp_id = e.emp_id
 		WHERE o.order_type = '수주'
+			<if test="planNo != null and planNo != ''">
+				AND wi.plan_id Like '%' || #{planNo} || '%'
+			</if>
+			<if test="startDate != null and startDate != ''">
+				AND (wi.wi_start_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD') OR wi.wi_start_date IS NULL)
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND (wi.wi_end_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') +1 OR wi.wi_end_date IS NULL)
+			</if>
+			<if test="processNo != null and processNo != ''">
+				AND wi.process_no Like '%' || #{processNo} || '%'
+			</if>
+			<if test="lineNo != null and lineNo != ''">
+				AND wi.line_no = #{lineNo} 
+			</if>
 		ORDER BY wi.wi_no
 	</select>
 	
