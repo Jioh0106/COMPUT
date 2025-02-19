@@ -29,5 +29,10 @@ public class ProductController {
 		model.addAttribute("productName", productName);
 		return"info/bom_info";
 	}
+	
+	
 
+	
+	
 }
+

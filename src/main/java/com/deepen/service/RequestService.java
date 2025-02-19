@@ -187,6 +187,25 @@ public class RequestService {
 	}
 	
 	
+	//토스트 알림 -> 최종승인 발령자 조회
+	public List<RequestDTO> selectChecked(String empId){
+		List<RequestDTO> selectCheck =  rqMapper.selectChecked(empId);
+		log.info("해당 로그인한 사번의 요청내역 :"+ selectCheck);  
+		
+		return selectCheck;
+	}
+	
+	//토스트알림 -> is_checked컬럼 업데이트
+	public void updateChecked(Integer request_no) {
+	    rqMapper.updateChecked(request_no);
+	    log.info("is_checked 업데이트 완료, 요청번호: " + request_no);
+	}
+	
+	
+	
+	
+	
+	
 	
 
 }

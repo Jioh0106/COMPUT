@@ -41,6 +41,11 @@ public class ExcelService {
 				rowIterator.next();
 			}
 			
+			//두번째 행
+			if(rowIterator.hasNext()){
+				rowIterator.next();
+			}
+			
 			
 			while(rowIterator.hasNext()) {
 				Row row = rowIterator.next();
@@ -61,8 +66,7 @@ public class ExcelService {
 		}
 		
 		return productList;
-		
-	}	
+	 }	
 	
 	
 	private String getCellValue(Cell cell) {
