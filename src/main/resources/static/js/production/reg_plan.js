@@ -1,19 +1,6 @@
 $(function() {	
 	const csrfToken = $('input[name="_csrf"]').val();
 	
-	tui.DatePicker.localeTexts.ko = {
-		titles: {
-			DD: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-			D: ['일', '월', '화', '수', '목', '금', '토'],
-			MMMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-			MMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-		},
-		titleFormat: 'yyyy년 MMM',
-		todayFormat: '오늘: yyyy년 MMMM dd일 DD',
-		date: 'Date',
-		time: 'Time'
-	};
-	
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		rowHeaders: ['checkbox'],
@@ -26,9 +13,9 @@ $(function() {
 			{ header: '상품명', name: 'product_name', width: 200, sortingType: 'asc', sortable: true },
 			{ header: '주문단위', name: 'unit_name', width: 80, sortingType: 'asc', sortable: true },
 			{ header: '주문량', name: 'sale_vol', width: 80, sortingType: 'asc', sortable: true },
-			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true },
 			{ header: '거래처', name: 'client_name', width: 100, sortingType: 'asc', sortable: true },
 			{ header: '소요시간', name: 'time_sum', width: 100 },
+			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true },
 			{
 				header: '생산 시작 예정일', 
 				name: 'plan_start_date', 
@@ -59,6 +46,11 @@ $(function() {
                             { text: '긴급', value: '긴급' }
                         ]
                     }
+			    },
+				formatter: (cellData) => {
+			        if (cellData.value === "긴급") {
+			            return '<span class="text-danger">' + cellData.value + '</span>';
+			        }
 			    } 
 			},
 			{ 
@@ -66,10 +58,14 @@ $(function() {
 	            name: 'check_mtr',
 				width: 80, 
 				formatter: (cellData) => {
-	                return cellData.value === "등록 가능" || cellData.value === "재고 부족" 
-	                    ? cellData.value 
-	                    : '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>';
-	            },
+				    if (cellData.value === "등록 가능") {
+				        return '<span class="text-success">' + cellData.value + '</span>';
+				    } else if (cellData.value === "재고 부족") {
+				        return '<span class="text-secondary">' + cellData.value + '</span>';
+				    }
+				    return '<button class="btn btn-warning btn-sm check-stock-btn">조회</button>';
+				},
+
 	            align: 'center'
 	        }
 		],
@@ -101,12 +97,8 @@ $(function() {
 	            },
 	        })
 	        .then(function (response) {
-	            const isAvailable = response.data; // 서버에서 boolean 값이 반환된다고 가정
-	            
-	            // 결과에 따라 텍스트 변경
+	            const isAvailable = response.data; 
 	            const newValue = isAvailable ? "등록 가능" : "재고 부족";
-
-	            // Grid에 값 업데이트
 	            grid.setValue(ev.rowKey, 'check_mtr', newValue);
 	        })
 	        .catch(function (error) {
@@ -186,10 +178,10 @@ $(function() {
 		      title: "생산 계획 등록",
 			  text: "새로운 생산 계획으로 등록하시겠습니까?",
 		      showCancelButton: true,
-		      confirmButtonText: "확인",   // OK 버튼 텍스트
-		      cancelButtonText: "취소"     // Cancel 버튼 텍스트
+		      confirmButtonText: "확인", 
+		      cancelButtonText: "취소"    
 		  }).then((result) => {
-		      if (result.isConfirmed) {  // OK 버튼을 눌렀을 경우
+		      if (result.isConfirmed) { 
 	
 				  axios.post('/api/plan/save', selectedRows, {
 			  			headers: {

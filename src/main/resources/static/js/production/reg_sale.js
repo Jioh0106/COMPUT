@@ -55,6 +55,8 @@ $(function() {
 	mainFetchData().then(function (data) {  
 		grid = new tui.Grid({
 			el: document.getElementById('grid'),
+			height: 300,
+			bodyHeight: 250,
 			data: [], 
 			columns: [
 				{ header: 'No', name: 'sale_no', width: 60 },
@@ -171,7 +173,9 @@ $(function() {
 		if (!modalGrid1) {
 		    modalGrid1 = new tui.Grid({
 		        el: document.getElementById('modal-grid1'), 
-		        data: [],
+				height: 350,
+				bodyHeight: 300,
+				data: [],
 		        columns: [
 		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
 		            { header: '거래처명', name: 'client_name', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },

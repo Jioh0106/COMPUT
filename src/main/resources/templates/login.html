@@ -22,11 +22,11 @@
 			                <a href="/"><img src="/images/icon-logo-clear.png" style="width: 170px; height: auto;"  alt="Logo"></a>
 			            </div>
 			            <h1 class="auth-title mb-5">Log in.</h1>
-	<!--		            <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>-->
-	
+							
 			            <form action="/loginPro" method="post">
+			                <input type="hidden" id="rememberedIdHidden" th:value="${rememberedId}">
 			                <div class="form-group position-relative has-icon-left mb-4">
-			                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id">
+			                    <input type="text" class="form-control form-control-xl" placeholder="사원번호" name="emp_id" id="emp_id">
 			                    <div class="form-control-icon">
 			                        <i class="bi bi-person"></i>
 			                    </div>
@@ -38,8 +38,8 @@
 			                    </div>
 			                </div>
 			                <div class="form-check form-check-lg d-flex align-items-end">
-			                    <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault" name="KeepLogged">
-			                    <label class="form-check-label text-gray-600" for="flexCheckDefault">
+			                    <input class="form-check-input me-2" type="checkbox" value="on" id="rememberMe" name="rememberMe">
+			                    <label class="form-check-label text-gray-600" for="rememberMe">
 			                        아이디 기억하기
 			                    </label>
 			                </div>
@@ -64,6 +64,16 @@
 	<script src="/assets/js/bootstrap.bundle.min.js"></script>
 	
 	<script>
+		$(function() {	
+			
+			const rememberedId = $('#rememberedIdHidden').val(); // 서버에서 받은 쿠키 값 가져오기
+
+		    if (rememberedId) {
+		        $('input[name="emp_id"]').val(rememberedId); // 아이디 입력 필드에 값 자동 입력
+		        $('#rememberMe').prop('checked', true); // 체크박스 체크
+		    }
+			
+		});
 		$('#low-login').on('click', function() {
 			submitLoginForm('202501093', '33333333');
 		});
@@ -81,9 +91,22 @@
 		    const form = $('form[action="/loginPro"]');
 		    form.find('input[name="emp_id"]').val(empId); // 사원번호 설정
 		    form.find('input[name="emp_pw"]').val(empPw); // 비밀번호 설정
-
+		    
+		    const isRememberChecked = $('#rememberMe').is(':checked'); 
+		    if (isRememberChecked) {
+		        form.append('<input type="hidden" name="rememberMe" value="on">');
+		    } else {
+		        form.append('<input type="hidden" name="rememberMe" value="off">');
+		    }
+		    
 		    form.submit();
 		}
+		
+		function getCookie(name) {
+		    let matches = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+		    return matches ? decodeURIComponent(matches[1]) : "";
+		}
+		
 		
 	</script>
 

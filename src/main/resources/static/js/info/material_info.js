@@ -6,29 +6,13 @@ $(function() {
 	console.log("CSRF Token:", csrfToken);
 	console.log('isEditable :', isEditable); 
 	
-	tui.DatePicker.localeTexts.ko = {
-		titles: {
-			// days
-			DD: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-			// daysShort
-			D: ['일', '월', '화', '수', '목', '금', '토'],
-			// months
-			MMMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-			// monthsShort
-			MMM: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-		},
-		titleFormat: 'yyyy년 MMM',
-		todayFormat: '오늘: yyyy년 MMMM dd일 DD',
-		date: 'Date',
-		time: 'Time'
-	};
-		
-		
 	let grid;
 
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		data: data, 
+		height: 700,
+		bodyHeight: 650,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true},
