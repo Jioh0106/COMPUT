@@ -266,7 +266,6 @@ $(function() {
 		    modalGrid2.on('click', function (ev) {
 		        if (typeof ev.rowKey !== 'undefined') {
 		            selectedMtrRow = modalGrid2.getRow(ev.rowKey);
-		            modalGrid2.setSelection([ev.rowKey]);
 		        }
 		    });
 		}	
@@ -328,7 +327,6 @@ $(function() {
 		    modalGrid3.on('click', function (ev) {
 		        if (typeof ev.rowKey !== 'undefined') {
 		            selectedPrdctRow = modalGrid3.getRow(ev.rowKey);
-		            modalGrid3.selectedPrdctRow([ev.rowKey]);
 		        }
 		    });
 		}	
@@ -346,6 +344,10 @@ $(function() {
 			    console.error('Error fetching data:', error);
 			});
 
+		});
+		
+		modal.on('hidden.bs.modal', function () {
+		    selectedPrdctRow = null;
 		});
 
 		// 모달창 표시
@@ -384,8 +386,39 @@ $(function() {
 	$('#appendMtr')	.on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
-		const mtrList = grid2.getData()
+		const mtrList = grid2.getData();
 		console.log("✅ 가져온 데이터:", mtrList);
+		
+		if (mtrList.length < 2) {
+			return;
+	 	}
+		// 현재 grid의 최대 buy_no 찾기
+		const gridData = grid.getData();
+		const maxNo = gridData.reduce((max, row) => {
+		    const buy_no = parseInt(row.buy_no, 10);
+		    return !isNaN(buy_no) && buy_no > max ? buy_no : max;
+		}, 0);
+		
+		// mtrList의 데이터 수 -1 만큼 추가
+	   for (let i = 1; i < mtrList.length; i++) {
+	       const mtr = mtrList[i]; // 현재 순회 중인 행 데이터
+
+	       // 새로운 행 데이터 생성
+	       const newRow = {
+	           buy_no: maxNo + i, // 연속적인 번호 부여
+	           mtr_no: mtr.MTR_NO, // grid2에서 가져온 mtr_no 값
+	           mtr_name: mtr.MTR_NAME, // grid2에서 가져온 mtr_name 값
+	           buy_unit: mtr.unit_name, 
+	           buy_vol: '', 
+	           buy_status: '정상', 
+	       };
+
+	       // grid에 새 행 추가
+	       grid.appendRow(newRow, {
+	           focus: true // 추가된 행에 포커스
+	       });
+	   }
+		
 	});
 	// =================================================================================================
 
@@ -396,7 +429,7 @@ $(function() {
 		let client_no = $('#client_no').val();
 		let order_date = $('#order_date').val();
 		
-		if(client_no === '' || client_no === null) {
+		if(client_no === '거래처 조회' ||client_no === '' || client_no === null) {
 			Swal.fire('Error', '거래처를 입력해 주세요.', 'warning');
 			return;
 		}

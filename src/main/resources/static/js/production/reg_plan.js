@@ -51,6 +51,7 @@ $(function() {
 			        if (cellData.value === "긴급") {
 			            return '<span class="text-danger">' + cellData.value + '</span>';
 			        }
+			       	return '일반';
 			    } 
 			},
 			{ 
