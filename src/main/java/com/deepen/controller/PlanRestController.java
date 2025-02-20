@@ -50,12 +50,12 @@ public class PlanRestController {
 	public ResponseEntity<List<SaleDTO>> getRegPlanList() {
 		
 		List<SaleDTO> list = service.getRegPlanList();
-		
+		log.info("getRegPlanList = " +list.toString());
 		return ResponseEntity.ok(list);
         
 	} // getRegPlanList
 	
-	/* 생산계획 그리드 정보 저장 */
+	/* 생산계획 등록 시 상품별 필요 원자재 재고 조회 */
 	@GetMapping("/check/mtr")
 	public boolean checkMtr(@RequestParam("product_no") int product_no, 
 							@RequestParam("sale_vol") int sale_vol) {

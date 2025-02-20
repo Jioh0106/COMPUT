@@ -43,6 +43,8 @@ public interface OrdersMapper {
 
 	List<Map<String, Object>> getgetBomList(int product_no);
 
+
+
 	
 
 

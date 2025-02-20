@@ -45,9 +45,11 @@ $(function() {
 	
 	axios.get('/api/plan/reg/list')
 	.then(function (response) {
-		var toastElement = document.querySelector(".toast");
-	    var toast = new bootstrap.Toast(toastElement);
-	    toast.show();
+		if(Array.isArray(response.data) && response.data.length > 0) {
+			var toastElement = document.querySelector(".toast");
+		    var toast = new bootstrap.Toast(toastElement);
+		    toast.show();
+		}
 	})
 	.catch(function (error) {
 	    console.error('Error fetching data:', error);

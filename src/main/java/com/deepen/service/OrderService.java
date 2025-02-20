@@ -13,6 +13,7 @@ import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.domain.SaleDTO;
 import com.deepen.mapper.OrdersMapper;
+import com.deepen.mapper.PlansMapper;
 import com.deepen.repository.OrdersRepository;
 
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ import lombok.extern.java.Log;
 public class OrderService {
 	
 	private final OrdersMapper mapper;
+	private final PlansMapper planMapper;
 	private final OrdersRepository repository;
 	
 	/* 주문관리 그리드 정보 조회 */
@@ -155,6 +157,7 @@ public class OrderService {
 		return bomList;
 	}
 
+	
 
 
 	

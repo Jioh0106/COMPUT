@@ -86,7 +86,7 @@ $(function() {
 	});
 
 		
-	// 버튼 클릭 이벤트 추가
+	// 재고 조회 버튼 클릭 이벤트 추가
 	grid.on('click', (ev) => {
 	    if (ev.columnName === 'check_mtr') {
 	        const rowData = grid.getRow(ev.rowKey);
