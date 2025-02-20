@@ -243,7 +243,7 @@ $(function() {
 		const selectedRows = grid.getCheckedRows();
 		console.log('선택된 데이터:', selectedRows);
 		
-		deleteRow(selectedRows);
+		deleteRow(selectedRows, 'order');
 		
 	}); // 주문 건 삭제 버튼 이벤트
 	
@@ -252,7 +252,7 @@ $(function() {
 		const selectedRows = grid2.getCheckedRows();
 		console.log('선택된 데이터:', selectedRows);
 		
-		deleteRow(selectedRows);
+		deleteRow(selectedRows, 'sale');
 		
 	}); // 수주 삭제 버튼 이벤트
 	
@@ -261,11 +261,11 @@ $(function() {
 		const selectedRows = grid3.getCheckedRows();
 		console.log('선택된 데이터:', selectedRows);
 		
-		deleteRow(selectedRows);
+		deleteRow(selectedRows, 'buy');
 		
 	}); // 수주 발주 버튼 이벤트
 	
-	function deleteRow(selectedRows) {
+	function deleteRow(selectedRows, type) {
 		if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
 			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
@@ -279,22 +279,24 @@ $(function() {
 		      showCancelButton: true,
 		      confirmButtonText: "확인",   // OK 버튼 텍스트
 		      cancelButtonText: "취소"     // Cancel 버튼 텍스트
-		  }).then((result) => {
-		      if (result.isConfirmed) {  // OK 버튼을 눌렀을 경우
-		          const deleteList = selectedRows.map(row => row.order_id);
-	
-		          axios.post('/api/order/delete', deleteList, {
-		              headers: { 'X-CSRF-TOKEN': csrfToken }
-		          })
-		          .then(function (response) {
-		              Swal.fire(
-		                  'Success',
-		                  '삭제가 완료되었습니다.',
-		                  'success'
-		              ).then(() => {
-		                  window.location.reload();  // 삭제 후 새로고침
-		              });
-		          })
+		}).then((result) => {
+			if (result.isConfirmed) {  // OK 버튼을 눌렀을 경우
+				const deleteList = selectedRows.map(row => row.order_id);
+				// 삭제 요청 데이터 생성
+	            const requestData = {
+					type: type,       // 'buy' 또는 'sale' 문자열
+					orderIds: deleteList  // 삭제할 주문 ID 리스트
+	            };
+
+				axios.post('/api/order/delete', deleteList, {
+					headers: { 'X-CSRF-TOKEN': csrfToken }
+				})
+				.then(function (response) {
+					Swal.fire('Success','삭제가 완료되었습니다.','success')
+					.then(() => {
+						window.location.reload();  // 삭제 후 새로고침
+					});
+				})
 		          .catch(function (error) {
 		              console.error('삭제 중 오류 발생:', error);
 		              Swal.fire(

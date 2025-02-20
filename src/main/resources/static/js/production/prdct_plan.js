@@ -119,7 +119,13 @@ $(function() {
 					options: {
                         listItems: [ { text: '일반', value: '일반' }, { text: '긴급', value: '긴급' }]
                     }
-			    }  
+			    },
+				formatter: (cellData) => {
+			        if (cellData.value === "긴급") {
+			            return '<span class="text-danger">' + cellData.value + '</span>';
+			        }
+			       	return '일반';
+			    }   
 			},
 			{ 
 				header: '생산 시작 예정일', 
