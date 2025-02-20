@@ -58,7 +58,7 @@ $(function() {
 			{header: '상품이름', name: 'PRODUCT_NAME', width: 200},
 			{header: '반제품번호', name: 'MTRPRODUCT_NO'},
 			{header: '자재번호', name: 'MTR_NO'},
-			{header: '자재명', name: 'MTR_NAME'},
+			{header: '자재명', name: 'MTR_NAME', width: 200},
 			{header: '단위', name: 'UNIT_NAME'},
 			{header: '소요량', name: 'TOTAL_QUANTITY' },
 		],
@@ -222,7 +222,11 @@ $(function() {
 			});
 
 		});
-
+		
+		modal.on('hidden.bs.modal', function () {
+		    selectedClientRow = null;
+		});
+		
 		// 모달창 표시
 		modal.modal('show');
 		
@@ -233,7 +237,7 @@ $(function() {
 			    $('#client_no').val(selectedClientRow.client_no);
 			    modal.modal('hide');
 			} else {
-			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
+			    Swal.fire('', '선택된 항목이 없습니다.', 'warning');
 			}
 		});
 		
@@ -284,20 +288,31 @@ $(function() {
 			});
 
 		});
-
+		
+		modal.on('hidden.bs.modal', function () {
+		    selectedMtrRow = null;
+		});
+		
 		// 모달창 표시
 		modal.modal('show');
 		
 		// "확인" 버튼 클릭 이벤트 핸들러 추가
 		$('#mtrModalConfirm').off('click').on('click', function () {
-			if (selectedMtrRow) {
-				grid.setValue(rowKey, 'mtr_no', selectedMtrRow.mtr_no); 
-		        grid.setValue(rowKey, 'mtr_name', selectedMtrRow.mtr_name); 
-				modal.modal('hide');
-			} else {
-			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
-				
-			}
+			if (!selectedMtrRow) {
+		        Swal.fire('', '선택된 항목이 없습니다.', 'warning');
+		        return;
+		    }
+			grid.refreshLayout();
+			const gridData = [...grid.getData(), ...grid.getModifiedRows().createdRows];
+
+			const isDuplicate = gridData.some(row => row.mtr_no === selectedMtrRow.mtr_no);
+			if (isDuplicate) {
+		        Swal.fire('', '이미 추가된 항목입니다.', 'warning');
+		        return;
+		    }
+			grid.setValue(rowKey, 'mtr_no', selectedMtrRow.mtr_no); 
+	        grid.setValue(rowKey, 'mtr_name', selectedMtrRow.mtr_name); 
+			modal.modal('hide');
 		});
 	
 	} // 자재 선택 모달창
@@ -376,13 +391,14 @@ $(function() {
 				    console.error('Error fetching data:', error);
 				});
 			} else {
-			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
+			    Swal.fire('', '선택된 항목이 없습니다.', 'warning');
 			}
 		});
 			
 	}); // 상품 조회 모달창
 	
 	// =================================================================================================
+	// 자재 일괄 추가 버튼
 	$('#appendMtr')	.on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
@@ -390,10 +406,13 @@ $(function() {
 		console.log("✅ 가져온 데이터:", mtrList);
 		
 		if (mtrList.length < 2) {
+			Swal.fire('', '상품을 먼저 조회해 주세요.', 'warning');
 			return;
 	 	}
 		// 현재 grid의 최대 buy_no 찾기
-		const gridData = grid.getData();
+		grid.refreshLayout();
+		const gridData = [...grid.getData(), ...grid.getModifiedRows().createdRows];
+
 		const maxNo = gridData.reduce((max, row) => {
 		    const buy_no = parseInt(row.buy_no, 10);
 		    return !isNaN(buy_no) && buy_no > max ? buy_no : max;
@@ -402,21 +421,22 @@ $(function() {
 		// mtrList의 데이터 수 -1 만큼 추가
 	   for (let i = 1; i < mtrList.length; i++) {
 	       const mtr = mtrList[i]; // 현재 순회 중인 행 데이터
-
+		   const isDuplicate = gridData.some(row => row.mtr_no === mtr.MTR_NO);
 	       // 새로운 행 데이터 생성
-	       const newRow = {
-	           buy_no: maxNo + i, // 연속적인 번호 부여
-	           mtr_no: mtr.MTR_NO, // grid2에서 가져온 mtr_no 값
-	           mtr_name: mtr.MTR_NAME, // grid2에서 가져온 mtr_name 값
-	           buy_unit: mtr.unit_name, 
-	           buy_vol: '', 
-	           buy_status: '정상', 
-	       };
-
-	       // grid에 새 행 추가
-	       grid.appendRow(newRow, {
-	           focus: true // 추가된 행에 포커스
-	       });
+		   if (!isDuplicate) {
+	           const newRow = {
+	               buy_no: maxNo + i, // 연속적인 번호 부여
+	               mtr_no: mtr.MTR_NO, // grid2에서 가져온 mtr_no 값
+	               mtr_name: mtr.MTR_NAME, // grid2에서 가져온 mtr_name 값
+	               buy_unit: mtr.UNIT_NAME, 
+	               buy_vol: '', 
+	               buy_status: '정상', 
+	           };
+		       grid.appendRow(newRow, {
+		           focus: true // 추가된 행에 포커스
+		       });
+			   
+			}
 	   }
 		
 	});

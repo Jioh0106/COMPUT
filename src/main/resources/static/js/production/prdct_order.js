@@ -1,13 +1,23 @@
 // 팝업창 가운데 위치(듀얼모니터 포함)
-function openView(type) {
+function openSaleView() {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
-	var url = type === 'sale' ? 'reg-sale' : type === 'buy' ? 'reg-buy' : '';
+	var url = 'reg-sale';
 	var popupW = 1200;
-	var popupH = 650;
+	var popupH = 600;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);
-	window.open(url, 'popup', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+	window.open(url, 'sale-view', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+}
+function openBuyView() {
+	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
+	var url = 'reg-buy';
+	var popupW = 1200;
+	var popupH = 800;
+	var left = (document.body.clientWidth / 2) - (popupW / 2);
+	left += window.screenLeft;	 //듀얼 모니터
+	var top = (screen.availHeight / 2) - (popupH / 2);
+	window.open(url, 'buy-view', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
 // =========================================================================
 
@@ -145,6 +155,8 @@ $(function() {
 	const grid2 = new tui.Grid({
 		el: document.getElementById('grid2'),
 		data: [], // 서버에서 전달받은 데이터
+		height: 300,
+		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '수주번호', name: 'sale_no', width: 60},
@@ -159,7 +171,8 @@ $(function() {
 			{header: '직원번호', name: 'order_emp', width: 100},
 			{header: '등록직원', name: 'emp_name', width: 100},
 			{header: '등록일자', name: 'order_date', width: 120},
-			{header: '상태', name: 'sale_status', width: 80}
+			{header: '주문상태', name: 'sale_status', width: 100},
+			{header: '계획상태', name: 'plan_status', width: 100}
 		]
 	});
 	
@@ -167,6 +180,8 @@ $(function() {
 	const grid3 = new tui.Grid({
 		el: document.getElementById('grid3'),
 		data: [], // 서버에서 전달받은 데이터
+		height: 300,
+		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '발주번호', name: 'buy_no', width: 80},
@@ -180,7 +195,8 @@ $(function() {
 			{header: '직원번호', name: 'order_emp', width: 100},
 			{header: '등록직원', name: 'emp_name', width: 100},
 			{header: '등록일자', name: 'order_date', width: 120},
-			{header: '상태', name: 'buy_status', width: 80}
+			{header: '주문상태', name: 'buy_status', width: 100},
+			{header: '입고상태', name: 'inbound_status', width: 100}
 		]
 	});
 	

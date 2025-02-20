@@ -51,6 +51,9 @@ public class PlanService {
 			
 			for(Map<String, Object> map : bomList) {
 				int sum = mapper.sumProcessTime((String) map.get("PROCESS_NAME"));
+				if(map.containsKey("PROCESS_COUNT")) {
+					sum *= Integer.parseInt(map.get("PROCESS_COUNT").toString());
+				} 
 				time_sum += sum;
 			}
 			
@@ -64,6 +67,7 @@ public class PlanService {
 	public boolean checkMtr(int product_no, int sale_vol) {
 		// 최종 반환할 값(재고 있음/없음)
 		boolean isMtr = true;
+		
 		// 현재 재고 
 		List<Map<String, Object>> inventory = mapper.getInventorty();
 		

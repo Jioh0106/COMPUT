@@ -35,11 +35,7 @@ $(function() {
 	        })
 	        .catch(function (error) {
 	            console.error('Error fetching data:', error);
-				Swal.fire(
-				        'Error',
-				        '데이터를 가져오는 중 문제가 발생했습니다.',
-				        'error'
-				      )
+				Swal.fire('Error', '데이터를 가져오는 중 문제가 발생했습니다.', 'error' )
 	            return []; // 에러 발생 시 빈 배열 반환
 	        });
 	}
@@ -88,10 +84,7 @@ $(function() {
 					editor: {
 						type: 'select',
 						options: {
-	                        listItems: [
-	                            { text: '정상', value: '정상' },
-	                            { text: '취소', value: '취소' }
-	                        ]
+	                        listItems: [{ text: '정상', value: '정상' }, { text: '취소', value: '취소' }]
 	                    }
 				    }
 				}
@@ -113,6 +106,8 @@ $(function() {
 	        }
 	        
 	    });
+		
+		
 		
 	});
 
@@ -136,10 +131,10 @@ $(function() {
 			sale_no: maxNo +1,
 			product_no: '',
 			product_name: '',
-			sale_unit: '', 
+			sale_unit: 'EA', 
 			sale_vol: '', 
 			sale_deadline: '', 
-			sale_status: '', 
+			sale_status: '정상', 
 		};
 		
 		// 새 행을 TOAST UI Grid에 추가
@@ -180,9 +175,7 @@ $(function() {
 						width: 100, 					
 						filter: {
 					        type: 'date',
-					        options: {
-					            format: 'yyyy-MM-dd'
-					        }
+					        options: { format: 'yyyy-MM-dd', language: 'ko' }
 					    }
  					},
 		            { header: '주소', name: 'client_adrress', width: 300}
@@ -193,8 +186,6 @@ $(function() {
 		    modalGrid1.on('click', function (ev) {
 		        if (typeof ev.rowKey !== 'undefined') {
 		            selectedClientRow = modalGrid1.getRow(ev.rowKey);
-		            // 선택 효과를 주기 위해 선택된 행을 표시 (선택 효과가 필요한 경우)
-		            modalGrid1.setSelection([ev.rowKey]);
 		        }
 		    });
 		}
@@ -217,7 +208,9 @@ $(function() {
 			});
 
 		});
-
+		modal.on('hidden.bs.modal', function () {
+		    selectedClientRow = null;
+		});
 		// 모달창 표시
 		modal.modal('show');
 		
@@ -257,7 +250,6 @@ $(function() {
 		    modalGrid2.on('click', function (ev) {
 		        if (typeof ev.rowKey !== 'undefined') {
 		            selectedPrdctRow = modalGrid2.getRow(ev.rowKey);
-		            modalGrid2.setSelection([ev.rowKey]);
 		        }
 		    });
 		}	
@@ -276,7 +268,11 @@ $(function() {
 			});
 
 		});
-
+		
+		modal.on('hidden.bs.modal', function () {
+		    selectedClientRow = null;
+		});
+		
 		// 모달창 표시
 		modal.modal('show');
 		
@@ -329,10 +325,7 @@ $(function() {
 		// 빈 필드가 있는 행이 존재하면 알림 표시 후 중단
 		if (invalidRows.length > 0) {
 			console.log('유효하지 않은 행:', invalidRows);
-		    Swal.fire({
-		        icon: 'error',
-		        title: '모든 항목을 입력하세요.',
-		    });
+		    Swal.fire({icon: 'error',  title: '모든 항목을 입력하세요.'});
 		    return; // 저장 중단
 		}
 		
