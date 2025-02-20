@@ -63,6 +63,7 @@ dependencies {
 	
 	implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
 	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	implementation 'org.apache.poi:poi:5.2.3'
 	
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	

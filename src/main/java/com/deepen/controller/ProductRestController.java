@@ -1,18 +1,30 @@
 package com.deepen.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.deepen.domain.BomDTO;
 import com.deepen.domain.CommonDetailDTO;
@@ -136,6 +148,73 @@ public class ProductRestController {
 		List<CommonDetailDTO> unitList = pdService.selectUnit();
 		return unitList;
 	}
+	
+	
+	//업로드된 엑셀파일을 다운받아서 saveExcel을 실행하는 메서드
+	@CrossOrigin(origins = "*")
+	@PostMapping("/upload")
+	public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file ){
+		try {
+			int insertCount = pdService.saveExcel(file);
+			return ResponseEntity.ok(insertCount +"개 성공");
+			
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("오류발생" + e.getMessage());
+		 
+		}
+	}
+		
+	
+	//상품등록 엑셀 양식 다운로드
+	@GetMapping("/excel/download")
+	public ResponseEntity<byte[]> excelDownload() throws IOException{
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("첫번째 시트"); //첫번째시트
+		
+		Row headerRow1 = sheet.createRow(0); //첫번째 행
+		headerRow1.createCell(0).setCellValue("상품명");
+		headerRow1.createCell(1).setCellValue("상품단위(N/kg/ml/L/M/cm/EA/%/box/bundle)");
+		headerRow1.createCell(2).setCellValue("상품유형(완제품 또는 반제품으로 입력)");
+		
+		Row headerRow2 = sheet.createRow(1); //두번째 행
+		headerRow2.createCell(0).setCellValue("product_name");
+		headerRow2.createCell(1).setCellValue("product_unit");
+		headerRow2.createCell(2).setCellValue("product_type");
+		
+		sheet.autoSizeColumn(0); //상품명 열
+		sheet.autoSizeColumn(1); // 상품단위 열
+		sheet.autoSizeColumn(2); //상품유형 열
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		workbook.write(outputStream);
+		workbook.close();
+		
+		// ByteArrayOutputStream을 byte 배열로 변환
+        byte[] excelBytes = outputStream.toByteArray();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.attachment()
+				.filename("상품등록_엑셀_양식.xlsx", StandardCharsets.UTF_8)
+				.build()
+			);
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		
+		return ResponseEntity.ok()
+				.headers(headers)
+				.body(excelBytes);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
