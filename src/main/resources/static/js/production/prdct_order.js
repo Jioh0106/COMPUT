@@ -195,7 +195,7 @@ $(function() {
 			
 			if(rowData.order_type === '수주') {
 				// 수주 모달창 열기	
-				$('#order-sale').modal('show');
+				$('#order-sale').modal('show').on('shown.bs.modal',()=> grid2.refreshLayout());
 		    
 				axios.get('/api/order/detail/sale', {
 					params: {
@@ -217,7 +217,7 @@ $(function() {
 			} // 수주 조건문	
 			
 			// 발주 모달창 열기	
-			$('#order-buy').modal('show');
+			$('#order-buy').modal('show').on('shown.bs.modal',()=> grid3.refreshLayout());
 	    
 			axios.get('/api/order/detail/buy', {
 				params: {

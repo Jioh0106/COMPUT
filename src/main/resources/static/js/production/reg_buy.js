@@ -205,7 +205,7 @@ $(function() {
 		}
 
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/client', {
 				params: {
 					type: '발주',
@@ -272,7 +272,7 @@ $(function() {
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/mtr')
 			.then(function (response) {
 				const data = response.data; // 데이터 로드
@@ -334,7 +334,7 @@ $(function() {
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/prdct')
 			.then(function (response) {
 				const data = response.data; // 데이터 로드
