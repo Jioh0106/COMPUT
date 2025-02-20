@@ -171,6 +171,7 @@ public class WorkInstructionService {
 		
 		// 작업 시작 정보 update
 		for(Map<String, Object> updateData : updateDataList) {
+			// 작업 지시 정보 및 상태 업데이트
 			wiMapper.updateWorkStartInfo(updateData);
 			
 			// 작업 계획 상태 업데이트
