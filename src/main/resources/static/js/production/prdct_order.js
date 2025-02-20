@@ -2,7 +2,7 @@
 function openView(type) {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
 	var url = type === 'sale' ? 'reg-sale' : type === 'buy' ? 'reg-buy' : '';
-	var popupW = 1000;
+	var popupW = 1200;
 	var popupH = 650;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
@@ -195,7 +195,7 @@ $(function() {
 			
 			if(rowData.order_type === '수주') {
 				// 수주 모달창 열기	
-				$('#order-sale').modal('show');
+				$('#order-sale').modal('show').on('shown.bs.modal',()=> grid2.refreshLayout());
 		    
 				axios.get('/api/order/detail/sale', {
 					params: {
@@ -217,7 +217,7 @@ $(function() {
 			} // 수주 조건문	
 			
 			// 발주 모달창 열기	
-			$('#order-buy').modal('show');
+			$('#order-buy').modal('show').on('shown.bs.modal',()=> grid3.refreshLayout());
 	    
 			axios.get('/api/order/detail/buy', {
 				params: {

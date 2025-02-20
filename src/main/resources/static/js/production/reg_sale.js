@@ -71,12 +71,7 @@ $(function() {
 						options: {listItems: data.unitCommon }
 					}
 				},
-				{
-					header: '주문량', 
-					width: 100,
-					name: 'sale_vol', 
-					editor: 'text'
-				},
+				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text'},
 				{
 					header: '납품기한', 
 					name: 'sale_deadline',

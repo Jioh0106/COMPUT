@@ -52,8 +52,6 @@ $(function() {
 	// 상품별 자재 소요량 조회 그리드
 	const grid2 = new tui.Grid({
 		el: document.getElementById('grid2'),
-		height: 200,
-		bodyHeight: 180,
 		columns: [
 			{header: 'BOM번호', name: 'BOM_NO'},
 			{header: '상품번호', name: 'PRODUCT_NO'},
@@ -70,7 +68,7 @@ $(function() {
 	
 		
 	// 발주 등록 그리드
-	let grid;
+	let grid; 
 	
 	mainFetchData().then(function (data) {  
 		grid = new tui.Grid({
@@ -87,26 +85,17 @@ $(function() {
 					name: 'buy_unit',
 					editor : {
 						type: 'select',
-						options: {
-							listItems: data.unitCommon
-		                }
+						options: {listItems: data.unitCommon}
 					}
 				},
-				{
-					header: '주문량', 
-					name: 'buy_vol', 
-					editor: 'text'
-				},
+				{ header: '주문량', name: 'buy_vol', editor: 'text'},
 				{
 					header: '발주 상태', 
 					name: 'buy_status',
 					editor: {
 						type: 'select',
 						options: {
-	                        listItems: [
-	                            { text: '정상', value: '정상' },
-	                            { text: '취소', value: '취소' }
-	                        ]
+	                        listItems: [ { text: '정상', value: '정상' }, { text: '취소', value: '취소' }]
 	                    }
 				    }
 				}
@@ -216,7 +205,7 @@ $(function() {
 		}
 
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/client', {
 				params: {
 					type: '발주',
@@ -283,7 +272,7 @@ $(function() {
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/mtr')
 			.then(function (response) {
 				const data = response.data; // 데이터 로드
@@ -345,7 +334,7 @@ $(function() {
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/prdct')
 			.then(function (response) {
 				const data = response.data; // 데이터 로드
@@ -394,6 +383,9 @@ $(function() {
 	// =================================================================================================
 	$('#appendMtr')	.on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
+		
+		const mtrList = grid2.getData()
+		console.log("✅ 가져온 데이터:", mtrList);
 	});
 	// =================================================================================================
 
