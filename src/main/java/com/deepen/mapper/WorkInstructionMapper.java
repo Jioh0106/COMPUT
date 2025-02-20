@@ -81,6 +81,11 @@ public interface WorkInstructionMapper {
 
 	void updateLotProcessLogStatusByWiNoToComplete(int wiNo);
 	
+	// 품질 검사 버튼 동작 시 작업 지시 상태 update
+	void updateWiStatusByWiNoToInspectionPending(int wiNo);
+	
+	void updateLotMasterStatusByWiNoToInspectionPending(@Param("wiNo") int wiNo, @Param("sessionEmpId") String sessionEmpId);
+
 	// 작업 완료 시 상태 작업 지시 상태 update
 	void updateWiStatusByWiNoToEnd(int wiNo);
 	

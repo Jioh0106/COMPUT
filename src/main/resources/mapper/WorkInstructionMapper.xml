@@ -211,6 +211,7 @@
 		    wi.wi_status AS "wi_status",
 		    cdw.common_detail_name AS "wi_status_name",
 		    wi.qc_status AS "qc_status",
+		    cdqc.common_detail_name AS "qc_status_name",
 		    TO_CHAR(wi.wi_start_date, 'YYYY-MM-DD') AS "start_date",
 		    TO_CHAR(wi.wi_end_date, 'YYYY-MM-DD') AS "end_date",
 		    wi.emp_id AS "emp_id",
@@ -235,6 +236,10 @@
 		    ON cdw.common_detail_code LIKE 'PRGR%'
 		    AND cdw.common_detail_code = wi.wi_status
 		    AND cdw.common_detail_status = 'Y'
+		LEFT JOIN common_detail cdqc
+		    ON cdqc.common_detail_code LIKE 'LTST%'
+		    AND cdqc.common_detail_code = wi.qc_status
+		    AND cdqc.common_detail_status = 'Y'
 		LEFT JOIN employees e
 			ON wi.emp_id = e.emp_id
 		WHERE o.order_type = '수주'
@@ -455,6 +460,20 @@
 	<update id="updateLotProcessLogStatusByWiNoToComplete">
 		UPDATE lot_process_log SET 
 			action_type = 'PRGR003' 
+		WHERE wi_no = #{wiNo}
+	</update>
+	
+	<update id="updateWiStatusByWiNoToInspectionPending">
+		UPDATE work_instruction SET 
+			qc_status = 'LTST003'
+		WHERE wi_no = #{wiNo}
+	</update>
+	
+	<update id="updateLotMasterStatusByWiNoToInspectionPending">
+		UPDATE lot_master SET 
+			lot_status = 'LTST003',
+			update_user = #{sessionEmpId},
+			update_time = sysdate 
 		WHERE wi_no = #{wiNo}
 	</update>
 	

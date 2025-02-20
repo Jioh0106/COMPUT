@@ -331,6 +331,21 @@ public class WorkInstructionService {
 	}
 	
 	/**
+	 * 품질 검사 버튼 로직
+	 */
+	public void checkDefect(List<Map<String, Object>> updateDataList, String sessionEmpId) {
+		log.info("품질 검사 시작 버튼 동작");
+		for(Map<String, Object> updateData :updateDataList ) {
+			int wiNo = (int)updateData.get("wi_no");
+			log.info("update기준 작업지시 번호 : "+ wiNo);
+			wiMapper.updateWiStatusByWiNoToInspectionPending(wiNo);
+			wiMapper.updateLotMasterStatusByWiNoToInspectionPending(wiNo,sessionEmpId);
+			log.info("품질 검사 상태 업데이트 완료!");
+		}
+	}
+
+	
+	/**
 	 * 공정 완료 로직
 	 * @param List<Map<String, Object>> updateDataList,sessionEmpId
 	 */

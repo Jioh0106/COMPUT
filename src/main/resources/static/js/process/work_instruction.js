@@ -644,7 +644,39 @@ document.getElementById('processFinishBtn').addEventListener('click', async () =
 	
 });
 
-// 공정완료 버튼 동작
+// 품질검사 버튼 동작
+document.getElementById('defectCheckBtn').addEventListener('click', async () =>{
+	try{
+		console.log("품질 검사 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("품질 검사 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("품질 검사할 항목을 선택해주세요");
+      		alert("품질 검사할 항목을 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/check-defect",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		
+	}catch(error){
+		console.log("error",error);
+	}
+});
+
+
+// 작업 종료 버튼 동작
 document.getElementById('workEndBtn').addEventListener('click', async () => {
 	try{
 		const selectRows = workInstructionGrid.getCheckedRows();
