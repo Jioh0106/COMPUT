@@ -483,6 +483,12 @@
 			wi_end_date = sysdate
 		WHERE wi_no = #{wiNo}
 	</update>
+	
+	<select id="countOutboundItemsByWiNo()">
+		SELECT count(wi_no)
+		FROM OUTBOUND
+		WHERE wi_no = #{wiNo}
+	</select>
 </mapper>
 
 

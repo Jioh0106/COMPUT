@@ -50,7 +50,7 @@ public interface WorkInstructionMapper {
 	//품목번호에 해당하는 자재 조회
 	List<Map<String, Object>> selectMaterialsByProductNo(String productNo);
 	
-	// 필요 자제 창고 테이블에 insert
+	// 필요 자재 창고 테이블에 insert
 	void insertMaterialInWareHouse(Map<String, Object> insertData);
 	
 	// 작업시작 정보 update
@@ -89,6 +89,7 @@ public interface WorkInstructionMapper {
 	// 작업 완료 시 상태 작업 지시 상태 update
 	void updateWiStatusByWiNoToEnd(int wiNo);
 	
-	
+	// 작업 지시 번호(wi_no)를 가진 출고 대기 항목의 개수
+	int countOutboundItemsByWiNo(int wiNo);
 	
 }
