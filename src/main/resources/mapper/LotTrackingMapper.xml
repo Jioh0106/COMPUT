@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deepen.mapper.LotTrackingMapper">
+    
+    <!-- LOT 마스터 정보 조회 (작업지시별) -->
+    <select id="selectLotByWorkOrder" resultType="com.deepen.domain.LotMasterDTO">
+        SELECT 
+            lm.lot_no,
+            lm.process_type,
+            lm.wi_no,
+            p.product_no,
+            p.product_name,
+            pi.process_no,
+            pi.process_name,
+            li.line_no,
+            li.line_name,
+            lm.lot_status,
+            lm.start_time,
+            lm.end_time,
+            lm.create_user,
+            lm.create_time
+        FROM lot_master lm
+        INNER JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+        INNER JOIN product p ON wi.product_no = p.product_no
+        INNER JOIN process_info pi ON lm.process_no = pi.process_no
+        LEFT JOIN line_info li ON lm.line_no = li.line_no
+        WHERE lm.wi_no = #{wiNo}
+        ORDER BY lm.start_time DESC
+    </select>
+    
+    <!-- LOT 마스터 정보 조회 (제품별) -->
+	<select id="selectLotByProduct" resultType="com.deepen.domain.LotMasterDTO">
+	    SELECT DISTINCT
+	        l.lot_no as lotNo,
+	        l.parent_lot_no as parentLotNo,
+	        l.process_type as processType,
+	        l.wi_no as wiNo,
+	        p.product_no as productNo,
+	        p.product_name as productName,
+	        pi.process_no as processNo,
+	        pi.process_name as processName,
+	        li.line_no as lineNo,
+	        li.line_name as lineName,
+	        l.lot_status as lotStatus,
+	        l.start_time as startTime,
+	        l.end_time as endTime,
+	        l.create_user as createUser
+	    FROM product p
+	    LEFT JOIN work_instruction wi ON p.product_no = wi.product_no
+	    LEFT JOIN lot_master l ON wi.wi_no = l.wi_no
+	    LEFT JOIN process_info pi ON l.process_no = pi.process_no
+	    LEFT JOIN line_info li ON l.line_no = li.line_no
+	    WHERE (#{productNo} = 0 OR p.product_no = #{productNo})
+	    AND l.lot_no IS NOT NULL
+	    ORDER BY l.start_time DESC
+	</select>
+    
+    <!-- LOT 공정 이력 조회 -->
+    <select id="selectLotProcessHistory" resultType="com.deepen.domain.LotProcessDTO">
+	    SELECT 
+	        lpl.process_log_no as processLogNo,
+	        lpl.lot_no as lotNo,
+	        lpl.wi_no as wiNo,
+	        pi.process_no as processNo,
+	        pi.process_name as processName,
+	        li.line_no as lineNo,
+	        li.line_name as lineName,
+	        lpl.action_type as actionType,
+	        lpl.input_qty as inputQty,
+	        lpl.output_qty as outputQty,
+	        lpl.create_user as createUser,
+	        lpl.create_time as createTime
+	    FROM lot_process_log lpl
+	    INNER JOIN process_info pi ON lpl.process_no = pi.process_no
+	    LEFT JOIN line_info li ON lpl.line_no = li.line_no
+	    WHERE lpl.lot_no = #{lotNo}
+	    ORDER BY lpl.process_log_no DESC
+	</select>
+    
+    <!-- LOT 품질검사 이력 조회 -->
+    <select id="selectLotQcHistory" resultType="com.deepen.domain.LotQcDTO">
+	    SELECT 
+	        lql.qc_log_no as qcLogNo,
+	        lql.lot_no as lotNo,
+	        pi.process_no as processNo,
+	        pi.process_name as processName,
+	        qm.qc_code as qcCode,
+	        qm.qc_name as qcName,
+	        lql.measure_value as measureValue,
+	        lql.judgement as judgement,
+	        lql.inspector as inspector,
+	        lql.check_time as checkTime,
+	        lql.create_user as createUser,
+	        lql.create_time as createTime
+	    FROM lot_qc_log lql
+	    INNER JOIN process_info pi ON lql.process_no = pi.process_no
+	    INNER JOIN qc_master qm ON lql.qc_code = qm.qc_code
+	    WHERE lql.lot_no = #{lotNo}
+	    ORDER BY lql.qc_log_no DESC
+	</select>
+    
+	<!-- LOT 계층 구조 조회 수정 -->
+<!-- LOT 계층 구조 조회 수정 -->
+<select id="selectLotDetail">
+    WITH LOT_HIERARCHY AS (
+        SELECT 
+            lm.lot_no,
+            lm.parent_lot_no,
+            lm.process_type,
+            lm.wi_no,
+            p.product_no,
+            p.product_name,
+            lm.process_no,
+            pi.process_name,
+            lm.line_no,
+            li.line_name,
+            lm.lot_status,
+            cd.common_detail_name as status_name,
+            lm.start_time,
+            lm.end_time,
+            lm.create_user,
+            LEVEL as hierarchy_level,
+            CONNECT_BY_ROOT lot_no as root_lot_no,
+            SYS_CONNECT_BY_PATH(lot_no, '/') as lot_path
+        FROM lot_master lm
+        LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+        LEFT JOIN product p ON wi.product_no = p.product_no
+        LEFT JOIN process_info pi ON lm.process_no = pi.process_no
+        LEFT JOIN line_info li ON lm.line_no = li.line_no
+        LEFT JOIN common_detail cd ON lm.lot_status = cd.common_detail_code
+        START WITH lot_no = #{lotNo}
+        CONNECT BY NOCYCLE PRIOR lot_no = parent_lot_no
+        ORDER SIBLINGS BY start_time DESC
+    )
+    SELECT * FROM LOT_HIERARCHY
+    ORDER BY hierarchy_level, lot_path
+</select>
+</mapper>

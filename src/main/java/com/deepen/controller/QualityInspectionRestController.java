@@ -45,7 +45,7 @@ public class QualityInspectionRestController {
         );
     }
     
- // 특정 LOT의 검사 항목 조회
+    // 특정 LOT의 검사 항목 조회
     @GetMapping("/items/{lotNo}")
     public ResponseEntity<List<QcProductMappingDTO>> getInspectionItems(
         @PathVariable(value = "lotNo") String lotNo

@@ -180,7 +180,7 @@ public class QualityInspectionService {
             int sequence = qualityInspectionMapper.getNextLotSequence(currentDate);
             
             // LOT 번호 생성: yyyyMMdd-W작업지시번호-Q품질검사이력번호-순차번호
-            return String.format("%s-W%d-Q%d-%03d", 
+            return String.format("%s-W%d-Q%03d-%d", 
                                currentDate, 
                                wiNo, 
                                qcLogNo, 

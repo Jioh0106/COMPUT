@@ -149,6 +149,11 @@ public class ProductRestController {
 		return unitList;
 	}
 	
+	@GetMapping
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(pdService.getAllProducts());
+    }
+	
 	
 	//업로드된 엑셀파일을 다운받아서 saveExcel을 실행하는 메서드
 	@CrossOrigin(origins = "*")

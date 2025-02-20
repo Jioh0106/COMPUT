@@ -137,6 +137,17 @@
 		AND common_detail_status ='Y' 
 	</select>
 	
+	<select id="selectAllProducts" resultType="com.deepen.domain.ProductDTO">
+        SELECT 
+            product_no as productNo,
+            product_name as productName,
+            product_unit as productUnit,
+            product_type as productType
+        FROM product
+        WHERE product_type != 'DUMMY'
+        ORDER BY product_name
+    </select>
+	
 	
 
 </mapper>

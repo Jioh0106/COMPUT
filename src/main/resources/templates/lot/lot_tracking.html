@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOT 추적</title>
+
+    <!-- CSS 라이브러리 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/themes/default/style.min.css">
+    
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+    
+    <style>
+        body { background-color: #f4f6f9; }
+        .lot-tracking-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        /* LOT 트리 스타일 */
+        .lot-tree-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* LOT 계층 구조 스타일 수정 */
+		.lot-hierarchy-view {
+		    min-height: 300px;
+		    max-height: 600px;
+		    overflow: auto;
+		    padding: 20px;
+		    background: #fff;
+		    border-radius: 8px;
+		    border: 1px solid #ddd;
+		}
+		
+		.hierarchy-level {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    margin: 20px 0;
+		    position: relative;
+		}
+		
+		.children-wrapper {
+		    display: flex;
+		    gap: 40px;
+		    margin-top: 30px;
+		    position: relative;
+		    justify-content: center;
+		}
+		
+		/* 계층 연결선 스타일 */
+		.children-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.children-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 20%;
+    width: 60%;
+    height: 2px;
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.hierarchy-level:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+		
+		/* LOT 카드 스타일 개선 */
+		.lot-card {
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    min-width: 280px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: 0 10px;
+}
+
+.lot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lot-card-header {
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #1a1a1a;
+}
+
+.lot-card-body {
+    font-size: 0.95em;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+/* 계층도 여백 조정 */
+.hierarchy-level {
+    margin: 30px 0;
+}
+
+.children-wrapper {
+    margin-top: 40px;
+    gap: 50px;
+}
+		
+		/* 공정 타입별 스타일 수정 */
+		.process-assembly {
+    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
+    border-color: #1e88e5;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+}
+
+.process-machining {
+    background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%);
+    border-color: #43a047;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
+}
+
+.process-heat {
+    background: linear-gradient(135deg, #ffe0b2 0%, #fff3e0 100%);
+    border-color: #f57c00;
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.1);
+}
+
+.process-qc {
+    background: linear-gradient(135deg, #e1bee7 0%, #f3e5f5 100%);
+    border-color: #8e24aa;
+    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.1);
+}
+
+.process-in {
+    background: linear-gradient(135deg, #d7ccc8 0%, #efebe9 100%);
+    border-color: #5d4037;
+    box-shadow: 0 2px 4px rgba(121, 85, 72, 0.1);
+}
+
+.process-out {
+    background: linear-gradient(135deg, #ffccbc 0%, #fbe9e7 100%);
+    border-color: #e64a19;
+    box-shadow: 0 2px 4px rgba(255, 87, 34, 0.1);
+}
+		
+		/* 방향 전환 버튼 스타일 */
+		#directionToggleBtn {
+		    position: relative;
+		    padding-left: 2.5rem;
+		}
+		
+		#directionToggleBtn::before {
+		    content: '↕️';
+		    position: absolute;
+		    left: 1rem;
+		    top: 50%;
+		    transform: translateY(-50%);
+		}
+        /* 상태 뱃지 스타일 */
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .status-created { background-color: #e9ecef; color: #6c757d; }
+        .status-progress { background-color: #d1ecf1; color: #0c5460; }
+        .status-complete { background-color: #d4edda; color: #155724; }
+        
+        /* 그리드 스타일 조정 */
+        .tui-grid-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <div class="page-heading">
+                <h3>LOT 추적</h3>
+            </div>
+            
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- 검색 영역 -->
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <div class="input-group">
+                                                <input type="text" id="lotSearchInput" class="form-control" placeholder="LOT 번호 또는 제품명 검색">
+                                                <select id="productSelect" class="form-select" style="max-width: 200px;">
+                                                    <option value="0">전체 제품</option>
+                                                </select>
+                                                <button id="searchButton" class="btn btn-primary">
+                                                    <i class="bi bi-search"></i> 검색
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- LOT 트리 및 계층 구조 영역 -->
+                                    <div class="row">
+                                        <!-- 좌측 트리 뷰 -->
+                                        <div class="col-3">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">LOT 목록</h6>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div id="lotTreeView" class="lot-tree-container"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 우측 상세 정보 -->
+                                        <div class="col-9">
+                                            <div class="card mb-4">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">LOT 계층 구조</h6>
+                                                    <button id="directionToggleBtn" class="btn btn-sm btn-outline-primary">
+                                                        정방향
+                                                    </button>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="lotHierarchyView" class="lot-hierarchy-view"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- LOT 상세 정보 -->
+                                            <div class="card mb-4">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">LOT 상세 정보</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="lotDetailsContent">
+                                                        LOT를 선택해주세요.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 공정 이력 -->
+                                            <div class="card mb-4">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">공정 이력</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="processHistoryGrid"></div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 품질 검사 이력 -->
+                                            <div class="card mb-4">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">품질 검사 이력</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="qcHistoryGrid"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 라이브러리 -->
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/jstree.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script th:src="@{/js/lot/lot_tracking.js}"></script>
+</body>
+</html>
