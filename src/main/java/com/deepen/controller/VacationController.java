@@ -130,7 +130,6 @@ public class VacationController {
 	@PostMapping("/vctnDays")
 	@ResponseBody
 	public int vctnDays(@RequestBody Map<String, Object> vctnType) {
-		System.out.println(vctnType.toString());
 		return service.workDays(vctnType);
 	}
 
@@ -180,8 +179,6 @@ public class VacationController {
 		} else {
 			searchVcntList = service.selectVctnDaysList(searchMap);
 		}
-
-		System.out.println(searchMap.toString());
 
 		return searchVcntList;
 	}
