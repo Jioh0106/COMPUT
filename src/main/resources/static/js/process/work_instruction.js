@@ -469,7 +469,7 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	
 	insertOB('/api/insert-material-warehouse',insertMaterialData);
 	
-	alert("자재 투입 완료");
+	alert("자재 투입 요청 완료");
 });
 
 async function insertOB(url,data){
@@ -565,7 +565,6 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
            	return;
        	}
    	}
-	
 	console.log('라인 선택완료!');
 	
 	for (let row of checkedWiGrid) {
@@ -578,7 +577,6 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
            	return;
        	}
    	}
-	
 	console.log('담당자 선택완료!');
 	
    	// 각 작업지시 데이터에 firstWiNo 추가
@@ -617,7 +615,6 @@ async function workStartBtn(url,data){
 // 공정완료 버튼 동작
 document.getElementById('processFinishBtn').addEventListener('click', async () => {
 	try{
-		console.log("공정 완료 버튼");
 		const selectRows = workInstructionGrid.getCheckedRows();
 		console.log("공정완료 동작을 위한 로우 정보",selectRows);
 		
@@ -647,10 +644,41 @@ document.getElementById('processFinishBtn').addEventListener('click', async () =
 	
 });
 
-// 공정완료 버튼 동작
+// 품질검사 버튼 동작
+document.getElementById('defectCheckBtn').addEventListener('click', async () =>{
+	try{
+		console.log("품질 검사 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("품질 검사 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("품질 검사할 항목을 선택해주세요");
+      		alert("품질 검사할 항목을 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/check-defect",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+		
+	}catch(error){
+		console.log("error",error);
+	}
+});
+
+
+// 작업 종료 버튼 동작
 document.getElementById('workEndBtn').addEventListener('click', async () => {
 	try{
-		console.log("작업 종료 버튼");
 		const selectRows = workInstructionGrid.getCheckedRows();
 		console.log("작업종료 동작을 위한 로우 정보",selectRows);
 		

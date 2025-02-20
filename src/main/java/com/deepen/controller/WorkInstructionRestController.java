@@ -127,6 +127,20 @@ public class WorkInstructionRestController {
 		
 	}
 	
+	@PostMapping("/check-defect")
+	public void checkDefect(@RequestBody List<Map<String, Object>> updateDataList,
+							HttpServletRequest request) {
+		log.info("품질 검사 버튼 동작 준비");
+		
+		HttpSession session = request.getSession();
+		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
+		String sessionEmpId = (String) empInfo.get("EMP_ID");
+		
+		wiService.checkDefect(updateDataList,sessionEmpId);
+		
+	}
+
+	
 	@PostMapping("/end-work-instruction")
 	public void endWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
 								HttpServletRequest request) {
