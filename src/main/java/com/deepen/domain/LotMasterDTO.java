@@ -21,6 +21,7 @@ public class LotMasterDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String createUser;
+    private String statusName;
     
     private List<LotProcessDTO> processHistory;
     private List<LotQcDTO> qcHistory;

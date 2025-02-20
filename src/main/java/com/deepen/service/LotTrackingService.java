@@ -1,6 +1,7 @@
 package com.deepen.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -51,26 +52,39 @@ public class LotTrackingService {
     }
     
     public LotMasterDTO getLotTrackingDetail(String lotNo) {
-        log.info("Getting LOT detail for lotNo: {}", lotNo);
-        
         List<LotMasterDTO> lotHierarchy = lotTrackingMapper.selectLotDetail(lotNo);
         if (lotHierarchy.isEmpty()) {
-            log.warn("No LOT found for lotNo: {}", lotNo);
             return null;
         }
         
-        LotMasterDTO mainLot = lotHierarchy.get(0);
+        // 계층 구조 구성
+        Map<String, LotMasterDTO> lotMap = new HashMap<>();
+        LotMasterDTO rootLot = null;
         
-        // 공정 이력 조회
-        List<LotProcessDTO> processHistory = lotTrackingMapper.selectLotProcessHistory(lotNo);
-        mainLot.setProcessHistory(processHistory);
-        log.info("Found {} process history records", processHistory.size());
+        // 먼저 모든 LOT를 Map에 저장
+        for (LotMasterDTO lot : lotHierarchy) {
+            lotMap.put(lot.getLotNo(), lot);
+            if (lot.getLotNo().equals(lot.getParentLotNo())) {
+                rootLot = lot;
+            }
+        }
         
-        // 품질검사 이력 조회
-        List<LotQcDTO> qcHistory = lotTrackingMapper.selectLotQcHistory(lotNo);
-        mainLot.setQcHistory(qcHistory);
-        log.info("Found {} QC history records", qcHistory.size());
+        // 부모-자식 관계 설정
+        for (LotMasterDTO lot : lotHierarchy) {
+            if (!lot.getLotNo().equals(lot.getParentLotNo())) {
+                LotMasterDTO parentLot = lotMap.get(lot.getParentLotNo());
+                if (parentLot != null) {
+                    parentLot.addChild(lot);
+                }
+            }
+        }
         
-        return mainLot;
+        // 공정 이력과 품질검사 이력 조회
+        if (rootLot != null) {
+            rootLot.setProcessHistory(lotTrackingMapper.selectLotProcessHistory(lotNo));
+            rootLot.setQcHistory(lotTrackingMapper.selectLotQcHistory(lotNo));
+        }
+        
+        return rootLot;
     }
 }

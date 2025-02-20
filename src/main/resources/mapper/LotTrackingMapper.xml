@@ -99,35 +99,40 @@
 	    ORDER BY lql.qc_log_no DESC
 	</select>
     
-	<!-- LOT 상세 정보 계층 구조 조회 -->
-	<select id="selectLotDetail" resultType="com.deepen.domain.LotMasterDTO">
-	    WITH LOT_HIERARCHY AS (
-	        SELECT 
-	            lm.lot_no,
-	            lm.parent_lot_no,
-	            lm.process_type,
-	            lm.wi_no,
-	            wi.product_no,
-	            wi.product_name,
-	            lm.process_no,
-	            pi.process_name,
-	            lm.line_no,
-	            li.line_name,
-	            lm.lot_status,
-	            lm.start_time,
-	            lm.end_time,
-	            lm.create_user,
-	            lm.create_time,
-	            SYS_CONNECT_BY_PATH(lm.lot_no, '/') AS lot_path,
-	            LEVEL AS hierarchy_level
-	        FROM lot_master lm
-	        LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no
-	        LEFT JOIN process_info pi ON lm.process_no = pi.process_no
-	        LEFT JOIN line_info li ON lm.line_no = li.line_no
-	        START WITH lm.lot_no = #{lotNo}
-	        CONNECT BY PRIOR lm.lot_no = lm.parent_lot_no
-	    )
-	    SELECT * FROM LOT_HIERARCHY
-	    ORDER BY hierarchy_level, start_time
-	</select>
+	<!-- LOT 계층 구조 조회 수정 -->
+<!-- LOT 계층 구조 조회 수정 -->
+<select id="selectLotDetail">
+    WITH LOT_HIERARCHY AS (
+        SELECT 
+            lm.lot_no,
+            lm.parent_lot_no,
+            lm.process_type,
+            lm.wi_no,
+            p.product_no,
+            p.product_name,
+            lm.process_no,
+            pi.process_name,
+            lm.line_no,
+            li.line_name,
+            lm.lot_status,
+            cd.common_detail_name as status_name,
+            lm.start_time,
+            lm.end_time,
+            lm.create_user,
+            LEVEL as hierarchy_level,
+            CONNECT_BY_ROOT lot_no as root_lot_no,
+            SYS_CONNECT_BY_PATH(lot_no, '/') as lot_path
+        FROM lot_master lm
+        LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+        LEFT JOIN product p ON wi.product_no = p.product_no
+        LEFT JOIN process_info pi ON lm.process_no = pi.process_no
+        LEFT JOIN line_info li ON lm.line_no = li.line_no
+        LEFT JOIN common_detail cd ON lm.lot_status = cd.common_detail_code
+        START WITH lot_no = #{lotNo}
+        CONNECT BY NOCYCLE PRIOR lot_no = parent_lot_no
+        ORDER SIBLINGS BY start_time DESC
+    )
+    SELECT * FROM LOT_HIERARCHY
+    ORDER BY hierarchy_level, lot_path
+</select>
 </mapper>
