@@ -51,6 +51,9 @@
             <if test="status != null and status != ''">
                 AND i.status = #{status}
             </if>
+            <if test="source != null and source != ''">
+                AND i.source = #{source}
+            </if>
             <if test="keyword != null and keyword != ''">
                 AND (
                     w.warehouse_name LIKE '%' || #{keyword} || '%'
@@ -173,4 +176,11 @@
                 FROM DUAL)
             )
     </insert>
+    
+      <!-- 품목번호로 완제품 여부 확인 -->
+	<select id="isProductItem" resultType="int">
+	    SELECT COUNT(1) 
+	    FROM PRODUCT
+	    WHERE product_no = #{itemNo}
+	</select>
 </mapper>

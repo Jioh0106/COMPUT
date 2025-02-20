@@ -33,4 +33,7 @@ public interface InboundMapper {
     List<String> selectWarehouseZones(@Param("warehouseCode") String warehouseCode, 
     								  @Param("itemNo") int itemNo);
 	
+    // 품목번호로 완제품 여부 확인
+ 	int isProductItem(@Param("itemNo") int itemNo);
+ 	
 }
