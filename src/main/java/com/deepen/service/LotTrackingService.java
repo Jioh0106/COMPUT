@@ -1,17 +1,13 @@
 package com.deepen.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.deepen.domain.LotMasterDTO;
-import com.deepen.domain.LotProcessDTO;
-import com.deepen.domain.LotQcDTO;
 import com.deepen.mapper.LotTrackingMapper;
 
 import lombok.RequiredArgsConstructor;

@@ -105,6 +105,8 @@ public class QualityInspectionService {
                     
                     // 4. 새로운 LOT_MASTER 생성 및 저장
                     LotMasterDTO newLot = createNewLotMaster(originalLot, newLotNo, result);
+                    // 새로운 LOT의 상태를 검사완료(LTST008)로 설정
+                    newLot.setLotStatus("LTST008");
                     qualityInspectionMapper.insertLotMaster(newLot);
                     
                     // 5. QC_LOG에 검사 결과 저장 (새로운 LOT 번호 사용)
@@ -123,12 +125,16 @@ public class QualityInspectionService {
                 }
             }
 
-            // 6. 원본 LOT 상태 업데이트
-            String newStatus = allPassed ? "LTST005" : "LTST006";
-            qualityInspectionMapper.updateLotStatusAndResult(originalLotNo, newStatus);
+            // 원본 LOT 상태를 검사완료로 업데이트
+//            qualityInspectionMapper.updateLotStatusAndResult(originalLotNo, "LTST008");
 
-            log.info("Successfully saved inspection results for LOT: {}, Status: {}", 
-                     originalLotNo, newStatus);
+            // 다음 공정 LOT 생성 (합격인 경우에만)
+            if (allPassed) {
+                createNextProcessLot(originalLotNo, "Y");
+            }
+
+            log.info("Successfully saved inspection results for LOT: {}, Status: LTST008, All Passed: {}", 
+                     originalLotNo, allPassed);
         } catch (Exception e) {
             log.error("Error while saving inspection results", e);
             throw e;

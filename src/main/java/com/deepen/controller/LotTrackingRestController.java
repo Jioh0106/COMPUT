@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.LotMasterDTO;
+//import com.deepen.mapper.LotTrackingMapper;
 import com.deepen.service.LotTrackingService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LotTrackingRestController {
     private final LotTrackingService lotTrackingService;
+//    private final LotTrackingMapper lotTrackingMapper;
     
     @GetMapping(value = "/{lotNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LotMasterDTO> getLotTrackingDetail(
