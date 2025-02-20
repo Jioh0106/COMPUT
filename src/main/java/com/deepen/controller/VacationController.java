@@ -105,9 +105,10 @@ public class VacationController {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		UserDetails userDetails = (UserDetails) principal;
 		String userId = userDetails.getUsername();
-
+		Map<String, Object> map = new HashMap<>();
+		map.put("empId", userId);
 		// 로그인한 유저 아이디 값으로 사원 테이블에서 정보 조회
-		Map<String, Object> empInfo = service.selectEmpInfo(userId);
+		Map<String, Object> empInfo = service.selectEmpInfo(map);
 		model.addAttribute("empInfo", empInfo);
 
 		// 휴가 종류 조회
@@ -119,6 +120,17 @@ public class VacationController {
 		model.addAttribute("middleAprvr", middleAprvr);
 
 		return "attendance/vctn_appform";
+	}
+	
+	/**
+	 * 휴가 구분에 따른 잔여일수
+	 * @param vctnType
+	 * @return int
+	 */
+	@PostMapping("/vctnDays")
+	@ResponseBody
+	public int vctnDays(@RequestBody Map<String, Object> vctnType) {
+		return service.workDays(vctnType);
 	}
 
 	/**
@@ -167,8 +179,6 @@ public class VacationController {
 		} else {
 			searchVcntList = service.selectVctnDaysList(searchMap);
 		}
-
-		System.out.println(searchMap.toString());
 
 		return searchVcntList;
 	}

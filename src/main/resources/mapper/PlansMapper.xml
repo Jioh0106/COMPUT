@@ -58,30 +58,82 @@
 			 , BOM_UNIT 
 			 , BOM_QUANTITY 
 			 , PROCESS_NAME
+			 , PRIOR BOM_QUANTITY * BOM_QUANTITY AS total_quantity
 		  FROM BOM b
 		 WHERE BOM_STATUS = 'Y'
 		 START WITH PRODUCT_NO = #{product_no}
 	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
 	</select>
 	
+	<!-- 상품당 공정 시간 계산 --> 
 	<select id="sumProcessTime" resultType="int">
 	    SELECT SUM(PROCESS_TIME) 
 	      FROM PROCESS_INFO
 	     WHERE PROCESS_NO IN (
-					SELECT REGEXP_SUBSTR(#{PROCESS_NAME}, '[^/]+', 1, LEVEL)
-					FROM DUAL
-					CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{PROCESS_NAME}, '/') + 1
+			   SELECT REGEXP_SUBSTR(#{PROCESS_NAME}, '[^/]+', 1, LEVEL)
+			   FROM DUAL
+			   CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{PROCESS_NAME}, '/') + 1
 	           )
 	</select>
 	
-	<select id="getInventort">
+	<!--  재고 조회  -->
+	<select id="getInventorty">
 		SELECT ITEM_NO, SUM(INVENTORY_QTY) AS INVENTORY_QTY
 		FROM INVENTORY 
 		WHERE INVENTORY_TYPE = '자재'
-		GROUP BY ITEM_NO;
+		GROUP BY ITEM_NO
 	</select>
 	
+	<!-- 재고에서 사용될 예정인 생산계획에 등록된 수주 건의 bom 목록 -->
+	<select id="getPlanBomList">
+		SELECT BOM_NO 
+	      	 , PRODUCT_NO
+	         , MTRPRODUCT_NO
+	         , MTR_NO 
+	         , BOM_UNIT
+	         , BOM_QUANTITY
+	         , PROCESS_NAME
+	         , LEVEL
+	         , PRIOR BOM_QUANTITY * BOM_QUANTITY AS total_quantity
+	      FROM BOM b
+		 START WITH PRODUCT_NO IN (SELECT s.PRODUCT_NO 
+		                             FROM PLANS p
+			                         JOIN SALE s ON p.SALE_NO = s.SALE_NO 
+			                        WHERE PLAN_STATUS IN ('PRGR001', 'PRGR005'))
+	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
+	</select>
 	
+	<insert id="savePlan">
+		INSERT INTO PLANS(
+			   PLAN_ID
+			 , ORDER_ID 
+			 , EMP_ID 
+			 , PLAN_STATUS 
+			 , PLAN_DATE 
+			 , PLAN_START_DATE 
+			 , PLAN_END_DATE 
+			 , PLAN_PRIORITY 
+			 , SALE_NO 
+		) VALUS (
+			   #{plan_id}
+			 , #{order_id}
+			 , #{emp_id}
+			 , #{plan_status}
+			 , CURRENT_DATE
+			 , #{plan_start_date}
+			 , #{plan_end_date}
+			 , #{plan_priority}
+			 , #{sale_no}
+		)
+	</insert>
+	
+	<select id="getPlanOrderId" >
+		SELECT plan_id
+		  FROM plans
+		 WHERE plan_id Like #{order_id} || '%'
+		 ORDER BY plan_id DESC
+		 FETCH FIRST 1 ROW ONLY
+	</select>
 </mapper>
 
 

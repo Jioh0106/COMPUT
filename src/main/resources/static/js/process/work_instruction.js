@@ -2,6 +2,9 @@
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 const token = document.querySelector('meta[name="_csrf"]').content;
 
+let processSelectBox = null;
+let lineSelectBox = null;
+
 // toast ui datepiker
 function datePiker(containerSelector, inputSelector){
 	return new tui.DatePicker(containerSelector,{
@@ -16,9 +19,13 @@ function datePiker(containerSelector, inputSelector){
 
 // toast ui Select Box
 function selectBox(idSelector,placeholderText,fetchData){
+	const dataWithNullValue = [
+        { label: placeholderText, value: '' }, // 기본값 항목
+        ...fetchData // 기존 fetchData 항목들
+    ];
 	return new tui.SelectBox(idSelector,{
 		placeholder: placeholderText,
-		data:fetchData
+		data:dataWithNullValue
 	});
 };
 
@@ -38,9 +45,11 @@ async function fetchProcessInfoList(){
 			label:item.processName,
 			value:item.processNo
 		}));
+		console.log("processData",processData);
 		
 		// selectBox 생성
-		selectBox("#processSelectBox","공정 선택",processData);
+		processSelectBox = selectBox("#processSelectBox","공정 선택",processData);
+		console.log("processSelectBox",processSelectBox);
 		
 	}catch(error){
 		console.error("error",error);
@@ -57,11 +66,13 @@ async function fetchLineInfoList(){
 		}
 		
 		const lineInfoList = await response.json();
+		console.log("lineInfoList",lineInfoList);
 		
 		const lineData = lineInfoList.map(item =>({
 			label: item.lineName,
 			value: item.lineNo
 		}));
+		console.log("lineData",lineData);
 		
 		// 그리드에서 사용할 listItems 생성
 		const gridLineListItems = lineData.map(item => ({
@@ -72,7 +83,7 @@ async function fetchLineInfoList(){
 		console.log("라인정보 확인",gridLineListItems);
 		
 		// selectBox 생성
-		//selectBox("#lineSelectBox","라인 선택",lineData);
+		lineSelectBox = selectBox("#lineSelectBox","라인 선택",lineData);
 		
 		// 그리드 생성할 때 동적으로 listItems 적용
 		createWorkInstructionGrid(gridLineListItems);
@@ -92,17 +103,27 @@ window.onload = async function() {
 	endDatePicker.setNull();
 	
 	// 서버에서 받은 데이터로 select box 생성
-	//fetchProcessInfoList();
+	fetchProcessInfoList();
 	//fetchLineInfoList();
 	const gridLineListItems = await fetchLineInfoList();
-	console.log("gridLineListItems",gridLineListItems);
 	
-	// 그리드 생성
+	// 초기 그리드 생성
 	createWorkInstructionGrid(gridLineListItems);
+	
+	
+	document.getElementById('planNoSearch').addEventListener('input', search);
+	startDatePicker.on('change',search);
+	endDatePicker.on('change',search);
+	if (processSelectBox) {
+      	processSelectBox.on('change', search);
+	}
+	
+  	if (lineSelectBox) {
+      	lineSelectBox.on('change', search);
+  	}
+	
 	createMaterialGrid();
-	//createWorkerGrid();
 	document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
-	//document.getElementById('tab-material-tab').addEventListener('click',createMaterialGrid);
 };
 
 // 그리드 초기값
@@ -110,6 +131,23 @@ let workInstructionGrid = "";
 let workerGrid = "";
 let materialGrid = "";
 let regGrid = "";
+
+function search() {
+    const selectedProcess = processSelectBox?.getSelectedItem();
+    const selectedLine = lineSelectBox?.getSelectedItem();
+
+    const workInstructionFilter = {
+        planNo: document.getElementById('planNoSearch').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+		processNo: selectedProcess && selectedProcess.value ? selectedProcess.value : "",  
+        lineNo: selectedLine && selectedLine.value ? selectedLine.value : ""
+    };
+
+    console.log("검색 필터:", workInstructionFilter);  
+
+    fetchWorkInstruction(workInstructionFilter);
+}
 
 function createWorkInstructionGrid(gridLineListItems = []){
 		//const data = [];//processList;
@@ -160,12 +198,12 @@ function createWorkInstructionGrid(gridLineListItems = []){
 			
 		});
 		
-		//workInstructionGrid.hideColumn("emp_id");
+		workInstructionGrid.hideColumn("emp_id");
 		
 		// 데이터 fetch
-		fetchWorkInstruction();
+		fetchWorkInstruction(null);
 		
-		workInstructionGrid.on('click',() => {
+		workInstructionGrid.on('check',() => {
 			fetchMaterialsByRowSelection();
 		});
 		
@@ -345,9 +383,10 @@ async function insertWorkInstruction(url,data){
 /**
  * 작업 지시 정보 조회
  */
-async function fetchWorkInstruction(){
+async function fetchWorkInstruction(workInstructionFilter){
 	try{
-		const response = await fetch("/api/work-instruction-info");
+		const params = new URLSearchParams(workInstructionFilter).toString();
+		const response = await fetch(`/api/work-instruction-info?${params}`);
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
@@ -407,7 +446,14 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	console.log("checkedWiRows",checkedWiRows);
 	
 	if (checkedWiRows.length === 0) {
-	       console.warn("작업지시 항목이 선택되지 않았습니다.");
+	       console.warn("작업지시 항목을 선택해주세요.");
+	       alert("작업지시 항목을 선택해주세요.");
+	       return;
+	}
+	
+	if (checkedMaterialRows.length === 0) {
+	       console.warn("자재 항목을 선택해주세요.");
+	       alert("자재 항목을 선택해주세요.");
 	       return;
 	}
 	
@@ -422,6 +468,8 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	   console.log("updatedMaterialRows (wi_no 추가됨)", insertMaterialData);
 	
 	insertOB('/api/insert-material-warehouse',insertMaterialData);
+	
+	alert("자재 투입 완료");
 });
 
 async function insertOB(url,data){
@@ -452,11 +500,13 @@ document.getElementById('addBtn').addEventListener('click', () => {
 	    
 	    if (checkedWorkerGrid.length === 0) {
 	        console.warn("작업담당자를 선택하세요.");
+			alert("작업담당자를 선택하세요.");
 	        return;
 	    }
 	    
 	    if (checkedWiGrid.length === 0) {
-	        console.warn("작업지시를 선택하세요.");
+	        console.warn("작업 담당자를 넣을 작업지시를 선택하세요.");
+	        alert("작업 담당자를 넣을 작업지시를 선택하세요.");
 	        return;
 	    }
 
@@ -520,9 +570,9 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
 	
 	for (let row of checkedWiGrid) {
        	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
-       	const lineName = workInstructionGrid.getValue(row.rowKey, 'emp_id');
-        console.log("lineName : ",lineName);
-       	if (!lineName) {
+       	const empId = workInstructionGrid.getValue(row.rowKey, 'emp_id');
+        console.log("empId : ",empId);
+       	if (!empId) {
            	console.warn("담당자을 선택해주세요");
 			alert("담당자을 선택해주세요");
            	return;
@@ -566,10 +616,67 @@ async function workStartBtn(url,data){
 
 // 공정완료 버튼 동작
 document.getElementById('processFinishBtn').addEventListener('click', async () => {
-	console.log("공정 완료 버튼");
-	
-	const response = await fetch('/api/work-instruction-info');
-	const fetchWorkInstructionInfo = response.json();
-	console.log("공정완료동작을위한 정보",fetchWorkInstructionInfo);
+	try{
+		console.log("공정 완료 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("공정완료 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("완료할 작업 지시를 선택해주세요");
+      		alert("완료할 작업 지시를 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/complete-process",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+				
+		console.log("공정 완료!");
+	}catch(error){
+		console.log("error",error);
+	}
 	
 });
+
+// 공정완료 버튼 동작
+document.getElementById('workEndBtn').addEventListener('click', async () => {
+	try{
+		console.log("작업 종료 버튼");
+		const selectRows = workInstructionGrid.getCheckedRows();
+		console.log("작업종료 동작을 위한 로우 정보",selectRows);
+		
+		if (selectRows.length === 0) {
+      		console.warn("종료할 작업 지시를 선택해주세요");
+      		alert("종료할 작업 지시를 선택해주세요");
+       		return;
+		}
+		
+		const response = await fetch("/api/end-work-instruction",{
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRF-Token": token
+			},
+			body: JSON.stringify(selectRows)
+		});
+		
+		if(!response.ok){
+			throw new Error("네트워크 응답 실패");
+		}
+				
+		console.log("작업 종료!");
+	}catch(error){
+		console.log("error",error);
+	}
+	
+});
+

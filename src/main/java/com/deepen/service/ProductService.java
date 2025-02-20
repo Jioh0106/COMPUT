@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.deepen.domain.BomDTO;
 import com.deepen.domain.CommonDetailDTO;
@@ -30,8 +33,10 @@ public class ProductService {
 	private final ProductRepository pdRepository;
 	private final ProductMapper pdMapper;
 	private final BomRepository bomRepository;
+	private final ExcelService excelService;
+	 
 	
-	//상품등록
+	//상품등록 - 단일상품 등록
 	public Integer saveProduct (ProductDTO productDto) {
 		
 		Product product = new Product();
@@ -45,6 +50,31 @@ public class ProductService {
 		
 		return product.getProduct_no();
 	}
+	
+	
+	//상품등록 - 엑셀파일로 대량등록(상품테이블에 저장)
+	public int saveExcel(MultipartFile file){
+		List<ProductDTO> productDTOList = excelService.readexcelfile(file);
+		
+		int saveCount = 0;
+		for(ProductDTO productDto : productDTOList) {
+			Product product = new Product();
+			product.setProduct_name(productDto.getProduct_name());
+			//이름으로 공통코드 조회(단위공통코드) - 엑셀파일에 이름으로 값 넣으면 공통코드로 테이블에 들어감!
+			product.setProduct_unit(cdRepository.findCommonDetailCodeByName(productDto.getProduct_unit()));
+			product.setProduct_type(productDto.getProduct_type());
+			product.setProduct_date(LocalDateTime.now());
+			
+			pdRepository.save(product);
+			saveCount ++;
+			log.info("행 개수 :"+ saveCount);
+			
+		}
+		
+		return saveCount;
+	}
+	
+	
 	
 	
 	//상품 리스트

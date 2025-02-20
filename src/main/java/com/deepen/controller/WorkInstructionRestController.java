@@ -1,5 +1,6 @@
 package com.deepen.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +63,27 @@ public class WorkInstructionRestController {
 	}
 	
 	/**
-	 * 작업 지시 테이블 조회
+	 * 작업 지시 테이블 검색 조회
 	 * @param
 	 */
 	@GetMapping("/work-instruction-info")
-	public List<Map<String, Object>> getWorkInstruction(){
+	public List<Map<String, Object>> getWorkInstruction(
+			@RequestParam(value = "planNo", required = false) String planNo,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "processNo", required = false) String processNo,
+			@RequestParam(value = "lineNo", required = false) String lineNo){
 		
-		List<Map<String, Object>> list = wiService.getWorkInstruction();
+		Map<String, Object> params =  new HashMap<>();
+		params.put("planNo", planNo);
+		params.put("startDate", startDate);
+		params.put("endDate", endDate);
+		params.put("processNo", processNo);
+		params.put("lineNo", lineNo);
+		
+		log.info("필터 검색 조회 : "+params.toString());
+		
+		List<Map<String, Object>> list = wiService.getWorkInstruction(params);
 		return list;
 	}
 	
@@ -78,7 +93,6 @@ public class WorkInstructionRestController {
 	@GetMapping("/material-info-by-row-selection")
 	public List<Map<String, Object>> getMaterialsByRowSelection(@RequestParam("productNo") String productNo,
 																@RequestParam("vol") String vol){
-		log.info("자재 정보 연결 준비 : "+productNo+", "+vol);
 		
 		List<Map<String, Object>> materialsList  = wiService.getMaterialsByProductNo(productNo,vol);
 		return materialsList;
@@ -86,7 +100,6 @@ public class WorkInstructionRestController {
 	
 	@PostMapping("/insert-material-warehouse")
 	public void insertMaterialInWarehouse(@RequestBody List<Map<String, Object>> insertMaterialData) {
-		log.info("자재 인서트 준비");
 		wiService.insertMaterialInWareHouse(insertMaterialData);
 	}
 	
@@ -98,8 +111,28 @@ public class WorkInstructionRestController {
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
 		String sessionEmpId = (String) empInfo.get("EMP_ID");
 		
-		log.info("작업 시작 동작 준비");
 		wiService.startWorkInstruction(updateDataList,sessionEmpId);
 	}
 	
+	@PostMapping("/complete-process")
+	public void processComplete(@RequestBody List<Map<String, Object>> updateDataList,
+								HttpServletRequest request) {
+		log.info("공정 완료 준비");
+		
+		HttpSession session = request.getSession();
+		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
+		String sessionEmpId = (String) empInfo.get("EMP_ID");
+		
+		wiService.completeProcess(updateDataList,sessionEmpId);
+		
+	}
+	
+	@PostMapping("/end-work-instruction")
+	public void endWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
+								HttpServletRequest request) {
+		log.info("작업 종료 준비");
+		
+		wiService.endWorkInstruction(updateDataList);
+		
+	}
 }

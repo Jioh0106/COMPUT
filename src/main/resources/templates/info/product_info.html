@@ -62,6 +62,9 @@
 	flex-shrink: 0;
 }
 
+.btn-primary {
+    margin-right: 11px; /* 업로드 버튼과 다운로드 버튼 사이 간격 */
+}
 
 
 </style>
@@ -111,9 +114,29 @@
 								</div>
 								<!-- 검색 조건 끝-->
 								
+								<!--단일상품 등록 버튼-->
 								<div class="float-end mb-3">
-								<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
+									<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
+<!-- 								<input type="file" id="fileInput" accept=".xlsx"> -->
+<!-- 								<button type="button" onclick="fileUpload()">엑셀파일업로드</button> -->
 								</div>
+								
+								<!--엑셀파일 업로드 -> 상품등록 -->
+								<div class="col-md-5 mb-1">
+                                    <fieldset>
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="fileInput" accept=".xlsx"
+                                                aria-describedby="inputGroupFileAddon04"
+                                                aria-label="Upload">
+                                            <button class="btn btn-primary" type="button" onclick="fileUpload()"
+                                                id="inputGroupFileAddon04">엑셀 파일 업로드</button>
+                                    	<input type="button" class="btn btn-outline-success" id="excel"  value="상품등록 엑셀 양식 다운로드" onclick=" excelDownload()">
+                                        </div>
+                                    </fieldset>
+                                </div>		
+								
+								<br>
+								
 								<h4>상품</h4>
 								<!--상품그리드-->										   
 								<div id="productGrid" class="mb-3 mt-2"></div>
@@ -222,6 +245,9 @@
 		const productGrid = new Grid({
 				el: document.getElementById('productGrid'),
 				rowHeaders: ['checkbox'],
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 280,
 				columns: [
 					{header: '상품번호',	name: 'PRODUCT_NO', editor: 'text', sortable: true},
 					{header: '상품유형',	
@@ -695,6 +721,57 @@
 			}
 			
 			
+			//엑셀파일 업로드 함수
+			function fileUpload(){
+				let fileInput = document.getElementById("fileInput");
+				
+				if (fileInput.files.length === 0) {
+		               alert("파일을 선택해주세요!");
+		               return;
+		           }
+			  
+			    let file = fileInput.files[0];
+		              let formData = new FormData();
+		              formData.append("file", file);
+
+		              fetch('/api/product/upload', { 
+		                  method: "POST",
+						  headers: {
+						         [header]: token 
+						     },
+		                  body: formData
+		              })
+		              .then(response => response.text())
+		              .then(data => {
+		                  alert("업로드 성공: " + data);
+						   location.reload(true); // 페이지 새로고침
+		              })
+		        
+					  .catch(error => {
+	  			         console.error('업로드 오류', error);
+						 alert("파일 업로드 중 오류 발생! " + error.message);
+	  			     }); 
+				
+				 }
+			
+			
+			//상품등록 엑셀 양식 파일 다운로드 함수
+			function excelDownload() {
+			    fetch('api/product/excel/download', {
+			        method: "GET"
+			    })
+			    .then(response => response.blob()) // 서버에서 받은 데이터를 Blob으로 변환(blob 이진데이터 파일업로드에서 주로 사용)
+			    .then(blob => {
+			        const url = window.URL.createObjectURL(blob); // Blob을 가리키는 URL 생성
+			        const a = document.createElement("a");
+			        a.href = url;
+			        a.download = "상품등록_엑셀_양식.xlsx"; // 다운로드될 파일명 설정
+			        document.body.appendChild(a);
+			        a.click(); // 자동으로 다운로드 실행
+			        document.body.removeChild(a);
+			    })
+			    .catch(error => console.error("다운로드 오류:", error));
+			}
 		
 		
 	</script>

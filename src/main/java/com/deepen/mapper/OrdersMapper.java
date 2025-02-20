@@ -39,6 +39,10 @@ public interface OrdersMapper {
 
 	List<BuyDTO> getDetailBuy(@Param("order_id") String order_id);
 
+	void insertInbound(Map<String, Object> inbound);
+
+	List<Map<String, Object>> getgetBomList(int product_no);
+
 	
 
 

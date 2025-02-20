@@ -93,13 +93,13 @@
 							<form>
 								<!-- 검색 조건 시작 -->
 								<div class="row mb-4 align-items-center">
-								    <!-- 상품명 -->
+								    <!-- 생산계획번호 -->
 									<div class="col-md-4">
-										<label for="nameSearch" class="form-label">상품명 검색</label>
+										<label for="nameSearch" class="form-label">생산계획번호 검색</label>
 										<div class="input-group mb-3">
 											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
-												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+											<input type="text" class="form-control" id="searchPlanId" placeholder="생산계획번호를 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="filterGrid()">
 										</div>
 									</div>
 								</div>
@@ -144,25 +144,61 @@
 
 	 	var Grid = tui.Grid;
 		
+	 	var historyList = /*[[${historyList}]]*/'UNKNOWN';
+	 	console.log('생산이력', historyList);
+	 	
 		const productionGrid = new Grid({
 			el: document.getElementById('productionGrid'),
 			columns: [
-				{header: '번호',	name: 'inventory_no', width: 100},
-				{header: '생산계획번호',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
-				{header: '작업지시번호',	name: 'item_no',	editor: 'text', sortable: true, width: 150},
-				{header: '상품구분',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '상품명',		name: 'bom_unit', editor: 'text', sortable: true, width: 100},
-				{header: '투입량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '불량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '생산량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
-				{header: '생산날짜',	name: 'bom_date',	editor: 'text', sortable: true, width: 150}
+			//	{header: '번호',	name: 'inventory_no', width: 100},
+				{header: '생산계획번호',	name: 'PLANID',		editor: 'text', sortable: true, width: 150},
+				{header: '작업지시번호',	name: 'WINO',	editor: 'text', sortable: true, width: 150},
+				{header: '상품구분',	name: 'PRODUCTTYPE',	editor: 'text', sortable: true, width: 150},
+				{header: '상품명',		name: 'PRODUCTNAME', editor: 'text', sortable: true, width: 200},
+// 				{header: '투입량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+ 				{header: '공정',	name: 'PROCESSNAME',	editor: 'text', sortable: true, width: 200},
+ 				{header: '라인',	name: 'LINENO',	editor: 'text', sortable: true, width: 150},
+				
+ 				{header: '검사',	name: 'JUDGEMENT', editor: 'text',  formatter: function({ value }) {  
+ 	                if (value === 'Y') {
+ 	                    return `<span style="color: green;">생산완료</span>`;
+ 	                } else {
+ 	                    return `<span style="color: red;">생산불가</span>`;
+ 	                }
+ 	            }, sortable: true, width: 150},
+				
+	            {header: '생산날짜',	name: 'ENDTIME',	editor: 'text', sortable: true}
 				
 			],
-			data: [],
+			data: historyList,
 			columnOptions: {
 			  resizable: true
 			}
 		});
+		
+		
+		
+		//생산계획번호 검색
+		function filterGrid() {
+		    var searchText = document.getElementById("searchPlanId").value.trim();
+
+		    if (searchText === "") {
+		        // 검색어가 없으면 원래 데이터로 복원
+		        productionGrid.resetData(historyList);
+		        return;
+		    }
+
+		    var filteredData = historyList.filter(row => row.PLANID.includes(searchText));
+		    productionGrid.resetData(filteredData);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		

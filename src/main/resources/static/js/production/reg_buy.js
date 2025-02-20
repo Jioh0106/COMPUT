@@ -49,12 +49,32 @@ $(function() {
 
 	const csrfToken = $('input[name="_csrf"]').val();
 	
+	// 상품별 자재 소요량 조회 그리드
+	const grid2 = new tui.Grid({
+		el: document.getElementById('grid2'),
+		columns: [
+			{header: 'BOM번호', name: 'BOM_NO'},
+			{header: '상품번호', name: 'PRODUCT_NO'},
+			{header: '상품이름', name: 'PRODUCT_NAME', width: 200},
+			{header: '반제품번호', name: 'MTRPRODUCT_NO'},
+			{header: '자재번호', name: 'MTR_NO'},
+			{header: '자재명', name: 'MTR_NAME'},
+			{header: '단위', name: 'UNIT_NAME'},
+			{header: '소요량', name: 'TOTAL_QUANTITY' },
+		],
+		data: [] // 서버에서 전달받은 데이터
+	});
+	
+	
+		
 	// 발주 등록 그리드
-	let grid;
+	let grid; 
 	
 	mainFetchData().then(function (data) {  
 		grid = new tui.Grid({
 			el: document.getElementById('grid'),
+			height: 300,
+			bodyHeight: 250,
 			data: [], 
 			columns: [
 				{ header: 'No', name: 'buy_no' },
@@ -65,26 +85,17 @@ $(function() {
 					name: 'buy_unit',
 					editor : {
 						type: 'select',
-						options: {
-							listItems: data.unitCommon
-		                }
+						options: {listItems: data.unitCommon}
 					}
 				},
-				{
-					header: '주문량', 
-					name: 'buy_vol', 
-					editor: 'text'
-				},
+				{ header: '주문량', name: 'buy_vol', editor: 'text'},
 				{
 					header: '발주 상태', 
 					name: 'buy_status',
 					editor: {
 						type: 'select',
 						options: {
-	                        listItems: [
-	                            { text: '정상', value: '정상' },
-	                            { text: '취소', value: '취소' }
-	                        ]
+	                        listItems: [ { text: '정상', value: '정상' }, { text: '취소', value: '취소' }]
 	                    }
 				    }
 				}
@@ -141,12 +152,14 @@ $(function() {
 		
 	}); // 추가 버튼 이벤트
 	
+	// =================================================================================================
 	
 	let modalGrid1;
 	let modalGrid2;
+	let modalGrid3;
 	let selectedClientRow = null;
 	let selectedMtrRow = null;
-	
+	let selectedPrdctRow = null;
 	// 거래처 입력 박스 클릭 시 모달창 열기
 	$('#client_name').on('click', function (e) {
 		e.preventDefault(); 
@@ -156,6 +169,8 @@ $(function() {
 		if (!modalGrid1) {
 		    modalGrid1 = new tui.Grid({
 		        el: document.getElementById('modal-grid1'), 
+				height: 350,
+				bodyHeight: 300,
 		        data: [],
 		        columns: [
 		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
@@ -163,7 +178,6 @@ $(function() {
 		            { header: '연락처', name: 'client_tel', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
 		            { header: '대표자명', name: 'client_boss', width: 80,filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
 		            { header: '담당자명', name: 'client_emp', width: 80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '우편번호', name: 'client_postcode', width: 80 },
 		            { 
 						header: '등록일자', 
 						name: 'client_date', 
@@ -175,6 +189,7 @@ $(function() {
 					        }
 					    }
  					},
+		            { header: '우편번호', name: 'client_postcode', width: 80 },
 		            { header: '주소', name: 'client_adrress', width: 300}
 		        ]
 		    });
@@ -190,7 +205,7 @@ $(function() {
 		}
 
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/client', {
 				params: {
 					type: '발주',
@@ -224,6 +239,7 @@ $(function() {
 		
 	});	// 거래처 선택 모달창
 	
+	// =================================================================================================
 	// 자재 선택 모달창
 	function showMtrModal(rowKey) { 
 		const modal = $('#mtrSerchModal'); // 거래처 검색 모달
@@ -231,6 +247,8 @@ $(function() {
 		if (!modalGrid2) {
 		    modalGrid2 = new tui.Grid({
 		        el: document.getElementById('modal-grid2'), 
+				height: 350,
+				bodyHeight: 300,
 		        data: [],
 		        columns: [
 		            { header: '자재번호', name: 'mtr_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true } },
@@ -254,7 +272,7 @@ $(function() {
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
-		modal.on('show.bs.modal', function () {
+		modal.on('shown.bs.modal', function () {
 			axios.get('/api/order/serch/mtr')
 			.then(function (response) {
 				const data = response.data; // 데이터 로드
@@ -282,11 +300,95 @@ $(function() {
 				
 			}
 		});
-		
-		
-	} // 자재 선택 모달창
-
 	
+	} // 자재 선택 모달창
+	
+	// =================================================================================================
+	// 상품 조회 모달창
+	$('#product_name').on('click', function (e) {
+		e.preventDefault(); 
+		const modal = $('#prdctSerchModal'); // 거래처 검색 모달
+		
+		if (!modalGrid3) {
+		    modalGrid3 = new tui.Grid({
+		        el: document.getElementById('modal-grid3'), 
+				height: 350,
+				bodyHeight: 300,
+		        data: [],
+		        columns: [
+		            { header: '상품번호', name: 'product_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
+		            { header: '상품명', name: 'product_name', width:200, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
+		            { header: '상품단위', name: 'unit_name', width:80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
+		            { header: '등록일자', name: 'product_date', width:100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
+		          
+		        ]
+		    });
+			
+			// 행 클릭 이벤트: 사용자가 행을 클릭하면 selectedClientRow에 해당 데이터를 저장
+		    modalGrid3.on('click', function (ev) {
+		        if (typeof ev.rowKey !== 'undefined') {
+		            selectedPrdctRow = modalGrid3.getRow(ev.rowKey);
+		            modalGrid3.selectedPrdctRow([ev.rowKey]);
+		        }
+		    });
+		}	
+	
+		// 모달 열릴 때 입력 필드와 그리드 초기화
+		modal.on('shown.bs.modal', function () {
+			axios.get('/api/order/serch/prdct')
+			.then(function (response) {
+				const data = response.data; // 데이터 로드
+				console.log('Fetched data:', data);
+			    modalGrid3.resetData(data);
+			    modalGrid3.refreshLayout(); // 레이아웃 새로고침
+			})
+			.catch(function (error) {
+			    console.error('Error fetching data:', error);
+			});
+
+		});
+
+		// 모달창 표시
+		modal.modal('show');
+		
+		// "확인" 버튼 클릭 이벤트 핸들러 추가
+		$('#prdctModalConfirm').off('click').on('click', function () {
+			
+			if (selectedPrdctRow) {
+				$('#product_name').val(selectedPrdctRow.product_name);
+				$('#product_no').val(selectedPrdctRow.product_no);
+				
+				axios.get('/api/order/serch/bom', {
+				    params: {  
+				        product_no: $('#product_no').val()
+				    }
+				}) 
+				.then(function (response) {
+					const data = response.data; // 데이터 로드
+					console.log('Fetched data:', data);
+				    grid2.resetData(data);
+				    grid2.refreshLayout(); // 레이아웃 새로고침
+					modal.modal('hide');
+				})
+				.catch(function (error) {
+				    console.error('Error fetching data:', error);
+				});
+			} else {
+			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
+			}
+		});
+			
+	}); // 상품 조회 모달창
+	
+	// =================================================================================================
+	$('#appendMtr')	.on('click', function (e) {
+		e.preventDefault(); // 기본 동작 방지
+		
+		const mtrList = grid2.getData()
+		console.log("✅ 가져온 데이터:", mtrList);
+	});
+	// =================================================================================================
+
 	// 발주 등록 버튼 클릭 이벤트
 	$('#appendOrder').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
@@ -330,6 +432,7 @@ $(function() {
 		
 	});	// 발주 등록 버튼 클릭 이벤트
 	
+	// 데이터 등록 함수
 	function sendToServer(createdRows, client_no, order_date) {
 		const param = {
 			createdRows : createdRows,

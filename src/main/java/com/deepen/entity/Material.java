@@ -1,5 +1,6 @@
 package com.deepen.entity;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,10 +51,10 @@ public class Material {
 	private String mtr_unit;
 	
 	@Column(name = "mtr_reg_data", nullable = false)
-	private LocalDate mtr_reg_data;
+	private Date mtr_reg_data;
 	
 	@Column(name = "mtr_mod_data")
-	private LocalDate mtr_mod_data;
+	private Date mtr_mod_data;
 	
 	@Column(name = "mtr_status", length = 1,  nullable = false)
 	private String mtr_status; // default ='Y' 

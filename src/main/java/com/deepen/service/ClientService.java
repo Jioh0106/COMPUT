@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class ClientService {
 	/** 거래처 항목 수정 **/
 	public void updateClient(List<Client> updatedRows) {
 		for(Client row : updatedRows) {
+			row.setClient_update(new Date(System.currentTimeMillis()));
 			repository.save(row);
 		}
 	}

@@ -1,5 +1,6 @@
 package com.deepen.entity;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -41,10 +42,10 @@ public class Client {
 	private String client_type;
 	
 	@Column(name = "client_date", nullable = false)
-	private LocalDate client_date;
+	private Date client_date;
 	
 	@Column(name = "client_update")
-	private LocalDate client_update;
+	private Date client_update;
 	
 	@Column(name = "client_memo", length = 300)
 	private String client_memo;

@@ -2,8 +2,8 @@
 function openView(type) {
 	// 파라미터에 따라 수주등록 or 발주등록 팝업창 열기
 	var url = type === 'sale' ? 'reg-sale' : type === 'buy' ? 'reg-buy' : '';
-	var popupW = 1000;
-	var popupH = 600;
+	var popupW = 1200;
+	var popupH = 650;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);
@@ -72,6 +72,8 @@ $(function() {
 	// 주문관리 그리드
 	const grid = new tui.Grid({
 		el: document.getElementById('grid'),
+		height: 600,
+		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '주문번호', name: 'order_id', sortingType: 'asc', sortable: true},
@@ -184,12 +186,16 @@ $(function() {
 	
 	// 주문 관리 상세 모달 열기
 	grid.on('click', function (ev) {
+		if (ev.targetType  === 'rowHeader') {
+	       return; 
+	   }
+		
 		if (typeof ev.rowKey !== 'undefined' && ev.rowKey !== null) {
 			const rowData = grid.getRow(ev.rowKey);
 			
 			if(rowData.order_type === '수주') {
 				// 수주 모달창 열기	
-				$('#order-sale').modal('show');
+				$('#order-sale').modal('show').on('shown.bs.modal',()=> grid2.refreshLayout());
 		    
 				axios.get('/api/order/detail/sale', {
 					params: {
@@ -211,7 +217,7 @@ $(function() {
 			} // 수주 조건문	
 			
 			// 발주 모달창 열기	
-			$('#order-buy').modal('show');
+			$('#order-buy').modal('show').on('shown.bs.modal',()=> grid3.refreshLayout());
 	    
 			axios.get('/api/order/detail/buy', {
 				params: {
@@ -261,10 +267,7 @@ $(function() {
 	
 	function deleteRow(selectedRows) {
 		if (!Array.isArray(selectedRows) || selectedRows.length === 0) {
-			Swal.fire({
-		        icon: "warning",
-		        title: "삭제할 항목을 선택하세요."
-			})
+			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
 	    }
 		

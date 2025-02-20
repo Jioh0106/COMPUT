@@ -23,6 +23,11 @@ public class InboundService {
     private final InboundRepository inboundRepository;
     private final InboundMapper inboundMapper;
     
+    private String determineItemType(int itemNo) {
+    	boolean isProduct = inboundMapper.isProductItem(itemNo) > 0;
+    	return isProduct ? "완제품" : "자재";
+    }
+    
     // 검색 조회
     public List<InboundDTO> getInboundList(Map<String, Object> params) {
         return inboundMapper.selectByConditions(params);
@@ -45,6 +50,9 @@ public class InboundService {
     
     // 창고 검색
     public List<Map<String, Object>> searchWarehouses(String keyword, int itemNo, String itemType) {
+    	if(itemType == null || itemType.isEmpty()) {
+    		itemType = determineItemType(itemNo);
+    	}
         return inboundMapper.searchWarehouses(keyword, itemNo, itemType);
     }
     

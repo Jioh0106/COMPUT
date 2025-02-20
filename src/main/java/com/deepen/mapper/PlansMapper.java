@@ -22,7 +22,13 @@ public interface PlansMapper {
 
 	int sumProcessTime(String string);
 
-	List<Map<String, Integer>> getInventort();
+	List<Map<String, Object>> getInventorty();
+
+	List<Map<String, Object>> getPlanBomList();
+
+	void savePlan(PlansDTO plan);
+
+	String getPlanOrderId(String order_id);
 
 	
 	

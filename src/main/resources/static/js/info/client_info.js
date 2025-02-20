@@ -6,11 +6,14 @@ $(function() {
 	console.log("CSRF Token:", csrfToken);
 	console.log('isEditable :', isEditable); 
 	
+	
 	let grid;
 
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
 		data: data, 
+		height: 600,
+		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},
@@ -40,7 +43,7 @@ $(function() {
                         ]
                     }
 			    } : null,
-				filter: 'select'
+				filter: 'select',
 			},
 			{
 				header: '등록일', 
@@ -50,14 +53,16 @@ $(function() {
 					? {
 	                type: 'datePicker',
 	                options: {
-	                    format: 'yyyy-MM-dd'
+	                    format: 'yyyy-MM-dd',
+						language: 'ko' 
 	                }
 	            }
 				: null,
 	            filter: {
 	                type: 'date',
 	                options: {
-	                    format: 'yyyy-MM-dd'
+	                    format: 'yyyy-MM-dd',
+						language: 'ko' 
 	                }
 	            }
 			},
@@ -69,16 +74,18 @@ $(function() {
 					? {
 	                type: 'datePicker',
 	                options: {
-	                    format: 'yyyy-MM-dd'
+	                    format: 'yyyy-MM-dd',
+						language: 'ko' 
 	                }
 	            }
 				: null,
 	            filter: {
 	                type: 'date',
 	                options: {
-	                    format: 'yyyy-MM-dd'
+	                    format: 'yyyy-MM-dd',
+						language: 'ko' 
 	                }
-	            }
+	            },
 			},
 			{ header: '메모', name: 'client_memo', width: 200, editor: isEditable ? 'text' : null},
 		],
@@ -146,11 +153,7 @@ $(function() {
 		// 빈 필드가 있는 행이 존재하면 알림 표시 후 중단
 		if (invalidRows.length > 0) {
 			console.log('유효하지 않은 행:', invalidRows);
-		    Swal.fire({
-		        icon: 'error',
-		        title: '모든 항목을 입력하세요.',
-		        text: '자재명은 필수 항목입니다.',
-		    });
+		    Swal.fire({icon: 'error', title: '모든 항목을 입력하세요.', text: '자재명은 필수 항목입니다.'});
 		    return; // 저장 중단
 		}
 	    
@@ -166,14 +169,11 @@ $(function() {
 		console.log('선택된 데이터:', selectedRows);
 		
 		if (selectedRows.length === 0) {
-			Swal.fire({
-			        icon: "warning",
-			        title: "삭제할 항목을 선택하세요."
-			})
+			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
 	    }
 		
-		const deleteList = selectedRows.map(row => row.mtr_no);
+		const deleteList = selectedRows.map(row => row.client_no);
 		
 		axios.post('/api/client/delete', deleteList, {
 			headers: {
@@ -181,20 +181,12 @@ $(function() {
 			    }
 		})
 	    .then(function (response) {
-			Swal.fire(
-			        'Success',
-			        '삭제가 완료되었습니다.',
-			        'success'
-			      )
+			Swal.fire('Success','삭제가 완료되었습니다.','success')
 	        window.location.reload();
 	    })
 	    .catch(function (error) {
 	        console.error('삭제 중 오류 발생:', error);
-			Swal.fire(
-			        'Error',
-			        '삭제 중 문제가 발생했습니다.',
-			        'error'
-			      )
+			Swal.fire('Error', '삭제 중 문제가 발생했습니다.','error')
 	    });
 		
 	}); // 삭제 버튼 이벤트

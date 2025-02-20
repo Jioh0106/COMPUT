@@ -55,6 +55,8 @@ $(function() {
 	mainFetchData().then(function (data) {  
 		grid = new tui.Grid({
 			el: document.getElementById('grid'),
+			height: 300,
+			bodyHeight: 250,
 			data: [], 
 			columns: [
 				{ header: 'No', name: 'sale_no', width: 60 },
@@ -66,26 +68,17 @@ $(function() {
 					width: 100,
 					editor : {
 						type: 'select',
-						options: {
-							listItems: data.unitCommon
-		                }
+						options: {listItems: data.unitCommon }
 					}
 				},
-				{
-					header: '주문량', 
-					width: 100,
-					name: 'sale_vol', 
-					editor: 'text'
-				},
+				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text'},
 				{
 					header: '납품기한', 
 					name: 'sale_deadline',
 					width: 120,
 					editor: {
 	                    type: 'datePicker',
-	                    options: {
-	                        format: 'yyyy-MM-dd', 
-	                    }
+	                    options: { format: 'yyyy-MM-dd', language: 'ko'}
 	                }
 				},
 				{
@@ -171,7 +164,9 @@ $(function() {
 		if (!modalGrid1) {
 		    modalGrid1 = new tui.Grid({
 		        el: document.getElementById('modal-grid1'), 
-		        data: [],
+				height: 350,
+				bodyHeight: 300,
+				data: [],
 		        columns: [
 		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
 		            { header: '거래처명', name: 'client_name', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
@@ -245,7 +240,9 @@ $(function() {
 		
 		if (!modalGrid2) {
 		    modalGrid2 = new tui.Grid({
-		        el: document.getElementById('modal-grid2'), 
+		        el: document.getElementById('modal-grid2'),
+				height: 350,
+				bodyHeight: 300, 
 		        data: [],
 		        columns: [
 		            { header: '상품번호', name: 'product_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },

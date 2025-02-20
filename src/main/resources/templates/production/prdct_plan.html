@@ -128,7 +128,7 @@
 					</section>
 					<!-- 그리드 끝 -->
 					<div class="d-flex justify-content-end">
-						<input type="button" class="btn btn-outline-success ms-2 deleteBtn" id="delete" value="저장">
+						<input type="button" class="btn btn-outline-success ms-2 saveBtn" id="update" value="저장">
 						<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
 							<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
 						</div>
@@ -139,7 +139,7 @@
 			
 		</div><!--main--> 
 	</div><!-- app -->
-		
+	<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />	
 		
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
