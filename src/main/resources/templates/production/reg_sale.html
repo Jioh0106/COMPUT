@@ -53,6 +53,10 @@
 				box-sizing: border-box;
 			}
 			
+			#client_name {
+				background-color: white;
+			}
+			
 		</style>
 
 	</head>
@@ -90,7 +94,10 @@
                             <div class="col-md-3">
                                 <fieldset class="form-group">
 									<label for="basicInput">거래처</label>
-									<input type="text" class="form-control serch-content" id="client_name">
+									<div class="input-group mb-3">
+										<input type="text" class="form-control serch-content" disabled placeholder="거래처 조회" id="client_name" aria-describedby="button-addon">
+										<button class="btn btn-outline-secondary" type="button" id="client-serch">조회</button>
+									</div>
 									<input type="hidden" name="client_no" value="client_no" id="client_no"/>	
                                 </fieldset>
                             </div>
@@ -101,10 +108,15 @@
 					<section class="section">
 						<div class="row" id="basic-table">
 							<div id="grid" class="mb-2"></div>
-							<div class="d-flex justify-content-end">
-								<input type="button" class="btn btn-outline-primary ms-2" id="appendRow" value="＋">
-								<input type="button" class="btn btn-outline-danger ms-2" id="minusRow" value="－">
-								<input type="button" class="btn btn-outline-success  ms-2" id="appendOrder" value="수주 등록">
+							<div class="d-flex justify-content-between">
+								<div class="d-flex justify-content-start">
+									<input type="button" class="btn btn-outline-primary me-2" id="appendRow" value="상품 추가">
+									<input type="button" class="btn btn-outline-danger me-2" id="minusRow" value="삭제">
+									<input type="button" class="btn btn-outline-secondary me-2" id="resetData" value="초기화">
+								</div>
+								<div class="d-flex justify-content-end">
+									<input type="button" class="btn btn-outline-success  ms-2" id="appendOrder" value="수주 등록">
+								</div>
 							</div>
 						</div> <!--row-->
 					</section>
