@@ -218,6 +218,22 @@ public class OrderService {
 		}
 	}
 
+	public int getProcessTime(int product_no, int sale_vol) {
+		int time_sum = 0;
+		
+		List<Map<String, Object>> bomList = planMapper.getUseBoMList(product_no);
+		
+		for(Map<String, Object> bom : bomList) {
+			int sum = planMapper.sumProcessTime((String) bom.get("PROCESS_NAME"));
+			if(bom.containsKey("PROCESS_COUNT")) {
+				sum *= Integer.parseInt(bom.get("PROCESS_COUNT").toString());
+			} 
+			time_sum += sum;
+		}
+		
+		return time_sum * sale_vol;
+	}
+
 	
 	
 

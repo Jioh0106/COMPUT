@@ -68,7 +68,8 @@ $(function() {
 					},
 					align: 'center'
 				},
-				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text'},
+				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text', align: 'center'},
+				{ header: '소요시간(시)', width: 100, name: 'time_sum', align: 'center'},
 				{
 					header: '납품기한', 
 					name: 'sale_deadline',
@@ -106,6 +107,39 @@ $(function() {
 				
 				// 행정보 전달
 	            showPrdctModal(rowKey);
+	        }
+	        
+	    });
+		
+		// 수량 입력 시 필요한 공정 시간 계산
+	    grid.on('editingEnd', function (ev) {
+	    	const { rowKey, columnName } = ev;
+
+	        // 사원번호 또는 사원명 수정 시 모달 띄우기
+	        if (columnName === 'sale_vol') {
+	            ev.stop(); // 기본 편집 동작 중단
+				
+				const rowData = grid.getRow(rowKey);
+				console.log('현재 행 데이터:', rowData);
+				if (!rowData || !rowData.product_no || !rowData.sale_vol) {
+		            console.warn("필수 데이터 누락: product_no 또는 sale_vol이 없음");
+		            return;
+		        }
+				
+				axios.get('/api/order/get/time', {
+					params: {
+						product_no :  rowData.product_no,
+						sale_vol : rowData.sale_vol
+					},
+				})
+				.then(function (response) {
+					const data = response.data; // 데이터 로드
+					console.log('Fetched data:', data);
+					grid.setValue(rowKey, 'time_sum', data.time_sum); 
+				})
+				.catch(function (error) {
+				    console.error('Error fetching data:', error);
+				});
 	        }
 	        
 	    });
