@@ -155,8 +155,8 @@ $(function() {
 	const grid2 = new tui.Grid({
 		el: document.getElementById('grid2'),
 		data: [], // 서버에서 전달받은 데이터
-		height: 300,
-		bodyHeight: 250,
+		height: 400,
+		bodyHeight: 350,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '수주번호', name: 'sale_no', width: 60, align: 'center'},
@@ -191,8 +191,8 @@ $(function() {
 	const grid3 = new tui.Grid({
 		el: document.getElementById('grid3'),
 		data: [], // 서버에서 전달받은 데이터
-		height: 300,
-		bodyHeight: 250,
+		height: 400,
+		bodyHeight: 350,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '발주번호', name: 'buy_no', width: 80, align: 'center'},

@@ -190,7 +190,7 @@
 		       LEFT JOIN PRODUCT p ON p.PRODUCT_NO = s.PRODUCT_NO 
 		  	   LEFT JOIN COMMON_DETAIL cd ON s.SALE_UNIT = cd.COMMON_DETAIL_CODE 
 		  	   LEFT JOIN CLIENT c ON o.CLIENT_NO = c.CLIENT_NO 
-		  	   LEFT JOIN PLAN p ON p.sale_no = s.sale_no
+		  	   LEFT JOIN PLANS p ON p.sale_no = s.sale_no
 		  	   LEFT JOIN COMMON_DETAIL cd2 ON p.PLAN_STATUS = cd2.COMMON_DETAIL_CODE 
 		 WHERE o.ORDER_ID = #{order_id}
 	</select>
