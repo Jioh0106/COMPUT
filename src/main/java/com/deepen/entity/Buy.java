@@ -1,5 +1,9 @@
 package com.deepen.entity;
 
+import com.deepen.domain.BuyDTO;
+import com.deepen.domain.SaleDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "BUY")
 @Data
@@ -32,6 +37,16 @@ public class Buy {
 	@Column(name = "buy_status", length = 30)
 	private String buy_status;
 	
-	
+	public static Buy setBuyEntity(BuyDTO buyDTO) {
+		Buy buy = new Buy();
+		buy.setBuy_no(buyDTO.getBuy_no());
+		buy.setOrder_id(buyDTO.getOrder_id());
+		buy.setMtr_no(buyDTO.getMtr_no());
+		buy.setBuy_unit(buyDTO.getBuy_unit());
+		buy.setBuy_vol(buyDTO.getBuy_vol());
+		buy.setBuy_status(buyDTO.getBuy_status());
+		
+		return buy;
+	}
 	
 }

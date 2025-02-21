@@ -143,9 +143,6 @@
 	</insert>
 	
 	<insert id="insertBuy" parameterType="com.deepen.domain.BuyDTO" >
-	    <selectKey keyProperty="buy_no" resultType="int" order="BEFORE">
-	        SELECT NVL(MAX(buy_no), 0) + 1 FROM buy
-	    </selectKey>
 		INSERT INTO buy (
 			   order_id
 			 , mtr_no
@@ -208,13 +205,14 @@
 			 , o.ORDER_DATE 
 			 , b.BUY_STATUS 
 			 , c.CLIENT_NAME 
-			 
+			 , i.STATUS AS INBOUND_STATUS
 		  FROM ORDERS o 
 		  	   LEFT JOIN EMPLOYEES e ON o.ORDER_EMP = e.EMP_ID 
 			   LEFT JOIN BUY b ON b.ORDER_ID = o.ORDER_ID
 			   LEFT JOIN MATERIAL m ON m.MTR_NO = b.MTR_NO
 			   LEFT JOIN COMMON_DETAIL cd ON b.BUY_UNIT = cd.COMMON_DETAIL_CODE 
 			   LEFT JOIN CLIENT c ON o.CLIENT_NO = c.CLIENT_NO 
+			   LEFT JOIN INBOUND i ON i.BUY_NO = b.BUY_NO
 		 WHERE o.ORDER_ID = #{order_id}
 	</select>
 	
@@ -249,5 +247,3 @@
 	</select>
 	
 </mapper>
-
-

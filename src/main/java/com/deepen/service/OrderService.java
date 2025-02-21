@@ -19,6 +19,7 @@ import com.deepen.entity.Sale;
 import com.deepen.mapper.OrdersMapper;
 import com.deepen.mapper.PlansMapper;
 import com.deepen.repository.BuyRepository;
+import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.OrdersRepository;
 import com.deepen.repository.SaleRepository;
 
@@ -36,6 +37,8 @@ public class OrderService {
 	private final OrdersRepository repository;
 	private final SaleRepository saleRepository;
 	private final BuyRepository buyRepository;
+	private final CommonDetailRepository cdRepository;
+	
 	
 	/* 주문관리 그리드 정보 조회 */
 	public List<OrdersDTO> getOrdersList() {
@@ -96,7 +99,7 @@ public class OrderService {
 			order.setOrder_id(order_id);
 			order.setClient_no(client_no); 
 			order.setOrder_emp((String)map.get("emp_id"));
-			order.setOrder_type("수주");
+			order.setOrder_type(order_type);
 			
 			// 주문 테이블 추가
 			mapper.insertOrders(order);
@@ -134,7 +137,7 @@ public class OrderService {
 			order.setOrder_id(order_id);
 			order.setClient_no(client_no); 
 			order.setOrder_emp((String)map.get("emp_id"));
-			order.setOrder_type("발주");
+			order.setOrder_type(order_type);
 			
 			// 주문 테이블 추가
 			mapper.insertOrders(order);
@@ -151,7 +154,15 @@ public class OrderService {
 			buy.setOrder_id(order_id);
 			mapper.insertBuy(buy);
 			log.info("buy = " + buy.toString());
+			// 입고 대기 추가
+			Map<String, Object> inbound = new HashMap<>();
+			inbound.put("in_qty", buy.getBuy_vol());
+			inbound.put("buy_no", buy.getBuy_no());
+			inbound.put("item_no", buy.getMtr_no());
+			inbound.put("warehouse_id", "미정");
+			
 		}
+		
 	}
 
 	
@@ -180,22 +191,28 @@ public class OrderService {
 		log.info("bomList = " + bomList.toString());
 		return bomList;
 	}
-
+	
+	// 동일일자 기등록된 거래처인지 확인 
 	public String checkIsClient(int client_no, String order_type) {
 		return mapper.checkIsClient(client_no, order_type);
 	}
 
-
-	public void updateSale(List<Sale> updatedRows) {
-		for(Sale sale : updatedRows) {
-			saleRepository.save(sale);
+	// 수주 정보 수정
+	public void updateSale(List<SaleDTO> updatedRows) {
+		for(SaleDTO sale : updatedRows) {
+			Sale saleEtt = Sale.setSaleEntity(sale);
+			saleEtt.setSale_unit(cdRepository.findCommonDetailCodeByName(sale.getUnit_name())); 
+			saleRepository.save(saleEtt);
 			mapper.updateOrder(sale.getOrder_id());
 		}
 	}
 
-	public void updateBuy(List<Buy> updatedRows) {
-		for(Buy buy : updatedRows) {
-			buyRepository.save(buy);
+	// 발주 정보 수정
+	public void updateBuy(List<BuyDTO> updatedRows) {
+		for(BuyDTO buy : updatedRows) {
+			Buy buyEtt = Buy.setBuyEntity(buy);
+			buyEtt.setBuy_unit(cdRepository.findCommonDetailCodeByName(buy.getUnit_name())); 
+			buyRepository.save(buyEtt);
 			mapper.updateOrder(buy.getOrder_id());
 		}
 	}

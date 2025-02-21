@@ -35,6 +35,7 @@ public class SaleDTO {
 	private String emp_name;
 	private String client_name;
 	private Integer time_sum;
+	private String plan_status;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private Timestamp order_date;
