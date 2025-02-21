@@ -16,19 +16,20 @@ $(function() {
 		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
-			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null},
+			{ header: 'No', name: 'client_no', width: 60, editor: isEditable ? 'text' : null, align: 'center'},
 			{ 
 				header: '거래처명', 
 				name: 'client_name', 
 				width: 150, 
 				filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-				editor: isEditable ? 'text' : null
+				editor: isEditable ? 'text' : null, 
+				align: 'center'
 			},
-			{ header: '연락처', name: 'client_tel', width: 120, editor: isEditable ? 'text' : null},
-			{ header: '대표자명', name: 'client_boss', width: 100, editor: isEditable ? 'text' : null},
-			{ header: '담당자명', name: 'client_emp', width: 100, editor: isEditable ? 'text' : null},
-			{ header: '우편번호', name: 'client_postcode', width: 80, editor: isEditable ? 'text' : null},
-			{ header: '주소', name: 'client_adrress', width: 300, editor: isEditable ? 'text' : null},
+			{ header: '연락처', name: 'client_tel', width: 120, editor: isEditable ? 'text' : null, align: 'center'},
+			{ header: '대표자명', name: 'client_boss', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+			{ header: '담당자명', name: 'client_emp', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+			{ header: '우편번호', name: 'client_postcode', width: 80, editor: isEditable ? 'text' : null, align: 'center'},
+			{ header: '주소', name: 'client_adrress', width: 300, editor: isEditable ? 'text' : null, align: 'center'},
 			{
 				header: '구분', 
 				name: 'client_type', 
@@ -44,6 +45,7 @@ $(function() {
                     }
 			    } : null,
 				filter: 'select',
+				align: 'center' 
 			},
 			{
 				header: '등록일', 
@@ -64,7 +66,8 @@ $(function() {
 	                    format: 'yyyy-MM-dd',
 						language: 'ko' 
 	                }
-	            }
+	            },
+				align: 'center' 
 			},
 			{
 				header: '수정일', 
@@ -86,8 +89,9 @@ $(function() {
 						language: 'ko' 
 	                }
 	            },
+				align: 'center'
 			},
-			{ header: '메모', name: 'client_memo', width: 200, editor: isEditable ? 'text' : null},
+			{ header: '메모', name: 'client_memo', width: 200, editor: isEditable ? 'text' : null, align: 'center'},
 		],
 		editing: isEditable  // 편집 기능 활성화
 	});

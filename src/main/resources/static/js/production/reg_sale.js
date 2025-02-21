@@ -55,9 +55,9 @@ $(function() {
 			bodyHeight: 250,
 			data: [], 
 			columns: [
-				{ header: 'No', name: 'sale_no', width: 60 },
-				{ header: '상품번호', name: 'product_no', width: 80, editor: 'text' },
-				{ header: '상품명', name: 'product_name', width: 230, editor: 'text'  },
+				{ header: 'No', name: 'sale_no', width: 60, align: 'center' },
+				{ header: '상품번호', name: 'product_no', width: 80, editor: 'text', align: 'center' },
+				{ header: '상품명', name: 'product_name', width: 230, editor: 'text' , align: 'center' },
 				{
 					header: '주문단위', 
 					name: 'sale_unit',
@@ -65,7 +65,8 @@ $(function() {
 					editor : {
 						type: 'select',
 						options: {listItems: data.unitCommon }
-					}
+					},
+					align: 'center'
 				},
 				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text'},
 				{
@@ -75,7 +76,8 @@ $(function() {
 					editor: {
 	                    type: 'datePicker',
 	                    options: { format: 'yyyy-MM-dd', language: 'ko'}
-	                }
+	                },
+					align: 'center'
 				},
 				{
 					header: '수주 상태', 
@@ -86,7 +88,8 @@ $(function() {
 						options: {
 	                        listItems: [{ text: '정상', value: '정상' }, { text: '취소', value: '취소' }]
 	                    }
-				    }
+				    },
+					align: 'center'
 				}
 			],
 			editing: true
@@ -107,7 +110,13 @@ $(function() {
 	        
 	    });
 		
-		
+		grid.on('focusChange', (ev) => {
+			grid.setSelectionRange({
+			    start: [ev.rowKey, 0],
+				end: [ev.rowKey, grid.getColumns().length]
+			});
+			
+		});	
 		
 	});
 
@@ -144,14 +153,31 @@ $(function() {
 		
 	}); // 추가 버튼 이벤트
 	
+	// "삭제" 버튼 클릭
+	$('#minusRow').on('click', function (e) {
+		e.preventDefault(); // 기본 동작 방지
+		
+		const selectedRow = grid.getFocusedCell();
+		if (selectedRow.rowKey !== null) {
+	        grid.removeRow(selectedRow.rowKey);
+	    } else {
+	        Swal.fire('', '삭제할 행을 선택하세요.', 'warning'); 
+	    }
+	});
 	
+	// "초기화" 버튼 클릭
+	$('#resetData').on('click', function () {
+		grid.resetData([]);
+	}); 
+	
+	// =======================================================================
 	let modalGrid1;
 	let modalGrid2;
 	let selectedClientRow = null;
 	let selectedPrdctRow = null;
 	
 	// 거래처 입력 박스 클릭 시 모달창 열기
-	$('#client_name').on('click', function (e) {
+	$('#client-serch').on('click', function (e) {
 		e.preventDefault(); 
 			
 		const modal = $('#clientSerchModal'); // 거래처 검색 모달
@@ -163,11 +189,11 @@ $(function() {
 				bodyHeight: 300,
 				data: [],
 		        columns: [
-		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '거래처명', name: 'client_name', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '연락처', name: 'client_tel', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
-		            { header: '대표자명', name: 'client_boss', width: 80,filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
-		            { header: '담당자명', name: 'client_emp', width: 80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
+		            { header: '번호', name: 'client_no', width: 60,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center' },
+		            { header: '거래처명', name: 'client_name', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center' },
+		            { header: '연락처', name: 'client_tel', width: 100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center'},
+		            { header: '대표자명', name: 'client_boss', width: 80,filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center'},
+		            { header: '담당자명', name: 'client_emp', width: 80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center' },
 		            { header: '우편번호', name: 'client_postcode', width: 80 },
 		            { 
 						header: '등록일자', 
@@ -176,18 +202,23 @@ $(function() {
 						filter: {
 					        type: 'date',
 					        options: { format: 'yyyy-MM-dd', language: 'ko' }
-					    }
+					    },
+						 align: 'center'
  					},
-		            { header: '주소', name: 'client_adrress', width: 300}
+		            { header: '주소', name: 'client_adrress', width: 300, align: 'center'}
 		        ]
 		    });
 			
-			// 행 클릭 이벤트: 사용자가 행을 클릭하면 selectedClientRow에 해당 데이터를 저장
-		    modalGrid1.on('click', function (ev) {
-		        if (typeof ev.rowKey !== 'undefined') {
-		            selectedClientRow = modalGrid1.getRow(ev.rowKey);
+			modalGrid1.on('focusChange', (ev) => {
+				modalGrid1.setSelectionRange({
+				    start: [ev.rowKey, 0],
+					end: [ev.rowKey, modalGrid1.getColumns().length]
+				});
+				if (typeof ev.rowKey !== 'undefined') {
+		            selectedClientRow = modalGrid1.getRow(ev.rowKey)
+					console.log('✔ 선택된 거래처:', selectedClientRow);
 		        }
-		    });
+			});
 		}
 
 		// 모달 열릴 때 입력 필드와 그리드 초기화
@@ -208,8 +239,10 @@ $(function() {
 			});
 
 		});
+		// 모달 닫힐 때 값 리셋
 		modal.on('hidden.bs.modal', function () {
 		    selectedClientRow = null;
+			$(this).removeAttr('aria-hidden');
 		});
 		// 모달창 표시
 		modal.modal('show');
@@ -217,11 +250,26 @@ $(function() {
 		// "확인" 버튼 클릭 이벤트 핸들러 추가
 		$('#clientSerchModalConfirm').off('click').on('click', function () {
 			if (selectedClientRow) {
-			    $('#client_name').val(selectedClientRow.client_name);
-			    $('#client_no').val(selectedClientRow.client_no);
-			    modal.modal('hide');
+//				axios.get('/api/order/check/client', {
+//				    params: {  
+//				        client_no: selectedClientRow.client_no,
+//						order_type: '수주'
+//				    }
+//				}) 
+//				.then(function (response) {
+//					if(response.data) {
+//						Swal.fire('금일 기등록 거래처', '주문 건 추가로 진행해 주세요.', 'warning');
+//						return;
+//					}
+				    $('#client_name').val(selectedClientRow.client_name);
+				    $('#client_no').val(selectedClientRow.client_no);
+				    modal.modal('hide');
+//				})
+//				.catch(function (error) {
+//				    console.error('Error fetching data:', error);
+//				});
 			} else {
-			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
+			    Swal.fire('', '선택된 항목이 없습니다.', 'warning');
 			}
 		});
 		
@@ -238,20 +286,24 @@ $(function() {
 				bodyHeight: 300, 
 		        data: [],
 		        columns: [
-		            { header: '상품번호', name: 'product_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '상품명', name: 'product_name', width:200, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, },
-		            { header: '상품단위', name: 'unit_name', width:80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
-		            { header: '등록일자', name: 'product_date', width:100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true },},
+		            { header: '상품번호', name: 'product_no', width:60, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center' },
+		            { header: '상품명', name: 'product_name', width:200, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center' },
+		            { header: '상품단위', name: 'unit_name', width:80, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center'},
+		            { header: '등록일자', name: 'product_date', width:100, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }, align: 'center'},
 		          
 		        ]
 		    });
 			
-			// 행 클릭 이벤트: 사용자가 행을 클릭하면 selectedClientRow에 해당 데이터를 저장
-		    modalGrid2.on('click', function (ev) {
-		        if (typeof ev.rowKey !== 'undefined') {
-		            selectedPrdctRow = modalGrid2.getRow(ev.rowKey);
+			modalGrid2.on('focusChange', (ev) => {
+				modalGrid2.setSelectionRange({
+				    start: [ev.rowKey, 0],
+					end: [ev.rowKey, modalGrid2.getColumns().length]
+				});
+				if (typeof ev.rowKey !== 'undefined') {
+		            selectedPrdctRow = modalGrid2.getRow(ev.rowKey)
+					console.log('✔ 선택된 상품:', selectedPrdctRow);
 		        }
-		    });
+			});
 		}	
 	
 		// 모달 열릴 때 입력 필드와 그리드 초기화
@@ -270,7 +322,8 @@ $(function() {
 		});
 		
 		modal.on('hidden.bs.modal', function () {
-		    selectedClientRow = null;
+		    selectedPrdctRow = null;
+			$(this).removeAttr('aria-hidden');
 		});
 		
 		// 모달창 표시
@@ -278,14 +331,21 @@ $(function() {
 		
 		// "확인" 버튼 클릭 이벤트 핸들러 추가
 		$('#prdctModalConfirm').off('click').on('click', function () {
-			if (selectedPrdctRow) {
-				grid.setValue(rowKey, 'product_no', selectedPrdctRow.product_no); 
-		        grid.setValue(rowKey, 'product_name', selectedPrdctRow.product_name); 
-				modal.modal('hide');
-			} else {
-			    Swal.fire('Error', '선택된 항목이 없습니다.', 'warning');
-				
-			}
+			if (!selectedPrdctRow) {
+		        Swal.fire('', '선택된 항목이 없습니다.', 'warning');
+		        return;
+		    }
+			grid.refreshLayout();
+			const gridData = [...grid.getData(), ...grid.getModifiedRows().createdRows];
+
+			const isDuplicate = gridData.some(row => row.product_no === selectedPrdctRow.product_no);
+			if (isDuplicate) {
+		        Swal.fire('', '이미 추가된 항목입니다.', 'warning');
+		        return;
+		    }
+			grid.setValue(rowKey, 'product_no', selectedPrdctRow.product_no); 
+	        grid.setValue(rowKey, 'product_name', selectedPrdctRow.product_name); 
+			modal.modal('hide');
 		});
 		
 		

@@ -25,6 +25,7 @@ public class OrdersDTO {
 	
 	private String emp_name;
 	private String client_name;
+	private String unit_name;
 	private Integer count;
 	
 	

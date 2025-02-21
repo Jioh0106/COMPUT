@@ -26,6 +26,7 @@
 			   LEFT JOIN BUY b ON o.ORDER_ID = b.ORDER_ID
 	 	 GROUP BY o.ORDER_ID, o.ORDER_DATE, o.ORDER_EMP, e.EMP_NAME, 
 		          o.ORDER_TYPE, o.CLIENT_NO, c.CLIENT_NAME, o.ORDER_UPDATE
+		 ORDER BY ORDER_DATE DESC
 	</select>
 	
 	<!-- 주문관리 필터링 조회  -->
@@ -61,6 +62,7 @@
 		 </where>
 		 GROUP BY o.ORDER_ID, o.ORDER_DATE, o.ORDER_EMP, e.EMP_NAME, 
 		          o.ORDER_TYPE, o.CLIENT_NO, c.CLIENT_NAME, o.ORDER_UPDATE
+		 ORDER BY ORDER_DATE DESC
 	</select>
 
 
@@ -131,14 +133,19 @@
 		) VALUES (
 			  #{order_id}
 			, #{product_no}
-			, #{sale_unit}
+			, (SELECT NVL(common_detail_code, '') 
+		       FROM common_detail 
+		       WHERE common_detail_name = #{sale_unit})
 			, #{sale_vol}
 			, #{sale_deadline}
 			, #{sale_status}
 		)
 	</insert>
 	
-	<insert id="insertBuy" parameterType="com.deepen.domain.BuyDTO">
+	<insert id="insertBuy" parameterType="com.deepen.domain.BuyDTO" >
+	    <selectKey keyProperty="buy_no" resultType="int" order="BEFORE">
+	        SELECT NVL(MAX(buy_no), 0) + 1 FROM buy
+	    </selectKey>
 		INSERT INTO buy (
 			   order_id
 			 , mtr_no
@@ -148,11 +155,19 @@
 		) VALUES (
 			  #{order_id}
 			, #{mtr_no}
-			, #{buy_unit}
+			, (SELECT NVL(common_detail_code, '') 
+		       FROM common_detail 
+		       WHERE common_detail_name = #{buy_unit})
 			, #{buy_vol}
 			, #{buy_status}
 		)
 	</insert>
+	
+	<update id="updateOrder">
+		UPDATE ORDERS 
+		   SET ORDER_UPDATE = CURRENT_TIMESTAMP 
+		 WHERE ORDER_ID = #{order_id}
+	</update>
 	
 	<select id="getDetailSale" resultType="com.deepen.domain.SaleDTO" parameterType="java.lang.String">
 		SELECT s.SALE_NO
@@ -168,12 +183,15 @@
 			 , o.ORDER_DATE 
 			 , s.SALE_STATUS 
 			 , c.CLIENT_NAME 
+			 , cd2.COMMON_DETAIL_NAME AS plan_status
 		  FROM ORDERS o 
 		  	   LEFT JOIN EMPLOYEES e ON o.ORDER_EMP = e.EMP_ID 
 		  	   LEFT JOIN SALE s ON s.ORDER_ID = o.ORDER_ID 
 		       LEFT JOIN PRODUCT p ON p.PRODUCT_NO = s.PRODUCT_NO 
 		  	   LEFT JOIN COMMON_DETAIL cd ON s.SALE_UNIT = cd.COMMON_DETAIL_CODE 
 		  	   LEFT JOIN CLIENT c ON o.CLIENT_NO = c.CLIENT_NO 
+		  	   LEFT JOIN PLAN p ON p.sale_no = s.sale_no
+		  	   LEFT JOIN COMMON_DETAIL cd2 ON p.PLAN_STATUS = cd2.COMMON_DETAIL_CODE 
 		 WHERE o.ORDER_ID = #{order_id}
 	</select>
 	
@@ -190,6 +208,7 @@
 			 , o.ORDER_DATE 
 			 , b.BUY_STATUS 
 			 , c.CLIENT_NAME 
+			 
 		  FROM ORDERS o 
 		  	   LEFT JOIN EMPLOYEES e ON o.ORDER_EMP = e.EMP_ID 
 			   LEFT JOIN BUY b ON b.ORDER_ID = o.ORDER_ID
@@ -221,6 +240,13 @@
 	   CONNECT BY PRIOR MTRPRODUCT_NO = b.PRODUCT_NO
 	</select>
 	
+	<select id="checkIsClient"  resultType="string">
+		SELECT ORDER_ID 
+		  FROM ORDERS
+		 WHERE TRUNC(order_date) = TRUNC(CURRENT_DATE)
+		   AND ORDER_TYPE = #{order_type}
+		   AND client_no = #{client_no}
+	</select>
 	
 </mapper>
 
