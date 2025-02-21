@@ -57,18 +57,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// LOT 노드 텍스트 포맷팅
 		formatLotNodeText(lot) {
-			if (!lot) return '데이터 없음';
+		    if (!lot) return '데이터 없음';
 
-			const statusBadge = this.getStatusBadge(lot.lotStatus);
-			const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
-			const warningIcon = hasQcFailed ?
-				'<i class="bi bi-exclamation-triangle-fill text-danger ms-2"></i>' : '';
+		    const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
+		    const statusBadge = this.getStatusBadge(lot.lotStatus);
+		    const warningIcon = hasQcFailed ? 
+		        '<i class="bi bi-exclamation-triangle-fill qc-warning-icon"></i>' : '';
 
-			return `<span class="lot-node">
-                ${lot.lotNo} - ${lot.productName || '미지정'} 
-                ${statusBadge}
-                ${warningIcon}
-            </span>`;
+		    return `
+		        <div class="lot-node">
+		            <div class="lot-node-text">
+		                ${lot.lotNo} - ${lot.productName || '미지정'}
+		                <span class="lot-node-status">${statusBadge}</span>
+		            </div>
+		            ${warningIcon}
+		        </div>
+		    `;
 		}
 
 		initializeComponents() {
@@ -176,13 +180,28 @@ document.addEventListener('DOMContentLoaded', function() {
 						name: 'measureValue',
 						width: 100,
 						align: 'right',
-						formatter: ({ value }) => value ? value.toFixed(2) : '-'
+						formatter: ({ value, row }) => {
+							const failureClass = row.judgement === 'N' ? 'text-danger fw-bold' : '';
+							return `<span class="${failureClass}">
+		                        ${value ? value.toFixed(2) : '-'}
+		                    </span>`;
+						}
 					},
 					{
 						header: '판정',
 						name: 'judgement',
 						width: 100,
-						formatter: ({ row }) => this.getJudgementBadge(row)
+						formatter: ({ row }) => {
+							if (row.judgement === 'N') {
+								return `<div class="d-flex align-items-center">
+		                            <span class="badge bg-danger d-flex align-items-center gap-1">
+		                                불합격
+		                                <i class="bi bi-exclamation-triangle-fill"></i>
+		                            </span>
+		                        </div>`;
+							}
+							return '<span class="badge bg-success">합격</span>';
+						}
 					},
 					{
 						header: '검사자',
@@ -204,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				});
 			});
 		}
+
 		setupEventListeners() {
 			try {
 				// 검색 이벤트
@@ -363,6 +383,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				const lotDetail = await response.json();
 				this.currentLotData = lotDetail;
+
+				// QC 데이터 로깅 추가
+				console.log('LOT QC History:', lotDetail?.qcHistory);
+				if (lotDetail?.qcHistory) {
+					const failedQc = lotDetail.qcHistory.filter(qc => qc.judgement === 'N');
+					console.log('불량 QC 항목:', failedQc);
+				}
 
 				if (this.currentLotData) {
 					this.updateLotDetails(lotDetail);
@@ -564,49 +591,44 @@ document.addEventListener('DOMContentLoaded', function() {
 		createHierarchyHtml(lot, level = 0) {
 			if (!lot) return '';
 
-			try {
-				const processTypeClass = this.getProcessTypeClass(lot.processType);
-				const statusBadge = this.getStatusBadge(lot.lotStatus);
-				const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
-				const warningIcon = hasQcFailed ?
-					'<i class="bi bi-exclamation-triangle-fill text-danger qc-warning-icon"></i>' : '';
+			const processTypeClass = this.getProcessTypeClass(lot.processType);
+			const statusBadge = this.getStatusBadge(lot.lotStatus);
+			const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
+			const warningIcon = hasQcFailed ?
+				'<i class="bi bi-exclamation-triangle-fill text-danger qc-warning-icon"></i>' : '';
 
-				let html = `
-		                    <div class="hierarchy-level" style="margin-left: ${level * 40}px">
-		                        <div class="lot-card ${processTypeClass} ${hasQcFailed ? 'qc-failed' : ''}" 
-		                             data-lot-no="${lot.lotNo}">
-		                            <div class="d-flex justify-content-between align-items-center">
-		                                <h6 class="mb-0">${lot.lotNo}</h6>
-		                                ${statusBadge}
-		                                ${warningIcon}
-		                            </div>
-		                            <div class="lot-info mt-2">
-		                                <div class="info-item">
-		                                    <i class="bi bi-box"></i>
-		                                    <span>${lot.productName || '-'}</span>
-		                                </div>
-		                                <div class="info-item">
-		                                    <i class="bi bi-gear"></i>
-		                                    <span>${lot.processName || '-'}</span>
-		                                </div>
-		                            </div>
-		                        </div>
+			let html = `
+		        <div class="hierarchy-level" style="margin-left: ${level * 40}px">
+		            <div class="lot-card ${processTypeClass}" data-lot-no="${lot.lotNo}">
+		                <div class="card-header">
+		                    <div class="d-flex align-items-center">
+		                        <h6 class="mb-0">${lot.lotNo}</h6>
+		                        ${statusBadge}
 		                    </div>
-		                `;
+		                    ${warningIcon}
+		                </div>
+		                <div class="lot-info mt-2">
+		                    <div class="info-item">
+		                        <i class="bi bi-box"></i>
+		                        <span>${lot.productName || '-'}</span>
+		                    </div>
+		                    <div class="info-item">
+		                        <i class="bi bi-gear"></i>
+		                        <span>${lot.processName || '-'}</span>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>`;
 
-				if (Array.isArray(lot.children) && lot.children.length > 0) {
-					html += '<div class="children-wrapper">';
-					lot.children.forEach(child => {
-						html += this.createHierarchyHtml(child, level + 1);
-					});
-					html += '</div>';
-				}
-
-				return html;
-			} catch (error) {
-				console.error('계층 구조 HTML 생성 실패:', error);
-				return '';
+			if (Array.isArray(lot.children) && lot.children.length > 0) {
+				html += '<div class="children-wrapper">';
+				lot.children.forEach(child => {
+					html += this.createHierarchyHtml(child, level + 1);
+				});
+				html += '</div>';
 			}
+
+			return html;
 		}
 
 		reverseHierarchy(lot) {
