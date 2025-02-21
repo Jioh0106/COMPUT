@@ -185,7 +185,8 @@ public class OrderService {
 		
 		return order_id;
 	}
-
+	
+	// 상품번호별 모든 bom 조회
 	public List<Map<String, Object>> getBomList(int product_no) {
 		List<Map<String, Object>> bomList = mapper.getgetBomList(product_no);
 		log.info("bomList = " + bomList.toString());

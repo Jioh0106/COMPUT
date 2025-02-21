@@ -1,7 +1,6 @@
 package com.deepen.entity;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
 import com.deepen.domain.SaleDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

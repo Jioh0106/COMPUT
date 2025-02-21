@@ -507,11 +507,13 @@ $(function() {
 	$('#appendOrder').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
+		grid.blur();
+		
 		let client_no = $('#client_no').val();
 		let client_name = $('#client_name').val();
 		let order_date = $('#order_date').val();
 		
-		if(client_name === '거래처 조회' ||client_no === '' || client_no === null) {
+		if(client_name === '거래처 조회' || client_no === '' || client_no === null) {
 			Swal.fire('Error', '거래처를 입력해 주세요.', 'warning');
 			return;
 		}
