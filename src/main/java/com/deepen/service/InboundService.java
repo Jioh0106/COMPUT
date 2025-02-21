@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.BeanUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,16 @@ public class InboundService {
     
     private final InboundRepository inboundRepository;
     private final InboundMapper inboundMapper;
+    private final JdbcTemplate jdbcTemplate;  // JdbcTemplate 주입 추가
+    
+    // DB 세션에 현재 사용자 ID 설정하는 메서드 추가
+    public void setCurrentUserInDbSession() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            String empId = auth.getName();
+            jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + empId + "'); END;");
+        }
+    }
     
     private String determineItemType(int itemNo) {
     	boolean isProduct = inboundMapper.isProductItem(itemNo) > 0;
@@ -99,7 +110,21 @@ public class InboundService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = auth.getName();
         
+        // DB 세션에 현재 사용자 설정
+        jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + currentUser + "'); END;");
+        
         List<Inbound> inbounds = inboundRepository.findAllById(inNos);
+        
+        // 구역이 미정인 입고건이 있는지 확인
+        boolean hasUndefinedZone = inbounds.stream()
+                .anyMatch(inbound -> inbound.getZone() == null || 
+                         inbound.getZone().trim().isEmpty() || 
+                         "미정".equals(inbound.getZone().trim()));
+        
+        if (hasUndefinedZone) {
+            throw new IllegalStateException("구역이 미정인 입고건은 완료 처리할 수 없습니다.");
+        }
+        
         LocalDate now = LocalDate.now();
         
         inbounds.forEach(inbound -> {

@@ -118,14 +118,6 @@ public class OrderService {
 			buy.setOrder_id(order_id);
 			mapper.insertBuy(buy);
 			
-			// 입고 대기 추가
-			Map<String, Object> inbound = new HashMap<>();
-			inbound.put("in_qty", buy.getBuy_vol());
-			inbound.put("buy_no", buy.getBuy_no());
-			inbound.put("item_no", buy.getMtr_no());
-			inbound.put("warehouse_id", "미정");
-			
-			mapper.insertInbound(inbound);
 		}
 		
 	}

@@ -59,6 +59,121 @@
         .gap-2 {
             gap: 0.5rem !important;
         }
+        
+        /* 출처 스타일링 */
+        .source-material {
+            border-left: 4px solid #3b82f6 !important;
+        }
+        .source-product {
+            border-left: 4px solid #8b5cf6 !important;
+        }
+
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .material-tag {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .product-tag {
+            background-color: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .source-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .material-tag .source-dot {
+            background-color: #3b82f6;
+        }
+
+        .product-tag .source-dot {
+            background-color: #8b5cf6;
+        }
+
+        /* 출처 필터 태그 스타일 */
+        .source-filter-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .source-filter-label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #444;
+        }
+
+        .source-filter-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 7px;
+            margin-right: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .source-filter-tag:hover {
+            transform: translateY(-2px);
+        }
+
+        .source-filter-tag.active {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tag-all {
+            background-color: #435ebe;
+            color: white;
+        }
+
+        .tag-material {
+            background-color: white;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .tag-material.active {
+            background-color: #dbeafe;
+        }
+
+        .tag-product {
+            background-color: white;
+            color: #5b21b6;
+            border: 1px solid #8b5cf6;
+        }
+        .tag-product.active {
+            background-color: #ede9fe;
+        }
+
+        .source-tag-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .tag-material .source-tag-dot {
+            background-color: #3b82f6;
+        }
+
+        .tag-product .source-tag-dot {
+            background-color: #8b5cf6;
+        }
     </style>
 </head>
 
@@ -107,6 +222,19 @@
                                             <span class="tui-ico-date"></span>
                                         </div>
                                         <div id="endDatePicker" style="margin-top: -1px;"></div>
+                                    </div>
+
+                                    <!-- 출처 필터 태그 -->
+                                    <div class="source-filter-container">
+                                        <div class="source-filter-tag tag-all active" data-source="">
+                                            전체
+                                        </div>
+                                       	<div class="source-filter-tag tag-material" data-source="MTI">
+										    <span class="source-tag-dot"></span>자재투입
+										</div>
+										<div class="source-filter-tag tag-product" data-source="PSH">
+										    <span class="source-tag-dot"></span>제품출고
+										</div>
                                     </div>
 
                                     <!-- 검색어 입력 -->

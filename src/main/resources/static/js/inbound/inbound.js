@@ -204,7 +204,7 @@ $(function() {
 	      // 출처별 스타일 적용
 	      if (rowData.source === 'QC') {
 	        row.classList.add('source-qc');
-	      } else if (rowData.source === 'PO') {
+	      } if (rowData.source === 'PO') {
 	        row.classList.add('source-po');
 	      }
 	    });
@@ -364,55 +364,79 @@ $(function() {
     }
 
     // 상태 변경 처리
-    function changeStatus(inNo) {
-        Swal.fire({
-            title: '상태 변경',
-            text: '입고 상태를 완료로 변경하시겠습니까?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '확인',
-            cancelButtonText: '취소'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+	function changeStatus(inNo) {
+	    // 모든 데이터에서 해당 inNo를 찾기
+	    const allRows = pendingGrid.getData();
+	    const rowData = allRows.find(row => row.in_no === inNo);
+	    
+	    if (!rowData) {
+	        console.error('입고 데이터를 찾을 수 없습니다:', inNo);
+	        Swal.fire('오류', '입고 데이터를 찾을 수 없습니다.', 'error');
+	        return;
+	    }
+	    
+	    // 구역이 미정인지 확인
+	    if (!rowData.zone || rowData.zone === '미정') {
+	        Swal.fire({
+	            title: '처리 불가',
+	            text: '구역이 미정인 상태에서는 입고 완료 처리를 할 수 없습니다.',
+	            icon: 'warning'
+	        });
+	        return;
+	    }
 
-                fetch('/api/inbound/bulk-complete', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken
-                    },
-                    body: JSON.stringify({
-                        inNos: [inNo]
-                    })
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        Swal.fire({
-                            title: '완료',
-                            text: '상태가 변경되었습니다.',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            // 완료 탭으로 이동
-                            const completeTab = document.querySelector('#complete-tab');
-                            if (completeTab) {
-                                const tab = new bootstrap.Tab(completeTab);
-                                tab.show();
-                                // 약간의 지연 후 데이터 새로고침
-                                setTimeout(() => {
-                                    search();
-                                }, 100);
-                            }
-                        });
-                    }
-                })
-            }
-        });
-    }
+	    Swal.fire({
+	        title: '상태 변경',
+	        text: '입고 상태를 완료로 변경하시겠습니까?',
+	        icon: 'warning',
+	        showCancelButton: true,
+	        confirmButtonText: '확인',
+	        cancelButtonText: '취소'
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+	            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+	            fetch('/api/inbound/bulk-complete', {
+	                method: 'PUT',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                    [csrfHeader]: csrfToken
+	                },
+	                body: JSON.stringify({
+	                    inNos: [inNo]
+	                })
+	            })
+	            .then(response => response.json())
+	            .then(result => {
+	                if (result.success) {
+	                    Swal.fire({
+	                        title: '완료',
+	                        text: '상태가 변경되었습니다.',
+	                        icon: 'success',
+	                        timer: 1500,
+	                        showConfirmButton: false
+	                    }).then(() => {
+	                        // 완료 탭으로 이동
+	                        const completeTab = document.querySelector('#complete-tab');
+	                        if (completeTab) {
+	                            const tab = new bootstrap.Tab(completeTab);
+	                            tab.show();
+	                            // 약간의 지연 후 데이터 새로고침
+	                            setTimeout(() => {
+	                                search();
+	                            }, 100);
+	                        }
+	                    });
+	                }
+	            })
+	            .catch(error => {
+	                console.error('상태 변경 실패:', error);
+	                Swal.fire('오류', '상태 변경 중 오류가 발생했습니다.', 'error');
+	            });
+	        }
+	    });
+	}
 
     // 팝업 열기
     function openPopup(url) {
@@ -572,7 +596,18 @@ $(function() {
 	            Swal.fire('알림', '완료 처리할 입고 정보를 선택해 주세요.', 'info');
 	            return;
 	        }
-
+			
+			// 선택된 행들 중 구역이 미정인 항목이 있는지 확인
+		    const invalidRows = selectedRows.filter(row => !row.zone || row.zone === '미정');
+		    if (invalidRows.length > 0) {
+		        Swal.fire({
+		            title: '처리 불가',
+		            text: '구역이 미정인 입고 건이 포함되어 있어 완료 처리를 할 수 없습니다.',
+		            icon: 'warning'
+		        });
+		        return;
+		    }
+			
 	        const inNos = selectedRows.map(row => row.in_no);
 	        
 	        Swal.fire({

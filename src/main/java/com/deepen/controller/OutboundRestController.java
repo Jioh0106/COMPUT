@@ -32,13 +32,15 @@ public class OutboundRestController {
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "status", required = false, defaultValue = "대기") String status) {
+            @RequestParam(value = "status", required = false, defaultValue = "대기") String status,
+            @RequestParam(value = "source", required = false) String source) {
         
         Map<String, Object> params = new HashMap<>();
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("keyword", keyword);
         params.put("status", status);
+        params.put("source", source);
         
         List<OutboundDTO> outboundList = outboundService.getOutboundList(params);
         

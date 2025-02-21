@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initOutboundForm();    // 폼 초기화
     initializeGrids();     // 그리드 초기화
     attachEventListeners(); // 이벤트 리스너 추가
+    bindSourceSelectEvents(); // 출처 선택 이벤트 바인딩
     checkUrlParameters();   // URL 파라미터 체크 (수정 모드)
 });
 
@@ -74,6 +75,31 @@ function initOutboundForm() {
         selectableRanges: [
             [new Date(1900, 0, 1), new Date()]
         ]
+    });
+    
+    // 출처 '제품출고'로 기본값 설정
+    document.getElementById('source').value = 'PRODUCT';
+}
+
+/**
+ * 출처 선택 이벤트 바인딩
+ */
+function bindSourceSelectEvents() {
+    const sourceOptions = document.querySelectorAll('.source-option');
+    const sourceInput = document.getElementById('source');
+    
+    if (!sourceInput || sourceOptions.length === 0) return;
+    
+    sourceOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // 활성 옵션 갱신
+            sourceOptions.forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            
+            // hidden input 값 설정
+            const sourceValue = option.getAttribute('data-source');
+            sourceInput.value = sourceValue;
+        });
     });
 }
 
@@ -370,6 +396,16 @@ function transformWarehouseData(data) {
  */
 function createOutboundData() {
     const outNo = document.getElementById('outNo').value;
+	
+	// source 값을 'PRODUCT'에서 'PSH'로 변경
+	   const sourceElement = document.getElementById('source');
+	   let sourceValue = sourceElement.value;
+	   
+	   // 'PRODUCT'를 'PSH'로 변환
+	   if (sourceValue === 'PRODUCT') {
+	       sourceValue = 'PSH';
+	   }
+	   
     return {
         out_no: outNo ? parseInt(outNo) : null,
         item_no: parseInt(document.getElementById('itemCode').value),
@@ -377,7 +413,8 @@ function createOutboundData() {
         out_qty: parseInt(document.getElementById('outQty').value),
         warehouse_id: document.getElementById('warehouseCode').value,
         zone: document.getElementById('zone').value || null,
-        status: "대기"
+        status: "대기",
+        source: sourceValue
     };
 }
 
@@ -387,9 +424,9 @@ function createOutboundData() {
 function getApiConfig(outNo) {
     return {
         url: outNo ? '/api/outbound/update' : '/api/outbound/save',
-		method: outNo ? 'PUT' : 'POST'
-		    };
-		}
+        method: outNo ? 'PUT' : 'POST'
+    };
+}
 
 /**
  * API 응답 처리
@@ -513,6 +550,7 @@ function fillFormData(data) {
     document.getElementById('warehouseCode').value = data.warehouse_id;
     document.getElementById('warehouseName').value = data.warehouse_name;
     document.getElementById('inventoryQty').value = data.inventory_qty;
+    document.getElementById('source').value = 'PRODUCT'; // 항상 제품출고로 고정
 
     // 구역 정보 설정
     const zoneSelect = document.getElementById('zone');
@@ -552,88 +590,4 @@ async function loadZones(warehouseCode) {
     } finally {
         zoneSelect.disabled = false;
     }
-}
-
-// =============== 이벤트 핸들러 함수 ===============
-/**
- * 일괄 완료 처리
- */
-function bulkComplete() {
-    const selectedRows = pendingGrid.getCheckedRows();
-    if (selectedRows.length === 0) {
-        Swal.fire('알림', '완료 처리할 출고 정보를 선택해 주세요.', 'info');
-        return;
-    }
-
-    const outNos = selectedRows.map(row => row.out_no);
-    
-    confirmBulkComplete(outNos, selectedRows.length);
-}
-
-/**
- * 일괄 완료 확인 대화상자 표시
- */
-function confirmBulkComplete(outNos, count) {
-    Swal.fire({
-        title: '출고 완료',
-        text: `선택한 ${count}건의 출고를 완료 처리하시겠습니까?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '확인',
-        cancelButtonText: '취소'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            processBulkComplete(outNos);
-        }
-    });
-}
-
-/**
- * 일괄 완료 처리 API 호출
- */
-function processBulkComplete(outNos) {
-    const headers = createHeaders();
-    
-    fetch('/api/outbound/complete', {
-        method: 'PUT',
-        headers: headers,
-        body: JSON.stringify({ outNos: outNos })
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            handleBulkCompleteSuccess(result.message);
-        } else {
-            throw new Error(result.message || '완료 처리에 실패했습니다.');
-        }
-    })
-    .catch(error => handleBulkCompleteError(error));
-}
-
-/**
- * 일괄 완료 성공 처리
- */
-function handleBulkCompleteSuccess(message) {
-    Swal.fire({
-        title: '완료',
-        text: message,
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-    }).then(() => {
-        const completeTab = document.querySelector('#complete-tab');
-        if (completeTab) {
-            const tab = new bootstrap.Tab(completeTab);
-            tab.show();
-            setTimeout(() => search(), 100);
-        }
-    });
-}
-
-/**
- * 일괄 완료 실패 처리
- */
-function handleBulkCompleteError(error) {
-    console.error('일괄 완료 처리 실패:', error);
-    Swal.fire('오류', error.message || '완료 처리 중 오류가 발생했습니다.', 'error');
 }
