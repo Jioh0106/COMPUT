@@ -333,6 +333,7 @@ $(function() {
 //	}); 
 
 	$('#saveBuy').on('click', function () {
+		grid3.blur();
 		const modifiedRows = grid3.getModifiedRows();
 		console.log(modifiedRows); 
 		
@@ -361,6 +362,7 @@ $(function() {
 	}); 
 	
 	$('#saveSale').on('click', function () {
+		grid2.blur();
 		const modifiedRows = grid2.getModifiedRows();
 		console.log(modifiedRows); 
 		

@@ -180,7 +180,7 @@
 			 , o.ORDER_DATE 
 			 , s.SALE_STATUS 
 			 , c.CLIENT_NAME 
-			 , cd2.COMMON_DETAIL_NAME AS plan_status
+			 , NVL(cd2.COMMON_DETAIL_NAME, '미등록') AS plan_status
 		  FROM ORDERS o 
 		  	   LEFT JOIN EMPLOYEES e ON o.ORDER_EMP = e.EMP_ID 
 		  	   LEFT JOIN SALE s ON s.ORDER_ID = o.ORDER_ID 

@@ -355,7 +355,7 @@ $(function() {
 	// 수주 등록 버튼 클릭 이벤트
 	$('#appendOrder').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
-		
+		grid.blur();
 		let client_no = $('#client_no').val();
 		let order_date = $('#order_date').val();
 		
