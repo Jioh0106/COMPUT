@@ -155,8 +155,8 @@ $(function() {
 	const grid2 = new tui.Grid({
 		el: document.getElementById('grid2'),
 		data: [], // 서버에서 전달받은 데이터
-		height: 400,
-		bodyHeight: 350,
+		height: 300,
+		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '수주번호', name: 'sale_no', width: 60, align: 'center'},
@@ -191,8 +191,8 @@ $(function() {
 	const grid3 = new tui.Grid({
 		el: document.getElementById('grid3'),
 		data: [], // 서버에서 전달받은 데이터
-		height: 400,
-		bodyHeight: 350,
+		height: 300,
+		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
 			{header: '발주번호', name: 'buy_no', width: 80, align: 'center'},
@@ -332,7 +332,7 @@ $(function() {
 //		});
 //	}); 
 
-	$('#savebuy').on('click', function () {
+	$('#saveBuy').on('click', function () {
 		const modifiedRows = grid3.getModifiedRows();
 		console.log(modifiedRows); 
 		
@@ -356,7 +356,7 @@ $(function() {
 		    return; // 저장 중단
 		}
 	    
-		sendToServer(modifiedRows);
+		sendToServer(modifiedRows, '발주');
 		
 	}); 
 	
@@ -384,7 +384,7 @@ $(function() {
 		    return; // 저장 중단
 		}
 	    
-		sendToServer(modifiedRows);
+		sendToServer(modifiedRows, '수주');
 	}); 
 
 	
@@ -450,11 +450,7 @@ $(function() {
 				})
 		          .catch(function (error) {
 		              console.error('삭제 중 오류 발생:', error);
-		              Swal.fire(
-		                  'Error',
-		                  '삭제 중 문제가 발생했습니다.',
-		                  'error'
-		              );
+		              Swal.fire('Error', '삭제 중 문제가 발생했습니다.', 'error' );
 		          });
 		      } 
 		      // "취소"를 누르면 아무 동작 없이 닫힘 (기본 동작)
@@ -463,7 +459,7 @@ $(function() {
 	
 	
 	// 수정/추가 컬럼 반영
-	function sendToServer(modifiedRows) {
+	function sendToServer(modifiedRows, type) {
 		const payload = {
 		    updatedRows: modifiedRows.updatedRows,
 		    createdRows: modifiedRows.createdRows,
@@ -479,14 +475,20 @@ $(function() {
 	        Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success');
 			const reversedData = response.data;
 	        grid.resetData(reversedData); 
+//			if(type === '수주') {
+//				$('#order-sale').modal('hide');
+//			} else if(type === '발주') {
+//				$('#order-buy').modal('hide');
+//			}
 	    })
 	    .catch(function (error) {
 	        console.error('데이터 저장 중 오류 발생:', error);
 	        Swal.fire('Error', '데이터 저장 중 문제가 발생했습니다.', 'error');
 	    });
+		
+		
 	}
 
 	
 
 });	// 돔 로드 이벤트
-

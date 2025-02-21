@@ -173,8 +173,7 @@ public class OrderRestController {
 		}
         
         // 최신 데이터 반환
-		List<OrdersDTO> Orderlist = service.getOrdersList();
-        return ResponseEntity.ok(Orderlist);
+        return ResponseEntity.ok(service.getOrdersList());
         
     } // saveSale
 	 
@@ -212,42 +211,37 @@ public class OrderRestController {
 		}
 		
         // 최신 데이터 반환
-		List<OrdersDTO> Orderlist = service.getOrdersList();
-        return ResponseEntity.ok(Orderlist);
+        return ResponseEntity.ok(service.getOrdersList());
 		
 	} // saveBuy
 	
 	/* 주문 수정 */
 	@PostMapping("/save/detail")
 	public ResponseEntity<List<OrdersDTO>> saveDetail(@RequestBody Map<String, Object> param, @AuthenticationPrincipal User user) {
-		List<?> rows = (List<?>) param.get("updatedRows");
-		ObjectMapper mapper = new ObjectMapper();
-		String order_type = (String) param.get("order_type");
-		
-		if(order_type.equals("수주")) {
-			List<Sale> updatedRows = new ArrayList<>();
-		    for (Object obj : rows) {
-		    	Sale sale = mapper.convertValue(obj, Sale.class);
-		        updatedRows.add(sale);
-		    }
-		    if (updatedRows != null && !updatedRows.isEmpty()) {
-		    	service.updateSale(updatedRows);
-		    }
-		} else if(order_type.equals("발주")) {
-			List<Buy> updatedRows = new ArrayList<>();
-		    for (Object obj : rows) {
-		    	Buy buy = mapper.convertValue(obj, Buy.class);
-		        updatedRows.add(buy);
-		    }
-		    if (updatedRows != null && !updatedRows.isEmpty()) {
-		    	service.updateBuy(updatedRows);
-		    }
-		}
-		
-		
-		// 최신 데이터 반환
-		List<OrdersDTO> Orderlist = service.getOrdersList();
-		return ResponseEntity.ok(Orderlist);
+		System.out.println("saveDetail- param = " + param);
+
+	    String order_type = (String) param.get("order_type");
+
+	    if(order_type != null && order_type.equals("수주")) {
+	        List<SaleDTO> updatedRows = new ArrayList<>();
+	        
+	        for (Object obj : (List<?>) param.get("updatedRows")) {
+	            updatedRows.add(new ObjectMapper().convertValue(obj, SaleDTO.class));
+	        }
+	        if (!updatedRows.isEmpty()) {
+	            service.updateSale(updatedRows);
+	        }
+	    } else if(order_type != null && order_type.equals("발주")) {
+	        List<BuyDTO> updatedRows = new ArrayList<>();
+	        for (Object obj : (List<?>) param.get("updatedRows")) {
+	            updatedRows.add(new ObjectMapper().convertValue(obj, BuyDTO.class));
+	        }
+	        if (!updatedRows.isEmpty()) {
+	            service.updateBuy(updatedRows);
+	        }
+	    }
+	    return ResponseEntity.ok(service.getOrdersList());
+	
 		
 	} // saveDetail
 	
@@ -307,5 +301,3 @@ public class OrderRestController {
 	
 	
 } // PlanRestController
-
-
