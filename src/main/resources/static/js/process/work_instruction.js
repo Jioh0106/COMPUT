@@ -39,17 +39,14 @@ async function fetchProcessInfoList(){
        	}
 		
 		const processInfoList = await response.json();
-		console.log("processInfoList",processInfoList);
 		
 		const processData = processInfoList.map(item => ({
 			label:item.processName,
 			value:item.processNo
 		}));
-		console.log("processData",processData);
 		
 		// selectBox 생성
 		processSelectBox = selectBox("#processSelectBox","공정 선택",processData);
-		console.log("processSelectBox",processSelectBox);
 		
 	}catch(error){
 		console.error("error",error);
@@ -66,13 +63,11 @@ async function fetchLineInfoList(){
 		}
 		
 		const lineInfoList = await response.json();
-		console.log("lineInfoList",lineInfoList);
 		
 		const lineData = lineInfoList.map(item =>({
 			label: item.lineName,
 			value: item.lineNo
 		}));
-		console.log("lineData",lineData);
 		
 		// 그리드에서 사용할 listItems 생성
 		const gridLineListItems = lineData.map(item => ({
@@ -555,6 +550,12 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
 	       return;
 	}
 	
+	// 출고 대기 항목 갯수
+	const itemsNumber = workStart('/api/count-outbound-items-by-wiNo',checkedWiGrid);
+	console.log('출고 대기 항목 갯수',itemsNumber);
+	
+	// 출고 대기 항목 갯수가 0이 아니면 작업시작 동작 제어
+	
 	for (let row of checkedWiGrid) {
        	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
        	const lineName = workInstructionGrid.getValue(row.rowKey, 'line_name');
@@ -587,11 +588,13 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
 	
 	console.log("updateData ",updateWiData);
 	
-	workStartBtn('/api/start-work-instruction',updateWiData);
+	workStart('/api/start-work-instruction',updateWiData);
+	
+	//location.reload(true);
 	
 });
 
-async function workStartBtn(url,data){
+async function workStart(url,data){
 	try{
 		const response = await fetch(url,{
 			method: 'POST',
@@ -605,12 +608,16 @@ async function workStartBtn(url,data){
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
-		//location.reload(true);
+		
+		const result = await response.json();
+		console.log('result',result);
+		return result;
 		
 	}catch(error){
 		console.log("error",error);
 	}
 };
+
 
 // 공정완료 버튼 동작
 document.getElementById('processFinishBtn').addEventListener('click', async () => {
@@ -636,6 +643,8 @@ document.getElementById('processFinishBtn').addEventListener('click', async () =
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
+		
+		location.reload(true);
 				
 		console.log("공정 완료!");
 	}catch(error){
@@ -670,6 +679,8 @@ document.getElementById('defectCheckBtn').addEventListener('click', async () =>{
 			throw new Error("네트워크 응답 실패");
 		}
 		
+		location.reload(true);
+		
 	}catch(error){
 		console.log("error",error);
 	}
@@ -700,7 +711,8 @@ document.getElementById('workEndBtn').addEventListener('click', async () => {
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
-				
+		location.reload(true);
+		
 		console.log("작업 종료!");
 	}catch(error){
 		console.log("error",error);

@@ -484,7 +484,7 @@
 		WHERE wi_no = #{wiNo}
 	</update>
 	
-	<select id="countOutboundItemsByWiNo()">
+	<select id="countOutboundItemsByWiNo">
 		SELECT count(wi_no)
 		FROM OUTBOUND
 		WHERE wi_no = #{wiNo}

@@ -46,7 +46,6 @@ public class WorkInstructionService {
 	
 	// 계획에서 가져온 작업지시 정보 테이블에 insert
 	public void regWorkInstruction(List<Map<String, Object>> insertList) {
-		log.info(insertList.toString());
 		
 		// 계획에서 가져오는 품목에서 반재품을 분리 시켜서 insert를 한다
 		for(Map<String, Object> selectData : insertList) {
@@ -157,7 +156,6 @@ public class WorkInstructionService {
 	}
 	
 	public void insertMaterialInWareHouse(List<Map<String, Object>> insertMaterialData) {
-		//log.info("인서트할 정보 : "+insertMaterialData.toString());
 		
 		for(Map<String, Object> materialData : insertMaterialData) {
 			wiMapper.insertMaterialInWareHouse(materialData);
@@ -170,22 +168,34 @@ public class WorkInstructionService {
 		log.info("작업시작 정보 : "+updateDataList);
 		
 		// 작업 시작 정보 update
-		for(Map<String, Object> updateData : updateDataList) {
-			// 작업 지시 정보 및 상태 업데이트
-			wiMapper.updateWorkStartInfo(updateData);
-			
-			// 작업 계획 상태 업데이트
-			wiMapper.updatePlanStatusStart(updateData);
-		}
+//		for(Map<String, Object> updateData : updateDataList) {
+//			// 작업 지시 정보 및 상태 업데이트
+//			wiMapper.updateWorkStartInfo(updateData);
+//			
+//			// 작업 계획 상태 업데이트
+//			wiMapper.updatePlanStatusStart(updateData);
+//		}
 		
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
 		
 		// 공정 lot insert
-		createAndInsertProcessLot(updateDataList,sessionEmpId);
+//		createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
-		// lot master insert
-		createAndInsertLotMaster(updateDataList,sessionEmpId);
+		// lot_master insert
+//		createAndInsertLotMaster(updateDataList,sessionEmpId);
 		
+	}
+	
+	// 작업 지시 번호(wi_no)를 가진 출고 대기 항목의 갯수
+	public int getCountOutboundItemsByWiNo(List<Map<String, Object>> updateDataList) {
+		// 작업 지시 번호
+		int wiNo = (int)updateDataList.get(0).get("wi_no");
+		log.info("작업 지시 번호 : "+wiNo);
+		
+		// 출고 대기 항목의 갯수
+		int itemsNumber = wiMapper.countOutboundItemsByWiNo(wiNo);
+		
+		return itemsNumber;
 	}
 	
 	/**

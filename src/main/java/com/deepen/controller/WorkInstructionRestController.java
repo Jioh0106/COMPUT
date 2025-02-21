@@ -111,13 +111,26 @@ public class WorkInstructionRestController {
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
 		String sessionEmpId = (String) empInfo.get("EMP_ID");
 		
+		// 작업 시작 버튼 동작
 		wiService.startWorkInstruction(updateDataList,sessionEmpId);
 	}
+	
+	@PostMapping("/count-outbound-items-by-wiNo")
+	public int getCountOutboundItemsByWiNo(@RequestBody List<Map<String, Object>> checkedWiGrid) {
+		
+		// 출고 대기 항목 갯수 확인 후 작업 시작 버튼 제어
+		int itemsNumber = wiService.getCountOutboundItemsByWiNo(checkedWiGrid);
+		log.info("출고 대기 항목 갯수 : "+itemsNumber);
+		
+		return itemsNumber;
+	}
+	
+	
+	
 	
 	@PostMapping("/complete-process")
 	public void processComplete(@RequestBody List<Map<String, Object>> updateDataList,
 								HttpServletRequest request) {
-		log.info("공정 완료 준비");
 		
 		HttpSession session = request.getSession();
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
@@ -130,7 +143,6 @@ public class WorkInstructionRestController {
 	@PostMapping("/check-defect")
 	public void checkDefect(@RequestBody List<Map<String, Object>> updateDataList,
 							HttpServletRequest request) {
-		log.info("품질 검사 버튼 동작 준비");
 		
 		HttpSession session = request.getSession();
 		Map<String, Object> empInfo = (Map<String, Object>)session.getAttribute("sEmp");
@@ -144,7 +156,6 @@ public class WorkInstructionRestController {
 	@PostMapping("/end-work-instruction")
 	public void endWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
 								HttpServletRequest request) {
-		log.info("작업 종료 준비");
 		
 		wiService.endWorkInstruction(updateDataList);
 		
