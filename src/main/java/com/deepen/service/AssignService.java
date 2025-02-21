@@ -63,7 +63,7 @@ public class AssignService {
 		// 반려사유는 여기서처리 x
 
 		request.setRequest_type("발령"); //요청유형
-//		request.setMiddle_approval(requestDto.getMiddle_approval());//중간권한자
+		request.setIs_checked("N"); //토스트알림 체크 컬럼
 		
 		
 		   // **권한에 따른 요청 상태 및 승인자 설정**
@@ -71,10 +71,6 @@ public class AssignService {
 	        case "ATHR001": // 최종 권한자
 	            request.setRequest_status("RQST005"); // 요청 상태: 최종승인 
 	            request.setHigh_approval(emp_id);     // 최종 승인자: 본인사번
-	            //발령테이블 최종승인날짜(오늘날짜) 컬럼도 insert 해야함.
-//	            Assignment assignmentRegistr_Date = asRepository.findByRequest_no(requestDto.getRequest_no())
-//	            									.orElseThrow(()->new RuntimeException("요청을 찾을 수 없음"));
-//	            assignmentRegistr_Date.setRegistr_date(LocalDateTime.now());
 	            break;
 
 	        case "ATHR002": // 중간 권한자

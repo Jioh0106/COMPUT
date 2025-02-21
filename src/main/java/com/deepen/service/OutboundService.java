@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.BeanUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class OutboundService {
     
     private final OutboundRepository outboundRepository;
     private final OutboundMapper outboundMapper;
+    private final JdbcTemplate jdbcTemplate;
     
     // 출고 목록 조회
     public List<OutboundDTO> getOutboundList(Map<String, Object> params) {
@@ -69,6 +71,12 @@ public class OutboundService {
     // 출고 등록
     @Transactional
     public void saveOutbound(OutboundDTO outboundDTO) {
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = auth.getName();
+        
+        // DB 세션에 현재 사용자 설정
+        jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + currentUser + "'); END;");
+    	
         // 재고 수량 체크
         Map<String, Object> params = new HashMap<>();
         params.put("item_no", outboundDTO.getItem_no());
@@ -88,6 +96,11 @@ public class OutboundService {
         Outbound outbound = new Outbound();
         BeanUtils.copyProperties(outboundDTO, outbound);
         outbound.setStatus("대기");
+        
+        // 기본값으로 제품출고 설정
+        if (outbound.getSource() == null || outbound.getSource().isEmpty()) {
+            outbound.setSource("PSH");  
+        }
         
         outboundRepository.save(outbound);
     }
@@ -122,6 +135,9 @@ public class OutboundService {
     public void completeOutbound(List<Integer> outNos) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = auth.getName();
+        
+        // DB 세션에 현재 사용자 설정
+        jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + currentUser + "'); END;");
         
         List<Outbound> outbounds = outboundRepository.findAllById(outNos);
         

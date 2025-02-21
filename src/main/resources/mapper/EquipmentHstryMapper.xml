@@ -35,9 +35,11 @@
 		FROM
 			common_detail
 		WHERE
-			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'MNTP'
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
 		AND
 			common_detail_status = 'Y'
+		AND
+			COMMON_DETAIL_CODE NOT IN ('USST002', 'USST004')
 		ORDER BY
 			common_detail_display
 	</select>
@@ -141,6 +143,21 @@
 		  FROM equipment_history
 		 WHERE hsty_no = #{hstyNo}
 	</delete>
+	
+	<update id="updateStts" parameterType="map">
+		UPDATE equipment_info
+		<choose>
+			<when test='hstyType == "USST001"'>
+			-- 점검이 끝난 후 가동 가능한 상태가 될 경우 설비 정보에 상태를 점검 -> 정지로 변경
+				SET   info_type 		= 'USST004'
+			</when>
+			<when test='hstyType != "USST001"'>
+			-- 이력에서 가동이 아닌 다른 상태값으로 추가 및 수정 시 이력과 동일한 값으로 변경
+				SET   info_type 		= #{hstyType}
+			</when>
+		</choose>
+		WHERE info_no 			= #{infoNo}
+	</update>
 
 	
 </mapper>

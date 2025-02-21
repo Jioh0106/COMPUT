@@ -23,14 +23,17 @@ public class InboundRestController {
     public ResponseEntity<Map<String, Object>> getInboundList(
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "status", required = false, defaultValue = "대기") String status) {
+            @RequestParam(value = "kbulk-completeyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false, defaultValue = "대기") String status,
+            @RequestParam(value = "source", required = false) String source ) {
         
         Map<String, Object> params = new HashMap<>();
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("keyword", keyword);
         params.put("status", status);
+        params.put("source", source);
+        
         
         List<InboundDTO> inboundList = inboundService.getInboundList(params);
         
@@ -64,7 +67,7 @@ public class InboundRestController {
     public ResponseEntity<List<Map<String, Object>>> searchWarehouses(
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
             @RequestParam("itemNo") int itemNo,
-            @RequestParam("itemType") String itemType) {
+            @RequestParam(value = "itemType", required = false) String itemType) {
         List<Map<String, Object>> warehouses = inboundService.searchWarehouses(keyword, itemNo, itemType);
         return ResponseEntity.ok(warehouses);
     }

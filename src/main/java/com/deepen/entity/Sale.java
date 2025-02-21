@@ -1,6 +1,9 @@
 package com.deepen.entity;
 
-import java.time.LocalDate;
+import java.sql.Date;
+
+import com.deepen.domain.SaleDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "SALE")
 @Data
@@ -26,7 +30,7 @@ public class Sale {
 	private Integer product_no;
 	
 	@Column(name = "sale_deadline", nullable = false)
-	private LocalDate sale_deadline;
+	private Date sale_deadline;
 	
 	@Column(name = "sale_unit", length = 30, nullable = false)
 	private String sale_unit;
@@ -37,6 +41,17 @@ public class Sale {
 	@Column(name = "sale_status", length = 30)
 	private String sale_status;
 	
-	
+	public static Sale setSaleEntity(SaleDTO saleDTO) {
+		Sale sale = new Sale();
+		sale.setSale_no(saleDTO.getSale_no());
+		sale.setOrder_id(saleDTO.getOrder_id());
+		sale.setProduct_no(saleDTO.getProduct_no());
+		sale.setSale_deadline(saleDTO.getSale_deadline());
+		sale.setSale_unit(saleDTO.getSale_unit());
+		sale.setSale_vol(saleDTO.getSale_vol());
+		sale.setSale_status(saleDTO.getSale_status());
+		
+		return sale;
+	}
 	
 }

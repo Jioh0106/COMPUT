@@ -35,8 +35,68 @@
             width: 30%;
             box-sizing: border-box;
         }
+        .child-input3 {
+            flex: 0.45;  
+            width: 15%; 
+            box-sizing: border-box;
+        }
         .tui-grid-cell {
             background-color: #ffffff !important;
+        }
+        
+        /* 출처 선택 스타일 */
+        .source-select-container {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .source-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .source-option-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .material-option .source-option-dot {
+            background-color: #3b82f6;
+        }
+        
+        .product-option .source-option-dot {
+            background-color: #8b5cf6;
+        }
+        
+        .material-option {
+            background-color: white;
+            color: #1e40af;
+        }
+        
+        .product-option {
+            background-color: white;
+            color: #5b21b6;
+        }
+        
+        .material-option.active {
+            background-color: #dbeafe;
+            font-weight: 600;
+        }
+        
+        .product-option.active {
+            background-color: #ede9fe;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -117,9 +177,12 @@
                             </div>
                         </div>
                         <div class="child-input2">
-                            <label>상태</label>
-                            <div class="form-group">
-                                <input type="text" id="status" class="form-control" value="대기" readonly>
+                            <div class="display-flex">
+                                <div class="child-input1">
+                                    <label>상태</label>
+                                        <input type="text" id="status" class="form-control" value="대기" readonly>
+                                </div>
+                                    <input type="hidden" id="source" value="PSH">
                             </div>
                         </div>
                     </div>
@@ -168,7 +231,7 @@
         </div>
     </div>
 
-	<!-- jQuery -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- 스크립트 -->
@@ -180,8 +243,6 @@
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
     <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
     <script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script>
-    
-   
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

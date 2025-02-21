@@ -39,9 +39,14 @@ public interface OrdersMapper {
 
 	List<BuyDTO> getDetailBuy(@Param("order_id") String order_id);
 
-	void insertInbound(Map<String, Object> inbound);
-
 	List<Map<String, Object>> getgetBomList(int product_no);
+
+	String checkIsClient(@Param("client_no")int client_no, @Param("order_type") String order_type);
+
+	void updateOrder(String order_id);
+
+
+
 
 	
 

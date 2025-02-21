@@ -49,7 +49,7 @@
 
     <!-- 현재 날짜 기준 순차 번호 조회 -->
     <select id="getNextLotSequence" resultType="java.lang.Integer">
-        SELECT NVL(MAX(TO_NUMBER(SUBSTR(lot_no, -3))), 0) + 1
+        SELECT NVL(MAX(TO_NUMBER(SUBSTR(lot_no, -1))), 0) + 1
         FROM lot_master
         WHERE lot_no LIKE #{date} || '%'
     </select>

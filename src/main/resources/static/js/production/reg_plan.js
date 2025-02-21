@@ -7,15 +7,15 @@ $(function() {
 		height: 400,
 		bodyHeight: 350,
 		columns: [
-			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true },
-			{ header: '주문번호', name: 'order_id', width: 100, sortingType: 'asc', sortable: true},
-			{ header: '상품번호', name: 'product_no', width: 80, sortingType: 'asc', sortable: true },
-			{ header: '상품명', name: 'product_name', width: 200, sortingType: 'asc', sortable: true },
-			{ header: '주문단위', name: 'unit_name', width: 80, sortingType: 'asc', sortable: true },
-			{ header: '주문량', name: 'sale_vol', width: 80, sortingType: 'asc', sortable: true },
-			{ header: '거래처', name: 'client_name', width: 100, sortingType: 'asc', sortable: true },
-			{ header: '소요시간', name: 'time_sum', width: 100 },
-			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true },
+			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true, align: 'center'  },
+			{ header: '주문번호', name: 'order_id', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '상품번호', name: 'product_no', width: 80, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '상품명', name: 'product_name', width: 200, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '주문단위', name: 'unit_name', width: 80, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '주문량', name: 'sale_vol', width: 80, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '거래처', name: 'client_name', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '소요시간', name: 'time_sum', width: 100, align: 'center' },
+			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
 			{
 				header: '생산 시작 예정일', 
 				name: 'plan_start_date', 
@@ -23,7 +23,8 @@ $(function() {
 				editor: {
 	                type: 'datePicker',
 	                options: { format: 'yyyy-MM-dd', language: 'ko' }
-				}
+				},
+				align: 'center'
 			},
 			{
 				header: '생산 시작 종료일', 
@@ -32,7 +33,8 @@ $(function() {
 				editor: {
 	                type: 'datePicker',
 	                options: { format: 'yyyy-MM-dd', language: 'ko'}
-				}
+				},
+				align: 'center'
 			},
 			{ 
 				header: '우선순위', 
@@ -51,7 +53,9 @@ $(function() {
 			        if (cellData.value === "긴급") {
 			            return '<span class="text-danger">' + cellData.value + '</span>';
 			        }
-			    } 
+			       	return '일반';
+			    },
+				align: 'center' 
 			},
 			{ 
 	            header: '재고 조회', 
@@ -85,7 +89,7 @@ $(function() {
 	});
 
 		
-	// 버튼 클릭 이벤트 추가
+	// 재고 조회 버튼 클릭 이벤트 추가
 	grid.on('click', (ev) => {
 	    if (ev.columnName === 'check_mtr') {
 	        const rowData = grid.getRow(ev.rowKey);

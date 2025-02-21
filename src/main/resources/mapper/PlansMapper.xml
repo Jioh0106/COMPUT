@@ -59,6 +59,7 @@
 			 , BOM_QUANTITY 
 			 , PROCESS_NAME
 			 , PRIOR BOM_QUANTITY * BOM_QUANTITY AS total_quantity
+			 , PRIOR BOM_QUANTITY AS PROCESS_COUNT
 		  FROM BOM b
 		 WHERE BOM_STATUS = 'Y'
 		 START WITH PRODUCT_NO = #{product_no}
@@ -77,7 +78,7 @@
 	</select>
 	
 	<!--  재고 조회  -->
-	<select id="getInventorty">
+	<select id="getInventorty" >
 		SELECT ITEM_NO, SUM(INVENTORY_QTY) AS INVENTORY_QTY
 		FROM INVENTORY 
 		WHERE INVENTORY_TYPE = '자재'

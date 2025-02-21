@@ -182,7 +182,7 @@
 										<div class="child-input1">
 											<label>사번: </label>
 											<div class="form-group">
-												<input type="text" id="empId" class="form-control" readonly>
+												<input type="text" id="empIdModal" class="form-control" readonly>
 											</div>
 										</div>
 										<div class="child-input2">
@@ -402,7 +402,7 @@
 							.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
 							.then(data => {
 								console.info(data[0].empId);
-								$("#empId").val(data[0].empId); // #empId 선택자로 수정
+								$("#empIdModal").val(data[0].empId); // #empId 선택자로 수정
 						      	$("#empName").val(data[0].empNm); // 이름 값 설정
 						      	$("#use-start-date").val(data[0].vctnStart); // 사용 시작일
 						      	$("#use-end-date").val(data[0].vctnEnd); // 사용 종료일

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.BomDTO;
 import com.deepen.domain.CommonDetailDTO;
+import com.deepen.domain.ProductDTO;
 
 
 @Mapper
@@ -28,5 +29,7 @@ public interface ProductMapper {
 	 List<Map<String, Object>> selectProcess();
 	 
 	 List<CommonDetailDTO> selectUnit();
+
+	 List<ProductDTO> selectAllProducts();
 	
 }

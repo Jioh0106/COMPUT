@@ -72,8 +72,6 @@ public class VacationService {
 				useVctn.put("vctnDays", 15 - Integer.valueOf(String.valueOf(useVctn.get("useDays"))));
 			}
 		}
-		System.out.println("useVctnList : " + useVctnList.toString());
-		System.out.println("athrMapList : " + athrMapList.toString());
 		return useVctnList;
 	}
 	

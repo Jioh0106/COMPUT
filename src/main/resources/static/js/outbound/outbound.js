@@ -63,6 +63,33 @@ $(function() {
         }
     }
 
+    /**
+     * 출처 태그 렌더러 클래스
+     * 그리드 내 출처를 태그 형태로 표시
+     */
+    class SourceTagRenderer {
+        constructor(props) {
+            this.el = document.createElement('div');
+            this.render(props);
+        }
+
+        getElement() {
+            return this.el;
+        }
+
+		render(props) {
+		    const el = this.el;
+		    const source = props.value;
+		    
+		    if (source === 'MTI') {
+		        el.innerHTML = '<div class="source-tag material-tag"><span class="source-dot"></span>자재투입</div>';
+		    } else if (source === 'PSH') {
+		        el.innerHTML = '<div class="source-tag product-tag"><span class="source-dot"></span>제품출고</div>';
+		    } else {
+		        el.innerHTML = source || '';
+		    }
+		}
+	}
     // =============== 유틸리티 함수 ===============
     /**
      * 그리드 컬럼 생성 헬퍼 함수
@@ -81,6 +108,7 @@ $(function() {
      */
     function getBaseColumns() {
         return [
+            createColumn({header: '출처', name: 'source', renderer: {type: SourceTagRenderer}}),
             createColumn({header: '출고번호', name: 'out_no'}),
             createColumn({header: '품목명', name: 'item_name', width: 200}),
             createColumn({
@@ -204,7 +232,57 @@ $(function() {
         pendingGrid.on('uncheck', updateButtonsState);
         pendingGrid.on('checkAll', updateButtonsState);
         pendingGrid.on('uncheckAll', updateButtonsState);
+        
+        // 그리드 이벤트에 출처 스타일 적용 등록
+        pendingGrid.on('onGridMounted', applySourceStyles);
+        pendingGrid.on('onGridUpdated', applySourceStyles);
+        completeGrid.on('onGridMounted', applySourceStyles);
+        completeGrid.on('onGridUpdated', applySourceStyles);
     }
+
+    /**
+     * 출처에 따라 행 스타일 지정하는 함수
+     */
+	function applySourceStyles() {
+	    const pendingRows = pendingGrid?.el.querySelectorAll('.tui-grid-row');
+	    const completeRows = completeGrid?.el.querySelectorAll('.tui-grid-row');
+	    
+	    // 대기 그리드에 스타일 적용
+	    if (pendingRows) {
+	        pendingRows.forEach(row => {
+	            const rowKey = row.getAttribute('data-row-key');
+	            if (rowKey === null) return;
+	            
+	            const rowData = pendingGrid.getRow(parseInt(rowKey, 10));
+	            if (!rowData) return;
+	            
+	            // 출처별 스타일 적용
+				if (rowData.source === 'MTI') {
+				    row.classList.add('source-material');
+				} else if (rowData.source === 'PSH') {
+				    row.classList.add('source-product');
+				}
+	        });
+	    }
+	    
+	    // 완료 그리드에 스타일 적용
+	    if (completeRows) {
+	        completeRows.forEach(row => {
+	            const rowKey = row.getAttribute('data-row-key');
+	            if (rowKey === null) return;
+	            
+	            const rowData = completeGrid.getRow(parseInt(rowKey, 10));
+	            if (!rowData) return;
+	            
+	            // 출처별 스타일 적용
+	            if (rowData.source === 'MATERIAL') {
+	                row.classList.add('source-material');
+	            } else if (rowData.source === 'PRODUCT') {
+	                row.classList.add('source-product');
+	            }
+	        });
+	    }
+	}
 
     /**
      * 탭 이벤트 초기화
@@ -227,6 +305,24 @@ $(function() {
                 });
             });
         }
+    }
+
+    /**
+     * 출처 필터 태그 이벤트 바인딩
+     */
+    function bindSourceFilterEvents() {
+        const filterTags = document.querySelectorAll('.source-filter-tag');
+        
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                // 활성 태그 갱신
+                filterTags.forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                
+                // 검색 실행
+                search();
+            });
+        });
     }
 
     /**
@@ -326,12 +422,17 @@ $(function() {
         const endDate = document.getElementById('endDate')?.value || '';
         const activeTab = document.querySelector('.nav-link.active')?.id;
         const status = activeTab === 'pending-tab' ? '대기' : '완료';
+        
+        // 활성화된 출처 필터 가져오기
+        const activeSourceTag = document.querySelector('.source-filter-tag.active');
+        const source = activeSourceTag ? activeSourceTag.getAttribute('data-source') : '';
 
         const params = new URLSearchParams({
             startDate: startDate,
             endDate: endDate,
             keyword: searchInput,
-            status: status
+            status: status,
+            source: source
         });
 
         fetch(`/api/outbound/list?${params}`)
@@ -346,6 +447,9 @@ $(function() {
                         grid.refreshLayout();
                         grid.resetData(result.data);
                         updateButtonsState();
+                        
+                        // 데이터 로드 후 출처 스타일 적용
+                        setTimeout(applySourceStyles, 100);
                     }
                 } else {
                     throw new Error('데이터 조회 결과가 없습니다.');
@@ -401,8 +505,9 @@ $(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content
-	fetch('/api/outbound/bulk-delete', {
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+                fetch('/api/outbound/bulk-delete', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -596,6 +701,7 @@ $(function() {
         initializeDatePickers();
         initializeGrids();
         bindButtonEvents();
+        bindSourceFilterEvents(); // 출처 필터 이벤트 바인딩 추가
         initializeTabEvents();
 
         // 초기 데이터 로드

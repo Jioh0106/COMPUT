@@ -25,4 +25,6 @@ public interface EquipmentHstryMapper {
 
 	int delete(Map<String, Object> saveData);
 
+	void updateStts(Map<String, Object> saveData);
+
 }

@@ -51,4 +51,7 @@ public class Inbound {
     @Column(name = "item_no")
     private int item_no; // 품목번호
     
+    @Column(name = "source", length = 20)
+    private String source; // 출처
+    
 }

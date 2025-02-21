@@ -35,10 +35,6 @@
 				margin: auto;
 			}
 			
-			.tui-grid-cell {
-				/* !important -> 우선순위 높아짐 */
-				background-color: #ffffff !important;
-			}
 			
 			.child-input1 {
 				flex: 1;
@@ -51,6 +47,10 @@
 				margin: 0px 5%;
 				width: 30%;
 				box-sizing: border-box;
+			}
+			
+			#client_name {
+				background-color: white;
 			}
 			
 		</style>
@@ -90,8 +90,11 @@
                             <div class="col-md-3">
                                 <fieldset class="form-group">
 									<label for="basicInput">거래처</label>
-									<input type="text" class="form-control serch-content" id="client_name" placeholder="거래처 조회">
-									<input type="hidden" name="client_no" value="client_no" id="client_no"/>	
+									<div class="input-group mb-3">
+										<input type="text" class="form-control serch-content" disabled placeholder="거래처 조회" id="client_name" aria-describedby="button-addon">
+										<button class="btn btn-outline-secondary" type="button" id="client-serch">조회</button>
+									</div>
+									<input type="hidden" name="client_no" id="client_no"/>	
                                 </fieldset>
                             </div>
                         </div> <!--row-->
@@ -101,14 +104,14 @@
 						<div class="d-flex justify-content-start">
 							<h5 class="d-flex align-items-center">상품별 소요량 조회</h5>
 							<fieldset class="form-group ms-3">
-								<input type="text" class="form-control serch-content" id="product_name" placeholder="상품 조회">
+								<input type="text" class="form-control serch-content form-control-sm" id="product_name" placeholder="상품 조회">
 								<input type="hidden" name="product_no" value="product_no" id="product_no"/>	
 							</fieldset>
 						</div>	
 						<div class="row" id="basic-table">
 							<div id="grid2" class="mb-2"></div>
-							<div class="d-flex justify-content-end">
-								<input type="button" class="btn btn-outline-secondary ms-2" id="appendMtr" value="일괄 추가 ▼">
+							<div class="d-flex justify-content-center">
+								<input type="button" class="btn btn-outline-secondary ms-2 btn-sm" id="appendMtr" value="자재 일괄 추가 ▼">
 							</div>
 						</div>
 					</section>
@@ -117,9 +120,15 @@
 						<h5>자재 발주 등록</h5>
 						<div class="row" id="basic-table">
 							<div id="grid" class="mb-2"></div>
-							<div class="d-flex justify-content-end">
-								<input type="button" class="btn btn-outline-secondary ms-2" id="appendRow" value="추가">
-								<input type="button" class="btn btn-outline-success  ms-2" id="appendOrder" value="발주 등록">
+							<div class="d-flex justify-content-between">
+								<div class="d-flex justify-content-start">
+									<input type="button" class="btn btn-outline-primary me-2" id="appendRow" value="자재 추가">
+									<input type="button" class="btn btn-outline-danger me-2" id="minusRow" value="삭제">
+									<input type="button" class="btn btn-outline-secondary me-2" id="resetData" value="초기화">
+								</div>
+								<div class="d-flex justify-content-end">
+									<input type="button" class="btn btn-outline-success  ms-2" id="appendOrder" value="발주 등록">
+								</div>
 							</div>
 						</div> <!--row-->
 					</section>

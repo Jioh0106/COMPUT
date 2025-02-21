@@ -30,6 +30,28 @@
 	 where request_no = #{request_no}
 	</select>
 	
+	<!-- 토스트 알림 -> 발령최종승인자 조회 -->
+	<select id="selectChecked" parameterType="String" resultType="com.deepen.domain.RequestDTO">
+    SELECT a.assign_emp_id, r.request_type, r.request_status, r.is_checked, r.request_no
+    FROM request r
+    JOIN assignment a
+    ON r.request_no = a.request_no
+    WHERE r.request_type = '발령' 
+    AND r.request_status = 'RQST005' 
+    AND r.is_checked = 'N'
+    AND a.assign_emp_id = #{empId} <!-- 로그인한 사용자만 조회 -->
+	</select>
+
+	<!-- 알림창 x 누르면 is_checked컬럼 'Y'로 변경 -> 알림안뜨도록 -->
+	<update id="updateChecked">
+	UPDATE request
+	SET is_checked = 'Y'
+	WHERE request_no = #{request_no}
+	</update>
+	
+	
+	
+	
 	
 </mapper>
 

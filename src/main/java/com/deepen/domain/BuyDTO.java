@@ -26,6 +26,7 @@ public class BuyDTO {
 	private String order_emp;
 	private String emp_name;
 	private String client_name;
+	private String inbound_status;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private Timestamp order_date;

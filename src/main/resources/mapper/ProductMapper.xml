@@ -35,11 +35,14 @@
 	FROM(SELECT
 		mtr_no AS item_no,  
 	    mtr_name AS item_name,
-	    mtr_unit AS item_unit,
+	    cd.common_detail_name AS item_unit,
 	    '자재' AS item_type
 	FROM 
-	    material
+	    material m
+	LEFT JOIN common_detail cd ON m.mtr_unit = cd.common_detail_code  
+	  
 	UNION ALL
+	
 	SELECT 
 		p.product_no AS item_no,
 	    p.product_name AS item_name,
@@ -47,7 +50,7 @@
 	    p.product_type AS item_type
 	FROM 
 	    product p
-	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code    
+	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code
 	WHERE
 		p.product_type = '반제품'    
 	 ) all_select
@@ -133,6 +136,17 @@
 		IN('UNIT')
 		AND common_detail_status ='Y' 
 	</select>
+	
+	<select id="selectAllProducts" resultType="com.deepen.domain.ProductDTO">
+        SELECT 
+            product_no as productNo,
+            product_name as productName,
+            product_unit as productUnit,
+            product_type as productType
+        FROM product
+        WHERE product_type != 'DUMMY'
+        ORDER BY product_name
+    </select>
 	
 	
 

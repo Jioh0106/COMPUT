@@ -1,6 +1,5 @@
 package com.deepen.service;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.PlansDTO;
 import com.deepen.domain.SaleDTO;
-import com.deepen.entity.Client;
 import com.deepen.entity.Plans;
 import com.deepen.mapper.PlansMapper;
 import com.deepen.repository.PlansRepository;
@@ -53,6 +51,9 @@ public class PlanService {
 			
 			for(Map<String, Object> map : bomList) {
 				int sum = mapper.sumProcessTime((String) map.get("PROCESS_NAME"));
+				if(map.containsKey("PROCESS_COUNT")) {
+					sum *= Integer.parseInt(map.get("PROCESS_COUNT").toString());
+				} 
 				time_sum += sum;
 			}
 			
@@ -66,8 +67,7 @@ public class PlanService {
 	public boolean checkMtr(int product_no, int sale_vol) {
 		// 최종 반환할 값(재고 있음/없음)
 		boolean isMtr = true;
-		System.out.println("JVM TimeZone: " + ZoneId.systemDefault());
-
+		
 		// 현재 재고 
 		List<Map<String, Object>> inventory = mapper.getInventorty();
 		

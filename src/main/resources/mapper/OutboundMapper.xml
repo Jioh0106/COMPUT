@@ -54,6 +54,9 @@
             <if test="status != null and status != ''">
                 AND o.status = #{status}
             </if>
+            <if test="source != null and source != ''">
+	            AND o.source = #{source}
+	        </if>
             <if test="keyword != null and keyword != ''">
                 AND (
                     w.warehouse_name LIKE '%' || #{keyword} || '%'

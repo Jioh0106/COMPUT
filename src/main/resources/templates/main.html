@@ -5,7 +5,6 @@
 <div th:fragment="main">
 	<!-- main.html -->
 	<div id="main">
-
 		<div class="card" style="width: 1200px;">
 		    <div class="card-body">
 		        <section >
@@ -35,7 +34,18 @@
 		        </section>
 		    </div>
 		</div>
-
+		<!--  발령 등록 토스트 알림 -->
+		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+			<div class="toast-header">
+				<img src="/images/siren.png" class="rounded me-2 " id="sirenImg" >
+				<strong class="me-auto">인사발령 알림</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				해당 사번의 인사발령이 승인되었습니다.<br>
+				인사발령현황 메뉴를 확인해주세요. 
+			</div>
+		</div>
      
 	</div>
 	<!-- main.html 끝-->
@@ -48,6 +58,7 @@
 <script src="/assets/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript" th:src="@{/js/main_work.js}"></script>
+<script th:inline="javascript" th:src="@{/js/main_assignment.js}"></script>
 
 <!-- sweetAlert CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

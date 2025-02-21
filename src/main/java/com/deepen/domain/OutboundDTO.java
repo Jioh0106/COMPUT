@@ -26,4 +26,6 @@ public class OutboundDTO {
     private String item_type;		// 품목구분 (자재 또는 완제품)
     private String item_name;		// 품목명(재고명 또는 상품명)
     private String item_unit;		// 품목단위(자재 또는 완제픔)
+    
+    private String source;			// 출처(자재투입 또는 제품출고)
 }

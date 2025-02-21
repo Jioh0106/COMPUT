@@ -16,6 +16,7 @@ public class RequestDTO {
 	private String request_type; //요청유형
 	private String request_status; //요청상태
 	private String request_rejection; //반려사유
+	private String is_checked; //알림확인여부
 	
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

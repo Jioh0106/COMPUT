@@ -108,7 +108,7 @@
 									<div class="col-md-4">
 									  <label for="warehouse">창고 선택</label>
 									  <select class="form-select deptArea" id="warehouse">
-									      <option value="">창고를 선택하세요</option>
+									      <option value="">전체</option>
 									  </select>
 									</div>
 									
@@ -116,7 +116,7 @@
 									  <div class="col-md-4">
 									  <label for="zone">구역 선택</label>
 									  <select class="form-select deptArea" id="zone">
-  										<option value="">구역을 선택하세요</option>
+  										<option value="">전체</option>
   									  </select>
 									  </div>
 									
@@ -545,7 +545,7 @@
 
 			
 		
-		//select박스 창고조회, 구역조회
+		//select박스 창고조회, 구역조회, 품목검색
 		$(document).ready(function(){
 			
 		   // 창고 목록 불러오기
@@ -558,7 +558,7 @@
 		   // 창고 선택 시 구역 불러오기
            $('#warehouse').change(function () {
                let warehouseId = $(this).val();
-               $('#zone').html('<option value="">구역 선택</option>');
+               $('#zone').html('<option value="">전체</option>');
 
                if (warehouseId) {
                    $.get(`/api/inventory/${warehouseId}/zone`, function (data) {
@@ -578,7 +578,7 @@
 			  
 		  //품목명 검색 데이터 조회
 			  $("#searchItem").on("keyup", function() {
-			         loadInventoryData(); // 🔥 검색 입력할 때마다 데이터 로드
+			         loadInventoryData(); // 검색 입력할 때마다 데이터 로드
 			     });  	
 				 
 		      // 초기 데이터 로드
