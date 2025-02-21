@@ -63,13 +63,16 @@ public class EquipmentHstryService {
 		for(Map<String, Object> saveData : saveDataList) {
 			
 			String rowType = String.valueOf(saveData.get("rowType"));
+			String hstyType = String.valueOf(saveData.get("hstyType"));
 			saveData.put("hstyPrfr", user.getUsername());
 			
 			if(rowType.equals("insert")) { 			// 추가일 경우
-				result = mapper.insert(saveData); 
+				result = mapper.insert(saveData);
+				mapper.updateStts(saveData);
 				
 			} else if(rowType.equals("update")) {	// 수정일 경우
 				result = mapper.update(saveData);
+				mapper.updateStts(saveData);
 				
 			} else {								// 삭제일 경우
 				result = mapper.delete(saveData);
