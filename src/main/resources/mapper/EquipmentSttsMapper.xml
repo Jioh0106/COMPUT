@@ -22,11 +22,11 @@
 		SELECT	  
 			  info_sn AS "sn"
 			, info_nm AS "name"
-			, (SELECT process_name FROM process_info WHERE process_no = ei.process_no) AS "processNm"
+			, (SELECT process_name FROM process_info WHERE process_no = ei.line_no) AS "processNm"
 			, NVL((SELECT common_detail_name FROM common_detail 
 					WHERE REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
 					AND common_detail_status = 'Y' 
-					AND common_detail_name = info_type), '정지') AS "type"
+					AND common_detail_code = info_type), '정지') AS "type"
 			, info_use_date AS "useDate"
 		FROM
 			equipment_info ei
