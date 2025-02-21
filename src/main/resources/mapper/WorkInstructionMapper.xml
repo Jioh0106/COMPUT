@@ -32,6 +32,7 @@
 			process_priority AS "processPriority"
 		FROM process_info
 		WHERE is_active = 'Y'
+		ORDER BY process_no
 	</select>
 	
 	<select id="selectLineInfo" resultType="com.deepen.domain.LineInfoDTO">
@@ -40,6 +41,7 @@
 			line_name AS "lineName" 
 		FROM line_info
 		WHERE is_active = 'Y'
+		ORDER BY line_no
 	</select>
 	
 	<select id="selectRegWorkInstruction" resultType="java.util.Map">
@@ -370,6 +372,13 @@
 		WHERE plan_id = #{plan_id}
 	</update>
 	
+	<update id="updateEquipmentInfoByLineNoToOperation" parameterType="Map">
+		UPDATE equipment_info SET
+			info_type = 'USST001'
+		WHERE line_no = #{line_no}
+			AND info_type = 'USST002'
+	</update>
+	
 	<select id="getLastLotSequence">
 		SELECT 
 			MAX(REGEXP_SUBSTR(lot_no,'[^-]+',1,4)) AS "lastSequence"
@@ -463,6 +472,13 @@
 		WHERE wi_no = #{wiNo}
 	</update>
 	
+	<update id="updateEquipmentInfoByLineNoToStanBy">
+		UPDATE equipment_info SET
+			info_type = 'USST002'
+		WHERE line_no = #{lineNo}
+			AND info_type = 'USST001'
+	</update>
+	
 	<update id="updateWiStatusByWiNoToInspectionPending">
 		UPDATE work_instruction SET 
 			qc_status = 'LTST003'
@@ -488,6 +504,7 @@
 		SELECT count(wi_no)
 		FROM OUTBOUND
 		WHERE wi_no = #{wiNo}
+			AND status = '대기'
 	</select>
 </mapper>
 

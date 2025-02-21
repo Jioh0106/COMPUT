@@ -168,21 +168,27 @@ public class WorkInstructionService {
 		log.info("작업시작 정보 : "+updateDataList);
 		
 		// 작업 시작 정보 update
-//		for(Map<String, Object> updateData : updateDataList) {
-//			// 작업 지시 정보 및 상태 업데이트
-//			wiMapper.updateWorkStartInfo(updateData);
-//			
-//			// 작업 계획 상태 업데이트
-//			wiMapper.updatePlanStatusStart(updateData);
-//		}
+		for(Map<String, Object> updateData : updateDataList) {
+			// 작업 지시 정보 및 상태 업데이트
+			wiMapper.updateWorkStartInfo(updateData);
+			
+			// 작업 계획 상태 업데이트
+			wiMapper.updatePlanStatusStart(updateData);
+			
+			// 설비 상태 업데이트 => 가동(USST001)
+			// 조건 : 라인번호에 해당하는 설비, 상태가 대기(USST002)인 것만
+			//wiMapper.updateEquipmentInfoByLineNoToOperation(updateData);
+		}
 		
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
 		
 		// 공정 lot insert
-//		createAndInsertProcessLot(updateDataList,sessionEmpId);
+		createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
 		// lot_master insert
-//		createAndInsertLotMaster(updateDataList,sessionEmpId);
+		createAndInsertLotMaster(updateDataList,sessionEmpId);
+		
+		log.info("작업 시작 완료");
 		
 	}
 	
@@ -327,14 +333,20 @@ public class WorkInstructionService {
 			log.info("update기준 작업지시 번호 : "+ wiNo);
 			String plandId = (String) updateData.get("plan_id");
 			log.info("update기준 계획번호 : "+ plandId);
+			int linNo = (int)updateData.get("line_no");
+			log.info("update기준 계획번호 : "+ linNo);
+			
+			// 상테 업데이트
 			wiMapper.updateWiStatusByWiNoToComplete(wiNo);
 			log.info("작업 지시 상태 업데이트 완료!");
-			wiMapper.updatePlanStatusByWiNoToComplete(plandId);
-			log.info("생산 계획 상태 업데이트 완료!");
 			wiMapper.updateLotMasterStatusByWiNoToComplete(wiNo,sessionEmpId);
 			log.info("lot_master 상태 업데이트 완료!");
 			wiMapper.updateLotProcessLogStatusByWiNoToComplete(wiNo);
 			log.info("lot_process_log 상태 업데이트 완료!");
+			
+			// 설비 상태 업데이트 => 대기(USST002)
+			// 조건 : 라인번호에 해당하는 설비, 상태가 가동(USST001)인 것만
+			//wiMapper.updateEquipmentInfoByLineNoToStanBy(linNo);
 		}
 		
 		
@@ -348,6 +360,8 @@ public class WorkInstructionService {
 		for(Map<String, Object> updateData :updateDataList ) {
 			int wiNo = (int)updateData.get("wi_no");
 			log.info("update기준 작업지시 번호 : "+ wiNo);
+			
+			// 상태 업데이트
 			wiMapper.updateWiStatusByWiNoToInspectionPending(wiNo);
 			wiMapper.updateLotMasterStatusByWiNoToInspectionPending(wiNo,sessionEmpId);
 			log.info("품질 검사 상태 업데이트 완료!");
@@ -356,16 +370,21 @@ public class WorkInstructionService {
 
 	
 	/**
-	 * 공정 완료 로직
+	 * 작업 종료 로직
 	 * @param List<Map<String, Object>> updateDataList,sessionEmpId
 	 */
 	public void endWorkInstruction(List<Map<String, Object>> updateDataList) {
 		log.info("작업 종료 동작 시작");
 		for(Map<String, Object> updateData :updateDataList ) {
 			int wiNo = (int)updateData.get("wi_no");
+			String plandId = (String) updateData.get("plan_id");
 			log.info("update기준 작업지시 번호 : "+ wiNo);
+			
+			//상태 업데이트
 			wiMapper.updateWiStatusByWiNoToEnd(wiNo);
 			log.info("작업 지시 상태 업데이트 완료!");
+			wiMapper.updatePlanStatusByWiNoToComplete(plandId);
+			log.info("생산 계획 상태 업데이트 완료!");
 		}
 		
 	}

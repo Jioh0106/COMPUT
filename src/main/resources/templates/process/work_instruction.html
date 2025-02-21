@@ -163,10 +163,10 @@
 				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 시작 -->
 				    <div class="row h-75 py-1">
 				        <div class="col d-flex justify-content-end ">
-				            <button class="btn btn-outline-primary btn-sm align-items-center justify-content-center me-1" id="workStartBtn">작업시작</button>
-				            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center me-1" id="processFinishBtn">공정완료</button>
-				            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center me-1" id="defectCheckBtn">품질검사</button>
-				            <button class="btn btn-outline-secondary btn-sm align-items-center justify-content-center" id="workEndBtn">작업종료</button>
+				            <button class="btn btn-primary btn-sm align-items-center justify-content-center me-1" id="workStartBtn">작업시작</button>
+				            <button class="btn btn-success btn-sm align-items-center justify-content-center me-1" id="processFinishBtn">공정완료</button>
+				            <button class="btn btn-warning btn-sm align-items-center justify-content-center me-1" id="defectCheckBtn">품질검사</button>
+				            <button class="btn btn-secondary btn-sm align-items-center justify-content-center" id="workEndBtn">작업종료</button>
 				        </div>
 				    </div>
 				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 끝 -->
@@ -183,7 +183,7 @@
 				                <button class="nav-link" id="tab-material-tab" data-bs-toggle="tab" data-bs-target="#tab-material" type="button" role="tab">자재</button>
 				            </li>
 				            <li class="nav-item me-1" role="presentation">
-				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업담당자</button>
+				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업 담당자</button>
 				            </li>
 				        </ul>
 				    </div>
@@ -220,6 +220,7 @@
 	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
 	<script th:src="@{/assets/js/main.js}"></script>
 
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
 	<script src="https://uicdn.toast.com/select-box/latest/toastui-select-box.js"></script>

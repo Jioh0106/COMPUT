@@ -98,27 +98,24 @@ window.onload = async function() {
 	endDatePicker.setNull();
 	
 	// 서버에서 받은 데이터로 select box 생성
-	fetchProcessInfoList();
-	//fetchLineInfoList();
+	await fetchProcessInfoList();
 	const gridLineListItems = await fetchLineInfoList();
 	
 	// 초기 그리드 생성
 	createWorkInstructionGrid(gridLineListItems);
 	
+	createMaterialGrid();
+	document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
 	
 	document.getElementById('planNoSearch').addEventListener('input', search);
 	startDatePicker.on('change',search);
 	endDatePicker.on('change',search);
-	if (processSelectBox) {
-      	processSelectBox.on('change', search);
-	}
+  	processSelectBox.on('change', search);
 	
   	if (lineSelectBox) {
       	lineSelectBox.on('change', search);
   	}
 	
-	createMaterialGrid();
-	document.getElementById('tab-worker-tab').addEventListener('click',createWorkerGrid);
 };
 
 // 그리드 초기값
@@ -139,14 +136,10 @@ function search() {
         lineNo: selectedLine && selectedLine.value ? selectedLine.value : ""
     };
 
-    console.log("검색 필터:", workInstructionFilter);  
-
     fetchWorkInstruction(workInstructionFilter);
 }
 
 function createWorkInstructionGrid(gridLineListItems = []){
-		//const data = [];//processList;
-		//console.log("processList:", data);
 		var Grid = tui.Grid;
 		Grid.applyTheme('clean');
 		if (workInstructionGrid) {
@@ -160,7 +153,6 @@ function createWorkInstructionGrid(gridLineListItems = []){
 			rowHeaders: ['checkbox'],
 			scrollX: true,
 			scrollY: true,
-			//width: 'auto',
 			bodyHeight: 280,
 			columns: [
 				{header: '지시번호', name: 'wi_no', width:90, sortable: true},
@@ -179,6 +171,7 @@ function createWorkInstructionGrid(gridLineListItems = []){
 																		        return selectedItem ? selectedItem.text : value;  // 존재하면 text(공정 1라인), 없으면 기본값
 																		    }},
 				{header: '공정', name: 'process_name', width:210, filter: { type: 'text', showApplyBtn: true, showClearBtn: true }},
+				{header: '공정 상태', name: 'wi_status', width:90, filter : 'select'},
 				{header: '공정 상태', name: 'wi_status_name', width:90, filter : 'select'},
 				{header: '검사 상태', name: 'qc_status_name', width:100, filter : 'select'},
 				{header: '작업 시작일', name: 'start_date', width:120, sortable: true},
@@ -194,6 +187,8 @@ function createWorkInstructionGrid(gridLineListItems = []){
 		});
 		
 		workInstructionGrid.hideColumn("emp_id");
+		workInstructionGrid.hideColumn("wi_status");
+		workInstructionGrid.hideColumn("qc_status_name");
 		
 		// 데이터 fetch
 		fetchWorkInstruction(null);
@@ -250,8 +245,6 @@ function createWorkerGrid(){
 };
 
 function createMaterialGrid(){
-		//const data = processList;
-		//console.log("processList:", data);
 		var Grid = tui.Grid;
 		
 		// 탭 활성화
@@ -346,7 +339,6 @@ async function fetchRegWorkInstructionInfo(){
  */
 document.getElementById('insert-work-instruction').addEventListener('click', () =>{
 	const checkedRows = regGrid.getCheckedRows();
-	console.log("checkedRows",checkedRows);
 	const data = checkedRows.map(row =>({
 		PLAN_ID:row.PLAN_ID
 	}));
@@ -442,13 +434,23 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	
 	if (checkedWiRows.length === 0) {
 	       console.warn("작업지시 항목을 선택해주세요.");
-	       alert("작업지시 항목을 선택해주세요.");
+		   Swal.fire({
+				title:"작업지시 항목을 선택해주세요.",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+		   });
 	       return;
 	}
 	
 	if (checkedMaterialRows.length === 0) {
 	       console.warn("자재 항목을 선택해주세요.");
-	       alert("자재 항목을 선택해주세요.");
+		   Swal.fire({
+				title:"자재 항목을 선택해주세요.",
+   				icon:"info",
+   				confirmButtonColor: "#435ebe",
+   				confirmButtonText: "확인"
+   		   });
 	       return;
 	}
 	
@@ -464,7 +466,12 @@ document.getElementById('inputMaterial').addEventListener('click',() => {
 	
 	insertOB('/api/insert-material-warehouse',insertMaterialData);
 	
-	alert("자재 투입 요청 완료");
+	Swal.fire({
+		title:"자재 투입 요청 완료",
+		icon:"success",
+		confirmButtonColor: "#435ebe",
+		confirmButtonText: "확인"
+   	});
 });
 
 async function insertOB(url,data){
@@ -491,32 +498,41 @@ async function insertOB(url,data){
 // 작업담당자 추가 버튼 이벤트
 document.getElementById('addBtn').addEventListener('click', () => {
 	const checkedWorkerGrid = workerGrid.getCheckedRows();
-	    const checkedWiGrid = workInstructionGrid.getCheckedRows();
-	    
-	    if (checkedWorkerGrid.length === 0) {
-	        console.warn("작업담당자를 선택하세요.");
-			alert("작업담당자를 선택하세요.");
-	        return;
-	    }
-	    
-	    if (checkedWiGrid.length === 0) {
-	        console.warn("작업 담당자를 넣을 작업지시를 선택하세요.");
-	        alert("작업 담당자를 넣을 작업지시를 선택하세요.");
-	        return;
-	    }
+    const checkedWiGrid = workInstructionGrid.getCheckedRows();
+    
+    if (checkedWorkerGrid.length === 0) {
+        console.warn("작업 담당자를 선택하세요.");
+		Swal.fire({
+			title:"작업 담당자를 선택하세요.",
+			icon:"info",
+			confirmButtonColor: "#435ebe",
+			confirmButtonText: "확인"
+	   	});
+        return;
+    }
+    
+    if (checkedWiGrid.length === 0) {
+        console.warn("담당할 작업지시를 선택하세요.");
+		Swal.fire({
+			title:"담당할 작업지시를 선택하세요.",
+			icon:"info",
+			confirmButtonColor: "#435ebe",
+			confirmButtonText: "확인"
+	   	});
+        return;
+    }
 
-	    const selectedWorker = checkedWorkerGrid[0]; // 첫 번째 체크된 작업자
-	    const selectedWorkerNo = selectedWorker.no;
-	    const selectedWorkerName = selectedWorker.name;
+    const selectedWorker = checkedWorkerGrid[0]; // 첫 번째 체크된 작업자
+    const selectedWorkerNo = selectedWorker.no;
+    const selectedWorkerName = selectedWorker.name;
 
-	    checkedWiGrid.forEach(row => {
-	        // UI에서 직접 셀 업데이트
-	        workInstructionGrid.setValue(row.rowKey, 'emp_id', selectedWorkerNo);
-	        workInstructionGrid.setValue(row.rowKey, 'emp_name', selectedWorkerName);
-	    });
+    checkedWiGrid.forEach(row => {
+        // UI에서 직접 셀 업데이트
+        workInstructionGrid.setValue(row.rowKey, 'emp_id', selectedWorkerNo);
+        workInstructionGrid.setValue(row.rowKey, 'emp_name', selectedWorkerName);
+    });
 
-	    console.log("담당자 배정 사원번호:", selectedWorkerNo);
-	    console.log("담당자 배정 사원이름:", selectedWorkerName);
+	console.log("작업 담당자 추가 완료");
 });
 
 // 작업담당자 삭제 버튼 이벤트
@@ -539,46 +555,101 @@ document.getElementById('deleteBtn').addEventListener('click', () => {
 
 // 작업시작 버튼 동작
 document.getElementById('workStartBtn').addEventListener('click', async () => {
-	//const checkedWiGrid = workInstructionGrid.getModifiedRows().updatedRows;
 	const checkedWiGrid = workInstructionGrid.getCheckedRows();
 	console.log("checkedWiGrid",checkedWiGrid);
-//	const checkedWorkerRows = workerGrid.getCheckedRows().map(item => item.no);
-//	console.log("추가할 사원아이디",checkedWorkerRows);
 	
 	if (checkedWiGrid.length === 0) {
-	       console.warn("작업지시 항목이 선택되지 않았습니다.");
-	       return;
+		console.warn("작업지시 항목이 선택되지 않았습니다.");
+   		Swal.fire({
+			title:"작업지시 항목을 선택해주세요.",
+	   		icon:"info",
+	   		confirmButtonColor: "#435ebe",
+	   		confirmButtonText: "확인"
+	   	});
+       return;
 	}
 	
-	// 출고 대기 항목 갯수
-	const itemsNumber = workStart('/api/count-outbound-items-by-wiNo',checkedWiGrid);
-	console.log('출고 대기 항목 갯수',itemsNumber);
+	// 상태에 따른 유효성 검사
+	// 공정 상태가 '대기중(PRGR005)' 일때만 동작
+    for (let row of checkedWiGrid) {
+        const status = workInstructionGrid.getValue(row.rowKey, 'wi_status');
+        if (status === 'PRGR002') {
+			Swal.fire({
+				title:"생산중입니다.",
+	   			icon:"info",
+		   		confirmButtonColor: "#435ebe",
+		   		confirmButtonText: "확인"
+		   	});
+            return;
+        } else if (status === 'PRGR003') {
+			Swal.fire({
+				title:'완료된 지시사항입니다.',
+	   			icon:'info',
+		   		confirmButtonColor: "#435ebe",
+		   		confirmButtonText: "확인"
+		   	});
+            return;
+        } else if (status === 'PRGR006') {
+			Swal.fire({
+				title:"종료된 지시사항입니다.",
+	   			icon:"info",
+		   		confirmButtonColor: "#435ebe",
+		   		confirmButtonText: "확인"
+		   	});
+            return;
+        }
+    }
 	
-	// 출고 대기 항목 갯수가 0이 아니면 작업시작 동작 제어
-	
+	// 라인 선택 유효성 검사
 	for (let row of checkedWiGrid) {
-       	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
+		// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
        	const lineName = workInstructionGrid.getValue(row.rowKey, 'line_name');
         console.log("lineName : ",lineName);
        	if (!lineName) {
            	console.warn("라인을 선택해주세요");
-			alert("라인을 선택해주세요");
+			Swal.fire({
+				title:"라인을 선택해주세요.",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
            	return;
        	}
    	}
 	console.log('라인 선택완료!');
 	
+	// 담당자 추가 유효성 검사
 	for (let row of checkedWiGrid) {
        	// 'line_name' 값이 null, undefined, 또는 빈 문자열("")인 경우 경고 메시지 출력
        	const empId = workInstructionGrid.getValue(row.rowKey, 'emp_id');
         console.log("empId : ",empId);
        	if (!empId) {
            	console.warn("담당자을 선택해주세요");
-			alert("담당자을 선택해주세요");
+			Swal.fire({
+				title:"담당자을 선택해주세요",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
            	return;
        	}
    	}
 	console.log('담당자 선택완료!');
+	
+	// 출고 대기 항목 갯수
+	const itemsNumber = await workStart('/api/count-outbound-items-by-wiNo',checkedWiGrid);
+	console.log('출고 대기 항목 갯수',itemsNumber);
+	
+	// 출고 대기 항목 갯수가 0이 아니면 작업시작 동작 제어
+	if(itemsNumber > 0){
+		Swal.fire({
+			title:"자재 출고 대기 중입니다.",
+			icon:"warning",
+			confirmButtonColor: "#435ebe",
+			confirmButtonText: "확인"
+		});
+		return;
+	}
 	
    	// 각 작업지시 데이터에 firstWiNo 추가
    	const updateWiData = checkedWiGrid.map(row => ({
@@ -588,9 +659,9 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
 	
 	console.log("updateData ",updateWiData);
 	
-	workStart('/api/start-work-instruction',updateWiData);
+	await workStart('/api/start-work-instruction',updateWiData);
 	
-	//location.reload(true);
+	location.reload(true);
 	
 });
 
@@ -627,8 +698,44 @@ document.getElementById('processFinishBtn').addEventListener('click', async () =
 		
 		if (selectRows.length === 0) {
       		console.warn("완료할 작업 지시를 선택해주세요");
-      		alert("완료할 작업 지시를 선택해주세요");
+			Swal.fire({
+				title:"완료할 작업 지시를 선택해주세요.",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
        		return;
+		}
+		
+		// 상태에 따른 유효성 검사
+		// 공정 상태가 '생산중' 일때만 동작
+		for (let row of selectRows) {
+			const status = workInstructionGrid.getValue(row.rowKey, 'wi_status');
+			if (status === 'PRGR005') {
+				Swal.fire({
+					title:"공정 대기중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR003') {
+				Swal.fire({
+					title:"완료된 지시사항입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR006') {
+				Swal.fire({
+					title:"종료된 지시사항입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
 		}
 		
 		const response = await fetch("/api/complete-process",{
@@ -662,8 +769,53 @@ document.getElementById('defectCheckBtn').addEventListener('click', async () =>{
 		
 		if (selectRows.length === 0) {
       		console.warn("품질 검사할 항목을 선택해주세요");
-      		alert("품질 검사할 항목을 선택해주세요");
+			Swal.fire({
+				title:"품질 검사할 항목을 선택해주세요.",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
        		return;
+		}
+		
+		// 상태에 따른 유효성 검사
+		// 공정 상태가 '완료' 일때만 동작
+		for (let row of selectRows) {
+			const status = workInstructionGrid.getValue(row.rowKey, 'wi_status');
+			const qcStatus = workInstructionGrid.getValue(row.rowKey, 'qc_status');
+			if (status === 'PRGR005') {
+				Swal.fire({
+					title:"공정 대기중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR002') {
+				Swal.fire({
+					title:"생산중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR006') {
+				Swal.fire({
+					title:"종료된 지시사항입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			}else if(qcStatus === 'LTST003'){
+				Swal.fire({
+					title:"품질 검사중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
 		}
 		
 		const response = await fetch("/api/check-defect",{
@@ -678,6 +830,13 @@ document.getElementById('defectCheckBtn').addEventListener('click', async () =>{
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
+		
+		Swal.fire({
+			title:"품질 검사 시작",
+			icon:"success",
+			confirmButtonColor: "#435ebe",
+			confirmButtonText: "확인"
+		});
 		
 		location.reload(true);
 		
@@ -695,8 +854,44 @@ document.getElementById('workEndBtn').addEventListener('click', async () => {
 		
 		if (selectRows.length === 0) {
       		console.warn("종료할 작업 지시를 선택해주세요");
-      		alert("종료할 작업 지시를 선택해주세요");
+			Swal.fire({
+				title:"종료할 작업 지시를 선택해주세요.",
+				icon:"info",
+				confirmButtonColor: "#435ebe",
+				confirmButtonText: "확인"
+			});
        		return;
+		}
+		
+		// 상태에 따른 유효성 검사
+		// 공정 상태가 '완료' 일때만 동작
+		for (let row of selectRows) {
+			const status = workInstructionGrid.getValue(row.rowKey, 'wi_status');
+			if (status === 'PRGR005') {
+				Swal.fire({
+					title:"공정 대기중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR002') {
+				Swal.fire({
+					title:"생산중입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			} else if (status === 'PRGR006') {
+				Swal.fire({
+					title:"종료된 지시사항입니다.",
+					icon:"info",
+					confirmButtonColor: "#435ebe",
+					confirmButtonText: "확인"
+				});
+				return;
+			}
 		}
 		
 		const response = await fetch("/api/end-work-instruction",{
@@ -711,6 +906,7 @@ document.getElementById('workEndBtn').addEventListener('click', async () => {
 		if(!response.ok){
 			throw new Error("네트워크 응답 실패");
 		}
+		
 		location.reload(true);
 		
 		console.log("작업 종료!");

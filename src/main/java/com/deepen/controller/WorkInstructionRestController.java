@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -104,7 +105,7 @@ public class WorkInstructionRestController {
 	}
 	
 	@PostMapping("/start-work-instruction")
-	public void startWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
+	public ResponseEntity<String> startWorkInstruction(@RequestBody List<Map<String, Object>> updateDataList,
 									HttpServletRequest request) {
 		
 		HttpSession session = request.getSession();
@@ -113,6 +114,8 @@ public class WorkInstructionRestController {
 		
 		// 작업 시작 버튼 동작
 		wiService.startWorkInstruction(updateDataList,sessionEmpId);
+		
+		return ResponseEntity.ok("{\"message\": \"작업 시작 성공\"}");
 	}
 	
 	@PostMapping("/count-outbound-items-by-wiNo")
@@ -158,6 +161,5 @@ public class WorkInstructionRestController {
 								HttpServletRequest request) {
 		
 		wiService.endWorkInstruction(updateDataList);
-		
 	}
 }
