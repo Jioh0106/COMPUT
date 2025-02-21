@@ -1,320 +1,441 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOT 추적</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LOT 추적</title>
 
-    <!-- CSS 라이브러리 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/themes/default/style.min.css">
-    
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
-    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
-    
-    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
-    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
-    
-    <style>
-        body { background-color: #f4f6f9; }
-        .lot-tracking-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        /* LOT 트리 스타일 */
-        .lot-tree-container {
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        /* LOT 계층 구조 스타일 수정 */
-		.lot-hierarchy-view {
-		    min-height: 300px;
-		    max-height: 600px;
-		    overflow: auto;
-		    padding: 20px;
-		    background: #fff;
-		    border-radius: 8px;
-		    border: 1px solid #ddd;
-		}
-		
-		.hierarchy-level {
-		    display: flex;
-		    flex-direction: column;
-		    align-items: center;
-		    margin: 20px 0;
-		    position: relative;
-		}
-		
-		.children-wrapper {
-		    display: flex;
-		    gap: 40px;
-		    margin-top: 30px;
-		    position: relative;
-		    justify-content: center;
-		}
-		
-		/* 계층 연결선 스타일 */
-		.children-wrapper::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    width: 2px;
-    height: 20px;
-    background: #cbd5e1;
-    border-radius: 2px;
-}
+	<!-- CSS 라이브러리 -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/themes/default/style.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.css">
 
-.children-wrapper::after {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 20%;
-    width: 60%;
-    height: 2px;
-    background: #cbd5e1;
-    border-radius: 2px;
-}
+	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
 
-.hierarchy-level:not(:first-child)::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    width: 2px;
-    height: 20px;
-    background: #cbd5e1;
-    border-radius: 2px;
-}
-		
-		/* LOT 카드 스타일 개선 */
-		.lot-card {
-    border: 2px solid #ddd;
-    border-radius: 12px;
-    padding: 15px;
-    min-width: 280px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin: 0 10px;
-}
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 
-.lot-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.lot-card-header {
-    font-weight: 600;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    font-size: 1.1em;
-    color: #1a1a1a;
-}
-
-.lot-card-body {
-    font-size: 0.95em;
-    color: #4a5568;
-    line-height: 1.5;
-}
-
-/* 계층도 여백 조정 */
-.hierarchy-level {
-    margin: 30px 0;
-}
-
-.children-wrapper {
-    margin-top: 40px;
-    gap: 50px;
-}
-		
-		/* 공정 타입별 스타일 수정 */
-		.process-assembly {
-    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
-    border-color: #1e88e5;
-    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
-}
-
-.process-machining {
-    background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%);
-    border-color: #43a047;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
-}
-
-.process-heat {
-    background: linear-gradient(135deg, #ffe0b2 0%, #fff3e0 100%);
-    border-color: #f57c00;
-    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.1);
-}
-
-.process-qc {
-    background: linear-gradient(135deg, #e1bee7 0%, #f3e5f5 100%);
-    border-color: #8e24aa;
-    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.1);
-}
-
-.process-in {
-    background: linear-gradient(135deg, #d7ccc8 0%, #efebe9 100%);
-    border-color: #5d4037;
-    box-shadow: 0 2px 4px rgba(121, 85, 72, 0.1);
-}
-
-.process-out {
-    background: linear-gradient(135deg, #ffccbc 0%, #fbe9e7 100%);
-    border-color: #e64a19;
-    box-shadow: 0 2px 4px rgba(255, 87, 34, 0.1);
-}
-		
-		/* 방향 전환 버튼 스타일 */
-		#directionToggleBtn {
-		    position: relative;
-		    padding-left: 2.5rem;
-		}
-		
-		#directionToggleBtn::before {
-		    content: '↕️';
-		    position: absolute;
-		    left: 1rem;
-		    top: 50%;
-		    transform: translateY(-50%);
-		}
-        /* 상태 뱃지 스타일 */
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-        }
-        .status-created { background-color: #e9ecef; color: #6c757d; }
-        .status-progress { background-color: #d1ecf1; color: #0c5460; }
-        .status-complete { background-color: #d4edda; color: #155724; }
-        
-        /* 그리드 스타일 조정 */
-        .tui-grid-container {
-            margin-top: 20px;
-        }
-    </style>
 </head>
+	<style>
+	/* 변수 정의 */
+	:root {
+	    --process-color: #3B82F6;
+	    --assembly-color: #8B5CF6;
+	    --heat-color: #EC4899;
+	    --qc-color: #F59E0B;
+	    --in-color: #10B981;
+	    --out-color: #6366F1;
+	    --error-color: #DC2626;
+	    --warning-bg: #FEF2F2;
+	    --border-color: #e5e7eb;
+	    --bg-header: #f8fafc;
+	    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+	    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	
+	/* JSTree 커스텀 스타일 */
+	.jstree-default .jstree-anchor {
+	    height: 24px !important;
+	    line-height: 24px !important;
+	}
+	
+	.jstree-default .jstree-node {
+	    min-height: 24px !important;
+	    line-height: 24px !important;
+	    margin-left: 24px !important;
+	    min-width: 24px !important;
+	}
+	
+	.jstree-default .jstree-icon {
+	    width: 24px !important;
+	    height: 24px !important;
+	    line-height: 24px !important;
+	}
+	
+	/* LOT 노드 스타일 */
+	.lot-node {
+	    position: relative;
+	    display: inline-flex !important;
+	    align-items: center !important;
+	    gap: 8px !important;
+	    height: 24px !important;
+	    line-height: 100% !important;
+	    padding-right: 24px !important;
+	}
+	
+	.lot-node-text {
+	    display: inline-flex !important;
+	    align-items: center !important;
+	    gap: 4px !important;
+	}
+	
+	.lot-node-status {
+	    margin-left: 4px !important;
+	}
+	
+	.qc-warning-icon {
+	    position: absolute !important;
+	    right: 4px !important;
+	    top: 0% !important;
+	    transform: translateY(10%) !important;
+	    color: var(--error-color) !important;
+	    animation: pulse 2s infinite !important;
+	}
+	
+	/* 레이아웃 구조 */
+	.split {
+	    display: flex;
+	    height: calc(100vh - 240px) !important;
+	    min-height: 500px;
+	    margin: 0;
+	    padding: 0;
+	}
+	
+	#mainContent {
+	    display: flex;
+	    gap: 1rem;
+	    padding: 1rem;
+	}
+	
+	/* 검색 영역 */
+	.search-area {
+	    background: white;
+	    padding: 1.5rem;
+	    border-radius: 8px;
+	    box-shadow: var(--shadow-sm);
+	    margin-bottom: 1.5rem;
+	}
+	
+	.search-row {
+	    display: flex;
+	    align-items: center;
+	    gap: 1rem;
+	    flex-wrap: nowrap;
+	}
+	
+	.search-input-group {
+	    position: relative;
+	    flex: 1;
+	    min-width: 300px;
+	}
+	
+	.search-input {
+	    width: 100%;
+	    height: 38px;
+	    padding: 0.5rem 1rem 0.5rem 2.5rem;
+	    border: 1px solid var(--border-color);
+	    border-radius: 4px;
+	    font-size: 0.875rem;
+	    transition: all 0.2s ease;
+	}
+	
+	.search-input:focus {
+	    border-color: var(--process-color);
+	    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+	    outline: none;
+	}
+	
+	.search-icon {
+	    position: absolute;
+	    left: 0.75rem;
+	    top: 50%;
+	    transform: translateY(-50%);
+	    color: #6c757d;
+	}
+	
+	/* 컨테이너 영역 */
+	.lot-tree-area {
+	    height: 100%;
+	    overflow: hidden;
+	    display: flex;
+	    flex-direction: column;
+	    min-width: 200px;
+	    max-width: 800px;
+	}
+	
+	.hierarchy-container {
+	    height: 100%;
+	    background: white;
+	    border: 1px solid var(--border-color);
+	    border-radius: 8px;
+	    display: flex;
+	    flex-direction: column;
+	}
+	
+	.hierarchy-header,
+	.lot-tree-header {
+	    padding: 1rem;
+	    background: var(--bg-header);
+	    border-bottom: 1px solid var(--border-color);
+	    flex-shrink: 0;
+	}
+	
+	.lot-tree-content,
+	.hierarchy-content {
+	    flex: 1;
+	    overflow-y: auto;
+	    padding: 1rem;
+	}
+	
+	/* 계층 구조 스타일 */
+	.hierarchy-level {
+	    position: relative;
+	    padding: 0.5rem 0;
+	    margin-left: 40px;
+	}
+	
+	.hierarchy-level::before {
+	    content: '';
+	    position: absolute;
+	    left: -20px;
+	    top: 0;
+	    bottom: 0;
+	    width: 2px;
+	    background: var(--border-color);
+	}
+	
+	.lot-card {
+	    background: white;
+	    border-radius: 8px;
+	    padding: 1rem;
+	    margin: 0.5rem 0;
+	    box-shadow: var(--shadow-sm);
+	    transition: all 0.2s ease;
+	    cursor: pointer;
+	    border: 1px solid var(--border-color);
+	}
+	
+	.lot-card:hover {
+	    transform: translateY(-2px);
+	    box-shadow: var(--shadow-md);
+	    background-color: rgba(0, 0, 0, 0.02);
+	}
+	
+	.lot-card .card-header {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    margin-bottom: 0.5rem;
+	}
+	
+	.lot-info {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 0.5rem;
+	}
+	
+	.info-item {
+	    display: flex;
+	    align-items: center;
+	    gap: 0.5rem;
+	    color: #666;
+	}
+	
+	/* 상태 배지 */
+	.status-badge {
+	    padding: 0.35rem 0.75rem;
+	    border-radius: 9999px;
+	    font-size: 0.75rem;
+	    font-weight: 500;
+	    display: inline-flex;
+	    align-items: center;
+	    gap: 0.25rem;
+	}
+	
+	/* 애니메이션 */
+	@keyframes pulse {
+	    0% { opacity: 1; }
+	    50% { opacity: 0.5; }
+	    100% { opacity: 1; }
+	}
+	
+	/* Split.js 스타일 */
+	.gutter {
+	    background-color: var(--bg-header);
+	    border: 1px solid var(--border-color);
+	}
+	
+	.gutter.gutter-horizontal {
+	    cursor: col-resize;
+	    width: 8px !important;
+	}
+	
+	/* 탭 컨텐츠 */
+	.tab-content {
+	    height: calc(100% - 42px);
+	    overflow: hidden;
+	}
+	
+	.tab-pane {
+	    height: 100%;
+	    overflow-y: auto;
+	    padding: 1rem;
+	}
+	
+	/* 스크롤바 스타일 */
+	.lot-tree-content::-webkit-scrollbar,
+	.tab-pane::-webkit-scrollbar {
+	    width: 6px;
+	    height: 6px;
+	}
+	
+	.lot-tree-content::-webkit-scrollbar-track,
+	.tab-pane::-webkit-scrollbar-track {
+	    background: #f1f1f1;
+	    border-radius: 3px;
+	}
+	
+	.lot-tree-content::-webkit-scrollbar-thumb,
+	.tab-pane::-webkit-scrollbar-thumb {
+	    background: #c1c1c1;
+	    border-radius: 3px;
+	}
+	
+	.lot-tree-content::-webkit-scrollbar-thumb:hover,
+	.tab-pane::-webkit-scrollbar-thumb:hover {
+	    background: #a8a8a8;
+	}
+	
+	/* Grid 스타일 */
+	.tui-grid-cell.qc-failed {
+	    color: var(--error-color);
+	}
+	
+	/* 반응형 스타일 */
+	@media (max-width: 768px) {
+	    .search-row {
+	        flex-direction: column;
+	    }
+	
+	    .search-input-group,
+	    .form-select,
+	    #searchButton {
+	        width: 100%;
+	    }
+	
+	    .split {
+	        flex-direction: column;
+	    }
+	
+	    .lot-tree-area {
+	        max-width: 100%;
+	        height: 300px;
+	    }
+	}
+	</style>
 <body>
-    <div id="app">
-        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-        <div id="main">
-            <div class="page-heading">
-                <h3>LOT 추적</h3>
-            </div>
-            
-            <div class="page-content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <!-- 검색 영역 -->
-                                    <div class="row mb-4">
-                                        <div class="col-12">
-                                            <div class="input-group">
-                                                <input type="text" id="lotSearchInput" class="form-control" placeholder="LOT 번호 또는 제품명 검색">
-                                                <select id="productSelect" class="form-select" style="max-width: 200px;">
-                                                    <option value="0">전체 제품</option>
-                                                </select>
-                                                <button id="searchButton" class="btn btn-primary">
-                                                    <i class="bi bi-search"></i> 검색
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+	<div id="app">
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+		<div id="main">
+			<div class="page-heading">
+				<div class="d-flex justify-content-between align-items-center">
+					<h3>LOT 추적</h3>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb mb-0">
+							<li class="breadcrumb-item"><a href="/"><i class="bi bi-house"></i></a></li>
+							<li class="breadcrumb-item">생산관리</li>
+							<li class="breadcrumb-item active">LOT 추적</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
 
-                                    <!-- LOT 트리 및 계층 구조 영역 -->
-                                    <div class="row">
-                                        <!-- 좌측 트리 뷰 -->
-                                        <div class="col-3">
-                                            <div class="card">
-                                                <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h6 class="mb-0">LOT 목록</h6>
-                                                </div>
-                                                <div class="card-body p-0">
-                                                    <div id="lotTreeView" class="lot-tree-container"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- 우측 상세 정보 -->
-                                        <div class="col-9">
-                                            <div class="card mb-4">
-                                                <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h6 class="mb-0">LOT 계층 구조</h6>
-                                                    <button id="directionToggleBtn" class="btn btn-sm btn-outline-primary">
-                                                        정방향
-                                                    </button>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div id="lotHierarchyView" class="lot-hierarchy-view"></div>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- LOT 상세 정보 -->
-                                            <div class="card mb-4">
-                                                <div class="card-header">
-                                                    <h6 class="mb-0">LOT 상세 정보</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div id="lotDetailsContent">
-                                                        LOT를 선택해주세요.
-                                                    </div>
-                                                </div>
-                                            </div>
+			<div class="search-area">
+				<div class="search-row">
+					<div class="search-input-group">
+						<i class="bi bi-search search-icon"></i>
+						<input type="text" id="lotSearchInput" class="search-input" placeholder="LOT 번호 또는 제품명으로 검색">
+					</div>
+					<select id="productSelect" class="form-select" style="width: 200px;">
+						<option value="0">전체 제품</option>
+					</select>
+					<select id="processSelect" class="form-select" style="width: 150px;">
+						<option value="">전체 공정</option>
+						<option value="PRTP001">가공</option>
+						<option value="PRTP002">조립</option>
+						<option value="PRTP003">열처리</option>
+						<option value="QRTP001">품질검사</option>
+					</select>
+					<button id="searchButton" class="btn btn-primary">
+						<i class="bi bi-search me-1"></i>검색
+					</button>
+				</div>
+			</div>
 
-                                            <!-- 공정 이력 -->
-                                            <div class="card mb-4">
-                                                <div class="card-header">
-                                                    <h6 class="mb-0">공정 이력</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div id="processHistoryGrid"></div>
-                                                </div>
-                                            </div>
+			<div id="mainContent" class="split">
+				<div class="lot-tree-area">
+					<div class="hierarchy-container">
+						<div class="hierarchy-header">
+							<div class="d-flex justify-content-between align-items-center">
+								<h6 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>LOT 계층구조</h6>
+								<div class="btn-group">
+									<button class="btn btn-sm btn-light" id="expandAllBtn">
+										<i class="bi bi-arrows-angle-expand"></i>
+									</button>
+									<button class="btn btn-sm btn-light" id="collapseAllBtn">
+										<i class="bi bi-arrows-angle-contract"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="lot-tree-content" id="lotTreeView"></div>
+					</div>
+				</div>
+				<div class="detail-container">
+					<div class="hierarchy-container">
+						<ul class="nav nav-tabs">
+							<li class="nav-item">
+								<a class="nav-link active" data-bs-toggle="tab" href="#hierarchyTab">
+									<i class="bi bi-diagram-3 me-2"></i>계층 구조
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-bs-toggle="tab" href="#processTab">
+									<i class="bi bi-gear me-2"></i>공정 이력
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-bs-toggle="tab" href="#qcTab">
+									<i class="bi bi-clipboard-check me-2"></i>품질 이력
+								</a>
+							</li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane fade show active" id="hierarchyTab">
+								<div id="lotDetailsContent"></div>
+								<div id="lotHierarchyView"></div>
+							</div>
+							<div class="tab-pane fade" id="processTab">
+								<div id="processHistoryGrid"></div>
+							</div>
+							<div class="tab-pane fade" id="qcTab">
+								<div id="qcHistoryGrid"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                                            <!-- 품질 검사 이력 -->
-                                            <div class="card mb-4">
-                                                <div class="card-header">
-                                                    <h6 class="mb-0">품질 검사 이력</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div id="qcHistoryGrid"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<!-- JavaScript 라이브러리 -->
+			<script th:src="@{/js/jquery-3.7.1.js}"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/jstree.min.js"></script>
+			<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
 
-    <!-- JavaScript 라이브러리 -->
-    <script th:src="@{/js/jquery-3.7.1.js}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/jstree.min.js"></script>
-    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-    
-    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-    <script th:src="@{/assets/js/main.js}"></script>
+			<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+			<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+			<script th:src="@{/assets/js/main.js}"></script>
 
-    <!-- 애플리케이션 스크립트 -->
-    <script th:src="@{/js/lot/lot_tracking.js}"></script>
+			<!-- 애플리케이션 스크립트 -->
+			<script th:src="@{/js/lot/lot_tracking.js}"></script>
+
 </body>
+
 </html>

@@ -10,26 +10,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deepen.domain.LotMasterDTO;
+//import com.deepen.mapper.LotTrackingMapper;
 import com.deepen.service.LotTrackingService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/lot")
 @RequiredArgsConstructor
 public class LotTrackingRestController {
     private final LotTrackingService lotTrackingService;
+//    private final LotTrackingMapper lotTrackingMapper;
     
     @GetMapping(value = "/{lotNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LotMasterDTO> getLotTrackingDetail(
             @PathVariable(name = "lotNo") String lotNo) {
-        LotMasterDTO result = lotTrackingService.getLotTrackingDetail(lotNo);
-        if (result == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            log.info("Received request to get LOT detail for: {}", lotNo);
+            
+            LotMasterDTO result = lotTrackingService.getLotTrackingDetail(lotNo);
+            if (result == null) {
+                log.warn("LOT not found: {}", lotNo);
+                return ResponseEntity.notFound().build();
+            }
+            
+            log.info("Successfully retrieved LOT detail");
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(result);
+                    
+        } catch (Exception e) {
+            log.error("Error getting LOT detail for: " + lotNo, e);
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(result);
     }
 
     @GetMapping(value = "/work-order/{wiNo}", produces = MediaType.APPLICATION_JSON_VALUE)
