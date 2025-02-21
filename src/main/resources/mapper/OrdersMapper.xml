@@ -218,22 +218,6 @@
 		 WHERE o.ORDER_ID = #{order_id}
 	</select>
 	
-	<insert id="insertInbound">
-		INSERT INTO inbound (
-			   in_qty
-			 , buy_no
-			 , item_no
-			 , warehouse_id
-			 , in_date
-		) VALUES (
-			  #{in_qty}
-			, #{buy_no}
-			, #{item_no}
-			, #{warehouse_id}
-			, CURRENT_DATE
-		)
-	</insert>
-	
 	<select id="getgetBomList">
 		SELECT b.BOM_NO
 		     , b.PRODUCT_NO 

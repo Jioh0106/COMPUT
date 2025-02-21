@@ -43,10 +43,10 @@
                 AND i.in_no = #{inNo}
             </if>
             <if test="startDate != null and startDate != ''">
-                AND i.in_date >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                AND TRUNC(i.in_date) >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
             </if>
             <if test="endDate != null and endDate != ''">
-                AND i.in_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+                AND TRUNC(i.in_date) &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
             </if>
             <if test="status != null and status != ''">
                 AND i.status = #{status}
@@ -67,21 +67,22 @@
     </select>
 
     <!-- 품목 검색 -->
-    <select id="searchItems" resultType="map">
-        SELECT 
-            TO_CHAR(mtr_no) as item_code,
-            mtr_name as item_name,
-            '자재' as item_type
-        FROM MATERIAL
-        WHERE mtr_name LIKE '%' || #{keyword} || '%'
-        UNION ALL
-        SELECT 
-            TO_CHAR(product_no) as item_code,
-            product_name as item_name,
-            '완제품' as item_type
-        FROM PRODUCT
-        WHERE product_name LIKE '%' || #{keyword} || '%'
-    </select>
+	<select id="searchItems" resultType="map">
+		SELECT
+		  TO_CHAR(mtr_no) as item_code,
+		  mtr_name as item_name,
+		  '자재' as item_type
+		FROM MATERIAL
+		WHERE mtr_name LIKE '%' || #{keyword} || '%'
+		UNION ALL
+		SELECT
+		  TO_CHAR(product_no) as item_code,
+		  product_name as item_name,
+		  '완제품' as item_type
+		FROM PRODUCT
+		WHERE product_name LIKE '%' || #{keyword} || '%'
+		  AND product_type = '완제품'
+	</select>
 
     <!-- 창고 검색 -->
     <select id="searchWarehouses" resultType="hashmap">
