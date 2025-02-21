@@ -23,6 +23,8 @@ import com.deepen.domain.MaterialDTO;
 import com.deepen.domain.OrdersDTO;
 import com.deepen.domain.ProductDTO;
 import com.deepen.domain.SaleDTO;
+import com.deepen.entity.Buy;
+import com.deepen.entity.Sale;
 import com.deepen.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -179,7 +181,7 @@ public class OrderRestController {
 	/* 발주 등록 */
 	@PostMapping("/save/buy")
     public ResponseEntity<List<OrdersDTO>> saveBuy(@RequestBody Map<String, Object> param, @AuthenticationPrincipal User user) {
-    												
+    	System.out.println();
 		List<?> rows = (List<?>) param.get("createdRows");
 		List<BuyDTO> createdRows = new ArrayList<>();
 		ObjectMapper mapper = new ObjectMapper();
@@ -187,7 +189,10 @@ public class OrderRestController {
 	    	BuyDTO buy = mapper.convertValue(obj, BuyDTO.class);
 	        createdRows.add(buy);
 	    }
-		int client_no = Integer.parseInt((String) param.get("client_no"));
+		Object clientNoObj = param.get("client_no");
+		String clientNoStr = clientNoObj.toString().trim();
+		int client_no = Integer.parseInt(clientNoStr);
+		
 		String order_date =(String) param.get("order_date");
 		String emp_id = user.getUsername();
 		
@@ -211,6 +216,40 @@ public class OrderRestController {
         return ResponseEntity.ok(Orderlist);
 		
 	} // saveBuy
+	
+	/* 주문 수정 */
+	@PostMapping("/save/detail")
+	public ResponseEntity<List<OrdersDTO>> saveDetail(@RequestBody Map<String, Object> param, @AuthenticationPrincipal User user) {
+		List<?> rows = (List<?>) param.get("updatedRows");
+		ObjectMapper mapper = new ObjectMapper();
+		String order_type = (String) param.get("order_type");
+		
+		if(order_type.equals("수주")) {
+			List<Sale> updatedRows = new ArrayList<>();
+		    for (Object obj : rows) {
+		    	Sale sale = mapper.convertValue(obj, Sale.class);
+		        updatedRows.add(sale);
+		    }
+		    if (updatedRows != null && !updatedRows.isEmpty()) {
+		    	service.updateSale(updatedRows);
+		    }
+		} else if(order_type.equals("발주")) {
+			List<Buy> updatedRows = new ArrayList<>();
+		    for (Object obj : rows) {
+		    	Buy buy = mapper.convertValue(obj, Buy.class);
+		        updatedRows.add(buy);
+		    }
+		    if (updatedRows != null && !updatedRows.isEmpty()) {
+		    	service.updateBuy(updatedRows);
+		    }
+		}
+		
+		
+		// 최신 데이터 반환
+		List<OrdersDTO> Orderlist = service.getOrdersList();
+		return ResponseEntity.ok(Orderlist);
+		
+	} // saveDetail
 	
 	/* 주문관리 그리드 정보 삭제 */
 	@PostMapping("/delete")
@@ -239,6 +278,17 @@ public class OrderRestController {
 		return ResponseEntity.ok(bomList);
 		
 	} // getBomList
+	
+	/* 거래처 기등록 여부 조회 */
+//	@GetMapping("/check/client")
+//	public ResponseEntity<Boolean> checkClient(@RequestParam("client_no") int client_no, @RequestParam("order_type") String order_type)  {
+//		
+//		boolean isClient = service.checkIsClient(client_no, order_type);
+//		System.out.println("isClient = " + isClient);
+//		return ResponseEntity.ok(isClient);
+//		
+//	} // checkClient
+	
 	
 	
 	/* 수주 그리드 정보 추가/수정 */

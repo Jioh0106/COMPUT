@@ -108,10 +108,10 @@ $(function() {
 		bodyHeight: 550,
 		rowHeaders: ['checkbox'],
 		columns: [
-			{ header: '생산계획번호', name: 'plan_id', width: 180, sortingType: 'asc', sortable: true  },
-			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true  },
-			{ header: '등록 직원', name: 'emp_name', width: 100 },
-			{ header: '상태', name: 'status_name', width: 100,filter: 'select' },
+			{ header: '생산계획번호', name: 'plan_id', width: 180, sortingType: 'asc', sortable: true, align: 'center'  },
+			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true, align: 'center'  },
+			{ header: '등록 직원', name: 'emp_name', width: 100, align: 'center' },
+			{ header: '상태', name: 'status_name', width: 100,filter: 'select', align: 'center' },
 			{ 
 				header: '우선순위', 
 				name: 'plan_priority', 
@@ -127,7 +127,8 @@ $(function() {
 			            return '<span class="text-danger">' + cellData.value + '</span>';
 			        }
 			       	return '일반';
-			    }   
+			    },
+				align: 'center'   
 			},
 			{ 
 				header: '생산 시작 예정일', 
@@ -143,11 +144,9 @@ $(function() {
 				},			
 				filter: {
 		            type: 'date',
-		            options: {
-		                format: 'yyyy-MM-dd',
-		                language: 'ko'
-		            }
-		        } 
+		            options: {format: 'yyyy-MM-dd',language: 'ko' }
+		        },
+				align: 'center' 
 			},
 			{ 
 				header: '생산 완료 예정일', 
@@ -156,18 +155,13 @@ $(function() {
 				sortable: true,
 				editor: {
 				    type: 'datePicker',
-				    options: {
-				        format: 'yyyy-MM-dd',
-						language: 'ko' 
-				    }
+				    options: {format: 'yyyy-MM-dd',language: 'ko' }
 				},
 				filter: {
 		            type: 'date',
-		            options: {
-		                format: 'yyyy-MM-dd',
-		                language: 'ko'
-		            }
-		        } 
+		            options: {format: 'yyyy-MM-dd',language: 'ko' }
+		        },
+				align: 'center' 
 			  },
 			{ 
 				header: '등록 일자', 
@@ -176,18 +170,13 @@ $(function() {
 				sortable: true,
 				editor: {
 	                type: 'datePicker',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
+	                options: { format: 'yyyy-MM-dd',language: 'ko'  }
 	            },
 				filter: {
 		            type: 'date',
-		            options: {
-		                format: 'yyyy-MM-dd',
-		                language: 'ko'
-		            }
-		        }   
+		            options: {format: 'yyyy-MM-dd',language: 'ko' }
+		        },
+				align: 'center' 
 			},
 			{ 
 				header: '수정 일자', 
@@ -196,18 +185,13 @@ $(function() {
 				sortable: true,
 				editor: {
 	                type: 'datePicker',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
+	                options: {format: 'yyyy-MM-dd',language: 'ko'}
 	            },
 				filter: {
 		            type: 'date',
-		            options: {
-		                format: 'yyyy-MM-dd',
-		                language: 'ko'
-		            }
-		        }   
+		            options: {format: 'yyyy-MM-dd',language: 'ko' }
+		        },
+				align: 'center' 
 			}
 		],
 		data: [] // 서버에서 전달받은 데이터
