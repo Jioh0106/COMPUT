@@ -24,6 +24,7 @@
 						, info_mnfct as "mnfct"
 						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
 						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
+						, line_no as "line"
 						, info_useyn as "useYn"
 						, 'select' AS  "rowType"
 		 FROM
@@ -64,6 +65,18 @@
 		ORDER BY
 			common_detail_display
 	</select>
+
+	<select id="lineInfo" resultType="map">
+		SELECT
+			  TO_CHAR(line_no) AS "lineNo"
+			, line_name AS "lineNm"
+		FROM
+			line_info
+		WHERE
+			is_active = 'Y'
+		ORDER BY
+			line_no
+	</select>
 	
 	<insert id="eqpInsert" parameterType="map">
 		INSERT INTO equipment_info (
@@ -74,6 +87,7 @@
 		  , info_mnfct
 		  , info_buy_date
 		  , info_set_date
+		  , line_no
 		  , info_useyn
 		  , info_reg_date
 		
@@ -85,6 +99,7 @@
 		  , #{mnfct}
 		  , TO_DATE(#{buy}, 'YYYY-MM-DD')
 		  , TO_DATE(#{set}, 'YYYY-MM-DD')
+		  , #{line}
 		  , #{useYn}
 		  , CURRENT_DATE
 		)
@@ -98,6 +113,7 @@
 			, info_mnfct		= #{mnfct}
 			, info_buy_date		= TO_DATE(#{buy}, 'YYYY-MM-DD')
 			, info_set_date		= TO_DATE(#{set}, 'YYYY-MM-DD')
+			, line_no			= #{line}
 			, info_useyn		= #{useYn}
 			, info_mdfn_date	= CURRENT_DATE
 		WHERE info_no 			= #{no}

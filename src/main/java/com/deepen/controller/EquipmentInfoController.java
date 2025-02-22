@@ -57,6 +57,10 @@ public class EquipmentInfoController {
 		List<Map<String, Object>> kindList = service.kindInfo();
 		model.addAttribute("kindList", kindList);
 		
+		// 라인 종류 목록 조회
+		List<Map<String, Object>> lineList = service.lineInfo();
+		model.addAttribute("lineList", lineList);
+		
 		return "equipment/equipment_info";
 	}
 	
