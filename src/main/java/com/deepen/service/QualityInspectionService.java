@@ -205,14 +205,15 @@ public class QualityInspectionService {
         LotMasterDTO newLot = new LotMasterDTO();
         newLot.setLotNo(newLotNo);
         newLot.setParentLotNo(originalLot.getLotNo());
-        newLot.setProcessType(originalLot.getProcessType());
+        newLot.setProcessType("PRTP002");
         newLot.setWiNo(originalLot.getWiNo());
         newLot.setProductNo(originalLot.getProductNo());
         newLot.setProcessNo(originalLot.getProcessNo());
         newLot.setLineNo(originalLot.getLineNo());
-        newLot.setLotStatus(result.getJudgement().equals("Y") ? "LTST005" : "LTST006");
+        newLot.setLotStatus("LTST008");
         newLot.setStartTime(result.getCheckTime());
         newLot.setEndTime(result.getEndTime());
+        newLot.setCreateUser("SYSTEM");
         
         return newLot;
     }
@@ -415,6 +416,7 @@ public class QualityInspectionService {
             newLot.setProcessNo(nextProcess.getProcessNo());
             newLot.setLotStatus("LTST003"); // 검사 대기 상태
             newLot.setStartTime(LocalDateTime.now());
+            newLot.setCreateUser("SYSTEM");
             
             qualityInspectionMapper.insertLotMaster(newLot);
             
