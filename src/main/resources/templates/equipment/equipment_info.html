@@ -162,6 +162,7 @@
 			const data = /*[[${equipmentList}]]*/[];
 			const clientList = /*[[${clientList}]]*/ []; // 거래처 정보
 			const kindList = /*[[${kindList}]]*/ []; // 설비종류 정보
+			const lineList = /*[[${lineList}]]*/ []; // 라인종류 정보
 			
 			var Grid = tui.Grid;
 
@@ -206,6 +207,14 @@
 													                    format: 'yyyy-MM-dd',
 																	language: 'ko'
 													                }}, 	sortable: true},
+					{header: '사용라인',	name: 'line',	formatter: 'listItemText', editor: {
+														            type: 'select',
+														            options: {
+													            	  listItems: lineList.map(line => ({
+													                    text: line.lineNm, // 라인 이름
+													                    value: line.lineNo // 라인 번호
+													                   }))
+														            }}, 	sortable: true},
 					{header: '사용여부',	name: 'useYn',	editor: {
 														            type: 'select',
 														            options: {
@@ -236,6 +245,7 @@
 					"mnfct": "",
 					"buy": "",
 					"set": "",
+					"line": "",
 					"useYn": "",
 					"rowType": "insert"
 				},
@@ -321,6 +331,7 @@
 				rowData.mnfct	= row.mnfct;	// 제조사
 				rowData.buy		= row.buy;		// 구입일
 				rowData.set		= row.set;		// 설치일
+				rowData.line	= row.line;		// 사용라인
 				rowData.useYn	= row.useYn;	// 사용여부
 				rowData.rowType = row.rowType;	// 행 타입
 

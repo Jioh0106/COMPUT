@@ -21,7 +21,7 @@ public class PersonnelController {
 	//http://localhost:8082/ex
 	@GetMapping("/ex")
 	public String exPage() {
-		return "/ex/component-modal";
+		return "/ex/component-button";
 	}
 	
 	//http://localhost:8082/ps-list

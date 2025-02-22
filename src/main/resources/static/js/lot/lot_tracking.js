@@ -607,16 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		                    </div>
 		                    ${warningIcon}
 		                </div>
-		                <div class="lot-info mt-2">
-		                    <div class="info-item">
-		                        <i class="bi bi-box"></i>
-		                        <span>${lot.productName || '-'}</span>
-		                    </div>
-		                    <div class="info-item">
-		                        <i class="bi bi-gear"></i>
-		                        <span>${lot.processName || '-'}</span>
-		                    </div>
-		                </div>
+		                
 		            </div>
 		        </div>`;
 
