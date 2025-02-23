@@ -5,8 +5,8 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
 @Data
 public class MaterialDTO {
 	
@@ -25,5 +25,8 @@ public class MaterialDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date mtr_mod_data;
 	private String mtr_status;
+	
+	// ------------------------------
+	private String unit_name;
 	
 }

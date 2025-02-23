@@ -138,6 +138,7 @@ $(function() {
 	
 	// "저장" 버튼 클릭 이벤트
 	$('#save').on('click', async function () {
+		grid.blur();
 		const modifiedRows = grid.getModifiedRows();
 		console.log(modifiedRows); 
 		

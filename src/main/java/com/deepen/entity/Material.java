@@ -1,9 +1,8 @@
 package com.deepen.entity;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.deepen.domain.MaterialDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.Data;
 
 @Entity
@@ -60,6 +58,26 @@ public class Material {
 	private String mtr_status; // default ='Y' 
 	
 	
-
+	public static Material setMaterialToEntity(MaterialDTO materialDTO) {
+		
+		Material matetial = new Material();
+		matetial.setMtr_no(materialDTO.getMtr_no());
+		matetial.setMtr_name(materialDTO.getMtr_name());
+		matetial.setMtr_type(materialDTO.getMtr_type());
+		matetial.setComposition(materialDTO.getComposition());
+		matetial.setHardness(materialDTO.getHardness());
+		matetial.setDensity(materialDTO.getDensity());
+		matetial.setMelting_point(materialDTO.getMelting_point());
+		matetial.setTensile_strength(materialDTO.getTensile_strength());
+		matetial.setMtr_use(materialDTO.getMtr_use());
+		matetial.setMtr_unit(materialDTO.getMtr_unit());
+		matetial.setMtr_reg_data(materialDTO.getMtr_reg_data());
+		matetial.setMtr_mod_data(materialDTO.getMtr_mod_data());
+		matetial.setMtr_status(materialDTO.getMtr_status());
+		
+		return matetial;
+		
+		
+	}
 	
 }
