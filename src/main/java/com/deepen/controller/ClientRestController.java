@@ -47,10 +47,7 @@ public class ClientRestController {
         
         
         // 최신 데이터 반환
-        List<Client> clientList = service.clientList();
-        
-	    
-        return ResponseEntity.ok(clientList);
+        return ResponseEntity.ok(service.clientList());
     }
 	 
 	/** 거래처 그리드 정보 삭제 **/

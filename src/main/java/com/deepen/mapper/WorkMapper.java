@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.deepen.domain.WorkDTO;
+import com.deepen.domain.WorkTmpDTO;
 import com.deepen.entity.Work;
 import com.deepen.entity.WorkTmp;
 
@@ -26,6 +27,8 @@ public interface WorkMapper {
 	List<WorkDTO> getWorkList(Map<String, String> map);
 
 	List<WorkDTO> getWorkListSerch(Map<String, String> map);
+
+	List<WorkTmpDTO> getWorkTmpList();
 
 
 

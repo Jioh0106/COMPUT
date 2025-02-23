@@ -59,7 +59,7 @@ $(document).ready(function () {
 	    console.log("end = " + end);
 
 	    $.ajax({
-	        url: '/api/work/schedules', // 백엔드 API 엔드포인트
+	        url: '/api/work/schedules', 
 	        method: 'GET',
 	        data: {
 	            startDate: start,
@@ -69,16 +69,16 @@ $(document).ready(function () {
 	            console.log('Schedules fetched successfully:', response);
 
 	            // 기존 일정 삭제 후 새로운 일정 추가
-	            calendar.clear(); // 기존 일정 초기화
+	            calendar.clear(); 
 	            const events = response.map(schedule => ({
-	                id: schedule.id, // 일정 ID
-	                calendarId: schedule.calendarId, // 캘린더 ID
-	                title: schedule.title, // 일정 제목
-	                start: schedule.start, // 시작 시간
-	                end: schedule.end, // 종료 시간
-	                isAllDay: schedule.isAllDay || false, // 종일 여부
-	                category: schedule.category || 'time', // 카테고리 ('time' or 'allday')
-	                location: schedule.location || '', // 위치 (선택 사항)
+	                id: schedule.id,
+	                calendarId: schedule.calendarId, 
+	                title: schedule.title, 
+	                start: schedule.start, 
+	                end: schedule.end, 
+	                isAllDay: schedule.isAllDay || false,
+	                category: schedule.category || 'time', 
+	                location: schedule.location || '', 
 	            }));
 	            calendar.createEvents(events); // 새 일정 추가
 	        },

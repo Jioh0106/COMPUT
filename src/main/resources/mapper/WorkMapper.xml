@@ -71,6 +71,20 @@
 		 </if>
 	</select>
 	
+	<select id="getWorkTmpList" resultType="com.deepen.domain.WorkTmpDTO" >
+		SELECT work_tmp_name
+		     , work_start
+		     , work_end
+		     , work_shift
+			 , work_type
+			 , work_time
+			 , rest_time
+			 , cd1.common_detail_name AS shift_name
+			 , cd2.common_detail_name AS type_name
+		  FROM WORK_TMP w
+		  	   JOIN COMMON_DETAIL cd1 ON w.work_shift = cd1.common_detail_code
+		  	   JOIN COMMON_DETAIL cd2 ON w.work_type = cd2.common_detail_code
+	</select>
 	
 </mapper>
 
