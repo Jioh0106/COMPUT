@@ -77,14 +77,23 @@ public class OutboundRestController {
         return ResponseEntity.ok(warehouses);
     }
     
-    // 등록/수정 API
     @PostMapping("/save")
     public ResponseEntity<Map<String, Object>> saveOutbound(@RequestBody OutboundDTO outboundDTO) {
-        outboundService.saveOutbound(outboundDTO);
-        
         Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "출고 등록이 완료되었습니다.");
+        
+        try {
+            outboundService.saveOutbound(outboundDTO);
+            response.put("success", true);
+            response.put("message", "출고 등록이 완료되었습니다.");
+        } catch (IllegalStateException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "출고 등록 중 오류가 발생했습니다.");
+            return ResponseEntity.internalServerError().body(response);
+        }
         
         return ResponseEntity.ok(response);
     }

@@ -30,8 +30,8 @@ public class Outbound {
     @Column(name = "out_qty", nullable = false, precision = 10, scale = 0)
     private int out_qty; // 출고수량
     
-    @Column(name = "wi_no", length = 20)
-    private String wi_no; // 작업지시번호
+    @Column(name = "wi_no")
+    private Integer wi_no;
     
     @Column(name = "warehouse_id", nullable = false, length = 20)
     private String warehouse_id; // 창고 ID

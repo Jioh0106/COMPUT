@@ -36,4 +36,7 @@ public interface InboundMapper {
     // 품목번호로 완제품 여부 확인
  	int isProductItem(@Param("itemNo") int itemNo);
  	
+ 	// InboundMapper.java
+ 	List<Map<String, Object>> checkExistingInventory(@Param("itemNo") int itemNo, 
+ 	                                                @Param("warehouseId") String warehouseId);
 }

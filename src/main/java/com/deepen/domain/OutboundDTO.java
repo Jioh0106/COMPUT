@@ -13,7 +13,7 @@ public class OutboundDTO {
     private LocalDate out_date;		// 출고일
     private int out_qty; 			// 출고수량
     private int inventory_qty;  	// 재고수량
-    private String wi_no;			// 작업지시번호
+    private int wi_no;			// 작업지시번호
     private String warehouse_id; 	// 창고 ID
     private String warehouse_name; 	// 창고명
     private String zone; 			// 구역(창고)
