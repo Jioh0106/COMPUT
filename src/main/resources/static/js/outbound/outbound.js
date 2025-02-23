@@ -575,10 +575,41 @@ $(function() {
                     } else {
                         throw new Error(result.message || '상태 변경에 실패했습니다.');
                     }
-                });
-            }
-        });
-    }
+                })
+				.catch(error => {
+	                const errorMessage = error.message || '';
+	                if (errorMessage.includes('재고 부족')) {
+	                    const match = errorMessage.match(/창고: (.*?), 구역: (.*?), 품목번호: (.*?), 필요수량: (.*?), 현재재고: (.*?)$/);
+	                    if (match) {
+	                        const [, warehouse, zone, itemNo, needed, current] = match;
+	                        Swal.fire({
+	                            title: '재고 부족',
+	                            html: `
+	                                <div class="text-left">
+	                                    <div class="mb-2">재고가 부족하여 출고 처리를 완료할 수 없습니다.</div>
+	                                    <hr>
+	                                    <div class="mt-3">
+	                                        <p><strong>창고:</strong> ${warehouse}</p>
+	                                        <p><strong>구역:</strong> ${zone}</p>
+	                                        <p class="text-danger"><strong>필요수량:</strong> ${needed}</p>
+	                                        <p class="text-danger"><strong>현재재고:</strong> ${current}</p>
+	                                    </div>
+	                                </div>
+	                            `,
+	                            icon: 'error',
+	                            confirmButtonText: '확인'
+	                        });
+	                    } else {
+	                        Swal.fire('오류', errorMessage, 'error');
+	                    }
+	                } else {
+	                    Swal.fire('오류', '출고 완료 처리 중 오류가 발생했습니다.', 'error');
+	                }
+	            });
+	        }
+	    });
+	}
+
 
     /**
      * 일괄 완료 처리
@@ -667,31 +698,41 @@ $(function() {
      * 일괄 완료 에러 처리
      * @param {Error} error - 발생한 에러
      */
-    function handleBulkCompleteError(error) {
-        const errorMessage = error.message || '';
-        if (errorMessage.includes('재고 부족')) {
-            const match = errorMessage.match(/창고: (.*?), 구역: (.*?), 품목번호: (.*?), 필요수량: (.*?), 현재재고: (.*?)$/);
-            if (match) {
-                const [, warehouse, zone, itemNo, needed, current] = match;
-                Swal.fire({
-                    title: '재고 부족',
-                    html: `
-                        <div class="text-start">
-                            <p><strong>창고:</strong> ${warehouse}</p>
-                            <p><strong>구역:</strong> ${zone}</p>
-                            <p><strong>필요수량:</strong> ${needed}</p>
-                            <p><strong>현재재고:</strong> ${current}</p>
-                        </div>
-                    `,
-                    icon: 'error'
-                });
-            } else {
-                Swal.fire('오류', errorMessage, 'error');
-            }
-        } else {
-            Swal.fire('오류', errorMessage || '출고 완료 처리 중 오류가 발생했습니다.', 'error');
-        }
-    }
+	function handleBulkCompleteError(error) {
+	    const errorMessage = error.message || '';
+	    if (errorMessage.includes('재고 부족')) {
+	        const match = errorMessage.match(/창고: (.*?), 구역: (.*?), 품목번호: (.*?), 필요수량: (.*?), 현재재고: (.*?)$/);
+	        if (match) {
+	            const [, warehouse, zone, itemNo, needed, current] = match;
+	            Swal.fire({
+	                title: '재고 부족',
+	                html: `
+	                    <div class="text-left">
+	                        <div class="mb-2">재고가 부족하여 출고 처리를 완료할 수 없습니다.</div>
+	                        <hr>
+	                        <div class="mt-3">
+	                            <p><strong>창고:</strong> ${warehouse}</p>
+	                            <p><strong>구역:</strong> ${zone}</p>
+	                            <p class="text-danger"><strong>필요수량:</strong> ${needed}</p>
+	                            <p class="text-danger"><strong>현재재고:</strong> ${current}</p>
+	                        </div>
+	                    </div>
+	                `,
+	                icon: 'error',
+	                confirmButtonText: '확인'
+	            });
+	        } else {
+	            Swal.fire('오류', errorMessage, 'error');
+	        }
+	    } else {
+	        Swal.fire({
+	            title: '오류',
+	            text: errorMessage || '출고 완료 처리 중 오류가 발생했습니다.',
+	            icon: 'error',
+	            confirmButtonText: '확인'
+	        });
+	    }
+	}
 
     /**
      * 전체 초기화 함수

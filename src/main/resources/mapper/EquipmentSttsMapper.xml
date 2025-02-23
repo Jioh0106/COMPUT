@@ -22,7 +22,7 @@
 		SELECT	  
 			  info_sn AS "sn"
 			, info_nm AS "name"
-			, (SELECT process_name FROM process_info WHERE process_no = ei.line_no) AS "processNm"
+			, (SELECT line_name FROM line_info WHERE line_no = ei.line_no) AS "lineNm"
 			, NVL((SELECT common_detail_name FROM common_detail 
 					WHERE REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
 					AND common_detail_status = 'Y' 

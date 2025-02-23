@@ -1,5 +1,6 @@
 package com.deepen.service;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -71,38 +72,42 @@ public class OutboundService {
     // 출고 등록
     @Transactional
     public void saveOutbound(OutboundDTO outboundDTO) {
-    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUser = auth.getName();
-        
-        // DB 세션에 현재 사용자 설정
-        jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + currentUser + "'); END;");
-    	
-        // 재고 수량 체크
-        Map<String, Object> params = new HashMap<>();
-        params.put("item_no", outboundDTO.getItem_no());
-        params.put("warehouse_id", outboundDTO.getWarehouse_id());
-        params.put("zone", outboundDTO.getZone());
-        
-        log.info("재고 체크 파라미터: " + params);
-        
-        // 현재 재고 수량 조회
-        Integer currentStock = outboundMapper.getCurrentStock(params);
-        if (currentStock == null || currentStock < outboundDTO.getOut_qty()) {
-            log.info("재고 부족 - 요청 수량: " + outboundDTO.getOut_qty() + ", 현재 재고: " + currentStock);
-            throw new IllegalStateException("재고 수량이 부족합니다.");
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String currentUser = auth.getName();
+            
+            // DB 세션에 현재 사용자 설정
+            jdbcTemplate.execute("BEGIN DBMS_SESSION.SET_IDENTIFIER('empId=" + currentUser + "'); END;");
+            
+            // 재고 수량 체크
+            Map<String, Object> params = new HashMap<>();
+            params.put("item_no", outboundDTO.getItem_no());
+            params.put("warehouse_id", outboundDTO.getWarehouse_id());
+            params.put("zone", outboundDTO.getZone());
+            
+            log.info("재고 체크 파라미터: " + params);
+            
+            // 현재 재고 수량 조회
+            Integer currentStock = outboundMapper.getCurrentStock(params);
+            if (currentStock == null || currentStock < outboundDTO.getOut_qty()) {
+                log.info("재고 부족 - 요청 수량: " + outboundDTO.getOut_qty() + ", 현재 재고: " + currentStock);
+                throw new IllegalStateException("재고 수량이 부족합니다.");
+            }
+            
+            // 출고 정보 저장
+            Outbound outbound = new Outbound();
+            BeanUtils.copyProperties(outboundDTO, outbound);
+            outbound.setStatus("대기");
+            
+            // 기본값으로 제품출고 설정
+            if (outbound.getSource() == null || outbound.getSource().isEmpty()) {
+                outbound.setSource("PSH");  
+            }
+            
+            outboundRepository.save(outbound);
+        } catch (Exception e) {
+            throw new RuntimeException("출고 처리 중 오류가 발생했습니다.");
         }
-        
-        // 출고 정보 저장
-        Outbound outbound = new Outbound();
-        BeanUtils.copyProperties(outboundDTO, outbound);
-        outbound.setStatus("대기");
-        
-        // 기본값으로 제품출고 설정
-        if (outbound.getSource() == null || outbound.getSource().isEmpty()) {
-            outbound.setSource("PSH");  
-        }
-        
-        outboundRepository.save(outbound);
     }
     
     // 출고 수정

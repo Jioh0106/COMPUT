@@ -184,4 +184,22 @@
 	    FROM PRODUCT
 	    WHERE product_no = #{itemNo}
 	</select>
+	
+	<select id="checkExistingInventory" resultType="hashmap">
+	    SELECT 
+	        warehouse_id,
+	        zone,
+	        inventory_type,
+	        inventory_qty
+	    FROM INVENTORY 
+	    WHERE item_no = #{itemNo} 
+	    AND warehouse_id = #{warehouseId}
+	    AND inventory_qty > 0
+	    ORDER BY inventory_qty DESC
+	</select>
+	
+	
+	
+	
+	
 </mapper>

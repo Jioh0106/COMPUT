@@ -50,7 +50,7 @@ public interface WorkInstructionMapper {
 	//품목번호에 해당하는 자재 조회
 	List<Map<String, Object>> selectMaterialsByProductNo(String productNo);
 	
-	// 필요 자제 창고 테이블에 insert
+	// 필요 자재 창고 테이블에 insert
 	void insertMaterialInWareHouse(Map<String, Object> insertData);
 	
 	// 작업시작 정보 update
@@ -58,6 +58,8 @@ public interface WorkInstructionMapper {
 	
 	// 작업계획 상태 변경('PRGR002'== 생산중)
 	void updatePlanStatusStart(Map<String, Object> updateData);
+	
+	void updateEquipmentInfoByLineNoToOperation(Map<String, Object> updateData);
 	
 	// 공정 lot_no 조회(where = 작업 지시 번호) 
 	List<Map<String, Object>> selectProcessLotNoByWiNo(int wiNo);
@@ -75,20 +77,25 @@ public interface WorkInstructionMapper {
 	// 공정 완료 시 상태 update 할 목록들
 	void updateWiStatusByWiNoToComplete(int wiNo);
 
-	void updatePlanStatusByWiNoToComplete(String plandId);
-
 	void updateLotMasterStatusByWiNoToComplete(@Param("wiNo") int wiNo,@Param("sessionEmpId") String sessionEmpId);
 
 	void updateLotProcessLogStatusByWiNoToComplete(int wiNo);
+	
+	void updateEquipmentInfoByLineNoToStanBy(int lineNo);
+	
 	
 	// 품질 검사 버튼 동작 시 작업 지시 상태 update
 	void updateWiStatusByWiNoToInspectionPending(int wiNo);
 	
 	void updateLotMasterStatusByWiNoToInspectionPending(@Param("wiNo") int wiNo, @Param("sessionEmpId") String sessionEmpId);
 
-	// 작업 완료 시 상태 작업 지시 상태 update
+	
+	// 작업 종료 시 상태 작업 지시 상태 update
 	void updateWiStatusByWiNoToEnd(int wiNo);
 	
+	void updatePlanStatusByWiNoToComplete(String plandId);
 	
+	// 작업 지시 번호(wi_no)를 가진 출고 대기 항목의 갯수
+	int countOutboundItemsByWiNo(int wiNo);
 	
 }

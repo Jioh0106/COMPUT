@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.deepen.domain.MaterialDTO;
 import com.deepen.entity.Material;
 import com.deepen.service.MaterialService;
 
@@ -26,10 +27,7 @@ public class MaterialController {
 	 * @return String
 	 */
 	@GetMapping("/material-info")
-	public String MaterialInfo(Model model) {
-		
-		List<Material> materialList = service.materialList();
-		model.addAttribute("materialList", materialList);
+	public String MaterialInfo() {
 		
 		return "info/material_info";
 		

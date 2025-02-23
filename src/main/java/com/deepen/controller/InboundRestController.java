@@ -118,15 +118,27 @@ public class InboundRestController {
     
     // 일괄 완료
     @PutMapping("/bulk-complete")
-    public ResponseEntity<Map<String, Object>> bulkComplete(@RequestBody Map<String, List<Integer>> request) {
-        List<Integer> inNos = request.get("inNos");
-        inboundService.bulkComplete(inNos);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "선택한 입고가 완료 처리되었습니다.");
-        
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> bulkComplete(@RequestBody Map<String, List<Integer>> request) {
+        try {
+            List<Integer> inNos = request.get("inNos");
+            inboundService.bulkComplete(inNos);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "선택한 입고가 완료 처리되었습니다.");
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "처리 중 오류가 발생했습니다.");
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
     }
     
     // 사용자 정보 

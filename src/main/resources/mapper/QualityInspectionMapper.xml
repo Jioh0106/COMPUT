@@ -54,36 +54,36 @@
         WHERE lot_no LIKE #{date} || '%'
     </select>
 
-    <!-- LOT 마스터 정보 저장 -->
-    <insert id="insertLotMaster">
-        INSERT INTO lot_master (
-            lot_no,
-            parent_lot_no,
-            process_type,
-            wi_no,
-            product_no,
-            process_no,
-            line_no,
-            lot_status,
-            start_time,
-            end_time,
-            create_user,
-            create_time
-        ) VALUES (
-            #{lotNo},
-            #{parentLotNo},
-            #{processType},
-            #{wiNo},
-            #{productNo},
-            #{processNo},
-            #{lineNo},
-            #{lotStatus},
-            #{startTime},
-            #{endTime},
-            'SYSTEM',
-            SYSDATE
-        )
-    </insert>
+    <!-- insertLotMaster 매퍼 -->
+	<insert id="insertLotMaster" parameterType="com.deepen.domain.LotMasterDTO">
+	    INSERT INTO lot_master (
+	        lot_no,
+	        parent_lot_no,
+	        process_type,
+	        wi_no,
+	        product_no,
+	        process_no,
+	        line_no,
+	        lot_status,
+	        start_time,
+	        end_time,
+	        create_user,
+	        create_time
+	    ) VALUES (
+	        #{lotNo},
+	        #{parentLotNo},
+	        #{processType},
+	        #{wiNo},
+	        #{productNo},
+	        #{processNo},
+	        #{lineNo,jdbcType=NUMERIC},
+	        #{lotStatus},
+	        #{startTime},
+	        #{endTime},
+	        #{createUser},
+	        SYSDATE
+	    )
+	</insert>
 
     <!-- LOT 상태 업데이트 -->
     <update id="updateLotStatusAndResult">

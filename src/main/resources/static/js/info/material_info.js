@@ -6,70 +6,130 @@ $(function() {
 	console.log("CSRF Token:", csrfToken);
 	console.log('isEditable :', isEditable); 
 	
+	// 그리드 수정 시 공통코드 셀렉트값 가져오기
+		function mainFetchData() {
+		    
+		    return Promise.all([
+		         getCommonList('UNIT'), 
+		    ])
+		    .then(function ([unitCommon]) {
+		        return {
+		            unitCommon: unitCommon.map(item => ({
+		                text: item.common_detail_name,
+		                value: item.common_detail_name
+		            }))
+		        };
+		    })
+		    .catch(function (error) {
+		        console.error('Error fetching data:', error);
+		        return { unitCommon: [] };
+		    });
+		}
+		
+		// type으로 공통 코드 가져오는 함수
+		function getCommonList(type) {
+		    return axios.get(`/api/absence/common/list/${type}`)
+		        .then(function (response) {
+		            return response.data; // 데이터 반환
+		        })
+		        .catch(function (error) {
+		            console.error('Error fetching data:', error);
+					Swal.fire(
+					        'Error',
+					        '데이터를 가져오는 중 문제가 발생했습니다.',
+					        'error'
+					      )
+		            return []; // 에러 발생 시 빈 배열 반환
+		        });
+		}
+	
+	
 	let grid;
+	mainFetchData().then(function (data) {  
+		grid = new tui.Grid({
+			el: document.getElementById('grid'),
+			data: [], 
+			height: 600,
+			bodyHeight: 550,
+			rowHeaders: ['checkbox'],
+			columns: [
+				{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true},
+				{header: '자재 이름', name: 'mtr_name', width: 200, editor: isEditable ? 'text' : null},
+				{header: '자재 종류', name: 'mtr_type', width: 150, editor: isEditable ? 'text' : null, filter: 'select' },
+				{header: '자재 성분', name: 'composition', width: 150, editor: isEditable ? 'text' : null},
+				{header: '경도/강도', name: 'hardness', width: 100, editor: isEditable ? 'text' : null},
+				{header: '밀도 (g/cm³)', name: 'density', width: 100, editor: isEditable ? 'text' : null},
+				{header: '융점 (°C)', name: 'melting_point', width: 100, editor: isEditable ? 'text' : null},
+				{header: '인장 강도 (MPa)', name: 'tensile_strength', width: 100, editor: isEditable ? 'text' : null},
+				{header: '주요 용도', name: 'mtr_use', width: 150, editor: isEditable ? 'text' : null},
+				{
+					header: '자재 단위', 
+					name: 'unit_name', 
+					width: 100, 				
+					editor : {
+						type: 'select',
+						options: {listItems: data.unitCommon}
+					},
+				},
+				{
+					header: '등록일', 
+					name: 'mtr_reg_data', 
+					width: 100, 
+					editor: isEditable
+						? {
+		                type: 'datePicker',
+		                options: {
+		                    format: 'yyyy-MM-dd',
+							language: 'ko' 
+		                }
+		            }
+					: null,
+		            filter: {
+		                type: 'date',
+		                options: {
+		                    format: 'yyyy-MM-dd',
+							language: 'ko' 
+		                }
+		            }
+				},
+				{
+					header: '수정일', 
+					name: 'mtr_mod_data', 
+					width: 100, 
+					editor: isEditable
+						? {
+		                type: 'datePicker',
+		                options: {
+		                    format: 'yyyy-MM-dd',
+							language: 'ko' 
+		                }
+		            }
+					: null,
+		            filter: {
+		                type: 'date',
+		                options: {
+		                    format: 'yyyy-MM-dd',
+							language: 'ko' 
+		                }
+		            }
+				},
+				{header: '사용여부', name: 'mtr_status', width: 80, editor: isEditable ? 'text' : null, filter: 'select' },
+			],
+			editing: isEditable  // 편집 기능 활성화
+		});
 
-	grid = new tui.Grid({
-		el: document.getElementById('grid'),
-		data: data, 
-		height: 600,
-		bodyHeight: 550,
-		rowHeaders: ['checkbox'],
-		columns: [
-			{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true},
-			{header: '자재 이름', name: 'mtr_name', width: 200, editor: isEditable ? 'text' : null},
-			{header: '자재 종류', name: 'mtr_type', width: 150, editor: isEditable ? 'text' : null, filter: 'select' },
-			{header: '자재 성분', name: 'composition', width: 150, editor: isEditable ? 'text' : null},
-			{header: '경도/강도', name: 'hardness', width: 100, editor: isEditable ? 'text' : null},
-			{header: '밀도 (g/cm³)', name: 'density', width: 100, editor: isEditable ? 'text' : null},
-			{header: '융점 (°C)', name: 'melting_point', width: 100, editor: isEditable ? 'text' : null},
-			{header: '인장 강도 (MPa)', name: 'tensile_strength', width: 100, editor: isEditable ? 'text' : null},
-			{header: '주요 용도', name: 'mtr_use', width: 150, editor: isEditable ? 'text' : null},
-			{header: '자재 단위', name: 'mtr_unit', width: 80, editor: isEditable ? 'text' : null},
-			{
-				header: '등록일', 
-				name: 'mtr_reg_data', 
-				width: 100, 
-				editor: isEditable
-					? {
-	                type: 'datePicker',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
-	            }
-				: null,
-	            filter: {
-	                type: 'date',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
-	            }
-			},
-			{
-				header: '수정일', 
-				name: 'mtr_mod_data', 
-				width: 100, 
-				editor: isEditable
-					? {
-	                type: 'datePicker',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
-	            }
-				: null,
-	            filter: {
-	                type: 'date',
-	                options: {
-	                    format: 'yyyy-MM-dd',
-						language: 'ko' 
-	                }
-	            }
-			},
-			{header: '사용여부', name: 'mtr_status', width: 80, editor: isEditable ? 'text' : null, filter: 'select' },
-		],
-		editing: isEditable  // 편집 기능 활성화
+	});
+	
+	// 주문 관리 그리드 데이터 초기화
+	axios.get('/api/material/list')
+	.then(function (response) {
+		const data = response.data; // 데이터 로드
+		console.log('Fetched data:', data);
+	    grid.resetData(data);
+	    grid.refreshLayout(); // 레이아웃 새로고침
+	})
+	.catch(function (error) {
+	    console.error('Error fetching data:', error);
 	});
 	
 	// "추가" 버튼 클릭 이벤트
@@ -116,6 +176,7 @@ $(function() {
 	
 	// "저장" 버튼 클릭 이벤트
 	$('#save').on('click', async function () {
+		grid.blur();
 		const modifiedRows = grid.getModifiedRows();
 		console.log(modifiedRows); 
 		
@@ -178,7 +239,8 @@ $(function() {
 	function sendToServer(modifiedRows) {
 		const payload = {
 		    updatedRows: modifiedRows.updatedRows,
-		    createdRows: modifiedRows.createdRows
+		    createdRows: modifiedRows.createdRows, 
+			unit_name: modifiedRows.createdRows.unit_name
 		};
 
 	    axios.post('/api/material/save', payload, {

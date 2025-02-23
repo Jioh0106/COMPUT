@@ -32,11 +32,15 @@ public class EquipmentInfoService {
 	public List<Map<String, Object>> kindInfo() {
 		return mapper.kindInfo();
 	}
+	
+	public List<Map<String, Object>> lineInfo() {
+		return mapper.lineInfo();
+	}
 
 	public int eqpSaveData(List<Map<String, Object>> saveDataList) {
 		//[{no=, sn=754903, name=비싼기계, kind=절삭, mnfct=사장님이 미쳤어요, buy=2025-01-13, set=2025-01-22, useYn=Y, rowType=insert}]
 		int result = 0;
-		
+		System.out.println(saveDataList.toString());
 		for(Map<String, Object> saveData : saveDataList) {
 			
 			String rowType = String.valueOf(saveData.get("rowType"));

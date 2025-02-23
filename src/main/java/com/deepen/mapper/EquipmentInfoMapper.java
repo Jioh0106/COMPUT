@@ -19,6 +19,8 @@ public interface EquipmentInfoMapper {
 	
 	List<Map<String, Object>> kindInfo();
 
+	List<Map<String, Object>> lineInfo();
+	
 	int eqpInsert(Map<String, Object> saveDataList);
 
 	int eqpUpdate(Map<String, Object> saveDataList);
