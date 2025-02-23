@@ -2,7 +2,7 @@
 let mainGrid = null;          // 메인 급여 대장 그리드
 let annualGrid = null;        // 연간 급여 현황 그리드
 let departmentGrids = {};     // 부서별 급여 현황 그리드
-
+let currentModal = null;      // 현재 활성화된 모달 인스턴스
 
 //DOM이 로드된 후 초기화를 수행하는 메인 함수
 $(document).ready(() => {
@@ -15,7 +15,6 @@ $(document).ready(() => {
 
 //CSRF 보안 설정
 //Ajax 요청에 CSRF 토큰을 자동으로 포함시킴
-
 function setupCSRF() {
     const token = $("meta[name='_csrf']").attr("content");
     const header = $("meta[name='_csrf_header']").attr("content");
@@ -35,43 +34,66 @@ function initializeGrids() {
 //이벤트 리스너 통합 설정 함수
 //검색, 연도 선택, 탭 전환, 모달 관련 이벤트를 처리
 function bindEvents() {
-    // 검색 버튼 클릭 이벤트
-    $('.btn-primary.rounded-pill').on('click', e => {
-        e.preventDefault();
-        search();
-    });
-    
-    // 검색어 입력 엔터 이벤트
-    $('#basicInput').on('keypress', e => {
-        if (e.which === 13) {
-            e.preventDefault();
-            search();
-        }
-    });
-    
-    // 연도 선택 변경 이벤트
-    $('#yearSelect').on('change', function() {
-        const selectedYear = $(this).val();
-        if (selectedYear) {
-            loadAnnualData(selectedYear);
-        }
-    });
+   // 검색 버튼 클릭 이벤트
+   $('.btn-primary.rounded-pill').on('click', e => {
+       e.preventDefault();
+       search();
+   });
+   
+   // 검색어 입력 엔터 이벤트
+   $('#basicInput').on('keypress', e => {
+       if (e.which === 13) {
+           e.preventDefault();
+           search();
+       }
+   });
+   
+   // 연도 선택 변경 이벤트
+   $('#yearSelect').on('change', function() {
+       const selectedYear = $(this).val();
+       if (selectedYear) {
+           loadAnnualData(selectedYear);
+       }
+   });
 
-    // 탭 전환 이벤트 - 연간 급여 탭 전환 시 그리드 새로고침
-    $('#payrollTabs a[data-bs-toggle="tab"]').on('shown.bs.tab', e => {
-        if (e.target.id === 'annual-tab' && annualGrid) {
-            annualGrid.refreshLayout();
-            const selectedYear = $('#yearSelect').val();
-            if (selectedYear) {
-                loadAnnualData(selectedYear);
-            }
-        }
-    });
+   // 탭 전환 전에 모달 처리
+   $('#payrollTabs a[data-bs-toggle="tab"]').on('hide.bs.tab', () => {
+       if (currentModal) {
+           currentModal.hide();
+           currentModal.dispose();
+           currentModal = null;
+           document.body.classList.remove('modal-open');
+           const backdrops = document.querySelectorAll('.modal-backdrop');
+           backdrops.forEach(backdrop => backdrop.remove());
+       }
+   });
 
-    // 모달 표시 이벤트 - 부서별 그리드 새로고침
-    $('#payrollDetailModal').on('shown.bs.modal', () => {
-        Object.values(departmentGrids).forEach(grid => grid?.refreshLayout());
-    });
+   // 탭 전환 후 그리드 처리
+   $('#payrollTabs a[data-bs-toggle="tab"]').on('shown.bs.tab', e => {
+       if (e.target.id === 'annual-tab' && annualGrid) {
+           annualGrid.refreshLayout();
+           const selectedYear = $('#yearSelect').val();
+           if (selectedYear) {
+               loadAnnualData(selectedYear);
+           }
+       }
+   });
+
+   // 모달 표시 이벤트 - 부서별 그리드 새로고침
+   $('#payrollDetailModal').on('shown.bs.modal', () => {
+       Object.values(departmentGrids).forEach(grid => grid?.refreshLayout());
+   });
+   
+   // 모달 숨김 이벤트 - 모달 인스턴스 정리
+   $('#payrollDetailModal').on('hidden.bs.modal', () => {
+       if (currentModal) {
+           currentModal.dispose();
+           currentModal = null;
+           document.body.classList.remove('modal-open');
+           const backdrops = document.querySelectorAll('.modal-backdrop');
+           backdrops.forEach(backdrop => backdrop.remove());
+       }
+   });
 }
 
 //숫자 포맷팅을 위한 Intl.NumberFormat 인스턴스
@@ -162,15 +184,22 @@ function initializeMainGrid() {
         ]
     });
 
-    // 조회 버튼 클릭 이벤트
-    mainGrid.on('click', (ev) => {
-        if (ev.columnName === 'payrollDetail') {
-            const rowData = mainGrid.getRow(ev.rowKey);
-            loadDetailGrid(rowData.paymentDate);
-            const modal = new bootstrap.Modal(document.getElementById('payrollDetailModal'));
-            modal.show();
-        }
-    });
+	// 조회 버튼 클릭 이벤트
+	mainGrid.on('click', (ev) => {
+	    if (ev.columnName === 'payrollDetail') {
+	        const rowData = mainGrid.getRow(ev.rowKey);
+	        loadDetailGrid(rowData.paymentDate);
+	        
+	        // 기존 모달 정리
+	        if (currentModal) {
+	            currentModal.dispose();
+	        }
+	        
+	        const modalElement = document.getElementById('payrollDetailModal');
+	        currentModal = new bootstrap.Modal(modalElement);
+	        currentModal.show();
+	    }
+	});
 
     // 초기 데이터 로드
     loadMainGrid();
@@ -403,7 +432,7 @@ function initializeDepartmentGrid(elementId, data, isTotalGrid = false) {
     return new tui.Grid(gridOptions);
 }
 
-//그리드 합계 행 옵션 생성 함수
+//그리드 합계 행 옵션 생성 함수 
 //@returns {Object} 합계 행 설정 객체
 function createSummaryOptions() {
     const summaryContent = {

@@ -353,48 +353,66 @@
 		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
 		let inventory_no = null; // 클릭한 행의 재고번호
 		let inventory_count = null; // 클릭한 행의 실재고량
-		
-		//모달창 열릴때
+		let currentHistoryModal = null;
+
+		// 모달 이벤트 핸들러를 밖으로 분리
+		$('#history').on('shown.bs.modal', function () {
+		    loadHistoryData(inventory_no);
+		});
+
+		// 모달 닫힐 때 정리
+		$('#history').on('hidden.bs.modal', function () {
+		    if (currentHistoryModal) {
+		        currentHistoryModal.dispose();
+		        currentHistoryModal = null;
+		        document.body.classList.remove('modal-open');
+		        const backdrops = document.querySelectorAll('.modal-backdrop');
+		        backdrops.forEach(backdrop => backdrop.remove());
+		    }
+		});
+
+		// 그리드 클릭 이벤트 수정
 		inventoryGrid.on('click', function (ev) {
-			 
-			    //모달창 초기화
-			    historyGrid.resetData([]);
-			    
-			    // 클릭된 row 데이터 가져오기
-	        	const rowData = ev.instance.getRow(ev.rowKey);
-	        	inventory_no = rowData.inventory_no;
-	        	inventory_count = rowData.inventory_count;
-	        	
-				console.log('로그인한 사번 : ', emp_id);	        
-				console.log('클릭한 행의 재고번호 : ', inventory_no);	        
-				console.log('클릭한 행의 실재고량 : ', inventory_count);	        
-				
-				$('#history').modal('show');
-				
+		    //모달창 초기화
+		    historyGrid.resetData([]);
+		    
+		    // 클릭된 row 데이터 가져오기
+		    const rowData = ev.instance.getRow(ev.rowKey);
+		    inventory_no = rowData.inventory_no;
+		    inventory_count = rowData.inventory_count;
+		    
+		    console.log('로그인한 사번 : ', emp_id);        
+		    console.log('클릭한 행의 재고번호 : ', inventory_no);        
+		    console.log('클릭한 행의 실재고량 : ', inventory_count);   
 
-			//변경이력 데이터 조회 요청 (GET /api/inventory/history/{inventory_no})
-			$('#history').on('shown.bs.modal', function () {
-			fetch(`/api/inventory/history/${inventory_no}`)
-			        .then(response => response.json())
-			        .then(data => {
-			            console.log("불러온 변경이력 데이터:", data);
-			            
-			            // ✅ 변경 후 실재고량 - 변경 전 실재고량 계산 후 업데이트
-		                const updatedData = data.map(row => ({
-		                    ...row,
-		                    DIFF_COUNT: row.NEW_COUNT - row.PREV_COUNT
-		                }));
+		    // 기존 모달 정리
+		    if (currentHistoryModal) {
+		        currentHistoryModal.dispose();
+		    }
 
-			            //변경이력 데이터를 TOAST UI Grid에 적용
-			            historyGrid.resetData(updatedData);
-			            historyGrid.refreshLayout();
-						
-			        })
-			        .catch(error => {
-			            console.error("Error fetching history data:", error);
-			        });
-	        	});
-			});
+		    currentHistoryModal = new bootstrap.Modal(document.getElementById('history'));
+		    currentHistoryModal.show();
+		});
+
+		// 이력 데이터 로드 함수 분리
+		function loadHistoryData(inventory_no) {
+		    fetch(`/api/inventory/history/${inventory_no}`)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("불러온 변경이력 데이터:", data);
+		            
+		            const updatedData = data.map(row => ({
+		                ...row,
+		                DIFF_COUNT: row.NEW_COUNT - row.PREV_COUNT
+		            }));
+
+		            historyGrid.resetData(updatedData);
+		            historyGrid.refreshLayout();
+		        })
+		        .catch(error => {
+		            console.error("Error fetching history data:", error);
+		        });
+		}
 		
 		
 		//차이값 자동입력
