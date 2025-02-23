@@ -5,11 +5,13 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deepen.domain.MaterialDTO;
 import com.deepen.entity.Material;
 import com.deepen.service.MaterialService;
 
@@ -25,13 +27,25 @@ public class MaterialRestController {
 	/** 자재 서비스 **/
 	private final MaterialService service;
 	
+	/** 자재 그리드 조회 **/
+	@GetMapping("/list")
+	public ResponseEntity<List< MaterialDTO>> getMaterialList() {
+		
+		List<MaterialDTO> list = service.getMaterialList();
+		
+		return ResponseEntity.ok(list);
+        
+	} // getOrdersList
+	
+	
+	
 	/** 자재 그리드 정보 저장 **/
 	@PostMapping("/save")
-    public ResponseEntity<List<Material>> saveMaterial(@RequestBody Map<String, List<Material>> modifiedRows) {
+    public ResponseEntity<List<MaterialDTO>> saveMaterial(@RequestBody Map<String, List<MaterialDTO>> modifiedRows) {
 		log.info("modifiedRows : " + modifiedRows.toString());
 		
-		List<Material> updatedRows = modifiedRows.get("updatedRows");
-		List<Material> createdRows = modifiedRows.get("createdRows");
+		List<MaterialDTO> updatedRows = modifiedRows.get("updatedRows");
+		List<MaterialDTO> createdRows = modifiedRows.get("createdRows");
 		
 		// 추가 처리
 		if (createdRows != null && !createdRows.isEmpty()) {
@@ -43,12 +57,8 @@ public class MaterialRestController {
         	service.updateMaterial(updatedRows);
         }
         
-        
         // 최신 데이터 반환
-        List<Material> materialList = service.materialList();
-        
-	    
-        return ResponseEntity.ok(materialList);
+        return ResponseEntity.ok(service.getMaterialList());
     }
 	 
 	/** 자재 그리드 정보 삭제 **/
