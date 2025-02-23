@@ -72,6 +72,14 @@ public class WorkController {
 		return "attendance/work_add";
 	}
 	
+	// 근무 템플릿 관리(팝업창)
+	@GetMapping("/work-tmp")
+	public String workTmp() {
+		//http://localhost:8082/work-tmp
+		
+		
+		return "attendance/work_tmp";
+	}
 
 	
 	

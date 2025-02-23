@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
+import com.deepen.domain.WorkTmpDTO;
+import com.deepen.entity.Client;
+import com.deepen.entity.WorkTmp;
 import com.deepen.service.WorkService;
 
 import lombok.RequiredArgsConstructor;
@@ -152,6 +155,43 @@ public class WorkRestController {
 		
 		return ResponseEntity.ok(schedules);
 	}
+	
+	/** 근무 템플릿 조회 */
+	@GetMapping("/tmp/list")
+	public ResponseEntity<List<WorkTmpDTO>> getWorkTmpList() {
+		
+		List<WorkTmpDTO> list = workService.getWorkTmpList();
+		
+		return ResponseEntity.ok(list);
+	}
+	
+	@PostMapping("/tmp/save")
+    public ResponseEntity<List<WorkTmpDTO>> saveWorkTmp(@RequestBody Map<String, List<WorkTmpDTO>> modifiedRows) {
+		
+		log.info("saveWorkTmp -  modifiedRows : "+ modifiedRows.toString());
+		
+		List<WorkTmpDTO> createdRows = modifiedRows.get("createdRows");
+		List<WorkTmpDTO> updatedRows = modifiedRows.get("updatedRows");
+		List<WorkTmpDTO> deletedRows = modifiedRows.get("deletedRows");
+		
+		// 추가 처리
+		if (createdRows != null && !createdRows.isEmpty()) {
+			workService.insertWorkTmp(createdRows);
+		}
+		
+        // 업데이트 처리
+        if (updatedRows != null && !updatedRows.isEmpty()) {
+        	workService.updateWorkTmp(updatedRows);
+        }
+        
+        // 삭제 처리
+        if (deletedRows != null && !deletedRows.isEmpty()) {
+        	workService.deleteWorkTmp(deletedRows);
+        }
+        
+        return ResponseEntity.ok(workService.getWorkTmpList());
+        
+    } // insertWork
 	
 	
 	

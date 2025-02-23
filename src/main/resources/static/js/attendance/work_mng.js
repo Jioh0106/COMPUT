@@ -1,11 +1,21 @@
-// 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
-function openView() {
+// 근무 일정 등록 팝업창 가운데 위치(듀얼모니터 포함)
+function openRegView() {
 	var popupW = 800;
 	var popupH = 550;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);
 	window.open('/work-add', 'work_add', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+}
+
+// 근무 템플릿 관리 팝업창 가운데 위치(듀얼모니터 포함)
+function openTempView() {
+	var popupW = 800;
+	var popupH = 400;
+	var left = (document.body.clientWidth / 2) - (popupW / 2);
+	left += window.screenLeft;	 //듀얼 모니터
+	var top = (screen.availHeight / 2) - (popupH / 2);
+	window.open('/work-tmp', 'work_tmp', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
 // =========================================================================
 

@@ -12,6 +12,8 @@ public class WorkTmpDTO {
 	private String work_type;
 	private Integer work_time;
 	private Integer rest_time;
-	
+	// ------------------------------
+	private String shift_name;
+	private String type_name;
 
 }

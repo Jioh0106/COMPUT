@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
+import com.deepen.domain.WorkTmpDTO;
 import com.deepen.entity.Employees;
 import com.deepen.entity.Work;
 import com.deepen.entity.WorkTmp;
@@ -141,6 +142,33 @@ public class WorkService {
 		
 	} // getSchedulesBetween
 
+	
+	/** 근무 템플릿 조회 */
+	public List<WorkTmpDTO> getWorkTmpList() {
+		return workMapper.getWorkTmpList();
+	}
+	
+	/** 근무 템플릿 추가 */
+	public void insertWorkTmp(List<WorkTmpDTO> createdRows) {
+		for(WorkTmpDTO wtd :  createdRows) {
+			
+		}		
+		
+	}
+	
+	/** 근무 템플릿 수정 */
+	public void updateWorkTmp(List<WorkTmpDTO> updatedRows) {
+		for(WorkTmpDTO wtd :  updatedRows) {
+			
+		}		
+	}
+
+	/** 근무 템플릿 삭제 */
+	public void deleteWorkTmp(List<WorkTmpDTO> deletedRows) {
+		for(WorkTmpDTO wtd :  deletedRows) {
+			
+		}
+	} 
 
 
 
