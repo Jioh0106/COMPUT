@@ -68,7 +68,8 @@ $(function() {
 					},
 					align: 'center'
 				},
-				{ header: '주문량', width: 100,name: 'sale_vol', editor: 'text'},
+				{ header: '주문량', width: 100, name: 'sale_vol', editor: 'text', align: 'center'},
+				{ header: '소요시간(시)', width: 100, name: 'time_sum', align: 'center'},
 				{
 					header: '납품기한', 
 					name: 'sale_deadline',
@@ -97,9 +98,13 @@ $(function() {
 		
 		
 		// 상품번호/상품명 수정 시 모달창에서 상품 조회 후 등록
-	    grid.on('editingStart', function (ev) {
-	    	const { rowKey, columnName } = ev;
-
+		grid.on('focusChange', (ev) => {
+			grid.setSelectionRange({
+			    start: [ev.rowKey, 0],
+				end: [ev.rowKey, grid.getColumns().length]
+			});
+			const { rowKey, columnName } = ev;
+	
 	        // 사원번호 또는 사원명 수정 시 모달 띄우기
 	        if (columnName === 'product_no' || columnName === 'product_name') {
 	            ev.stop(); // 기본 편집 동작 중단
@@ -107,16 +112,36 @@ $(function() {
 				// 행정보 전달
 	            showPrdctModal(rowKey);
 	        }
-	        
-	    });
-		
-		grid.on('focusChange', (ev) => {
-			grid.setSelectionRange({
-			    start: [ev.rowKey, 0],
-				end: [ev.rowKey, grid.getColumns().length]
-			});
-			
+	
 		});	
+		
+		// 수량 입력 시 필요한 공정 시간 계산
+		grid.on('afterChange', function (ev) {
+		    ev.changes.forEach(change => {
+		        if (change.columnName === 'sale_vol') {
+		            const rowData = grid.getRow(change.rowKey);
+
+		            if (!rowData || !rowData.product_no || !rowData.sale_vol) {
+		                return;
+		            }
+
+		            axios.get('/api/order/get/time', {
+		                params: {
+		                    product_no: rowData.product_no,
+		                    sale_vol: rowData.sale_vol
+		                },
+		            })
+		            .then(function (response) {
+		                console.log(' Fetched data:', response.data);
+		                grid.setValue(change.rowKey, 'time_sum', response.data);
+		            })
+		            .catch(function (error) {
+		                console.error('❌ API 요청 실패:', error);
+		            });
+		        }
+		    });
+		});
+
 		
 	});
 

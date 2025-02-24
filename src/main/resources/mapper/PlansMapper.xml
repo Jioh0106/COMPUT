@@ -22,6 +22,40 @@
 		       JOIN ORDERS o ON p.ORDER_ID = o.ORDER_ID 
 		       JOIN EMPLOYEES e ON p.EMP_ID = e.EMP_ID 
 		       JOIN COMMON_DETAIL cd ON p.PLAN_STATUS = cd.COMMON_DETAIL_CODE
+		 ORDER BY plan_date DESC 
+	</select>
+	
+	<!-- 생산계획 목록 필터링  -->
+	<select id="getPlanFilterList" resultType="com.deepen.domain.PlansDTO" >
+		SELECT plan_id
+			 , p.order_id 
+			 , p.sale_no 
+			 , p.emp_id 
+			 , e.emp_name
+			 , p.plan_status
+			 , cd.COMMON_DETAIL_NAME AS status_name
+			 , plan_date
+			 , plan_update
+			 , plan_start_date
+			 , plan_end_date
+			 , plan_priority
+		  FROM PLANS p 
+		       JOIN ORDERS o ON p.ORDER_ID = o.ORDER_ID 
+		       JOIN EMPLOYEES e ON p.EMP_ID = e.EMP_ID 
+		       JOIN COMMON_DETAIL cd ON p.PLAN_STATUS = cd.COMMON_DETAIL_CODE
+		<where>
+			<if test="checked_values == null or checked_values == ''">
+	            AND 1 = 0
+	        </if>
+	        <if test="checked_values != null and checked_values != '' and checked_values != 'checkAll'">
+	            AND plan_status IN (
+	                SELECT REGEXP_SUBSTR(#{checked_values}, '[^,]+', 1, LEVEL)
+	                FROM DUAL
+	                CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{checked_values}, ',') + 1
+	            )
+	        </if>
+	    </where>
+		 ORDER BY plan_date DESC 
 	</select>
 	
 	<!-- 생산계획 등록 목록 조회  -->

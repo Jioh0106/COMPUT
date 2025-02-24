@@ -89,8 +89,13 @@ $(function() {
 		
 		
 		// 상품번호/상품명 수정 시 모달창에서 상품 조회 후 등록
-	    grid.on('editingStart', function (ev) {
-	    	const { rowKey, columnName } = ev;
+		grid.on('focusChange', (ev) => {
+			grid.setSelectionRange({
+			    start: [ev.rowKey, 0],
+				end: [ev.rowKey, grid.getColumns().length]
+			});
+			
+			const { rowKey, columnName } = ev;
 
 	        // 사원번호 또는 사원명 수정 시 모달 띄우기
 	        if (columnName === 'mtr_no' || columnName === 'mtr_name') {
@@ -99,13 +104,6 @@ $(function() {
 				// 행정보 전달
 	            showMtrModal(rowKey);
 	        }
-	    });
-		
-		grid.on('focusChange', (ev) => {
-			grid.setSelectionRange({
-			    start: [ev.rowKey, 0],
-				end: [ev.rowKey, grid.getColumns().length]
-			});
 			
 		});	
 
@@ -435,7 +433,7 @@ $(function() {
 				$('#product_name').val(selectedPrdctRow.product_name);
 				$('#product_no').val(selectedPrdctRow.product_no);
 				
-				axios.get('/api/order/serch/bom', {
+				axios.get('/api/order/get/bom', {
 				    params: {  
 				        product_no: $('#product_no').val()
 				    }

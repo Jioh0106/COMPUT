@@ -43,6 +43,22 @@ public class PlanRestController {
 	} // getPlanList
 	
 	
+	/* 생산계획 목록 필터링 조회 */
+	@GetMapping("/list/filter")
+	public ResponseEntity<List<PlansDTO>> getPlanFilterList(@RequestParam("checked_values") String checked_values) {
+		System.out.println("checked_values = " + checked_values);
+		
+		
+		if(checked_values.equals("") || checked_values == null) {
+			checked_values = "";
+		}
+		
+		List<PlansDTO> list = service.getPlanFilterList(checked_values);
+		
+		return ResponseEntity.ok(list);
+        
+	} // getPlanFilterList
+	
 	/* 생산계획 등록 가능 목록 조회 */
 	@GetMapping("/reg/list")
 	public ResponseEntity<List<SaleDTO>> getRegPlanList() {

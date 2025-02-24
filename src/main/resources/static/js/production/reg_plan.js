@@ -14,7 +14,7 @@ $(function() {
 			{ header: '주문단위', name: 'unit_name', width: 80, sortingType: 'asc', sortable: true, align: 'center' },
 			{ header: '주문량', name: 'sale_vol', width: 80, sortingType: 'asc', sortable: true, align: 'center' },
 			{ header: '거래처', name: 'client_name', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
-			{ header: '소요시간', name: 'time_sum', width: 100, align: 'center' },
+			{ header: '소요시간(시)', name: 'time_sum', width: 100, align: 'center' },
 			{ header: '납품기한', name: 'sale_deadline', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
 			{
 				header: '생산 시작 예정일', 
@@ -133,6 +133,7 @@ $(function() {
 	
 	// "생산 계획 등록" 버튼 클릭 이벤트
 	$('#regPlan').on('click', function () {
+		grid.blur();
 		const selectedRows = grid.getCheckedRows();
 		console.log('선택된 데이터:', selectedRows);
 		
@@ -141,14 +142,20 @@ $(function() {
 		    Swal.fire({icon: "warning", title: "등록할 항목을 선택하세요."});
 		    return;
 		}
-		
+		selectedRows.forEach(row => {
+		    if (!row.plan_priority) {
+		        row.plan_priority = '일반';  // 기본값 설정
+		    }
+		});
+
 		// 빈 항목 검사
 		const invalidRows = selectedRows.filter(row => {
 			console.log('검사 중인 행 데이터:', row); // 디버깅용 출력
 		    return (
 		        !row.plan_start_date ||
 		        !row.plan_end_date ||
-		        !row.plan_priority 
+		        !row.plan_priority === null ||
+		        !row.plan_priority === ""  
 		    );
 		});
 		

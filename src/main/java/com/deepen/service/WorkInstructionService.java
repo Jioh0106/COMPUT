@@ -176,8 +176,8 @@ public class WorkInstructionService {
 			wiMapper.updatePlanStatusStart(updateData);
 			
 			// 설비 상태 업데이트 => 가동(USST001)
-			// 조건 : 라인번호에 해당하는 설비, 상태가 대기(USST002)인 것만
-			//wiMapper.updateEquipmentInfoByLineNoToOperation(updateData);
+			// 조건 : 라인번호에 해당하는 설비, 상태가 대기(USST002),정지(USST004)인 것만
+			wiMapper.updateEquipmentInfoByLineNoToOperation(updateData);
 		}
 		
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
@@ -346,7 +346,7 @@ public class WorkInstructionService {
 			
 			// 설비 상태 업데이트 => 대기(USST002)
 			// 조건 : 라인번호에 해당하는 설비, 상태가 가동(USST001)인 것만
-			//wiMapper.updateEquipmentInfoByLineNoToStanBy(linNo);
+			wiMapper.updateEquipmentInfoByLineNoToStanBy(linNo);
 		}
 		
 		

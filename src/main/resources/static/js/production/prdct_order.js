@@ -91,7 +91,75 @@ $(function() {
 		],
 		data: [] // 서버에서 전달받은 데이터
 	});
+	
+	// 주문 관리 상세 모달 열기
+	grid.on('focusChange', (ev) => {
+		grid.setSelectionRange({
+		    start: [ev.rowKey, 0],
+			end: [ev.rowKey, grid.getColumns().length]
+		});
+		
+		if (ev.targetType  === 'rowHeader') {
+		       return; 
+		   }
+			
+			if (typeof ev.rowKey !== 'undefined' && ev.rowKey !== null) {
+				const rowData = grid.getRow(ev.rowKey);
+				$('#order-sale').on('hidden.bs.modal', function () {
+				    $(this).removeAttr('aria-hidden');
+				});
+				$('#order-buy').on('hidden.bs.modal', function () {
+				    $(this).removeAttr('aria-hidden');
+				})
+				
+				if(rowData.order_type === '수주') {
 
+					// 수주 모달창 열기	
+					$('#order-sale').modal('show').on('shown.bs.modal',()=> grid2.refreshLayout());
+
+					axios.get('/api/order/detail/sale', {
+						params: {
+							order_id: rowData.order_id  
+						}
+					})
+					.then(function (response) {
+					  const detailData = response.data;
+					  
+					  grid2.resetData(detailData);
+					  grid2.refreshLayout();
+					})
+					.catch(function (error) {
+					  console.error('Error fetching order detail:', error);
+					});
+					return;
+					
+				} // 수주 조건문	
+				
+			;
+
+				// 발주 모달창 열기	
+				$('#order-buy').modal('show').on('shown.bs.modal',()=> grid3.refreshLayout());
+				
+				axios.get('/api/order/detail/buy', {
+					params: {
+						order_id: rowData.order_id  
+					}
+				})
+				.then(function (response) {
+				  const detailData = response.data;
+				  
+				  grid3.resetData(detailData);
+				  grid3.refreshLayout();
+				})
+				.catch(function (error) {
+				  console.error('Error fetching order detail:', error);
+				});	
+				
+
+					
+			}
+	
+	});	
 	// ------------------------------------------------
 	// 주문 관리 그리드 데이터 초기화
 	axios.get('/api/order/list')
@@ -125,7 +193,7 @@ $(function() {
 		console.log("search_word=" + search_word);
 		console.log("check_value=" + check_value);
 		
-		axios.get('/api/order/list/serch', {
+		axios.get('/api/order/list/filter', {
 		    params: {
 		        reg_date: reg_date,
 		        search_word: search_word,
