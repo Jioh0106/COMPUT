@@ -30,6 +30,8 @@ public interface PlansMapper {
 
 	String getPlanOrderId(String order_id);
 
+	List<PlansDTO> getPlanFilterList(String checked_values);
+
 	
 	
 

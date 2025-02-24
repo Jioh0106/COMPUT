@@ -12,32 +12,6 @@ function openView(type) {
 // =========================================================================
 
 
-// 첫 번째 DatePicker 초기화
-const container1 = document.getElementById('tui-date-picker-container-1');
-const target1 = document.getElementById('tui-date-picker-target-1');
-const instance1 = new tui.DatePicker(container1, {
-	language: 'ko',
-	date: new Date(),
-	input: {
-		element: target1,
-		format: 'yyyy-MM-dd'
-	}
-});
-
-// 두 번째 DatePicker 초기화
-const container2 = document.getElementById('tui-date-picker-container-2');
-const target2 = document.getElementById('tui-date-picker-target-2');
-const date = new Date();
-date.setDate(date.getDate() + 7);
-const instance2 = new tui.DatePicker(container2, {
-	language: 'ko',
-	date: date,
-	input: {
-		element: target2,
-		format: 'yyyy-MM-dd'
-	}
-});
-
 
 
 $(function() {	
@@ -55,29 +29,41 @@ $(function() {
 	    console.error('Error fetching data:', error);
 	});
 
-	// 부서 셀렉트 박스 
-	$('#statusSelect').on('click', function () {
-	    // 이미 데이터가 로드된 경우 추가 요청 방지
-	    if (this.options.length > 1) {
-	        return;
-	    }
+	const type = 'PRGR'; // 공통 코드 타입
+	
+	getCommonList(type).then(function (data) {
+	    const statusCheckContainer = $('#statusCheck');
 
-	    const type = 'PRGR'; 
+	    // 기존 체크박스 삭제 후 다시 추가 (초기화)
+	    statusCheckContainer.find('.form-check:not(:first)').remove(); 
 
-	    getCommonList(type).then(function (data) {
-	        $('#statusSelect')
-	            .empty()
-				.append('<option value="" selected>전체</option>');
-	        data.forEach(item => {
-	            if (item.common_detail_code && item.common_detail_name) {
-	                $('#statusSelect').append(
-	                    $('<option></option>').val(item.common_detail_name).text(item.common_detail_name)
-	                );
-	            }
-	        });
+	    data.forEach(item => {
+	        if (item.common_detail_code && item.common_detail_name) {
+	            const checkboxHtml = `
+	                <div class="form-check ms-3">
+	                    <input class="form-check-input status-check" type="checkbox" value="${item.common_detail_code}" id="check_${item.common_detail_code}" checked>
+	                    <label class="form-check-label" for="check_${item.common_detail_code}">${item.common_detail_name}</label>
+	                </div>
+	            `;
+	            statusCheckContainer.append(checkboxHtml);
+	        }
 	    });
-	    
-	}); // 부서 셀렉트 박스 
+	});
+
+    // "전체" 체크박스 클릭 시 모든 체크박스 선택/해제
+    $(document).on('change', '#checkAll', function () {
+        const isChecked = $(this).prop('checked');
+        $('.status-check').prop('checked', isChecked);
+    });
+
+    // 개별 체크박스가 변경될 때 "전체" 체크 상태 조정
+    $(document).on('change', '.status-check', function () {
+        const total = $('.status-check').length;
+        const checkedCount = $('.status-check:checked').length;
+        $('#checkAll').prop('checked', total === checkedCount); // 모두 체크되면 "전체" 체크
+    });
+		
+	
 
 	// type으로 공통 코드 가져오는 함수
 	function getCommonList(type) {
@@ -96,7 +82,36 @@ $(function() {
 	        });
 	}
 	
-	
+	$(document).on('change', '.status-check, #checkAll', function () {
+	    let checkedValues = [];
+
+	    // "전체" 체크박스가 체크되었을 경우
+	    if ($('#checkAll').is(':checked')) {
+	        checkedValues.push('checkAll');
+	    } else {
+	        // 개별 체크된 체크박스의 값을 배열로 저장
+	        $('.status-check:checked').each(function () {
+	            checkedValues.push($(this).val());
+	        });
+	    }
+
+	    console.log("선택된 상태 값:", checkedValues);
+
+	    axios.get('/api/plan/list/filter', {
+	        params: {
+	            checked_values: checkedValues.join(','), // 배열을 콤마로 구분된 문자열로 변환
+	        }
+	    })
+	    .then(function (response) {
+	        const newData = response.data;
+	        grid.resetData(newData); // 새로운 데이터로 그리드 갱신
+	        grid.refreshLayout();
+	    })
+	    .catch(function (error) {
+	        console.error('Error fetching data:', error);
+	    });
+	});
+
 	// ======================================================================
 	
 	// 생산 계획 그리드
@@ -110,12 +125,14 @@ $(function() {
 		columns: [
 			{ header: '생산계획번호', name: 'plan_id', width: 180, sortingType: 'asc', sortable: true, align: 'center'  },
 			{ header: '수주번호', name: 'sale_no', width: 80, sortingType: 'asc', sortable: true, align: 'center'  },
-			{ header: '등록 직원', name: 'emp_name', width: 100, align: 'center' },
-			{ header: '상태', name: 'status_name', width: 100,filter: 'select', align: 'center' },
+			{ header: '등록 직원', name: 'emp_name', width: 100, sortingType: 'asc', sortable: true, align: 'center' },
+			{ header: '상태', name: 'status_name', width: 100, sortingType: 'asc', sortable: true,align: 'center' },
 			{ 
 				header: '우선순위', 
 				name: 'plan_priority', 
 				width: 100, 
+				sortingType: 'asc', 
+				sortable: true,
 				editor:{
 					type: 'select',
 					options: {
@@ -336,23 +353,3 @@ $(function() {
 	
 	
 });	// 돔 로드 이벤트
-
-// 제이쿼리로 데이트피커에 숫자만 입력되게 정규식 처리
-function datePickerReplace(id) {
-	$(document).ready(function () {
-		// 숫자가 아닌 정규식
-		var replaceNotInt = /[^0-9]/gi;
-
-		$(`#${id}`).on("focusout", function () {
-			var x = $(this).val();
-			if (x.length > 0) {
-				if (x.match(replaceNotInt)) {
-					x = x.replace(replaceNotInt, "");
-				}
-				$(this).val(x);
-			}
-		}).on("keyup", function () {
-			$(this).val($(this).val().replace(replaceNotInt, ""));
-		});
-	});
-}

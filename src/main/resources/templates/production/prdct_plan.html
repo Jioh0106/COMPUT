@@ -83,35 +83,10 @@
 					<!-- 데이트 피커 시작 -->
 					<section class="section mb-4 d-flex justify-content-between">
 						<div style="display: flex; align-items: center; gap: 0.5rem;">
-							<!-- 첫 번째 데이트 피커 -->
-							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									<input type="text" id="tui-date-picker-target-1" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
-										 class="form-control" placeholder="시작일 선택" />
-									<span class="tui-ico-date"></span>
-								</div>
-								<div id="tui-date-picker-container-1" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
-							</div>
-
-							<!-- 구분자 -->
-							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
-
-							<!-- 두 번째 데이트 피커 -->
-							<div>
-								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									<input type="text" id="tui-date-picker-target-2" aria-label="Date-Time" onmousedown="datePickerReplace(this.id)"
-										 class="form-control" placeholder="종료일 선택" />
-									<span class="tui-ico-date"></span>
-								</div>
-								<div id="tui-date-picker-container-2" style="margin-top: -1px; z-index: 1000; position: relative;"></div>
-							</div>
-							
-							<div style="display: flex; align-items: center;" class="ms-3">
-								<span style="font-size: 1rem; line-height: 2rem;"> 상태 </span>
-								<div class="ms-3">
-									<select class="form-select deptArea" id="statusSelect" name="statusSelect" >
-										<option value="all" selected>전체</option>
-									</select>
+							<div style="display: flex; align-items: center;" class="ms-3" id="statusCheck">
+								<div class="form-check ms-3">
+									<input class="form-check-input" type="checkbox" value="checkAll" id="checkAll" checked>
+									<label class="form-check-label" for="checkAll"> 전체 </label>
 								</div>
 							</div>
 							
