@@ -20,6 +20,7 @@ import com.deepen.entity.Employees;
 import com.deepen.entity.Work;
 import com.deepen.entity.WorkTmp;
 import com.deepen.mapper.WorkMapper;
+import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
 import com.deepen.repository.WorkRepository;
 import com.deepen.repository.WorkTmpRepository;
@@ -36,6 +37,8 @@ public class WorkService {
 	private final PersonnelRepository personnelRepository;
 	private final WorkTmpRepository workTmpRepository;
 	private final WorkMapper workMapper;
+	private final CommonDetailRepository cdRepository;
+
 	
 	// 근무 관리 - 사용자 정보 조회
 	public Optional<Employees> findById(String emp_id) {
@@ -148,21 +151,17 @@ public class WorkService {
 		return workMapper.getWorkTmpList();
 	}
 	
-	/** 근무 템플릿 추가 */
-	public void insertWorkTmp(List<WorkTmpDTO> createdRows) {
-		for(WorkTmpDTO wtd :  createdRows) {
-			
+	/** 근무 템플릿 수정/추가 */
+	public void updateWorkTmp(List<WorkTmpDTO> updateRows) {
+		for(WorkTmpDTO wtd :  updateRows) {
+			WorkTmp workTmp = WorkTmp.setWorkTmpEntity(wtd);
+			workTmp.setWork_shift(cdRepository.findCommonDetailCodeByName(wtd.getShift_name()));
+			workTmp.setWork_type(cdRepository.findCommonDetailCodeByName(wtd.getType_name()));
+			workTmpRepository.save(workTmp);
 		}		
 		
 	}
 	
-	/** 근무 템플릿 수정 */
-	public void updateWorkTmp(List<WorkTmpDTO> updatedRows) {
-		for(WorkTmpDTO wtd :  updatedRows) {
-			
-		}		
-	}
-
 	/** 근무 템플릿 삭제 */
 	public void deleteWorkTmp(List<WorkTmpDTO> deletedRows) {
 		for(WorkTmpDTO wtd :  deletedRows) {

@@ -161,7 +161,7 @@ public class WorkRestController {
 	public ResponseEntity<List<WorkTmpDTO>> getWorkTmpList() {
 		
 		List<WorkTmpDTO> list = workService.getWorkTmpList();
-		
+		System.out.println("********************getWorkTmpList = " + list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -174,16 +174,11 @@ public class WorkRestController {
 		List<WorkTmpDTO> updatedRows = modifiedRows.get("updatedRows");
 		List<WorkTmpDTO> deletedRows = modifiedRows.get("deletedRows");
 		
-		// 추가 처리
-		if (createdRows != null && !createdRows.isEmpty()) {
-			workService.insertWorkTmp(createdRows);
+		// 추가/수정 처리
+		if (createdRows != null && !createdRows.isEmpty() || updatedRows != null && !updatedRows.isEmpty()) {
+			workService.updateWorkTmp(createdRows);
 		}
 		
-        // 업데이트 처리
-        if (updatedRows != null && !updatedRows.isEmpty()) {
-        	workService.updateWorkTmp(updatedRows);
-        }
-        
         // 삭제 처리
         if (deletedRows != null && !deletedRows.isEmpty()) {
         	workService.deleteWorkTmp(deletedRows);

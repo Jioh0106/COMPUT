@@ -1,4 +1,5 @@
 $(function() {
+	const csrfToken = $('input[name="_csrf"]').val();
 
 	function mainFetchData() {
 		    
@@ -79,28 +80,23 @@ $(function() {
 		});
 		
 		
-		grid.on('focusChange', (ev) => {
-			grid.setSelectionRange({
-			    start: [ev.rowKey, 0],
-				end: [ev.rowKey, grid.getColumns().length]
-			});
-			
-		});	
+		axios.get('/api/work/tmp/list')
+		.then(function (response) {
+			const data = response.data; // 데이터 로드
+			console.log('Fetched data:', data);
+		    grid.resetData(data);
+		    grid.refreshLayout(); // 레이아웃 새로고침
+		})
+		.catch(function (error) {
+		    console.error('Error fetching data:', error);
+		});
+		
+		
+		
 	});
 
 	// ====================================== 
 
-	axios.get('/api/work/tmp/list')
-	.then(function (response) {
-		const data = response.data; // 데이터 로드
-		console.log('Fetched data:', data);
-	    grid.resetData(data);
-	    grid.refreshLayout(); // 레이아웃 새로고침
-	})
-	.catch(function (error) {
-	    console.error('Error fetching data:', error);
-	});
-	
 		
 	// "추가" 버튼 클릭 이벤트
 	$('#append').on('click', function (e) {
@@ -132,16 +128,16 @@ $(function() {
 		
 	}); // 추가 버튼 이벤트
 	
-	// "삭제" 버튼 클릭
+	// "삭제" 버튼 클릭 (그리드상 row 제거)
 	$('#delete').on('click', function (e) {
 		e.preventDefault(); // 기본 동작 방지
 		
 		const selectedRow = grid.getFocusedCell();
 		if (selectedRow.rowKey !== null) {
 	        grid.removeRow(selectedRow.rowKey);
-	    } else {
-	        Swal.fire('', '삭제할 행을 선택하세요.', 'warning'); 
-	    }
+			return;
+	    } 	
+		Swal.fire('', '삭제할 행을 선택하세요.', 'warning'); 
 	});
 	
 	// "저장" 버튼 클릭

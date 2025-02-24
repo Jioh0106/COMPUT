@@ -1,5 +1,6 @@
 package com.deepen.entity;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 import com.deepen.domain.MaterialDTO;
@@ -34,7 +35,7 @@ public class Material {
 	private String hardness;
 	
 	@Column(name = "density")
-	private Integer density;
+	private BigDecimal density;
 	
 	@Column(name = "melting_point")
 	private Integer melting_point;
