@@ -260,7 +260,7 @@ public class OrderRestController {
 	} // deleteOrder
 	
 	/* 상품별 BOM 정보 조회 */
-	@GetMapping("/serch/bom")
+	@GetMapping("/get/bom")
 	public ResponseEntity<List<Map<String, Object>>> getBomList(@RequestParam("product_no") int product_no)  {
 		
 		List<Map<String, Object>> bomList = service.getBomList(product_no);
@@ -273,6 +273,19 @@ public class OrderRestController {
 		
 	} // getBomList
 	
+	/* 상품별 생산 수량에 따른 공정 시간 조회 */
+	@GetMapping("/get/time")
+	public ResponseEntity<Integer> getProcessTime(@RequestParam("product_no") int product_no, @RequestParam("sale_vol") int sale_vol)  {
+		
+		int time_sum = service.getProcessTime(product_no, sale_vol);
+		System.out.println("getProcessTime = " + time_sum);
+		
+		return ResponseEntity.ok(time_sum);
+		
+	} // getProcessTime
+	
+	
+	
 	/* 거래처 기등록 여부 조회 */
 //	@GetMapping("/check/client")
 //	public ResponseEntity<Boolean> checkClient(@RequestParam("client_no") int client_no, @RequestParam("order_type") String order_type)  {
@@ -284,14 +297,7 @@ public class OrderRestController {
 //	} // checkClient
 	
 	
-	
-	/* 수주 그리드 정보 추가/수정 */
-	
-	
-	
-	
-	
-	/* 발주 그리드 정보 추가/수정 */
+
 	
 	
 	

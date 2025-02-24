@@ -435,7 +435,7 @@ $(function() {
 				$('#product_name').val(selectedPrdctRow.product_name);
 				$('#product_no').val(selectedPrdctRow.product_no);
 				
-				axios.get('/api/order/serch/bom', {
+				axios.get('/api/order/get/bom', {
 				    params: {  
 				        product_no: $('#product_no').val()
 				    }
