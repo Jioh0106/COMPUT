@@ -25,7 +25,7 @@
 	    ON emp.emp_dept = dept_code.common_detail_code
 	    LEFT JOIN common_detail pos_code
 	    ON emp.emp_position = pos_code.common_detail_code
-	    WHERE emp_status LIKE 'WRST%'
+	    WHERE emp_status IN ('WRST001','WRST003')
 	    AND emp_name LIKE '%' || #{keyword, jdbcType=VARCHAR} || '%'
 	</select>
 	
