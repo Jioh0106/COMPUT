@@ -1,5 +1,6 @@
 package com.deepen.domain;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -15,7 +16,7 @@ public class MaterialDTO {
 	private String mtr_type;
 	private String composition;
 	private String hardness;
-	private Integer density;
+	private BigDecimal density;
 	private Integer melting_point;
 	private Integer tensile_strength;
 	private String mtr_use;

@@ -60,17 +60,12 @@ $(function() {
 		
 	// '전체' 체크박스 클릭 시
 	$('#all-check').on('change', function () {
-		let isChecked = $(this).is(':checked');
-		$('#sale-check, #buy-check').prop('checked', isChecked);
+	    $('#sale-check, #buy-check').prop('checked', this.checked);
 	});
 
-   // '수주' 또는 '발주' 체크박스 클릭 시
+	// '수주' 또는 '발주' 체크박스 클릭 시
 	$('#sale-check, #buy-check').on('change', function () {
-		if (!$('#sale-check').is(':checked') || !$('#buy-check').is(':checked')) {
-			$('#all-check').prop('checked', false);
-		} else {
-			$('#all-check').prop('checked', true);
-		}
+	    $('#all-check').prop('checked', $('#sale-check').is(':checked') && $('#buy-check').is(':checked'));
 	});
 	
 	instance1.on('change', function(event) {
@@ -159,18 +154,18 @@ $(function() {
 		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '수주번호', name: 'sale_no', width: 60, align: 'center'},
-			{header: '주문번호', name: 'order_id', width: 120, align: 'center'},
-			{header: '구분', name: 'order_type', width: 80, align: 'center'},
-			{header: '거래처명', name: 'client_name', width: 120, align: 'center'},
-			{header: '상품번호', name: 'product_no', width: 80, align: 'center'},
-			{header: '상품명', name: 'product_name', width: 200, align: 'center'},
-			{header: '주문 단위', name: 'unit_name', width: 80, align: 'center'},
-			{header: '주문량', name: 'sale_vol', width: 80, align: 'center', editor: 'text'},
-			{header: '납품기한', name: 'sale_deadline', width: 100, align: 'center'},
-			{header: '직원번호', name: 'order_emp', width: 100, align: 'center'},
-			{header: '등록직원', name: 'emp_name', width: 100, align: 'center'},
-			{header: '등록일자', name: 'order_date', width: 120, align: 'center'},
+			{ header: '수주번호', name: 'sale_no', width: 60, align: 'center'},
+			{ header: '주문번호', name: 'order_id', width: 120, align: 'center'},
+			{ header: '구분', name: 'order_type', width: 80, align: 'center'},
+			{ header: '거래처명', name: 'client_name', width: 120, align: 'center'},
+			{ header: '상품번호', name: 'product_no', width: 80, align: 'center'},
+			{ header: '상품명', name: 'product_name', width: 200, align: 'center'},
+			{ header: '주문 단위', name: 'unit_name', width: 80, align: 'center'},
+			{ header: '주문량', name: 'sale_vol', width: 80, align: 'center', editor: 'text'},
+			{ header: '납품기한', name: 'sale_deadline', width: 100, align: 'center'},
+			{ header: '직원번호', name: 'order_emp', width: 100, align: 'center'},
+			{ header: '등록직원', name: 'emp_name', width: 100, align: 'center'},
+			{ header: '등록일자', name: 'order_date', width: 120, align: 'center'},
 			{
 				header: '주문상태', 
 				name: 'sale_status', 
@@ -183,7 +178,7 @@ $(function() {
 				    }
 				}
 			},
-			{header: '계획상태', name: 'plan_status', width: 100, align: 'center'}
+			{ header: '계획상태', name: 'plan_status', width: 100, align: 'center'}
 		]
 	});
 	
@@ -195,17 +190,17 @@ $(function() {
 		bodyHeight: 250,
 		rowHeaders: ['checkbox'],
 		columns: [
-			{header: '발주번호', name: 'buy_no', width: 80, align: 'center'},
-			{header: '주문번호', name: 'order_id', width: 130, align: 'center'},
-			{header: '구분', name: 'order_type', width: 80, align: 'center'},
-			{header: '거래처명', name: 'client_name', width: 80, align: 'center'},
-			{header: '자재번호', name: 'mtr_no', width: 80, align: 'center'},
-			{header: '자재명', name: 'mtr_name', width: 150, align: 'center'},
-			{header: '주문 단위', name: 'unit_name', width: 80, align: 'center'},
-			{header: '주문량', name: 'buy_vol', width: 80, align: 'center',  editor: 'text'},
-			{header: '직원번호', name: 'order_emp', width: 100, align: 'center'},
-			{header: '등록직원', name: 'emp_name', width: 100, align: 'center'},
-			{header: '등록일자', name: 'order_date', width: 120, align: 'center'},
+			{ header: '발주번호', name: 'buy_no', width: 80, align: 'center'},
+			{ header: '주문번호', name: 'order_id', width: 130, align: 'center'},
+			{ header: '구분', name: 'order_type', width: 80, align: 'center'},
+			{ header: '거래처명', name: 'client_name', width: 80, align: 'center'},
+			{ header: '자재번호', name: 'mtr_no', width: 80, align: 'center'},
+			{ header: '자재명', name: 'mtr_name', width: 150, align: 'center'},
+			{ header: '주문 단위', name: 'unit_name', width: 80, align: 'center'},
+			{ header: '주문량', name: 'buy_vol', width: 80, align: 'center',  editor: 'text'},
+			{ header: '직원번호', name: 'order_emp', width: 100, align: 'center'},
+			{ header: '등록직원', name: 'emp_name', width: 100, align: 'center'},
+			{ header: '등록일자', name: 'order_date', width: 120, align: 'center'},
 			{
 				header: '주문상태', 
 				name: 'buy_status', 
@@ -218,16 +213,16 @@ $(function() {
                     }
 			    }
 			},
-			{header: '입고상태', name: 'inbound_status', width: 100, align: 'center'}
+			{ header: '입고상태', name: 'inbound_status', width: 100, align: 'center'}
 		]
 	});
 	
 	// 주문 관리 상세 모달 열기
 	grid.on('click', function (ev) {
 		if (ev.targetType  === 'rowHeader') {
-	       return; 
-	   }
-		
+			return; 
+		}
+	
 		if (typeof ev.rowKey !== 'undefined' && ev.rowKey !== null) {
 			const rowData = grid.getRow(ev.rowKey);
 			$('#order-sale').on('hidden.bs.modal', function () {
@@ -241,7 +236,7 @@ $(function() {
 
 				// 수주 모달창 열기	
 				$('#order-sale').modal('show').on('shown.bs.modal',()=> grid2.refreshLayout());
-
+				
 				axios.get('/api/order/detail/sale', {
 					params: {
 						order_id: rowData.order_id  
@@ -249,7 +244,6 @@ $(function() {
 				})
 				.then(function (response) {
 				  const detailData = response.data;
-				  
 				  grid2.resetData(detailData);
 				  grid2.refreshLayout();
 				})
@@ -257,10 +251,8 @@ $(function() {
 				  console.error('Error fetching order detail:', error);
 				});
 				return;
-				
 			} // 수주 조건문	
 			
-		;
 
 			// 발주 모달창 열기	
 			$('#order-buy').modal('show').on('shown.bs.modal',()=> grid3.refreshLayout());
@@ -279,9 +271,6 @@ $(function() {
 			.catch(function (error) {
 			  console.error('Error fetching order detail:', error);
 			});	
-			
-
-				
 		}
 	});
 	
@@ -430,15 +419,14 @@ $(function() {
 		      title: "주문 건 삭제",
 			  text: "해당 정보를 모두 삭제하시겠습니까?",
 		      showCancelButton: true,
-		      confirmButtonText: "확인",   // OK 버튼 텍스트
-		      cancelButtonText: "취소"     // Cancel 버튼 텍스트
+		      confirmButtonText: "확인",   
+		      cancelButtonText: "취소"     
 		}).then((result) => {
-			if (result.isConfirmed) {  // OK 버튼을 눌렀을 경우
+			if (result.isConfirmed) {  
 				const deleteList = selectedRows.map(row => row.order_id);
-				// 삭제 요청 데이터 생성
 	            const requestData = {
 					type: type,       // 'buy' 또는 'sale' 문자열
-					orderIds: deleteList  // 삭제할 주문 ID 리스트
+					orderIds: deleteList  
 	            };
 
 				axios.post('/api/order/delete', deleteList, {
@@ -447,7 +435,7 @@ $(function() {
 				.then(function (response) {
 					Swal.fire('Success','삭제가 완료되었습니다.','success')
 					.then(() => {
-						window.location.reload();  // 삭제 후 새로고침
+						window.location.reload();  
 					});
 				})
 		          .catch(function (error) {
@@ -455,7 +443,6 @@ $(function() {
 		              Swal.fire('Error', '삭제 중 문제가 발생했습니다.', 'error' );
 		          });
 		      } 
-		      // "취소"를 누르면 아무 동작 없이 닫힘 (기본 동작)
 		  });
 	}
 	
@@ -477,17 +464,11 @@ $(function() {
 	        Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success');
 			const reversedData = response.data;
 	        grid.resetData(reversedData); 
-//			if(type === '수주') {
-//				$('#order-sale').modal('hide');
-//			} else if(type === '발주') {
-//				$('#order-buy').modal('hide');
-//			}
 	    })
 	    .catch(function (error) {
 	        console.error('데이터 저장 중 오류 발생:', error);
 	        Swal.fire('Error', '데이터 저장 중 문제가 발생했습니다.', 'error');
 	    });
-		
 		
 	}
 

@@ -11,7 +11,7 @@ function openRegView() {
 // 근무 템플릿 관리 팝업창 가운데 위치(듀얼모니터 포함)
 function openTempView() {
 	var popupW = 800;
-	var popupH = 400;
+	var popupH = 500;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);
@@ -123,6 +123,8 @@ $(function() {
 
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
+		height: 600,
+		bodyHeight: 550,
 		columns: [
 			{header: 'No', name: 'work_no'},
 			{header: '사원번호', name: 'emp_id'},
