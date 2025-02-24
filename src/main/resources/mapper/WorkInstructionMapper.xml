@@ -376,7 +376,7 @@
 		UPDATE equipment_info SET
 			info_type = 'USST001'
 		WHERE line_no = #{line_no}
-			AND info_type = 'USST002'
+			AND (info_type = 'USST002' OR info_type = 'USST004') 
 	</update>
 	
 	<select id="getLastLotSequence">
