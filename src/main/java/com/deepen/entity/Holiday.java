@@ -24,9 +24,17 @@ public class Holiday {
 	@Column(name = "locdate", length = 10, nullable = false)
 	private String locdate;
 	
-    public Holiday(String date_name, String locdate) {
+	@Column(name = "year")
+	private int year;
+	
+	@Column(name = "month")
+	private int month;
+	
+    public Holiday(String date_name, String locdate, int year, int month) {
         this.date_name = date_name;
         this.locdate = locdate;
+        this.year = year;
+        this.month = month;
     }
 
 }

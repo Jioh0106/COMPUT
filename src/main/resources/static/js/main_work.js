@@ -40,10 +40,7 @@ $(document).ready(function () {
 	    useDetailPopup: true, // 상세 팝업 활성화
 		timezone: {
 	       zones: [
-	           {
-	               timezoneName: 'Asia/Seoul',
-	               displayLabel: 'Seoul',
-	           },
+	           { timezoneName: 'Asia/Seoul', displayLabel: 'Seoul'},
 	       ],
 	   },
 	    template: {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> 
 
 <head>
     <meta charset="UTF-8">
@@ -8,14 +8,11 @@
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
-<!--     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"> -->
-    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
-
-    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
-
-    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
-    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" href="/assets/vendors/iconly/bold.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
     <link rel="icon" href="images/favicon.png" type="images/png">
     <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
 	<style>
@@ -57,7 +54,6 @@
 		
 	</style>
 	
-	<meta charset="UTF-8">
 	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
 	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
@@ -70,17 +66,76 @@
 		
 	
 		<!-- 메인 content -->
-		<div th:replace="~{main :: main}"></div>
+<!-- 		<div th:replace="~{main :: main}"></div> -->
 	
-		
+	<div id="main">
+		<div class="card" style="width: 1200px;">
+		    <div class="card-body">
+		        <section class="row mb-5">
+		            <div class="col-10 d-flex align-items-center justify-content-start ">
+		                <!-- 제목과 날짜 -->
+		                <div class="d-flex align-items-center">
+		                    <h4>근무 일정</h4>
+		                </div>
+		                <!-- 버튼들 -->
+		                <div class="d-flex align-items-center ms-3">
+		                    <button type="button" id="todayBtn" class="btn btn-outline-secondary rounded-pill mx-3">
+		                        Today
+		                    </button>
+		                    <button type="button" id="prevBtn" class="btn btn-outline-secondary rounded-pill me-2">
+		                        <i class="bi bi-chevron-left"></i>
+		                    </button>
+		                    <h5 id="today" class="mx-4"></h5>
+		                    <button type="button" id="nextBtn" class="btn btn-outline-secondary rounded-pill">
+		                        <i class="bi bi-chevron-right"></i>
+		                    </button>
+		                </div>
+		            </div>
+		            <div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"  class="col-2 d-flex align-items-center justify-content-end">
+		            	<select class="form-select" aria-label="Default select example">
+							<option selected>부서 전체</option>
+							<option value="1">One</option>
+							<option value="2">Two</option>
+							<option value="3">Three</option>
+						</select>
+		            </div>
+		        </section>
+
+		        <section>
+		            <div id="calendar" style="height: 600px; "></div>
+		        </section>
+		    </div>
+		</div>
+		<!--  발령 등록 토스트 알림 -->
+		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+			<div class="toast-header">
+				<img src="/images/siren.png" class="rounded me-2 " id="sirenImg" >
+				<strong class="me-auto">인사발령 알림</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				해당 사번의 인사발령이 승인되었습니다.<br>
+				인사발령현황 메뉴를 확인해주세요. 
+			</div>
+		</div>
+     
+	</div>
+	<!-- main.html 끝-->
 
     </div> <!--app 끝 -->
 	
-    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
-
-    <script th:src="@{/assets/js/main.js}"></script>
-   
+    <script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+	<!-- Toast UI Calendar -->
+	<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
+	<!-- 제이쿼리 -->
+	<script src="/js/jquery-3.7.1.js"></script>
+	<!-- sweetAlert CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script th:inline="javascript" th:src="@{/js/main_work.js}"></script>
+	<script th:inline="javascript" th:src="@{/js/main_assignment.js}"></script>
 
 </body>
 
