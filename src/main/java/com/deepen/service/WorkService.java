@@ -3,11 +3,9 @@ package com.deepen.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -17,12 +15,10 @@ import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
 import com.deepen.domain.WorkTmpDTO;
 import com.deepen.entity.Employees;
-import com.deepen.entity.Work;
 import com.deepen.entity.WorkTmp;
 import com.deepen.mapper.WorkMapper;
 import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
-import com.deepen.repository.WorkRepository;
 import com.deepen.repository.WorkTmpRepository;
 
 import jakarta.transaction.Transactional;
@@ -171,7 +167,8 @@ public class WorkService {
 			workTmpRepository.delete(workTmp);
 		}
 	} 
-
+	
+	/** 공휴일 정보  */
 
 
 } // WorkService
