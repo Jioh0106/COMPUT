@@ -54,7 +54,7 @@ public class OrderRestController {
 	
 	
 	/* 주문관리 목록 필터링 조회 */
-	@GetMapping("/list/serch")
+	@GetMapping("/list/filter")
 	public ResponseEntity<List<OrdersDTO>> getOrderSerchList(@RequestParam("reg_date") String reg_date,
 														     @RequestParam("search_word") String search_word,
 														     @RequestParam("check_value") String check_value) {
@@ -277,6 +277,7 @@ public class OrderRestController {
 	@GetMapping("/get/time")
 	public ResponseEntity<Integer> getProcessTime(@RequestParam("product_no") int product_no, @RequestParam("sale_vol") int sale_vol)  {
 		
+		System.out.println("getProcessTime - product_no = " + product_no+ ", sale_vol = " + sale_vol );
 		int time_sum = service.getProcessTime(product_no, sale_vol);
 		System.out.println("getProcessTime = " + time_sum);
 		

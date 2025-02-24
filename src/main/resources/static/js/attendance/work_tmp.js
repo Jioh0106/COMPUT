@@ -77,6 +77,15 @@ $(function() {
 			],
 			data: [] // 서버에서 전달받은 데이터
 		});
+		
+		
+		grid.on('focusChange', (ev) => {
+			grid.setSelectionRange({
+			    start: [ev.rowKey, 0],
+				end: [ev.rowKey, grid.getColumns().length]
+			});
+			
+		});	
 	});
 
 	// ====================================== 

@@ -35,9 +35,9 @@ public class PlanService {
 		return mapper.getPlanList();
 	}
 	
-	public List<OrdersDTO> getPlanSerchList(Map<String, String> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PlansDTO> getPlanFilterList(String checked_values) {
+		
+		return mapper.getPlanFilterList(checked_values);
 	}
 	
 	@Transactional

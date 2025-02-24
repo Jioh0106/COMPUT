@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +22,6 @@ import com.deepen.service.PlanService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RequiredArgsConstructor
@@ -44,6 +44,22 @@ public class PlanRestController {
         
 	} // getPlanList
 	
+	
+	/* 생산계획 목록 필터링 조회 */
+	@GetMapping("/list/filter")
+	public ResponseEntity<List<PlansDTO>> getPlanFilterList(@RequestParam("checked_values") String checked_values) {
+		System.out.println("checked_values = " + checked_values);
+		
+		
+		if(checked_values.equals("") || checked_values == null) {
+			checked_values = "";
+		}
+		
+		List<PlansDTO> list = service.getPlanFilterList(checked_values);
+		
+		return ResponseEntity.ok(list);
+        
+	} // getPlanFilterList
 	
 	/* 생산계획 등록 가능 목록 조회 */
 	@GetMapping("/reg/list")
