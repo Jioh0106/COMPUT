@@ -23,7 +23,7 @@ public class InboundRestController {
     public ResponseEntity<Map<String, Object>> getInboundList(
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam(value = "kbulk-completeyword", required = false) String keyword,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false, defaultValue = "대기") String status,
             @RequestParam(value = "source", required = false) String source ) {
         
