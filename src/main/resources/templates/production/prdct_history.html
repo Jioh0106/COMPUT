@@ -122,7 +122,28 @@
 
 				</div> <!-- card-body -->
 			</div> <!-- card -->
-			
+				
+				<!-- 생산이력 모달창 시작 -->
+		    <div class="modal fade text-left w-100" id="history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
+		           
+		            <div class="modal-content">
+		                <div class="modal-header">
+		                    <h4 class="modal-title" id="myModalLabel17"> 생산 이력 </h4>
+		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		                </div>
+		                <div class="modal-body">
+							<div class="row" id="basic-table">
+								<!-- 그리드 시작 -->
+								<div id="historyGrid"></div>
+								<!-- 그리드 끝 -->
+								
+							</div>
+		                </div>
+		            </div>
+		        </div>
+		    </div> 
+		    <!-- 생산이력 모달창 끝 -->
 	
 		</div> <!-- main -->
 	</div> <!-- app -->
@@ -144,18 +165,38 @@
 
 	 	var Grid = tui.Grid;
 		
-	 	var historyList = /*[[${historyList}]]*/'UNKNOWN';
-	 	console.log('생산이력', historyList);
+	 	//var historyList = /*[[${historyList}]]*/'UNKNOWN';
+	 	var planIdList = /*[[${planIdList}]]*/'UNKNOWN';
+	 	console.log('생산이력', planIdList);
 	 	
+	 	//생산계획번호 조회 그리드
 		const productionGrid = new Grid({
 			el: document.getElementById('productionGrid'),
 			columns: [
-			//	{header: '번호',	name: 'inventory_no', width: 100},
-				{header: '생산계획번호',	name: 'PLANID',		editor: 'text', sortable: true, width: 150},
-				{header: '작업지시번호',	name: 'WINO',	editor: 'text', sortable: true, width: 150},
-				{header: '상품구분',	name: 'PRODUCTTYPE',	editor: 'text', sortable: true, width: 150},
+				{header: '생산계획번호',	name: 'PLANID',		editor: 'text', sortable: true},
+				{header: '상품명',	name: 'PRODUCTNAME',	editor: 'text', sortable: true},
+				{header: '생산 상태',	name: 'PALNSTATUS',	editor: 'text', sortable: true},
+				{header: '생산 등록일',		name: 'PLANDATE', editor: 'text', sortable: true}
+ 				
+				
+			],
+			data: planIdList,
+			
+			columnOptions: {
+			  resizable: true
+			}
+		});
+		
+	 	
+	 	let planId = null; //클릭한 행의 생산계획번호
+	 	
+		//생산이력 모달창
+		const historyGrid = new Grid({
+			el: document.getElementById('historyGrid'),
+			columns: [
+				{header: '작업지시번호',	name: 'WINO',	editor: 'text', sortable: true, width: 80},
+				{header: '상품구분',	name: 'PRODUCTTYPE',	editor: 'text', sortable: true, width: 100},
 				{header: '상품명',		name: 'PRODUCTNAME', editor: 'text', sortable: true, width: 200},
-// 				{header: '투입량',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
  				{header: '공정',	name: 'PROCESSNAME',	editor: 'text', sortable: true, width: 200},
  				{header: '라인',	name: 'LINENO',	editor: 'text', sortable: true, width: 150},
 				
@@ -167,16 +208,54 @@
  	                }
  	            }, sortable: true, width: 150},
 				
-	            {header: '생산날짜',	name: 'ENDTIME',	editor: 'text', sortable: true}
+	            {header: '생산날짜',	name: 'ENDTIME',	editor: 'text', sortable: true, width: 200}
 				
-			],
-			data: historyList,
-			columnOptions: {
-			  resizable: true
-			}
+			]
+			
 		});
 		
-		
+	 	
+		function loadData(planId) {
+		    fetch(`/api/production/history/${planId}`)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("불러온 변경이력 데이터:", data);
+
+		            historyGrid.resetData(data);
+		            historyGrid.refreshLayout();
+		        })
+		        .catch(error => {
+		            console.error("Error fetching history data:", error);
+    			});
+		}
+	 	
+	 	
+		productionGrid.on('click', function (ev) {
+		    // 클릭된 row 데이터 가져오기
+		    const rowData = ev.instance.getRow(ev.rowKey);
+		    console.log('클릭클릭 :', rowData);
+		    
+		    if (rowData) {
+		        planId = rowData.PLANID;
+		        console.log('클릭한 행의 생산계획번호 : ', planId);
+		        
+		        // 모달창 띄우기
+		        $('#history').modal('show').on('shown.bs.modal',()=>historyGrid.refreshLayout());
+
+		        // 데이터 불러오기
+		        loadData(planId);
+		    } else {
+		        console.error("선택된 행의 데이터가 없습니다.");
+		    }
+	   	});
+
+	 	
+	
+	 	
+	 	
+	 	
+	 	
+	 	
 		
 		//생산계획번호 검색
 		function filterGrid() {
@@ -184,11 +263,11 @@
 
 		    if (searchText === "") {
 		        // 검색어가 없으면 원래 데이터로 복원
-		        productionGrid.resetData(historyList);
+		        productionGrid.resetData(planIdList);
 		        return;
 		    }
 
-		    var filteredData = historyList.filter(row => row.PLANID.includes(searchText));
+		    var filteredData = planIdList.filter(row => row.PLANID.includes(searchText));
 		    productionGrid.resetData(filteredData);
 		}
 		

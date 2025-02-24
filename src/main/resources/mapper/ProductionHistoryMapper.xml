@@ -4,31 +4,33 @@
 
 <mapper namespace="com.deepen.mapper.ProductionHistoryMapper">
 
-<!-- 생산이력 뷰 -->
+<!-- 생산이력 모달창 (뷰 테이블 조회) -->
 <select id="historyList" resultType="java.util.Map">
-	SELECT 
+SELECT 
     plan_id AS planId,
     wi_no AS wiNo,
     process_name AS processName,
     line_no AS lineNo,
     judgement,
-    end_time AS endTime,
+    TO_CHAR(end_time, 'YYYY-MM-DD HH24:MI:SS') AS endTime,
     product_name AS productName,
     product_type AS productType
 FROM
     prdct_history
-ORDER BY 
-    
-    CASE 
-        WHEN REGEXP_LIKE(SUBSTR(plan_id, 2, 8), '^[0-9]{8}$') THEN 
-            TO_DATE(SUBSTR(plan_id, 2, 8), 'YYYYMMDD') 
-        ELSE 
-            NULL 
-    END DESC,  
-   
-    TO_NUMBER(REGEXP_SUBSTR(plan_id, '[0-9]+$', 1, 1)) ASC
-
+WHERE plan_id = #{plan_id} 
+ORDER BY end_time DESC   
 </select>
+
+<!-- 생산계획번호 조회 -->
+<select id="selectPlanId" resultType="java.util.Map">
+select pl.plan_id AS planId, c.common_detail_name AS palnStatus, p.product_name AS productName, TO_CHAR(pl.plan_date, 'YYYY-MM-DD') AS planDate
+from plans pl
+join product p on REGEXP_SUBSTR(pl.plan_id, '[^-]+', 1, 3) = p.product_no
+join common_detail c on pl.plan_status = c.common_detail_code
+</select>
+
+
+
 
 
 

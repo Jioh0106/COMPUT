@@ -17,9 +17,13 @@ public class ProductionHistoryService {
 	
 	private final ProductionHistoryMapper prdctMapper;
 	
-	//생산이력
-	public List<Map<String, Object>> historyList(){
-		return prdctMapper.historyList();
+	//생산이력 모달
+	public List<Map<String, Object>> historyList(String plan_id){
+		return prdctMapper.historyList(plan_id);
 	}
 	
+	//생산계획번호 조회
+	public List<Map<String, Object>> selectPlanId(){
+		return prdctMapper.selectPlanId();
+	}
 }
