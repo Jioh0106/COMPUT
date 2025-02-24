@@ -40,7 +40,7 @@
         LEFT JOIN MATERIAL m ON i.item_no = m.mtr_no
         <where>
             <if test="inNo != null">
-                AND i.in_no = #{inNo}
+                i.in_no = #{inNo}
             </if>
             <if test="startDate != null and startDate != ''">
                 AND TRUNC(i.in_date) >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
