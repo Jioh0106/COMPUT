@@ -146,7 +146,7 @@ $(function() {
 		const modifiedRows = grid.getModifiedRows();
 		console.log(modifiedRows); 
 		
-		if (modifiedRows.updatedRows.length === 0 && modifiedRows.createdRows.length === 0) {
+		if (modifiedRows.updatedRows.length === 0 && modifiedRows.createdRows.length === 0 && modifiedRows.deletedRows.length === 0) {
 	        Swal.fire('Info', '수정 또는 추가된 데이터가 없습니다.', 'info');
 	        return;
 	    }		

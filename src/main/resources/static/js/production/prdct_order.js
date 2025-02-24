@@ -105,12 +105,9 @@ $(function() {
 			
 			if (typeof ev.rowKey !== 'undefined' && ev.rowKey !== null) {
 				const rowData = grid.getRow(ev.rowKey);
-				$('#order-sale').on('hidden.bs.modal', function () {
+				$('#order-sale', '#order-buy').on('hidden.bs.modal', function () {
 				    $(this).removeAttr('aria-hidden');
 				});
-				$('#order-buy').on('hidden.bs.modal', function () {
-				    $(this).removeAttr('aria-hidden');
-				})
 				
 				if(rowData.order_type === '수주') {
 
@@ -180,19 +177,10 @@ $(function() {
 		let search_word = $('#searchWord').val();
 		let check_value = '';
 		
-		if ($('#all-check').is(':checked')) {
-			check_value = '전체';
-		} else {
-			if ($('#sale-check').is(':checked')) {
-			    check_value = '수주';
-			} else if ($('#buy-check').is(':checked')) {
-			    check_value = '발주';
-			}
-		}
-		console.log("reg_date=" + reg_date);
-		console.log("search_word=" + search_word);
-		console.log("check_value=" + check_value);
-		
+		check_value = $('#all-check').is(':checked') ? '전체' : 
+		              $('#sale-check').is(':checked') ? '수주' : 
+		              $('#buy-check').is(':checked') ? '발주' : '';
+
 		axios.get('/api/order/list/filter', {
 		    params: {
 		        reg_date: reg_date,
@@ -208,7 +196,6 @@ $(function() {
 		.catch(function (error) {
 		    console.error('Error fetching data:', error);
 		});
-		
 		
 			
 	}); // 주문 건 삭제 버튼 이벤트

@@ -165,13 +165,13 @@ public class WorkService {
 	/** 근무 템플릿 삭제 */
 	public void deleteWorkTmp(List<WorkTmpDTO> deletedRows) {
 		for(WorkTmpDTO wtd :  deletedRows) {
-			
+			WorkTmp workTmp = WorkTmp.setWorkTmpEntity(wtd);
+			workTmp.setWork_shift(cdRepository.findCommonDetailCodeByName(wtd.getShift_name()));
+			workTmp.setWork_type(cdRepository.findCommonDetailCodeByName(wtd.getType_name()));
+			workTmpRepository.delete(workTmp);
 		}
 	} 
 
-
-
-	
 
 
 } // WorkService

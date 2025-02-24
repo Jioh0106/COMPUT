@@ -168,7 +168,6 @@ public class AbsenceService {
 		absence.setRequest_no(request.getRequest_no());
 		absenceRepository.save(absence);
 		
-		
 	}
 	
 	// 최종승인자가 본인일 때 정보 가져오기
