@@ -385,7 +385,7 @@
 			const role = 'ATHR001';
 			
 			 // approveModal 모달이 열릴 때 데이터 로드 및 그리드 업데이트
-		    $('#approveModal').on('show.bs.modal', function () {
+		    $('#approveModal').on('shown.bs.modal', function () {
 		    	
 		        axios.get(`/api/absence/request/${role}`)
 		            .then(function (response) {

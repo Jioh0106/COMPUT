@@ -2,11 +2,9 @@ package com.deepen.domain;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 @Data
 public class MaterialDTO {

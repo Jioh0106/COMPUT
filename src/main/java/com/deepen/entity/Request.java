@@ -69,6 +69,7 @@ public class Request {
 		request.setMiddle_approval(requestDTO.getMiddle_approval());
 		request.setHigh_approval(requestDTO.getHigh_approval());
 		request.setEmp_id(requestDTO.getEmp_id());
+		request.setIs_checked("N");
 		
 		return request;
 	}
