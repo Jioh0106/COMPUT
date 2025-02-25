@@ -131,11 +131,11 @@ $(function() {
 		data: [], // 초기 데이터
 	    rowHeaders: ['checkbox'], // 행 헤더: 체크박스 추가
 	    columns: [
-	        { header: '사번', name: 'EMP_ID' },
-	        { header: '이름', name: 'EMP_NAME' },
-	        { header: '부서', name: 'EMP_DEPT' },
-	        { header: '직급', name: 'EMP_POSITION' },
-	        { header: '근무형태', name: 'EMP_JOB_TYPE' }
+	        { header: '사번', name: 'EMP_ID', align: 'center' },
+	        { header: '이름', name: 'EMP_NAME', align: 'center' },
+	        { header: '부서', name: 'EMP_DEPT', align: 'center' },
+	        { header: '직급', name: 'EMP_POSITION', align: 'center' },
+	        { header: '근무형태', name: 'EMP_JOB_TYPE', align: 'center' }
 	    ]
 	});
 
@@ -212,9 +212,16 @@ $(function() {
 			weekdays: weekdays, 
 			tmp : tmp
 		}
-		
-		// 겹치는 일정 확인
-		ckeckWork(appendData)
+		Swal.fire({
+		      icon: "info",
+		      title: "근무 일정 등록",
+			  text: "선택한 모든 사원의 근무 일정을 등록하시겠습니까?",
+		      showCancelButton: true,
+		      confirmButtonText: "확인",   
+		      cancelButtonText: "취소"     
+		}).then((result) => {
+			// 겹치는 일정 확인
+			ckeckWork(appendData)
 		    .then(function (data) {
 		        // 200 상태일 때 처리
 		        let exist_emp = '';
@@ -223,8 +230,10 @@ $(function() {
 		                exist_emp += ', ' + work.emp_id + '(' + work.emp_name + ')';
 		            }
 		        });
-//		        Swal.fire('해당 기간에 기등록 직원 있음', exist_emp, 'warning');
-		        Swal.fire('Warning', '해당 기간에 기등록 직원이 있습니다.', 'warning');
+		        Swal.fire('Warning', '해당 기간에 기등록 직원이 있습니다.', 'warning')
+				.then(() => {
+					return;
+				});
 		    })
 		    .catch(function (error) {
 		        if (error.status === 404) {
@@ -232,7 +241,7 @@ $(function() {
 		            insertWork(appendData);
 		        }
 		    });
-			
+		});		
 			
 	});
 	
@@ -274,12 +283,14 @@ $(function() {
 		    }
 		})
 		.then(function (response) {
-		    Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success');
-		    window.close();
-		    // 부모 창 새로고침
-		    if (window.opener && !window.opener.closed) {
-		        window.opener.location.reload();
-		    }
+		    Swal.fire('Success', '데이터가 성공적으로 저장되었습니다.', 'success')
+			.then(() => {
+			    window.close();
+			    // 부모 창 새로고침
+			    if (window.opener && !window.opener.closed) {
+			        window.opener.location.reload();
+			    }
+			});
 		})
 		.catch(function (error) {
 		    console.error('데이터 저장 중 오류 발생:', error);

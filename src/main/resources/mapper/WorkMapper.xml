@@ -59,16 +59,24 @@
 	<select id="getWorkListSerch" resultType="com.deepen.domain.WorkDTO" parameterType="map">
 	    SELECT *
 	      FROM work_view
-	     WHERE work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
-		 <if test="dept != null and dept != ''">
-		   AND emp_dept = #{dept}
-		 </if>
-		 <if test="emp_info != null and emp_info != ''">
-		   AND (
-	           emp_name LIKE '%' || #{emp_info} || '%'
-	           OR emp_id LIKE '%' || #{emp_info} || '%'
-	       )
-		 </if>
+		<where>
+			<if test="serch_box == null || serch_box == '' and dept == '' || dept == null">
+		       AND work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+		       AND emp_id = #{emp_id}
+			</if>
+			<if test="start != null and end != ''" >
+				AND work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+			</if>
+			<if test="dept != null and dept != ''">
+			  AND emp_dept = #{dept}
+			</if>
+			<if test="serch_box != null and serch_box != ''">
+			  AND (
+			         emp_name LIKE '%' || #{serch_box} || '%'
+			         OR emp_id LIKE '%' || #{serch_box} || '%'
+			     )
+			</if>
+		</where>
 	</select>
 	
 	<select id="getWorkTmpList" resultType="com.deepen.domain.WorkTmpDTO" >
