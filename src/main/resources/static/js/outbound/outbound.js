@@ -48,13 +48,21 @@ $(function() {
             if (props.value === '대기') {
                 el.className = 'btn btn-sm btn-warning';
                 el.innerHTML = '출고대기';
-                el.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const rowKey = props.rowKey;
-                    const rowData = grid.getRow(rowKey);
-                    changeStatus(rowData.out_no);
-                };
+				
+				// 전역 변수로 설정된 권한 정보 확인
+	            if (typeof hasAdminRole !== 'undefined' && hasAdminRole) {
+	                el.onclick = (e) => {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    const rowKey = props.rowKey;
+	                    const rowData = grid.getRow(rowKey);
+	                    changeStatus(rowData.in_no);
+	                };
+	            } else {
+	                // 권한이 없는 경우 버튼 비활성화
+	                el.disabled = true;
+	                el.title = "권한이 없습니다";
+	            }
             } else {
                 el.className = 'btn btn-sm btn-success';
                 el.innerHTML = '출고완료';
