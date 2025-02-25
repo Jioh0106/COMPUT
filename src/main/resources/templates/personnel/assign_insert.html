@@ -47,10 +47,7 @@
 		<div class="col-12">
 			<div class="card">
 				<div class="card-header">
-<!--					<h4 class="card-title">인사발령등록 작성</h4>-->
-				<h2 th:text="'사원명: ' + ${emp.emp_name}"></h2>
-				<h2 th:text="'사원번호: ' + ${emp.emp_id}"></h2>
-				<h2 th:text="'권한: ' + ${emp.emp_role}"></h2>
+
 					
 				</div>
 				<div class="card-content">
@@ -146,7 +143,7 @@
 							<div class="col-12 d-flex justify-content-end">
 								<button type="button"  id="registBtn" class="btn btn-primary me-1 mb-1"
 								 >등록</button>
-								<button type="reset" class="btn btn-outline-danger me-1 mb-1">취소</button>
+								<button type="reset" id= "resetBtn" class="btn btn-outline-danger me-1 mb-1">취소</button>
 							</div>
 						</div>
 					</form>
@@ -309,10 +306,10 @@
 	            const keyword = this.value.trim(); // 입력된 키워드
 
 	            console.log("입력된 키워드:", keyword); // 디버그용 로그 출력
-	            console.log("요청 URL:", `/api/empSearch?keyword=${encodeURIComponent(keyword)}`);
+	            console.log("요청 URL:", `/api/assign/empsearch?keyword=${encodeURIComponent(keyword)}`);
 
 	            if (keyword.length > 0) {
-	                fetch(`/api/empSearch?keyword=${encodeURIComponent(keyword)}`)
+	                fetch(`/api/assign/empsearch?keyword=${encodeURIComponent(keyword)}`)
 	                    .then(response => {
 	                        if (!response.ok) {
 	                            throw new Error('검색 요청 중 오류가 발생했습니다.');
@@ -460,9 +457,9 @@
 				let fetchUrl = '';
 				
 				if (userRole === 'ATHR003') {
-				       fetchUrl = '/api/middleRole';
+				       fetchUrl = '/api/assign/middlerole';
 				   } else if (userRole === 'ATHR002') {
-				       fetchUrl = '/api/highRole';
+				       fetchUrl = '/api/assign/highrole';
 				   } else {
 				       alert('승인권한이 없는 사용자입니다.');
 				       return; // 권한이 없으면 요청을 중단
@@ -481,7 +478,7 @@
 	        	});
 	
 	
-		 // 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
+		 // (중간/최종)승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
 	        grid2.on('click', (ev) => {
 	            if (ev.rowKey !== null) {
 	                const row = grid2.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
@@ -501,8 +498,8 @@
 			approverString = `${selectApprover.approverEmp_id}`;
 				Swal.fire({
 				        icon: "success",
-						title: "중간승인권자 선택",
-						text: `중간승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
+						title: "승인권자 선택",
+						text: `승인권자 : ${selectApprover.approverEmp_name}님이 선택되었습니다.`,
 						confirmButtonText: "확인"
 				    })
 	        }
@@ -654,6 +651,12 @@
 	    document.getElementById("assignForm").reset(); // 폼 전체 초기화
 	    console.log("발령 폼이 초기화되었습니다.");
 	}	
+	
+	
+	document.getElementById('resetBtn').addEventListener('click', function () {//팝업창 취소버튼 눌렀을때 팝업창 닫기
+		window.close(); // 팝업창 닫기
+		
+	});
 		
 		
 	</script>

@@ -30,8 +30,6 @@ const empListGrid = new Grid({
   el: document.getElementById('grid'),
   data: [], // 초기 데이터
   rowHeaders: ['checkbox'],
-  //scrollX: false,
-  //scrollY: false,
   bodyHeight: 600,
   columns: [
     { 
@@ -97,8 +95,8 @@ window.onload = function () {
 empListGrid.on('click', function (ev) {
 	
 	const target = ev.nativeEvent.target;
-	//console.log(target);
 	const columnName = ev.columnName;
+	console.log(columnName);
 	
 	if(target.type === 'checkbox' || columnName === '_checked'){
 		return;
@@ -200,6 +198,7 @@ function showModal(empDetailInfo) {
 const deleteBtn = document.getElementById("deleteBtn");
 const updateBtn = document.getElementById("updateBtn");
 const updateForm = document.getElementById("updateForm");
+
 // 그리드에서 삭제하고싶은 key 배열로 만들어주기
 function CheckedRowValues(gridObj,jsonKey){
 	const checkedRowsIds = gridObj.getCheckedRows();

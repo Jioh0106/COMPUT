@@ -66,12 +66,6 @@
 		<!-- 메인 content -->
 		<div id="main">
 
-			<!-- 반응형 사이드 메뉴 버튼-->
-			<header class="mb-3">
-				<a href="#" class="burger-btn d-block d-xl-none"> <i
-					class="bi bi-justify fs-3"></i>
-				</a>
-			</header>
 
 			<div class="display-flex">
 				<h3>휴가 관리</h3>
@@ -134,7 +128,7 @@
 						</li>
 						<li class="nav-item" role="presentation"><a class="nav-link"
 							id="holdTab" data-bs-toggle="tab" onclick="holdTab()"
-							href="#hold" role="tab" aria-controls="hold" aria-selected="false">보유현황</a>
+							href="#hold" role="tab" aria-controls="hold" aria-selected="false">보유현황(연월차)</a>
 						</li>
 					</ul>
 					<div class="tab-content" id="tabContent">
@@ -188,7 +182,7 @@
 										<div class="child-input1">
 											<label>사번: </label>
 											<div class="form-group">
-												<input type="text" id="empId" class="form-control" readonly>
+												<input type="text" id="empIdModal" class="form-control" readonly>
 											</div>
 										</div>
 										<div class="child-input2">
@@ -408,7 +402,7 @@
 							.then(resp => resp.json()) // 응답 객체를 매개변수로 얻어와 파싱
 							.then(data => {
 								console.info(data[0].empId);
-								$("#empId").val(data[0].empId); // #empId 선택자로 수정
+								$("#empIdModal").val(data[0].empId); // #empId 선택자로 수정
 						      	$("#empName").val(data[0].empNm); // 이름 값 설정
 						      	$("#use-start-date").val(data[0].vctnStart); // 사용 시작일
 						      	$("#use-end-date").val(data[0].vctnEnd); // 사용 종료일

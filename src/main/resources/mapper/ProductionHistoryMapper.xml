@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.ProductionHistoryMapper">
+
+<!-- 생산이력 모달창 (뷰 테이블 조회) -->
+<select id="historyList" resultType="java.util.Map">
+SELECT 
+    plan_id AS planId,
+    wi_no AS wiNo,
+    process_name AS processName,
+    line_no AS lineNo,
+    judgement,
+    TO_CHAR(end_time, 'YYYY-MM-DD HH24:MI:SS') AS endTime,
+    product_name AS productName,
+    product_type AS productType
+FROM
+    prdct_history
+WHERE plan_id = #{plan_id} 
+ORDER BY end_time DESC   
+</select>
+
+<!-- 생산계획번호 조회 -->
+<select id="selectPlanId" resultType="java.util.Map">
+SELECT pl.plan_id AS planId, c.common_detail_name AS palnStatus, p.product_name AS productName, TO_CHAR(pl.plan_date, 'YYYY-MM-DD') AS planDate
+FROM plans pl
+JOIN product p ON REGEXP_SUBSTR(pl.plan_id, '[^-]+', 1, 3) = p.product_no
+JOIN common_detail c ON pl.plan_status = c.common_detail_code
+ORDER BY planDate desc
+</select>
+
+
+
+
+
+
+</mapper>

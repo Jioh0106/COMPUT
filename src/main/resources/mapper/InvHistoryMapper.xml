@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.InventoryHistoryMapper">
+
+<!-- 변경사유 공통코드 select박스 조회 -->
+	<select id="reasonChangeList" resultType="java.util.Map">
+	SELECT common_detail_code AS "code", common_detail_name AS "name"
+	FROM common_detail
+	WHERE SUBSTR(common_detail_code,1,4) 
+		IN('RSFC')
+		AND common_detail_status ='Y' 
+	</select>
+	
+
+<!--변경이력 리스트 조회 -->
+	<select id="historyList"  resultType="java.util.Map">
+	SELECT i.history_no,
+		   i.prev_count,
+		   i.new_count,
+		   c.common_detail_name AS change_reason,
+		   i.reason_detail,
+		   i.mod_user,
+		   TO_CHAR(i.mod_date, 'YYYY-MM-DD HH24:MI:SS') AS mod_date,
+		   i.diff_count
+	FROM inventory_history i
+	LEFT JOIN common_detail c
+	ON i.change_reason = c.common_detail_code
+	WHERE i.inventory_no = #{inventory_no}
+	ORDER BY i.history_no DESC	   
+	</select>
+
+
+<!--변경이력 삭제-->
+	<delete id="deleteHistory" parameterType="list">
+        DELETE FROM inventory_history
+        WHERE history_no IN
+        <foreach collection="historyNoList" item="history_no" open="(" separator="," close=")">
+            #{history_no}
+        </foreach>
+    </delete>
+	
+
+<!--변경이력 최신수정일에 해당하는 값으로 재고현황 테이블 업데이트-->
+	<update id="updateInv" parameterType="java.util.Map">
+	 UPDATE inventory i
+	 SET 
+	    i.inventory_qty = NVL( 
+	        (SELECT new_count
+	         FROM (
+	             SELECT h.new_count
+	             FROM inventory_history h
+	             WHERE h.inventory_no = i.inventory_no
+	             ORDER BY h.mod_date DESC
+	         ) WHERE ROWNUM = 1  
+	        ),
+	        i.inventory_qty  
+	    ),
+	    i.inventory_count = NVL( 
+	        (SELECT new_count
+	         FROM (
+	             SELECT h.new_count
+	             FROM inventory_history h
+	             WHERE h.inventory_no = i.inventory_no
+	             ORDER BY h.mod_date DESC
+	         ) WHERE ROWNUM = 1  
+	        ),
+	        i.inventory_qty  
+	    )
+	 WHERE i.inventory_no = #{inventory_no}
+	</update>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

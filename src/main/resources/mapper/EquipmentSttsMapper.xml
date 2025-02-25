@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.EquipmentSttsMapper">
+
+	<select id="selectStts" resultType="map">
+		SELECT
+			  common_detail_code AS "code"
+			, common_detail_name AS "name"
+		FROM
+			common_detail
+		WHERE
+			REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
+		AND
+			common_detail_status = 'Y'
+		ORDER BY
+			common_detail_display
+	</select>
+	
+	<select id="selectEquipmentStts" resultType="map" parameterType="map">
+		SELECT	  
+			  info_sn AS "sn"
+			, info_nm AS "name"
+			, (SELECT line_name FROM line_info WHERE line_no = ei.line_no) AS "lineNm"
+			, NVL((SELECT common_detail_name FROM common_detail 
+					WHERE REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
+					AND common_detail_status = 'Y' 
+					AND common_detail_code = info_type), '정지') AS "type"
+			, info_use_date AS "useDate"
+		FROM
+			equipment_info ei
+		<where>
+			AND info_useyn = 'Y'
+			<if test="name != null and name != '' or chkListSize != 0">
+			 <choose> 
+			 <!-- OR 하나만 있으면 체크박스와 별개로 설비명 검색이 되어 검색 조건에 오차가 생김
+			 	  예를 들어 목록에 없는 점검중을 체크하면 그리드에 데이터가 안 뜨는 게 정상임
+			 	  근데 점검중이 체크된 상태인데도 설비명을 입력하면 목록이 나옴
+			 	  고로 when으로 AND 또는 OR을 동적으로 변경할 수 있게끔 적용해야 한다  -->
+                <!-- name과 chkListSize 둘 다 조건에 해당할 경우 AND -->
+                <when test="name != null and name != '' and chkListSize != 0">
+                    AND (
+                        info_nm LIKE '%' || #{name} || '%'
+                        AND NVL(info_type, 'USST004') IN
+                        <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+                            #{item}
+                        </foreach>
+                    )
+                </when>
+                <!-- 둘 중 하나만 해당할 경우 OR -->
+                <otherwise>
+                    AND (
+                        <if test="name != null and name != ''">
+                            info_nm LIKE '%' || #{name} || '%'
+                        </if>
+                        <if test="name != null and name != '' and chkListSize != 0">
+                            OR
+                        </if>
+                        <if test="chkListSize != 0">
+                            NVL(info_type, 'USST004') IN
+                            <foreach item="item" index="index" collection="chkList" open="(" separator="," close=")">
+                                #{item}
+                            </foreach>
+                        </if>
+                    )
+                </otherwise>
+            </choose>
+			</if>
+		</where>
+	</select>
+	
+</mapper>
+
+
+

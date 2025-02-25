@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+
+    <!-- TOAST Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+    
+    <!-- Bootstrap & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+    
+    <!-- CSRF 토큰 -->
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+		.summary-card {
+		    background-color: #f8f9fa;
+		    padding: 15px;
+		    border-radius: 5px;
+		    margin-bottom: 20px;
+		    cursor: pointer;
+		    transition: all 0.3s ease;
+		}
+
+		.summary-card:hover {
+		    background-color: #e9ecef;
+		    transform: translateY(-2px);
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		}
+
+		.summary-card.active {
+		    background-color: #e9ecef;
+		    border: 2px solid #0d6efd;
+		}
+        .stats-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .pass-rate {
+            color: #4caf50;
+        }
+        .fail-rate {
+            color: #f44336;
+        }
+		.search-container {
+		    display: flex;
+		    align-items: flex-end;
+		    gap: 1rem;
+		    width: 100%; /* 전체 너비 사용 */
+		}
+
+		.search-container > div {
+		    display: flex;
+		    flex-direction: column;
+		}
+
+		.search-container .flex-grow-3 {
+		    flex: 2;
+		}
+
+		.search-container .flex-grow-2 {
+		    flex: 1;
+		}
+
+		.date-range-input {
+		    display: flex;
+		    align-items: center;
+		    width: 200%;
+		    gap: 0.5rem;
+		}
+
+		.date-range-input .input-group {
+		    flex: 1;
+		    position: relative;
+		}
+		
+		.date-range-input .input-group:first-child {
+		    margin-right: 0.5rem;
+		}
+
+		.date-separator {
+		    margin: 0 0.5rem;
+		    color: #6c757d;
+		}
+
+		.align-self-end {
+		    display: flex;
+		    align-items: flex-end;
+		    margin-bottom: 1px;
+		}
+
+		.date-range-input .input-group {
+		    position: relative;
+		    width: calc(50% - 15px);
+		}
+
+		.date-separator {
+		    margin: 0 0.5rem;
+		    color: #6c757d;
+		    white-space: nowrap;
+		}
+
+		.date-input {
+		    width: 100%;
+		}
+
+		.calendar-icon {
+		    position: absolute;
+		    right: 0;
+		    top: 0;
+		    height: 100%;
+		    z-index: 10;
+		    background: none;
+		    border: none;
+		    color: #6c757d;
+		    padding: 0 10px;
+		}
+
+		.datePiker {
+		    position: absolute;
+		    z-index: 9999;
+		    top: 100%;
+		    left: 0;
+		    margin-top: 5px;
+		}
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <div class="display-flex">
+                <h3>품질검사 이력</h3>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <section class="section">
+                        <!-- 검색 조건 -->
+                        <div class="search-container">
+                            <div class="flex-grow-3">
+                                <label for="lotNo" class="form-label">LOT 번호</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="lotNo" 
+                                           placeholder="LOT 번호를 입력하세요">
+                                </div>
+                            </div>
+							<div class="flex-grow-2">
+                                <label for="processNo" class="form-label">공정</label>
+                                <select id="processNo" class="form-control">
+                                    <option value="">전체</option>
+                                    <th:block th:each="process : ${processes}">
+                                        <option th:value="${process.processNo}" 
+                                                th:text="${process.processName}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <div class="flex-grow-3">
+                                <label class="form-label">검사 일자</label>
+                                <div class="d-flex align-items-center">
+									<div class="date-range-input">
+									        <div class="input-group">
+									            <input type="text" id="fromDate" class="form-control date-input" 
+									                   placeholder="검사 시작일">
+									            <span class="input-group-text calendar-icon">
+									                <i class="bi bi-calendar"></i>
+									            </span>
+									            <div id="fromDatepicker-container" class="datePiker"></div>
+									        </div>
+									        <span class="date-separator">~</span>
+									        <div class="input-group">
+									            <input type="text" id="toDate" class="form-control date-input" 
+									                   placeholder="검사 종료일">
+									            <span class="input-group-text calendar-icon">
+									                <i class="bi bi-calendar"></i>
+									            </span>
+									            <div id="toDatepicker-container" class="datePiker"></div>
+									        </div>
+									    </div>
+                                </div>
+                            </div>
+							<div class="align-self-end">
+                                <button type="button" class="btn btn-primary" onclick="searchHistory()">
+                                    <i class="bi bi-search"></i> 검색
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 통계 요약 -->
+						<div class="row mb-4" id="statsSection" style="display: none;">
+						    <div class="col-md-12">
+						        <div class="card">
+						            <div class="card-body">
+						                <h5 class="card-title">검사 통계</h5>
+						                <div class="row">
+						                    <div class="col-md-4">
+						                        <div class="summary-card cursor-pointer" onclick="filterByJudgement('')" id="totalStats">
+						                            <h6>전체 검사</h6>
+						                            <span class="stats-value" id="totalCount">0</span>건
+						                        </div>
+						                    </div>
+						                    <div class="col-md-4">
+						                        <div class="summary-card cursor-pointer" onclick="filterByJudgement('Y')" id="passStats">
+						                            <h6>합격</h6>
+						                            <span class="stats-value pass-rate" id="passCount">0</span>건
+						                            (<span class="pass-rate" id="passRate">0</span>%)
+						                        </div>
+						                    </div>
+						                    <div class="col-md-4">
+						                        <div class="summary-card cursor-pointer" onclick="filterByJudgement('N')" id="failStats">
+						                            <h6>불합격</h6>
+						                            <span class="stats-value fail-rate" id="failCount">0</span>건
+						                            (<span class="fail-rate" id="failRate">0</span>%)
+						                        </div>
+						                    </div>
+						                </div>
+						            </div>
+						        </div>
+						    </div>
+						</div>
+
+                        <!-- 공정별 통계 그리드 -->
+                        <div class="mb-4" id="processStatsGrid" style="display: none;"></div>
+
+                        <!-- 검사 이력 그리드 -->
+                        <div class="mb-4" id="historyGrid"></div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script th:src="@{/js/quality/inspection_history.js}"></script>
+</body>
+</html>

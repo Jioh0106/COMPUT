@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/select-box/latest/toastui-select-box.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.selectBox {
+	width: 100px; 
+	z-index: 1000; 
+	position: relative
+}
+
+.datePiker {
+	margin-top: -1px; 
+	z-index: 2000; 
+	position: relative
+}
+
+.grid-height {
+	height: 300px
+}
+
+.buttons {
+	display: flex;
+	align-items: center;
+    font-size: 0.8rem;
+    height: 28px
+}
+
+/* .tui-grid-body-container{
+	width: 100%
+} */
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+			
+			<div class="display-flex">
+				<h3>작업 지시</h3>
+			</div>
+			
+			<div class="card">
+				<div class="card-body" id="default">
+					 <!-- 검색 영역 -->
+				    <div class="row">
+				    	<div class="col-auto d-flex">
+				    	 	<div class="me-1">
+				            	<label for="planNoSearch" class="form-label"><b>계획번호</b></label>
+				    	 	</div>
+				            <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+								<input type="text" id="planNoSearch" name="planNoSearch"/>
+							</div>
+				        </div>
+				        <div class="col-auto ps-0 d-flex">
+				        	<div class="me-1">
+				        		<label for="startDate" class="form-label"><b>작업일</b></label>
+			        		</div>
+							<!-- 첫 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="startDate" name="startDate" aria-label="Date-Time" placeholder="시작일 선택"/>
+									<span class="tui-ico-date"></span>
+								</div>
+								<div class="datePiker" id="tui-date-picker-container1"></div>
+							</div>
+			
+							<!-- 구분자 -->
+							<span style="font-size: 1.2rem; line-height: 2rem;">~</span>
+			
+							<!-- 두 번째 데이트 피커 -->
+							<div>
+								<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+									<input type="text" id="endDate" name="endDate" aria-label="Date-Time" placeholder="종료일 선택"/>
+									<span class="tui-ico-date"></span>
+								</div>
+								<div class="datePiker" id="tui-date-picker-container2"></div>
+							</div>
+						</div>
+						<!-- 추후에 사용하고 싶으시면 하세요... -->
+				        <div class="col-auto ps-0 d-flex">
+				        	<div class="me-1">
+				            	<label for="processSelectBox" class="form-label"><b>공정/라인</b></label>
+				            </div>	
+				            <div class="selectBox me-1" id="processSelectBox"></div>
+				            <div class="selectBox" id="lineSelectBox"></div>
+				        </div>
+				        <div class="col-auto ps-0 d-flex ms-auto">
+				        	 <button class="btn btn-primary btn-sm align-items-center justify-content-center me-1" id="regWork" 
+				        	 		 data-bs-toggle="modal" data-bs-target="#large">
+				        	 	작업등록
+				        	 </button>
+				        	 
+				        	 <!--사원 상세 모달-->
+				        	 <!-- TODO -->
+<!-- 				        	 style="padding-right: 17px; display: block;" -->
+				             <div class="modal fade" id="large" tabindex="-1" role="dialog" 
+					                aria-labelledby="psDatailModalTitle" aria-hidden="true">
+			                	<div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+				                    <div class="modal-content">
+				                        <div class="modal-header">
+				                            <h5 class="modal-title">
+												생산 계획
+											</h5>
+				                        </div>
+				                        
+				                        <!-- 모달 바디 시작 -->
+				                        <div class="modal-body">
+											<div class="card-body">
+												<div id="regGrid" style="display: block"></div>
+				                        	</div>
+				                        </div>
+				                        <!-- 모달 바디 끝 -->
+				                        
+				                        <div class="modal-footer">
+				                            <button type="button" id="insert-work-instruction" class="btn btn-outline-success ml-1">
+				                                <i class="bx bx-check d-block d-sm-none"></i>
+				                                <span class="d-none d-sm-block">등록</span>
+				                            </button>
+				                            <button type="button" class="btn btn-outline-danger"
+				                                data-bs-dismiss="modal">
+				                                <i class="bx bx-x d-block d-sm-none"></i>
+				                                <span class="d-none d-sm-block">취소</span>
+				                            </button>
+				                        </div>
+				                    </div>
+				                </div>
+				            </div>
+			            	<!--사원 상세 모달 끝-->
+				        </div>
+				    </div>
+					<hr class="m-1">
+				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 시작 -->
+				    <div class="row h-75 py-1">
+				        <div class="col d-flex justify-content-end ">
+				            <button class="btn btn-primary btn-sm align-items-center justify-content-center me-1" id="workStartBtn">작업시작</button>
+				            <button class="btn btn-success btn-sm align-items-center justify-content-center me-1" id="processFinishBtn">공정완료</button>
+				            <button class="btn btn-warning btn-sm align-items-center justify-content-center me-1" id="defectCheckBtn">품질검사</button>
+				            <button class="btn btn-secondary btn-sm align-items-center justify-content-center" id="workEndBtn">작업종료</button>
+				        </div>
+				    </div>
+				    <!-- 작업 시작/종료, 품질검사 버튼 메뉴 끝 -->
+				
+				    <!-- 작업 지시 Grid -->
+				    <div class="grid-height" id="workInstructionGrid" style="margin-bottom: 20px;"></div>
+				
+					<hr>
+				
+				    <!-- 하단 탭 메뉴 -->
+				    <div class="d-flex justify-content-between align-items-center">
+				        <ul class="nav nav-tabs" id="tabMenu" role="tablist">
+				            <li class="nav-item" role="presentation">
+				                <button class="nav-link" id="tab-material-tab" data-bs-toggle="tab" data-bs-target="#tab-material" type="button" role="tab">자재</button>
+				            </li>
+				            <li class="nav-item me-1" role="presentation">
+				                <button class="nav-link" id="tab-worker-tab" data-bs-toggle="tab" data-bs-target="#tab-worker" type="button" role="tab">작업 담당자</button>
+				            </li>
+				        </ul>
+				    </div>
+					<!-- 하단 탭 메뉴 끝 -->
+					
+					<hr class="m-1">
+					
+				    <!-- 탭 내용 시작 -->
+				    <div class="tab-content mt-2">
+				        <div class="tab-pane active" id="tab-worker" role="tabpanel">
+				        	<div class="text-end mb-1">
+					            <button class="btn btn-outline-success btn-sm align-items-center justify-content-center" id="addBtn">추가</button>
+					            <button class="btn btn-outline-danger btn-sm align-items-center justify-content-center" id="deleteBtn">삭제</button>
+				        	</div>
+				            <div class="grid-height" id="workerGrid" ></div>
+				        </div>
+				        <div class="tab-pane active" id="tab-material" role="tabpanel">
+				        	<div class="text-end mb-1">
+				        		<button class="btn btn-outline-success btn-sm align-items-center justify-content-center" id="inputMaterial">자재투입</button>
+				        	</div>
+				            <div class="grid-height" id="materialGrid"></div>
+				        </div>
+				    </div>
+				    <!-- 탭 내용 끝 -->
+				    
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/select-box/latest/toastui-select-box.js"></script>
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+   		const workerList = /*[[${workerList}]]*/ [];
+	/*]]>*/
+	</script>
+	<script src="js/process/work_instruction.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ec2-user/deployment
+    overwrite: true  # 기존의 파일을 덮어쓰도록 설정
+hooks:
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 300
+      runas: ec2-user

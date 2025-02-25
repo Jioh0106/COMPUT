@@ -9,13 +9,12 @@ import lombok.Data;
 @Data
 public class PayListDTO {
     // 기존 필드 (요약 정보용)
-    private String paymentDate;				   //지급월
-    private String formattedDate;			   
-    private String payrollName;				   //대장명칭
-    private int headcount;					   //인원수
-    private BigDecimal totalAmount;            //지급총액
-    private BigDecimal totalAllowance;		   //수당총액
-    private BigDecimal totalDeduction;         //공제총액
+    private String paymentDate;				   // 지급월
+    private String payrollName;				   // 대장명칭
+    private int headcount;					   // 인원수
+    private BigDecimal totalAmount;            // 지급총액
+    private BigDecimal totalAllowance;		   // 수당총액
+    private BigDecimal totalDeduction;         // 공제총액
 
     // 상세 정보용 필드 추가
     private String empId;                      // 사원번호
@@ -37,5 +36,5 @@ public class PayListDTO {
     private BigDecimal residentTax;            // 주민세
     private BigDecimal deducAmt;               // 공제총액
     private BigDecimal netSalary;              // 실수령액
-    private LocalDateTime createdAt; //작성일
+    private LocalDateTime createdAt;		   // 작성일
 }

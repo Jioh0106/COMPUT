@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
+import com.deepen.domain.WorkTmpDTO;
 import com.deepen.service.WorkService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,10 @@ import lombok.extern.java.Log;
 @RequestMapping("/api/work")
 public class WorkRestController {
 	
+	/** 근무관리 서비스 */
 	private final WorkService workService;
 	
+	/** 직원 검색 조회 */
 	@GetMapping("/serchEmp")
 	public ResponseEntity<List<Map<String, String>>> getSerchEmpList(@RequestParam Map<String, String> serchEmpInfo) {
 		
@@ -86,6 +89,7 @@ public class WorkRestController {
 	    
     } // insertWork
 	
+	/** 근무일정 정보 조회 */
 	@GetMapping("/list")
 	public ResponseEntity<List<WorkDTO>> getWorkList(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
@@ -103,7 +107,6 @@ public class WorkRestController {
 		return ResponseEntity.ok(list);
         
 	}
-	
 	
 	@GetMapping("/list/serch")
 	public ResponseEntity<List<WorkDTO>> getWorkListSerch(@RequestParam("start") String start, 
@@ -129,7 +132,7 @@ public class WorkRestController {
 		return ResponseEntity.ok(list);
         
 	}
-	
+	//    
 	
 	@GetMapping("/schedules")
 	public ResponseEntity<List<ScheduleDTO>> getSchedules( @RequestParam("startDate") String startDate,
@@ -150,6 +153,41 @@ public class WorkRestController {
 		
 		return ResponseEntity.ok(schedules);
 	}
+	
+	/** 근무 템플릿 조회 */
+	@GetMapping("/tmp/list")
+	public ResponseEntity<List<WorkTmpDTO>> getWorkTmpList() {
+		
+		List<WorkTmpDTO> list = workService.getWorkTmpList();
+		System.out.println("********************getWorkTmpList = " + list);
+		return ResponseEntity.ok(list);
+	}
+	
+	@PostMapping("/tmp/save")
+    public ResponseEntity<List<WorkTmpDTO>> saveWorkTmp(@RequestBody Map<String, List<WorkTmpDTO>> modifiedRows) {
+		
+		log.info("saveWorkTmp -  modifiedRows : "+ modifiedRows.toString());
+		
+		List<WorkTmpDTO> createdRows = modifiedRows.get("createdRows");
+		List<WorkTmpDTO> updatedRows = modifiedRows.get("updatedRows");
+		List<WorkTmpDTO> deletedRows = modifiedRows.get("deletedRows");
+		
+		// 추가/수정 처리
+		if (createdRows != null && !createdRows.isEmpty() || updatedRows != null && !updatedRows.isEmpty()) {
+			workService.updateWorkTmp(createdRows);
+		}
+		
+        // 삭제 처리
+        if (deletedRows != null && !deletedRows.isEmpty()) {
+        	workService.deleteWorkTmp(deletedRows);
+        }
+        
+        return ResponseEntity.ok(workService.getWorkTmpList());
+        
+    } // insertWork
+	
+	
+	
 	
 	
 	

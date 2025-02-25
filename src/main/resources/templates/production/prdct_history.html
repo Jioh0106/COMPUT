@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>생산이력</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4 align-items-center">
+								    <!-- 생산계획번호 -->
+									<div class="col-md-4">
+										<label for="nameSearch" class="form-label">생산계획번호 검색</label>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+											<input type="text" class="form-control" id="searchPlanId" placeholder="생산계획번호를 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="filterGrid()">
+										</div>
+									</div>
+								</div>
+								<!-- 검색 조건 끝-->
+								
+								<!--생산이력 그리드-->										   
+								<div id="productionGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+<!--									<div class="float-end">-->
+<!--										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">-->
+<!--									</div>-->
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+				
+				<!-- 생산이력 모달창 시작 -->
+		    <div class="modal fade text-left w-100" id="history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
+		           
+		            <div class="modal-content">
+		                <div class="modal-header">
+		                    <h4 class="modal-title" id="myModalLabel17"> 생산 이력 </h4>
+		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		                </div>
+		                <div class="modal-body">
+							<div class="row" id="basic-table">
+								<!-- 그리드 시작 -->
+								<div id="historyGrid"></div>
+								<!-- 그리드 끝 -->
+								
+							</div>
+		                </div>
+		            </div>
+		        </div>
+		    </div> 
+		    <!-- 생산이력 모달창 끝 -->
+	
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+	 	var Grid = tui.Grid;
+		
+	 	//var historyList = /*[[${historyList}]]*/'UNKNOWN';
+	 	var planIdList = /*[[${planIdList}]]*/'UNKNOWN';
+	 	console.log('생산이력', planIdList);
+	 	
+	 	//생산계획번호 조회 그리드
+		const productionGrid = new Grid({
+			el: document.getElementById('productionGrid'),
+			columns: [
+				{header: '생산계획번호',	name: 'PLANID',		editor: 'text', sortable: true},
+				{header: '상품명',	name: 'PRODUCTNAME',	editor: 'text', sortable: true},
+				{header: '생산 상태',	name: 'PALNSTATUS',	editor: 'text', sortable: true},
+				{header: '생산 등록일',		name: 'PLANDATE', editor: 'text', sortable: true}
+ 				
+				
+			],
+			data: planIdList,
+			
+			columnOptions: {
+			  resizable: true
+			}
+		});
+		
+	 	
+	 	let planId = null; //클릭한 행의 생산계획번호
+	 	
+		//생산이력 모달창
+		const historyGrid = new Grid({
+			el: document.getElementById('historyGrid'),
+			columns: [
+				{header: '작업지시번호',	name: 'WINO',	editor: 'text', sortable: true, width: 80},
+				{header: '상품구분',	name: 'PRODUCTTYPE',	editor: 'text', sortable: true, width: 100},
+				{header: '상품명',		name: 'PRODUCTNAME', editor: 'text', sortable: true, width: 200},
+ 				{header: '공정',	name: 'PROCESSNAME',	editor: 'text', sortable: true, width: 200},
+ 				{header: '라인',	name: 'LINENO',	editor: 'text', sortable: true, width: 150},
+				
+ 				{header: '검사',	name: 'JUDGEMENT', editor: 'text',  formatter: function({ value }) {  
+ 	                if (value === 'Y') {
+ 	                    return `<span style="color: green;">생산완료</span>`;
+ 	                } else {
+ 	                    return `<span style="color: red;">생산불가</span>`;
+ 	                }
+ 	            }, sortable: true, width: 150},
+				
+	            {header: '생산날짜',	name: 'ENDTIME',	editor: 'text', sortable: true, width: 200}
+				
+			]
+			
+		});
+		
+	 	
+		function loadData(planId) {
+		    fetch(`/api/production/history/${planId}`)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("불러온 변경이력 데이터:", data);
+
+		            historyGrid.resetData(data);
+		            historyGrid.refreshLayout();
+		        })
+		        .catch(error => {
+		            console.error("Error fetching history data:", error);
+    			});
+		}
+	 	
+	 	
+		productionGrid.on('click', function (ev) {
+		    // 클릭된 row 데이터 가져오기
+		    const rowData = ev.instance.getRow(ev.rowKey);
+		    console.log('클릭클릭 :', rowData);
+		    
+		    if (rowData) {
+		        planId = rowData.PLANID;
+		        console.log('클릭한 행의 생산계획번호 : ', planId);
+		        
+		        // 모달창 띄우기
+		        $('#history').modal('show').on('shown.bs.modal',()=>historyGrid.refreshLayout());
+
+		        // 데이터 불러오기
+		        loadData(planId);
+		    } else {
+		        console.error("선택된 행의 데이터가 없습니다.");
+		    }
+	   	});
+
+	 	
+	
+	 	
+	 	
+	 	
+	 	
+	 	
+		
+		//생산계획번호 검색
+		function filterGrid() {
+		    var searchText = document.getElementById("searchPlanId").value.trim();
+
+		    if (searchText === "") {
+		        // 검색어가 없으면 원래 데이터로 복원
+		        productionGrid.resetData(planIdList);
+		        return;
+		    }
+
+		    var filteredData = planIdList.filter(row => row.PLANID.includes(searchText));
+		    productionGrid.resetData(filteredData);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</script>
+
+</body>
+
+</html>

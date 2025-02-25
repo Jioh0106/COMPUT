@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.PlansMapper">
+	
+	<!-- 생산계획 목록 조회  -->
+	<select id="getPlanList" resultType="com.deepen.domain.PlansDTO" >
+		SELECT plan_id
+			 , p.order_id 
+			 , p.sale_no 
+			 , p.emp_id 
+			 , e.emp_name
+			 , p.plan_status
+			 , cd.COMMON_DETAIL_NAME AS status_name
+			 , plan_date
+			 , plan_update
+			 , plan_start_date
+			 , plan_end_date
+			 , plan_priority
+		  FROM PLANS p 
+		       JOIN ORDERS o ON p.ORDER_ID = o.ORDER_ID 
+		       JOIN EMPLOYEES e ON p.EMP_ID = e.EMP_ID 
+		       JOIN COMMON_DETAIL cd ON p.PLAN_STATUS = cd.COMMON_DETAIL_CODE
+		 ORDER BY plan_date DESC 
+	</select>
+	
+	<!-- 생산계획 목록 필터링  -->
+	<select id="getPlanFilterList" resultType="com.deepen.domain.PlansDTO" >
+		SELECT plan_id
+			 , p.order_id 
+			 , p.sale_no 
+			 , p.emp_id 
+			 , e.emp_name
+			 , p.plan_status
+			 , cd.COMMON_DETAIL_NAME AS status_name
+			 , plan_date
+			 , plan_update
+			 , plan_start_date
+			 , plan_end_date
+			 , plan_priority
+		  FROM PLANS p 
+		       JOIN ORDERS o ON p.ORDER_ID = o.ORDER_ID 
+		       JOIN EMPLOYEES e ON p.EMP_ID = e.EMP_ID 
+		       JOIN COMMON_DETAIL cd ON p.PLAN_STATUS = cd.COMMON_DETAIL_CODE
+		<where>
+			<if test="checked_values == null or checked_values == ''">
+	            AND 1 = 0
+	        </if>
+	        <if test="checked_values != null and checked_values != '' and checked_values != 'checkAll'">
+	            AND plan_status IN (
+	                SELECT REGEXP_SUBSTR(#{checked_values}, '[^,]+', 1, LEVEL)
+	                FROM DUAL
+	                CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{checked_values}, ',') + 1
+	            )
+	        </if>
+	    </where>
+		 ORDER BY plan_date DESC 
+	</select>
+	
+	<!-- 생산계획 등록 목록 조회  -->
+	<select id="getRegPlanList" resultType="com.deepen.domain.SaleDTO" >
+		SELECT s.SALE_NO 
+			 , s.ORDER_ID 
+			 , s.PRODUCT_NO 
+			 , p.PRODUCT_NAME 
+			 , s.SALE_UNIT 
+			 , cd.COMMON_DETAIL_NAME AS unit_name
+			 , s.SALE_VOL 
+			 , s.SALE_DEADLINE 
+			 , c.client_name 
+		  FROM SALE s 
+		       JOIN PRODUCT p ON s.PRODUCT_NO = p.PRODUCT_NO 
+		       JOIN COMMON_DETAIL cd ON s.SALE_UNIT = cd.COMMON_DETAIL_CODE 
+		       JOIN ORDERS o ON s.ORDER_ID = o.ORDER_ID
+		       JOIN CLIENT c ON o.CLIENT_NO = c.CLIENT_NO
+		 WHERE s.SALE_STATUS = '정상'
+		   AND NOT EXISTS(
+			   SELECT 1 
+			   FROM PLANS pl
+			   WHERE s.SALE_NO  = pl.sale_no
+		  	 ) 
+		 ORDER BY s.SALE_NO
+	</select>
+	
+	<!-- 상품에 해당하는 BOM 전부 탐색 -->
+	<select id="getUseBoMList" resultType="Map" >
+		SELECT BOM_NO 
+			 , PRODUCT_NO 
+			 , MTRPRODUCT_NO 
+			 , MTR_NO 
+			 , BOM_UNIT 
+			 , BOM_QUANTITY 
+			 , PROCESS_NAME
+			 , PRIOR BOM_QUANTITY * BOM_QUANTITY AS total_quantity
+			 , PRIOR BOM_QUANTITY AS PROCESS_COUNT
+		  FROM BOM b
+		 WHERE BOM_STATUS = 'Y'
+		 START WITH PRODUCT_NO = #{product_no}
+	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
+	</select>
+	
+	<!-- 상품당 공정 시간 계산 --> 
+	<select id="sumProcessTime" resultType="int">
+	    SELECT SUM(PROCESS_TIME) 
+	      FROM PROCESS_INFO
+	     WHERE PROCESS_NO IN (
+			   SELECT REGEXP_SUBSTR(#{PROCESS_NAME}, '[^/]+', 1, LEVEL)
+			   FROM DUAL
+			   CONNECT BY LEVEL &lt;= REGEXP_COUNT(#{PROCESS_NAME}, '/') + 1
+	           )
+	</select>
+	
+	<!--  재고 조회  -->
+	<select id="getInventorty" >
+		SELECT ITEM_NO, SUM(INVENTORY_QTY) AS INVENTORY_QTY
+		FROM INVENTORY 
+		WHERE INVENTORY_TYPE = '자재'
+		GROUP BY ITEM_NO
+	</select>
+	
+	<!-- 재고에서 사용될 예정인 생산계획에 등록된 수주 건의 bom 목록 -->
+	<select id="getPlanBomList">
+		SELECT BOM_NO 
+	      	 , PRODUCT_NO
+	         , MTRPRODUCT_NO
+	         , MTR_NO 
+	         , BOM_UNIT
+	         , BOM_QUANTITY
+	         , PROCESS_NAME
+	         , LEVEL
+	         , PRIOR BOM_QUANTITY * BOM_QUANTITY AS total_quantity
+	      FROM BOM b
+		 START WITH PRODUCT_NO IN (SELECT s.PRODUCT_NO 
+		                             FROM PLANS p
+			                         JOIN SALE s ON p.SALE_NO = s.SALE_NO 
+			                        WHERE PLAN_STATUS IN ('PRGR001', 'PRGR005'))
+	   CONNECT BY PRIOR MTRPRODUCT_NO = PRODUCT_NO
+	</select>
+	
+	<insert id="savePlan">
+		INSERT INTO PLANS(
+			   PLAN_ID
+			 , ORDER_ID 
+			 , EMP_ID 
+			 , PLAN_STATUS 
+			 , PLAN_DATE 
+			 , PLAN_START_DATE 
+			 , PLAN_END_DATE 
+			 , PLAN_PRIORITY 
+			 , SALE_NO 
+		) VALUS (
+			   #{plan_id}
+			 , #{order_id}
+			 , #{emp_id}
+			 , #{plan_status}
+			 , CURRENT_DATE
+			 , #{plan_start_date}
+			 , #{plan_end_date}
+			 , #{plan_priority}
+			 , #{sale_no}
+		)
+	</insert>
+	
+	<select id="getPlanOrderId" >
+		SELECT plan_id
+		  FROM plans
+		 WHERE plan_id Like #{order_id} || '%'
+		 ORDER BY plan_id DESC
+		 FETCH FIRST 1 ROW ONLY
+	</select>
+</mapper>
+
+

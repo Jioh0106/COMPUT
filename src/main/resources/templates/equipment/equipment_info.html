@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>설비 정보</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4">
+								    <!-- 구입월 -->
+								    <div class="buyDiv">
+								        <span style="font-size: 1rem; line-height: 2rem; margin-right: 8px;">구입월</span>
+								        <fieldset class="form-group" style="margin: 0;">
+								            <select class="form-select buySelect" id="searchSelected" onchange="searchSelect(this.id)">
+								                <option value="">선택</option>
+								                <option th:each="yearMonth :${yearMonthList}" th:value="${yearMonth.yearMonth}"
+														th:text="${yearMonth.yearMonth}"
+														th:selected="${selectedYearMonth == yearMonth.yearMonth}"></option>
+								            </select>
+								        </fieldset>
+								    </div>
+
+								    <!-- 설비명 -->
+								    <div class="nameDiv">
+								        <span style="font-size: 1rem; line-height: 2rem; margin-right: 8px;">설비명</span>
+								        <input type="text" id="searchInput" class="form-control" style="width: 150px;" onkeyup="searchSelect(this.id)">
+								    </div>
+								</div>
+								<!-- 검색 조건 끝-->
+																		   
+								<div id="grid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-secondary" id="add" value="추가">
+										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick="saveData()">
+										<input type="button" class="btn btn-outline-danger" id="del" value="삭제">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+								
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+		let grid = "";
+
+		// 페이지 로드 시 설비 정보 조회하는 함수 호출
+		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
+			selectInfo();
+		};
+
+		// 초기 화면 함수
+		function selectInfo() {
+			
+			const data = /*[[${equipmentList}]]*/[];
+			const clientList = /*[[${clientList}]]*/ []; // 거래처 정보
+			const kindList = /*[[${kindList}]]*/ []; // 설비종류 정보
+			const lineList = /*[[${lineList}]]*/ []; // 라인종류 정보
+			
+			var Grid = tui.Grid;
+
+			if (grid) {
+				// 이미 생성된 경우 destroy하지 않고 재사용
+				grid.refreshLayout();
+				return;
+			}
+			console.info(kindList);
+			grid = new Grid({
+				el: document.getElementById('grid'),
+				rowHeaders: ['checkbox'],
+				columns: [
+					{header: '고유번호',	name: 'no'},
+					{header: '일련번호',	name: 'sn',		editor: 'text', sortable: true},
+					{header: '설비명',		name: 'name',	editor: 'text', sortable: true},
+					{header: '종류',		name: 'kind',	formatter: 'listItemText', editor: {
+														            type: 'select',
+														            options: {
+														              listItems: kindList.map(kind => ({
+													                    text: kind.name, // 설비종류 이름
+													                    value: kind.code // 설비종류 코드
+														               }))
+														            }}, 	sortable: true},
+					{header: '제조사',		name: 'mnfct',	formatter: 'listItemText', editor: {
+														            type: 'select',
+														            options: {
+													            	  listItems: clientList.map(client => ({
+													                    text: client.name, // 거래처 이름
+													                    value: client.no // 거래처 번호
+													                   }))
+														            }}, 	sortable: true},
+					{header: '구입일',		name: 'buy',    editor: {
+													                type: 'datePicker',
+													                options: {
+													                    format: 'yyyy-MM-dd',
+																	language: 'ko'
+													                }}, 	sortable: true},
+					{header: '설치일',		name: 'set',    editor: {
+													                type: 'datePicker',
+													                options: {
+													                    format: 'yyyy-MM-dd',
+																	language: 'ko'
+													                }}, 	sortable: true},
+					{header: '사용라인',	name: 'line',	formatter: 'listItemText', editor: {
+														            type: 'select',
+														            options: {
+													            	  listItems: lineList.map(line => ({
+													                    text: line.lineNm, // 라인 이름
+													                    value: line.lineNo // 라인 번호
+													                   }))
+														            }}, 	sortable: true},
+					{header: '사용여부',	name: 'useYn',	editor: {
+														            type: 'select',
+														            options: {
+														              listItems: [
+														                { text: 'Y', value: 'Y' },
+														                { text: 'N', value: 'N' },
+														              ]
+														            }}, 	sortable: true},
+					{header: '타입', name: 'rowType'} // 조회 / 추가를 구분하기 위함
+				],
+				data: data,
+				columnOptions: {
+				  resizable: true
+				}
+			});
+			
+			// id 및 rowType 숨기기
+			grid.hideColumn("no");
+			grid.hideColumn("rowType");
+			
+			// 추가 버튼 이벤트
+			add.addEventListener('click', () => {
+				grid.appendRow({
+					"no": "",
+					"sn": "",
+					"name": "",
+					"kind": "",
+					"mnfct": "",
+					"buy": "",
+					"set": "",
+					"line": "",
+					"useYn": "",
+					"rowType": "insert"
+				},
+					{
+						at: 0, // 행 추가 인덱스
+						focus: true
+					});
+			});
+			
+			// 저장 버튼 이벤트
+			// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
+			save.addEventListener('mousedown', () => {
+				grid.blur(); // 포커스 해제
+
+				// 수정된 행일 경우 rowType을 update로 변경
+				const updatedRows = grid.getModifiedRows().updatedRows;
+				updatedRows.forEach((row, index) => {
+					grid.setValue(row.rowKey, "rowType", "update")
+				});
+			});
+			
+			// 체크박스가 활성화된 행의 index를 배열에 저장
+			let delRows = [];
+			grid.on('check', (ev) => {
+				delRows.push(ev.rowKey);
+			});
+			
+			// 삭제 버튼 이벤트
+			// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
+			del.addEventListener('mousedown', () => {
+				grid.blur(); // 포커스 해제
+				
+				// delRows 저장된 인덱스에 대한 행 삭제 처리
+				delRows.forEach((index) => {
+					// 삭제된 행일 경우 rowType을 update로 변경
+					grid.setValue(index, "rowType", "delete")
+					grid.removeRow(index);
+				});
+			});
+		}; // selectInfo 함수 끝
+		
+		// 검색 조건 입력 조회
+		function searchSelect(searchId){
+			const value = document.getElementById(searchId).value;
+			var data = {value: value};
+			$.ajax({
+				url: "/eqpSearchSelect",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					grid.resetData(response);
+				} // success
+			}) // ajax
+		}
+		
+		// 추가 및 수정된 값이 저장된 json을 들고 통신
+		function saveData() {
+			const modifiedRows = grid.getModifiedRows(); // 수정된 데이터 가져오기
+
+			const createdRows = modifiedRows.createdRows; // 추가된 행
+			const updatedRows = modifiedRows.updatedRows; // 수정된 행
+			const deletedRows = modifiedRows.deletedRows; // 삭제된 행
+
+			// 모든 수정된 데이터 배열로 합치기
+			const modifiedData = [...createdRows, ...updatedRows, ...deletedRows];
+			const data = [];
+
+			modifiedData.forEach(row => {
+				const rowData = {};
+
+				// 각 행의 데이터를 꺼냄
+				//if(row.no != null && row.no != 'null' && row.no != '' && row.no != 'undefind'){
+					rowData.no	= row.no;		// 고유번호
+				//}
+				rowData.sn		= row.sn;		// 일련번호
+				rowData.name	= row.name;		// 설비명
+				rowData.kind	= row.kind;	 	// 종류
+				rowData.mnfct	= row.mnfct;	// 제조사
+				rowData.buy		= row.buy;		// 구입일
+				rowData.set		= row.set;		// 설치일
+				rowData.line	= row.line;		// 사용라인
+				rowData.useYn	= row.useYn;	// 사용여부
+				rowData.rowType = row.rowType;	// 행 타입
+
+				data.push(rowData);
+			});
+
+			// 수정된 데이터를 서버로 전송
+			$.ajax({
+				url: "/eqpSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (res) {
+					if (res == 1) {
+						Swal.fire({
+							title: "저장 성공",
+							icon: "success",
+							confirmButtonText: "확인"
+						}).then(function () { // 확인 클릭 시 실행
+							location.reload(true); // 페이지 새로고침
+						});
+					} else {
+						Swal.fire({
+							title: "저장 실패",
+							icon: "error",
+							confirmButtonText: "확인"
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
+		}; // save 함수 끝
+
+	</script>
+
+
+</body>
+
+</html>

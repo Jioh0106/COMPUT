@@ -27,7 +27,7 @@ import lombok.extern.java.Log;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/assign")
 @Log
 public class AssignRestController {
 
@@ -36,7 +36,7 @@ public class AssignRestController {
 	
 	
 	//발령등록페이지 공통코드 연결
-	@GetMapping("/assignCommonDetail")
+	@GetMapping("/commondetail")
 	public List<CommonDetailDTO> fetchAssignCommonDetail(){
 		
 		List<CommonDetailDTO> codeList = asService.fetchAssignCommonDetail();
@@ -46,7 +46,7 @@ public class AssignRestController {
 	}
 	
 	//발령등록페이지 직원검색
-	@GetMapping("/empSearch")
+	@GetMapping("/empsearch")
 	public List<EmployeesDTO> empSearch(@RequestParam ("keyword")String keyword){
 		List<EmployeesDTO> search = asService.empSearch(keyword);
 //		log.info("키워드"+keyword);
@@ -56,7 +56,7 @@ public class AssignRestController {
 	}
 	
 	//중간승인권자 조회 모달창
-	@GetMapping("/middleRole")
+	@GetMapping("/middlerole")
 	public List<EmployeesDTO> middleRole(){
 		List<EmployeesDTO> search = asService.middleRoleSearch();
 		return search;
@@ -64,14 +64,14 @@ public class AssignRestController {
 	
 	
 	//최종승인권자 조회 모달창
-	@GetMapping("/highRole")
+	@GetMapping("/highrole")
 	public List<EmployeesDTO> highRole(){
 		List<EmployeesDTO> search = asService.highRoleSearch();
 		return search;
 	}
 	
 	//요청번호로 발령테이블 조회
-	@GetMapping("/selectAssign/{request_no}") 
+	@GetMapping("/select/{request_no}") 
 	public Map<String, Object> selectAssign(@PathVariable("request_no") Integer request_no, 
 			@AuthenticationPrincipal User user){
 		String emp_id = user.getUsername(); //로그인한 사원번호
@@ -86,7 +86,7 @@ public class AssignRestController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("assignment",requestAssign);
 		response.put("request", requestDto);
-		response.put("request_status", requestStatus.get("REQUEST_STATUS")); //상태추가
+		response.put("request_status", requestStatus.get("REQUEST_STATUS")); //상태추가(map은 대문자로 받는다.)
 		
 		return response;
 	}
@@ -119,7 +119,7 @@ public class AssignRestController {
 	
 	
     //인사발령현황 리스트 조회
-    @GetMapping("/assign/list")
+    @GetMapping("/list")
     public List<Map<String, Object>> assignList (@RequestParam(value="startDate") String startDate,
     		@RequestParam(value="endDate") String endDate, 
     		@RequestParam(value = "search",defaultValue = "") String search){
@@ -130,7 +130,7 @@ public class AssignRestController {
 	
     
     //요청내역 중간승인권자 최종승인권자 사번 조회
-    @GetMapping("/getEmployees")
+    @GetMapping("/get-employees")
     public ResponseEntity<Map<String, Object>> getEmployees(@RequestParam("request_no") Integer request_no) {
         Map<String, Object> employees = asService.getEmployees(request_no);
         return ResponseEntity.ok(employees); // JSON 형태로 반환

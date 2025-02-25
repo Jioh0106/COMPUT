@@ -62,8 +62,17 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	
 	implementation 'org.xhtmlrenderer:flying-saucer-pdf:9.1.22'
+	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	implementation 'org.apache.poi:poi:5.2.3'
 	
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	
+	// https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4.1
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+	
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0'
+	
+	implementation 'com.oracle.database.jdbc:ojdbc11'
 	
 	
 }
@@ -75,3 +84,9 @@ tasks.named('test') {
 tasks.withType(JavaCompile) {
     options.compilerArgs += '-parameters'
 }
+
+bootWar {
+	archiveBaseName = 'ROOT' 
+	archiveVersion = '' 
+}
+

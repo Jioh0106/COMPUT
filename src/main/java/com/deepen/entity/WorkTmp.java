@@ -1,5 +1,7 @@
 package com.deepen.entity;
 
+import java.math.BigDecimal;
+
 import com.deepen.domain.WorkTmpDTO;
 
 import jakarta.persistence.Column;
@@ -30,12 +32,12 @@ public class WorkTmp {
 	private String work_type;
 	
 	@Column(name = "work_time")
-	private Integer work_time;
+	private BigDecimal work_time;
 	
 	@Column(name = "rest_time")
-	private Integer rest_time;
+	private BigDecimal rest_time;
 	
-	public static WorkTmp absenceDTOToEntity(WorkTmpDTO workTmpDTO) {
+	public static WorkTmp setWorkTmpEntity(WorkTmpDTO workTmpDTO) {
 		WorkTmp workTmp = new WorkTmp();
 		workTmp.setWork_tmp_name(workTmpDTO.getWork_tmp_name());
 		workTmp.setWork_start(workTmpDTO.getWork_start());

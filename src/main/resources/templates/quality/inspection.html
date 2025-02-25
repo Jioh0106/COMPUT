@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+
+    <!-- TOAST Grid CSS -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    
+    <!-- Bootstrap & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/iconly/bold.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="icon" href="images/favicon.png" type="images/png">
+    
+    <!-- CSRF 토큰 -->
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+        .tui-grid-cell { 
+            background-color: #ffffff !important; 
+        }
+        .search-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .grid-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-wait { background-color: #ffd54f; }
+        .status-progress { background-color: #4fc3f7; }
+        .status-complete { background-color: #66bb6a; }
+        .status-fail { background-color: #e57373; }
+        .form-label i {
+            margin-right: 5px;
+            color: #666;
+        }
+        .inspection-controls {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div id="main">
+            <!-- 헤더 섹션 -->
+            <div class="page-heading">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3>품질검사</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <!-- 검색 조건 섹션 -->
+                <div class="search-section">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="processNo" class="form-label">
+                                <i class="bi bi-gear-fill"></i>
+                            </label>
+                            <select id="processNo" class="form-select" onchange="updateGrids()">
+                                <option value="">전체</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="lotNo" class="form-label">
+                                <i class="bi bi-upc-scan"></i>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" id="lotNo" 
+                                       placeholder="LOT 번호를 입력하세요" 
+                                       onkeyup="updateGrids()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="wiNo" class="form-label">
+                                <i class="bi bi-file-text-fill"></i>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" id="wiNo" 
+                                       placeholder="작업지시번호를 입력하세요" 
+                                       onkeyup="updateGrids()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검사 컨트롤 영역 -->
+                <div class="inspection-controls">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">상태:</span>
+                            <div class="d-flex align-items-center me-3">
+                                <span class="status-indicator status-wait"></span>
+                                <span>대기</span>
+                            </div>
+                            <div class="d-flex align-items-center me-3">
+                                <span class="status-indicator status-progress"></span>
+                                <span>진행중</span>
+                            </div>
+                            <div class="d-flex align-items-center me-3">
+                                <span class="status-indicator status-complete"></span>
+                                <span>완료</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="status-indicator status-fail"></span>
+                                <span>불합격</span>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary me-2" onclick="startInspection()">
+                                <i class="bi bi-play-fill"></i> 검사시작
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="saveInspection()">
+                                <i class="bi bi-check2-square"></i> 검사완료
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 그리드 섹션 -->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- LOT 그리드 -->
+                        <div class="grid-container">
+                            <div class="section-title">
+                                <i class="bi bi-list-check me-2"></i>검사대상
+                            </div>
+                            <div id="lotGrid"></div>
+                        </div>
+
+                        <!-- 검사항목 그리드 -->
+                        <div class="grid-container">
+                            <div class="section-title">
+                                <i class="bi bi-clipboard-check me-2"></i>검사항목
+                            </div>
+                            <div id="inspectionGrid"></div>
+                        </div>
+
+                        <!-- 검사결과 그리드 -->
+                        <div class="grid-container">
+                            <div class="section-title">
+                                <i class="bi bi-graph-up me-2"></i>현재 검사결과
+                            </div>
+                            <div id="inspectionResultGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script th:src="@{/js/quality/inspection.js}"></script>
+</body>
+</html>

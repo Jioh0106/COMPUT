@@ -1,18 +1,4 @@
 $(document).ready(function () {
-    // 오늘 날짜를 "yyyy년 MM월 dd일 (요일)" 형식으로 포맷
-    function formatDateWithDay(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1 필요)
-        const day = String(date.getDate()).padStart(2, '0'); // 날짜를 두 자리로
-        const dayNames = ['일', '월', '화', '수', '목', '금', '토']; // 요일 배열
-        const dayName = dayNames[date.getDay()]; // 요일 가져오기
-        return `${year}년 ${month}월 ${day}일 (${dayName})`;
-    }
-
-    // 오늘 날짜 가져오기 및 todayDate에 출력
-    const today = new Date();
-    const formattedToday = formatDateWithDay(today);
-    $('#todayDate').text(formattedToday); // 오늘 날짜 출력
 	
 	// 오늘 날짜를 "yyyy-MM-dd" 형식으로 포맷
 	function formatDate(date) {
@@ -54,10 +40,7 @@ $(document).ready(function () {
 	    useDetailPopup: true, // 상세 팝업 활성화
 		timezone: {
 	       zones: [
-	           {
-	               timezoneName: 'Asia/Seoul',
-	               displayLabel: 'Seoul',
-	           },
+	           { timezoneName: 'Asia/Seoul', displayLabel: 'Seoul'},
 	       ],
 	   },
 	    template: {
@@ -73,7 +56,7 @@ $(document).ready(function () {
 	    console.log("end = " + end);
 
 	    $.ajax({
-	        url: '/api/work/schedules', // 백엔드 API 엔드포인트
+	        url: '/api/work/schedules', 
 	        method: 'GET',
 	        data: {
 	            startDate: start,
@@ -83,16 +66,16 @@ $(document).ready(function () {
 	            console.log('Schedules fetched successfully:', response);
 
 	            // 기존 일정 삭제 후 새로운 일정 추가
-	            calendar.clear(); // 기존 일정 초기화
+	            calendar.clear(); 
 	            const events = response.map(schedule => ({
-	                id: schedule.id, // 일정 ID
-	                calendarId: schedule.calendarId, // 캘린더 ID
-	                title: schedule.title, // 일정 제목
-	                start: schedule.start, // 시작 시간
-	                end: schedule.end, // 종료 시간
-	                isAllDay: schedule.isAllDay || false, // 종일 여부
-	                category: schedule.category || 'time', // 카테고리 ('time' or 'allday')
-	                location: schedule.location || '', // 위치 (선택 사항)
+	                id: schedule.id,
+	                calendarId: schedule.calendarId, 
+	                title: schedule.title, 
+	                start: schedule.start, 
+	                end: schedule.end, 
+	                isAllDay: schedule.isAllDay || false,
+	                category: schedule.category || 'time', 
+	                location: schedule.location || '', 
 	            }));
 	            calendar.createEvents(events); // 새 일정 추가
 	        },
@@ -130,4 +113,75 @@ $(document).ready(function () {
     updateCurrentMonth();
 	// 페이지 로드 시 일정 가져오기
 	fetchSchedules();
+	
+	
+	
+	// 부서 셀렉트 박스 
+	$('#deptSelect').on('click', function () {
+	    // 이미 데이터가 로드된 경우 추가 요청 방지
+	    if (this.options.length > 1) {
+	        return;
+	    }
+	
+	    const type = 'DEPT'; 
+	
+	    getCommonList(type).then(function (data) {
+	        $('#deptSelect')
+	            .empty()
+				.append('<option value="" disabled selected>전체 부서</option>');
+	        data.forEach(item => {
+	            if (item.common_detail_code && item.common_detail_name) {
+	                $('#deptSelect').append(
+	                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+	                );
+	            }
+	        });
+	    });
+	    
+	}); // 부서 셀렉트 박스
+	
+	
+
+	// type으로 공통 코드 가져오는 함수
+	function getCommonList(type) {
+	    return axios.get(`/api/absence/common/list/${type}`)
+	        .then(function (response) {
+	            return response.data; // 데이터 반환
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
+	            return []; // 에러 발생 시 빈 배열 반환
+	        });
+	}
+	
+	$('#deptSelect').on('change', function () {
+	    // 이미 데이터가 로드된 경우 추가 요청 방지
+	    if (this.options.length > 1) {
+	        return;
+	    }
+	
+	    const type = 'DEPT'; 
+	
+	    getCommonList(type).then(function (data) {
+	        $('#deptSelect')
+	            .empty()
+				.append('<option value="" disabled selected>전체 부서</option>');
+	        data.forEach(item => {
+	            if (item.common_detail_code && item.common_detail_name) {
+	                $('#deptSelect').append(
+	                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+	                );
+	            }
+	        });
+	    });
+	    
+	}); // 부서 셀렉트 박스
+	
+
+
 });

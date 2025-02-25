@@ -93,7 +93,6 @@ public class SalaryFormulaService {
         salaryFormulaRepository.deleteAllInBatch(formulas);
     }
     
- // SalaryFormulaService.java
     public List<Map<String, String>> getFormulaTypes() {
         List<Map<String, String>> result = new ArrayList<>();
         
@@ -127,7 +126,7 @@ public class SalaryFormulaService {
         return salaryFormulaRepository.findAll();
     }
     
- // 휴가수당 계산식 생성
+    // 휴가수당 계산식 생성
     public SalaryFormula createLeaveAllowanceFormula() {
         SalaryFormula formula = new SalaryFormula();
         formula.setFormulaName("휴가수당");

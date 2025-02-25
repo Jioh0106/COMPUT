@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>COMPUT.</title>
 	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />		
 	<!--공통 -->
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet"> 
 	<link rel="stylesheet" href="/assets/css/bootstrap.css">
 	<link rel="stylesheet" href="/assets/vendors/iconly/bold.css">
 	<link rel="stylesheet" href="/assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
@@ -38,19 +40,13 @@
 		<!-- 메인 content -->
 		<div id="main">
 			
-			<!-- 반응형 사이드 메뉴 버튼-->
-			<header class="mb-3">
-		        <a href="#" class="burger-btn d-block d-xl-none">
-		            <i class="bi bi-justify fs-3"></i>
-		        </a>
-		    </header>
-			
 			<div class="d-flex justify-content-between">
 				<h3>근무 관리</h3>
 				
 				<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">
 					<div class="buttons">
-						<button type="button" class="btn btn-primary" onclick="openView()">근무 일정 등록</button>
+						<button type="button" class="btn btn-primary" onclick="openRegView()">근무 일정 등록</button>
+						<button type="button" class="btn btn-primary" onclick="openTempView()">근무 템플릿 관리</button>
 					</div>
 				</div>
 			</div>
@@ -138,6 +134,7 @@
 	<!-- TOAST UI CDN -->
 	<script src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.js"></script>
 	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script><!-- 한글 번역 파일 -->
 	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
 	<script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.js"></script>
 	

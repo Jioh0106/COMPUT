@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+	<style>
+		.tui-grid-cell {
+			/* !important -> 우선순위 높아짐 */
+			background-color: #ffffff !important;
+		}
+
+		.display-flex {
+			display: flex;
+		}
+
+		.row mb-4 {
+			display: flex;
+			align-items: center
+		}
+
+		.checkbox-container {
+			display: inline-flex;
+			gap: 40px;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+			<h3>설비 가동 현황</h3>
+
+			<div class="card">
+				<div class="card-body" id="default">
+
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4">
+									<div class="col-auto display-flex align-items-center" style="height: 43px;">
+										<!-- 상태 체크박스 시작 -->
+										<ul class="list-unstyled mb-0">
+											<li class="d-inline-block me-2 mb-1">
+												<div class="form-check">
+													<div class="checkbox-container">
+														<div class="checkbox" th:each="stts :${sttsList}">
+															<input type="checkbox" class="form-check-input"
+																id="checkbox" onclick='searchSelect(this.id)'
+																th:value="${stts.code}">
+															<label class="font-semibold "
+																style="color: rgba(35, 28, 99, .7);" for="checkbox2"
+																th:text="${stts.name}"></label>
+														</div>
+													</div>
+												</div>
+											</li>
+										</ul>
+										<!-- 상태 체크박스 끝 -->
+									</div>
+
+									<!-- 설비명 (입력창) -->
+									<div class="col-md-6 display-flex align-items-center">
+										<div class="form-group d-sm-flex align-items-center">
+											<div class="col-4">
+												<label class="col-form-label">설비명</label>
+											</div>
+											<div class="col-lg-10 col-5">
+												<input type="text" id="searchInput" class="form-control"
+													style="width: 150px; height: 100%;" onkeyup="searchSelect(this.id)">
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- 검색 조건 끝-->
+
+								<div id="grid" class="mb-3 mt-2"></div>
+
+							</form>
+						</div>
+					</section>
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+		let grid = "";
+
+		// 페이지 로드 시 설비 정보 조회하는 함수 호출
+		window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
+			selectInfo();
+		};
+
+		// 초기 화면 함수
+		function selectInfo() {
+
+			const data = /*[[${equipmentList}]]*/[];
+
+			var Grid = tui.Grid;
+
+			if (grid) {
+				// 이미 생성된 경우 destroy하지 않고 재사용
+				grid.refreshLayout();
+				return;
+			}
+
+			grid = new Grid({
+				el: document.getElementById('grid'),
+				columns: [
+					{header: '일련번호', name: 'sn', sortable: true},
+					{header: '설비명', name: 'name', sortable: true},
+					{header: '공정명', name: 'lineNm', sortable: true},
+					{header: '상태', name: 'type', sortable: true},
+					{header: '사용일', name: 'useDate', sortable: true},
+				],
+				data: data,
+				columnOptions: {
+					resizable: true
+				}
+			});
+
+		}; // selectInfo 함수 끝
+
+		// 검색 조건 입력 조회
+		function searchSelect() {
+			const name = document.getElementById("searchInput").value;
+			
+			var selectedStts = [];
+			// 체크된 체크박스의 값을 배열에 추가
+			$('input[type="checkbox"]:checked').each(function () {
+				selectedStts.push($(this).val());
+			});
+			console.info(selectedStts);
+						
+			var data = {checkboxes: selectedStts, name: name};
+			console.info(data);
+			$.ajax({
+				url: "/selectEqpSearch",
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (response) {
+					grid.resetData(response);
+				} // success
+			}) // ajax
+		}
+
+		// 추가 및 수정된 값이 저장된 json을 들고 통신
+		function saveData() {
+			const modifiedRows = grid.getModifiedRows(); // 수정된 데이터 가져오기
+
+			const createdRows = modifiedRows.createdRows; // 추가된 행
+			const updatedRows = modifiedRows.updatedRows; // 수정된 행
+			const deletedRows = modifiedRows.deletedRows; // 삭제된 행
+
+			// 모든 수정된 데이터 배열로 합치기
+			const modifiedData = [...createdRows, ...updatedRows, ...deletedRows];
+			const data = [];
+
+			modifiedData.forEach(row => {
+				const rowData = {};
+
+				// 각 행의 데이터를 꺼냄
+				//if(row.no != null && row.no != 'null' && row.no != '' && row.no != 'undefind'){
+				rowData.no = row.no;		// 고유번호
+				//}
+				rowData.sn = row.sn;		// 일련번호
+				rowData.name = row.name;		// 설비명
+				rowData.kind = row.kind;	 	// 종류
+				rowData.mnfct = row.mnfct;	// 제조사
+				rowData.buy = row.buy;		// 구입일
+				rowData.set = row.set;		// 설치일
+				rowData.useYn = row.useYn;	// 사용여부
+				rowData.rowType = row.rowType;	// 행 타입
+
+				data.push(rowData);
+			});
+
+			// 수정된 데이터를 서버로 전송
+			$.ajax({
+				url: "/eqpSaveData", // 변경된 데이터를 처리할 컨트롤러 URL
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(data),
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (res) {
+					if (res == 1) {
+						Swal.fire({
+							title: "저장 성공",
+							icon: "success",
+							confirmButtonText: "확인"
+						}).then(function () { // 확인 클릭 시 실행
+							location.reload(true); // 페이지 새로고침
+						});
+					} else {
+						Swal.fire({
+							title: "저장 실패",
+							icon: "error",
+							confirmButtonText: "확인"
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
+		}; // save 함수 끝
+
+	</script>
+
+
+</body>
+
+</html>

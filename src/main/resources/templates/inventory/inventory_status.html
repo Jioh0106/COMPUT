@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>재고현황</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4 align-items-center">
+								    <!-- 상품명 -->
+									<div class="col-md-4">
+										<label for="nameSearch" class="form-label">품목명 검색</label>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+											<input type="text" class="form-control" id="searchItem" placeholder="품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2">
+										</div>
+									</div>
+									
+									
+									<!-- 첫 번째 SELECT 박스: 창고 선택 -->
+									<div class="col-md-4">
+									  <label for="warehouse">창고 선택</label>
+									  <select class="form-select deptArea" id="warehouse">
+									      <option value="">전체</option>
+									  </select>
+									</div>
+									
+									  <!-- 두 번째 SELECT 박스: 구역 선택 -->
+									  <div class="col-md-4">
+									  <label for="zone">구역 선택</label>
+									  <select class="form-select deptArea" id="zone">
+  										<option value="">전체</option>
+  									  </select>
+									  </div>
+									
+								</div>
+								<!-- 검색 조건 끝-->
+								
+								<!--전체/완제품/자재 탭 시작-->
+					          <ul class="nav nav-tabs" id="myTab" role="tablist">
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link active" id="all" data-bs-toggle="tab" href="#home" role="tab"
+					                      aria-controls="home" aria-selected="true">전체</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="product" data-bs-toggle="tab" href="#profile" role="tab"
+					                      aria-controls="profile" aria-selected="false">완제품</a>
+					              </li>
+					              <li class="nav-item" role="presentation">
+					                  <a class="nav-link" id="material" data-bs-toggle="tab" href="#contact" role="tab"
+					                      aria-controls="contact" aria-selected="false">자재</a>
+					              </li>
+					          </ul>
+					          <div class="tab-content" id="myTabContent">
+					              <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="home-tab">
+									
+									<!--재고현황 그리드-->										   
+									<div id="inventoryGrid" class="mb-3 mt-2"></div> 
+	
+					              </div>
+					              <div class="tab-pane fade" id="product" role="tabpanel" aria-labelledby="profile-tab">
+					                 
+					                 <!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					              <div class="tab-pane fade" id="material" role="tabpanel" aria-labelledby="contact-tab">
+					                  
+									<!--각 탭마다 그리드 id 다르게 해줘야함-->
+									
+					              </div>
+					          </div>
+							  <!--전체/받은요청/보낸요청 탭 끝-->
+							  
+							  <!-- 버튼 시작 -->
+  								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+  									<div class="float-end">
+  										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick="saveAllChanges()">
+  									</div>
+  								<!--</div>-->
+  								<!-- 버튼 끝 -->
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+					
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
+			<!-- 재고현황 - 실재고량 변경 이력 모달창 시작 -->
+		    <div class="modal fade text-left w-100" id="history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel17" aria-hidden="true">
+		        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"  role="document">
+		           
+		            <div class="modal-content">
+		                <div class="modal-header">
+		                    <h4 class="modal-title" id="myModalLabel17"> 실재고량 변경 이력 </h4>
+		                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		                </div>
+		                <div class="modal-body">
+							<div class="row" id="basic-table">
+								<!-- 그리드 시작 -->
+								<div id="historyGrid"></div>
+								<!-- 그리드 끝 -->
+								<div class="d-flex justify-content-end">
+									<input type="button" class="btn btn-outline-secondary ms-2" id="append" value="추가">
+									<input type="button" class="btn btn-outline-success ms-2" id="modalSave" value="저장">
+<!-- 									<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"> -->
+										<input type="button" class="btn btn-outline-danger ms-2 deleteBtn" id="delete" value="삭제">
+<!-- 									</div> -->
+								</div>
+							</div>
+		                </div>
+		            </div>
+		        </div>
+		    </div> 
+		    <!-- 재고현황 - 실재고량 변경 이력 모달창 끝 -->
+			
+		
+	
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+	 	var Grid = tui.Grid;
+		
+	 	//재고현황 그리드
+		const inventoryGrid = new Grid({
+			el: document.getElementById('inventoryGrid'),
+			columns: [
+				{header: '재고번호',	name: 'inventory_no', width: 100},
+				{header: '재고구분',	name: 'inventory_type',		editor: 'text', sortable: true, width: 150},
+				{header: '품목명',		name: 'item_name', editor: 'text', sortable: true, width: 200},
+				{header: '재고량',	name: 'inventory_qty',	editor: 'text', sortable: true, width: 100},
+				
+				{header: '실재고량',	name: 'inventory_count',	editor: 'text', sortable: true, width: 150,
+				 defaultValue: 0,
+				 formatter: ({ value }) => `<span style="color: #dc3545;">${value}</span>`},
+				
+				{header: '단위',	name: 'unit',	editor: 'text', sortable: true, width: 150},
+				{header: '창고',	name: 'warehouse_id',	editor: 'text', sortable: true, width: 150},
+				{header: '구역',	name: 'zone',	editor: 'text', sortable: true, width: 150},
+				{header: '재고량변경일',	name: 'inventory_change_date',	editor: 'text', sortable: true, width: 150}
+				
+			],
+			data: [],
+			columnOptions: {
+			  resizable: true
+			}
+		});
+		
+		
+		const reasonChangeList = /*[[${reasonChangeList}]]*/ []; // 변경사유공통코드
+		console.log('변경사유 공통코드 :', reasonChangeList);
+		
+		// 실재고량 변경 이력 모달 그리드
+		const historyGrid = new tui.Grid({
+			el: document.getElementById('historyGrid'),
+			data: [], // 서버에서 전달받은 데이터
+			rowHeaders: ['checkbox'],
+			columns: [
+				{header: '번호', name: 'HISTORY_NO', hidden: true, width: 60},
+				{header: '변경 전 실재고량', name: 'PREV_COUNT', width: 100},
+				{header: '변경 후 실재고량', name: 'NEW_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '차이값', name: 'DIFF_COUNT', editor: 'text', sortable: true, width: 100},
+				{header: '변경사유', name: 'CHANGE_REASON', width: 120,
+					formatter: ({ value }) => {
+				        const reason = reasonChangeList.find(item => item.code === value);
+				        return reason ? reason.name : value; // 매칭되는 name이 있으면 출력, 없으면 value 그대로 표시
+				    },
+					editor: {
+			            type: 'select',
+			            options: {
+			              listItems: reasonChangeList.map(reason => ({
+		                    text: reason.name, // 변경사유 이름(name과 code는 매퍼 AS "name", AS "code")
+		                    value: reason.code // 변경사유 코드
+			               }))
+			            }
+					}, 
+					},
+				{header: '기타사유', name: 'REASON_DETAIL', editor: 'text', sortable: true, width: 200},
+				{header: '수정자', name: 'MOD_USER', width: 100},
+				{header: '수정일', name: 'MOD_DATE', width: 150}
+				
+			]
+		});
+		
+		
+		
+		let allData = []; // 전체 데이터를 저장할 변수
+
+		
+			//재고현황테이블 조회
+			function loadInventoryData() {
+				 
+				 let warehouseId = $("#warehouse").val();  //선택한 창고값
+					console.log('선택한창고값', warehouseId);
+				 let zone = $("#zone").val(); //선택한 구역값
+				 let itemName = $("#searchItem").val(); //품목검색
+				 	console.log('검색명', itemName)
+				
+		        $.ajax({
+		            url: "/api/inventory/list", 
+		            type: "GET",
+		            contentType: "application/json",
+		            dataType: "json",
+					data: {warehouse_id: warehouseId, zone: zone, item_name: itemName },  // 필터 값 전달
+		            beforeSend: function(xhr) {
+		                xhr.setRequestHeader(header, token);  
+		            },
+		            success: function(response) {
+		            	allData = response; // 전체 데이터 저장
+		                console.log("재고 데이터 로드 성공:", response);
+		                inventoryGrid.resetData(response);  // Grid에 데이터 삽입
+		            },
+		            error: function(xhr, status, error) {
+		                console.error("재고 데이터 로드 실패:", status, error);
+		            }
+		        });
+		    }
+
+		    //페이지 로드 후 즉시 데이터 로드
+		    loadInventoryData();
+			
+			
+			 const tabs = {
+				        전체: document.getElementById('all'),
+				        완제품: document.getElementById('product'),
+				        자재: document.getElementById('material')
+				    };
+			
+			 			
+			// 탭 클릭 이벤트 등록
+	        Object.keys(tabs).forEach(tabName => {
+	            tabs[tabName].addEventListener('click', () => {
+	                let filteredData;
+	                if (tabName === '전체') {
+	                    filteredData = allData; // 전체 데이터
+	                } else {
+	                    filteredData = allData.filter(item => item.inventory_type === tabName); // 요청구분에 따른 필터링
+	                }
+
+	                inventoryGrid.resetData(filteredData); // 필터링된 데이터를 TOAST UI Grid에 적용
+	                inventoryGrid.refreshLayout(); // 레이아웃 새로고침
+	            });
+	        });	
+				
+	
+			
+	
+	//--------------------------------------------------------실재고량 변경이력 모달창 시작
+		
+	
+		let emp_id = /*[[${emp_id}]]*/'UNKNOWN'; //로그인한 사번
+		let inventory_no = null; // 클릭한 행의 재고번호
+		let inventory_count = null; // 클릭한 행의 실재고량
+		let currentHistoryModal = null;
+
+		// 모달 이벤트 핸들러를 밖으로 분리
+		$('#history').on('shown.bs.modal', function () {
+		    loadHistoryData(inventory_no);
+		});
+
+		// 모달 닫힐 때 정리
+		$('#history').on('hidden.bs.modal', function () {
+		    if (currentHistoryModal) {
+		        currentHistoryModal.dispose();
+		        currentHistoryModal = null;
+		        document.body.classList.remove('modal-open');
+		        const backdrops = document.querySelectorAll('.modal-backdrop');
+		        backdrops.forEach(backdrop => backdrop.remove());
+		    }
+		});
+
+		// 그리드 클릭 이벤트 수정
+		inventoryGrid.on('click', function (ev) {
+		    //모달창 초기화
+		    historyGrid.resetData([]);
+		    
+		    // 클릭된 row 데이터 가져오기
+		    const rowData = ev.instance.getRow(ev.rowKey);
+		    inventory_no = rowData.inventory_no;
+		    inventory_count = rowData.inventory_count;
+		    
+		    console.log('로그인한 사번 : ', emp_id);        
+		    console.log('클릭한 행의 재고번호 : ', inventory_no);        
+		    console.log('클릭한 행의 실재고량 : ', inventory_count);   
+
+		    // 기존 모달 정리
+		    if (currentHistoryModal) {
+		        currentHistoryModal.dispose();
+		    }
+
+		    currentHistoryModal = new bootstrap.Modal(document.getElementById('history'));
+		    currentHistoryModal.show();
+		});
+
+		// 이력 데이터 로드 함수 분리
+		function loadHistoryData(inventory_no) {
+		    fetch(`/api/inventory/history/${inventory_no}`)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("불러온 변경이력 데이터:", data);
+		            
+		            const updatedData = data.map(row => ({
+		                ...row,
+		                DIFF_COUNT: row.NEW_COUNT - row.PREV_COUNT
+		            }));
+
+		            historyGrid.resetData(updatedData);
+		            historyGrid.refreshLayout();
+		        })
+		        .catch(error => {
+		            console.error("Error fetching history data:", error);
+		        });
+		}
+		
+		
+		//차이값 자동입력
+		historyGrid.on('afterChange', (ev) => {
+		    ev.changes.forEach(change => {
+		        if (change.columnName === 'NEW_COUNT') {
+		            const rowKey = change.rowKey;
+		            const newCount = historyGrid.getValue(rowKey, 'NEW_COUNT') || 0;
+		            const prevCount = historyGrid.getValue(rowKey, 'PREV_COUNT') || 0;
+		
+		            historyGrid.setValue(rowKey, 'DIFF_COUNT', newCount - prevCount);
+		        }
+		    });
+		});
+
+			
+		// "추가" 버튼 클릭 이벤트
+		$('#append').on('click', function (e) {
+			e.preventDefault(); // 기본 동작 방지
+			
+			if (!inventory_no || inventory_no === null) {
+			       alert("재고번호를 선택해야함");
+			       return;
+			   }
+
+			   console.log('추가 버튼 클릭: inventory_no =', inventory_no, ', inventory_count =', inventory_count);
+			
+		    // 기본값으로 새 행 데이터 생성
+			const newRow = {
+				HISTORY_NO: '',
+				PREV_COUNT: inventory_count,
+				NEW_COUNT: '',
+				CHANGO_REASON: '', 
+				REASON_DETAIL: '', 
+				MOD_USER: emp_id, 
+				MOD_DATE: '' ,
+				DIFF_COUNT: ''
+			};
+		
+			// 새 행을 TOAST UI Grid에 추가
+			historyGrid.prependRow(newRow, {
+				focus: true // 추가된 행에 포커스
+			});
+			historyGrid.refreshLayout();
+			
+		}); // 추가 버튼 이벤트
+	
+		
+		// "저장" 버튼 클릭 이벤트
+			$('#modalSave').on('click', async function () {
+				
+				const checkedColumns = ['PREV_COUNT', 'NEW_COUNT', 'CHANGE_REASON', 'MOD_USER']
+				// 모든 행 데이터 가져오기
+				  let rows = historyGrid.getData();
+				
+				// 기존 행(`HISTORY_NO`가 있는 경우) 제외하고 새로운 행만 필터링
+			    rows = rows.filter(row => !row.HISTORY_NO && row.NEW_COUNT !== "");
+				
+				
+				  // 빈 값이 있는지 확인
+				  for (const row of rows) {
+				      for (const column of checkedColumns) {
+				          if (row[column] === null || row[column] === undefined || row[column] === '') {
+				              alert(`"${column}" 값이 비어 있습니다. 모든 필드를 입력해주세요.`);
+				              return; // 저장 중단
+				          }
+				      }
+				  }
+				  	
+				  	let date  = [];
+				  	data = rows.map(row =>({
+					inventory_no: inventory_no, //전역변수 클릭한 행의 재고번호
+					prev_count: row.PREV_COUNT,
+					new_count: row.NEW_COUNT,
+					change_reason: row.CHANGE_REASON || null,
+					reason_detail: row.REASON_DETAIL,
+					mod_user: emp_id, //전역변수
+					diff_count: row.DIFF_COUNT
+					
+				  }));
+				  
+				  console.log("@전송 데이터:", JSON.stringify(data));
+				  
+				  // 모든 값이 입력된 경우, 저장 로직 실행
+			     try {
+					const response = await fetch('/api/inventory/history/save', {
+			           method: 'POST',
+			           headers: { 'Content-Type': 'application/json',
+				   	    [header]: token },
+			           body: JSON.stringify(data)
+			       });
+				   
+				   if (response.ok) {
+				              alert('저장 완료!');
+				              $('#history').modal('hide');
+				              location.reload(true); // 페이지 새로고침
+				          } else {
+				              alert('저장 실패');
+				          }
+			     } catch (error) {
+			         console.error('저장 실패:', error);
+			         alert('저장 중 오류가 발생했습니다.');
+			     }
+				
+			}); // 저장 클릭 이벤트
+			
+		
+			
+			
+			
+		//"삭제" 버튼 클릭 이벤트
+		$('#delete').on('click', async function () {
+		    const selectedRows = historyGrid.getCheckedRows();
+		    
+		    if (selectedRows.length === 0) {
+		        alert("삭제할 변경 이력을 선택하세요.");
+		        return;
+		    }
+
+		    const historyNoList = selectedRows.map(row => row.HISTORY_NO); // 선택된 PK 리스트
+		    console.log("삭제할 변경 이력 목록:", historyNoList);
+
+		    try {
+		        const response = await fetch('/api/inventory/history/delete', {
+		            method: 'POST',
+		            headers: { 
+		                'Content-Type': 'application/json',
+		                [header]: token
+		            },
+		            body: JSON.stringify({
+		                historyNoList: historyNoList,
+		                inventoryNo: inventory_no  // 전역 변수 사용
+		            })
+		        });
+
+		        if (response.ok) {
+		            alert('삭제 완료 및 재고 현황 업데이트 완료');
+		            $('#history').modal('hide'); // 모달 닫기
+		            location.reload(); // 새로고침하여 UI 반영
+		        } else {
+		            alert('삭제 실패');
+		        }
+		    } catch (error) {
+		        console.error('삭제 오류:', error);
+		        alert('삭제 중 오류 발생');
+		    }
+		});
+
+			
+		
+		//select박스 창고조회, 구역조회, 품목검색
+		$(document).ready(function(){
+			
+		   // 창고 목록 불러오기
+           $.get("/api/inventory", function (data) {
+               data.forEach(wh => {
+                   $('#warehouse').append(`<option value="${wh.warehouse_id}">${wh.warehouse_name}</option>`);
+               });
+           });
+		
+		   // 창고 선택 시 구역 불러오기
+           $('#warehouse').change(function () {
+               let warehouseId = $(this).val();
+               $('#zone').html('<option value="">전체</option>');
+
+               if (warehouseId) {
+                   $.get(`/api/inventory/${warehouseId}/zone`, function (data) {
+                       data.forEach(zone => {
+                           $('#zone').append(`<option value="${zone}">${zone}</option>`);
+                       });
+                   });
+               }
+		   		
+			   loadInventoryData();  // 창고 선택 시 데이터 조회
+           });
+		   
+		   // 구역 선택 시 필터링된 재고 데이터 조회
+		      $('#zone').change(function() {
+		          loadInventoryData();  // 구역 선택 시 데이터 조회
+		      });
+			  
+		  //품목명 검색 데이터 조회
+			  $("#searchItem").on("keyup", function() {
+			         loadInventoryData(); // 검색 입력할 때마다 데이터 로드
+			     });  	
+				 
+		      // 초기 데이터 로드
+		      loadInventoryData();  
+		   
+		});// document.ready 끝
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			
+		
+		
+	</script>
+
+</body>
+
+</html>

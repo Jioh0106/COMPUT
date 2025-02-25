@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.ProductMapper">
+
+	<!--상품리스트 조회/검색-->
+	<select id="listProduct" parameterType="Map" resultType="java.util.Map">
+	SELECT 
+	  p.product_no,
+	  p.product_name,
+	  c.common_detail_name AS product_unit,
+	  TO_CHAR(p.product_date, 'YYYY-MM-DD HH24:MI:SS') AS product_date,
+	  p.product_type
+	FROM 
+	    product p
+	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code   
+	WHERE 
+	    1 = 1
+	    <if test="productName != null and productName != ''">
+	      AND p.product_name LIKE '%' || #{productName} || '%'
+	    </if>
+	    <if test="searchMonth != null and searchMonth != ''">
+	      		AND TRUNC(p.product_date, 'MONTH') = TO_DATE(#{searchMonth}, 'YYYY-MM')
+	    </if>
+	ORDER BY 
+	    p.product_no DESC
+	</select>
+
+	
+	<!--자재/상품 리스트 조회-->
+	<select id="mtrAndProduct" parameterType="String" resultType="java.util.Map">
+	SELECT
+	*
+	FROM(SELECT
+		mtr_no AS item_no,  
+	    mtr_name AS item_name,
+	    cd.common_detail_name AS item_unit,
+	    '자재' AS item_type
+	FROM 
+	    material m
+	LEFT JOIN common_detail cd ON m.mtr_unit = cd.common_detail_code  
+	  
+	UNION ALL
+	
+	SELECT 
+		p.product_no AS item_no,
+	    p.product_name AS item_name,
+	    c.common_detail_name AS item_unit,
+	    p.product_type AS item_type
+	FROM 
+	    product p
+	LEFT JOIN common_detail c ON p.product_unit = c.common_detail_code
+	WHERE
+		p.product_type = '반제품'    
+	 ) all_select
+	WHERE 
+	    item_name LIKE '%' || #{item_name} || '%'
+	ORDER BY 
+	    item_type, item_name
+	
+	</select>
+
+	<!--하위그리드 조회-->
+	<select id="listBom" parameterType="java.lang.Integer" resultType="com.deepen.domain.BomDTO">
+	 SELECT
+        b.bom_no AS bom_no,
+        b.product_no AS product_no,
+        m.mtr_name AS mtr_name, 
+        p2.product_name AS product_name, 
+        c.common_detail_name AS bom_unit,
+        b.bom_quantity AS bom_quantity,
+        b.bom_date AS bom_date,
+        b.bom_status AS bom_status,
+       
+       (
+        SELECT LISTAGG(pi.process_name, '/') WITHIN GROUP (ORDER BY pi.process_no)
+        FROM process_info pi
+        WHERE INSTR('/' || b.process_name || '/', '/' || pi.process_no || '/') > 0
+    	) AS process_name  
+        
+     FROM
+        bom b
+     LEFT JOIN
+     	common_detail c ON b.bom_unit = c.common_detail_code   
+     INNER JOIN
+        product p ON b.product_no = p.product_no
+     LEFT JOIN
+        material m ON b.mtr_no = m.mtr_no 
+     LEFT JOIN
+        product p2 ON b.mtrproduct_no = p2.product_no
+     WHERE
+        p.product_no = #{product_no}
+     ORDER BY
+        b.bom_no		
+	</select>
+
+	<!--하위그리드 체크박스 삭제-->
+	<delete id="deleteRow" parameterType="list">
+	DELETE 
+	FROM 
+		bom
+	WHERE
+		bom_no
+	IN
+	 <foreach item="bom_no" collection="list" open="(" separator="," close=")">
+        #{bom_no}
+    </foreach>
+	</delete>
+	
+	<!--상위그리드 체크박스 삭제 -->
+	<delete id="deleteRowProduct" parameterType="list">
+	DELETE
+	FROM
+		product
+	WHERE
+		product_no
+	IN
+	<foreach item="product_no" collection="list" open="(" separator="," close=")">
+        #{product_no}
+    </foreach>		
+	</delete>
+	
+	<!-- 하위그리드 공정 select박스 조회 -->
+	<select id="selectProcess" resultType="java.util.Map">
+	SELECT process_no, process_name
+	FROM process_info
+	WHERE is_active ='Y'
+	</select>
+	
+	<!-- 단위 공통코드 select박스 조회 -->
+	<select id="selectUnit" resultType="com.deepen.domain.CommonDetailDTO">
+	SELECT common_detail_code, common_detail_name
+	FROM common_detail
+	WHERE SUBSTR(common_detail_code,1,4) 
+		IN('UNIT')
+		AND common_detail_status ='Y' 
+	</select>
+	
+	<select id="selectAllProducts" resultType="com.deepen.domain.ProductDTO">
+        SELECT 
+            product_no as productNo,
+            product_name as productName,
+            product_unit as productUnit,
+            product_type as productType
+        FROM product
+        WHERE product_type != 'DUMMY'
+        ORDER BY product_name
+    </select>
+	
+	
+
+</mapper>

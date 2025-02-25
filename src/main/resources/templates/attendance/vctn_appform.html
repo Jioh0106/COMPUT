@@ -105,14 +105,15 @@
 					<div class="child-input2">
 						<label>잔여일수: </label>
 						<div class="form-group">
-							<input type="text" class="form-control" th:value="${empInfo.vctnDays}" readonly>
+						<!-- th:value="${empInfo.vctnDays}"  -->
+							<input type="text" class="form-control" id="vctnDays" readonly>
 						</div>
 					</div>
 				</div>
 
 				<label>휴가 구분</label>
 				<fieldset class="form-group">
-					<select class="form-select" id="vctnSe">
+					<select class="form-select" id="vctnSe" onchange="vctnDays()">
 						<option value="">선택</option>
 						<option th:each="commonDtl :${commonDtlList}" th:value="${commonDtl.CODE}"
 							th:text="${commonDtl.NAME}"></option>
@@ -131,6 +132,7 @@
 					onclick="middleAprvr()">신청</button>
 			</div>
 		</div>
+		<input type="hidden" id="emp_id" th:value="${session.sEmp.EMP_ID}">
 	</div>
 
 	<!--승인권자 선택 모달창 시작-->
@@ -240,6 +242,36 @@
 				swal(name + "님이 선택되었습니다.");
 			}
 		};
+		
+		function vctnDays(){
+			const empId = document.getElementById('emp_id').value;  // 현재 로그인된 사용자 ID
+			const type = vctnSe.options[vctnSe.selectedIndex].value;
+			console.info(type);
+			$.ajax({
+				url: '/vctnDays',
+				type: 'POST',
+				contentType: 'application/json',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data: JSON.stringify({
+					empId: empId,
+					type: type
+				}),
+				success: function (res) {
+					console.info(res);
+					document.getElementById('vctnDays').value = res;
+				},
+				error: function () {
+					Swal.fire({
+						title: "서버 오류",
+						icon: "error",
+						confirmButtonText: "확인"
+					});
+				}
+			});
+		}
 
 		// 승인 요청 클릭 시 실행되는 함수
 		function requestApproval() {

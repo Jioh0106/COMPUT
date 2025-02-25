@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.deepen.mapper.MaterialMapper">
+	<select id="getMaterialList">
+		SELECT MTR_NO 
+			 , MTR_NAME 
+			 , MTR_TYPE 
+			 , COMPOSITION 
+			 , HARDNESS 
+			 , DENSITY 
+			 , MELTING_POINT 
+			 , TENSILE_STRENGTH 
+			 , MTR_USE 
+			 , MTR_UNIT 
+			 , MTR_REG_DATA 
+			 , MTR_MOD_DATA 
+			 , MTR_STATUS 
+			 , cd.COMMON_DETAIL_NAME AS unit_name
+		  FROM MATERIAL m 
+		       JOIN COMMON_DETAIL cd ON m.MTR_UNIT = cd.COMMON_DETAIL_CODE
+		 ORDER BY MTR_NO DESC
+	</select>
+	
+</mapper>
+
+

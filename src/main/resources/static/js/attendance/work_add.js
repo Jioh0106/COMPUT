@@ -100,6 +100,7 @@ $(function() {
 	const container1 = document.getElementById('tui-date-picker-container-1');
 	const target1 = document.getElementById('tui-date-picker-target-1');
 	const instance1 = new tui.DatePicker(container1, {
+		language: 'ko',
 		date: nextMonthFirstDay,
 		input: {
 			element: target1,
@@ -112,6 +113,7 @@ $(function() {
 	const container2 = document.getElementById('tui-date-picker-container-2');
 	const target2 = document.getElementById('tui-date-picker-target-2');
 	const instance2 = new tui.DatePicker(container2, {
+		language: 'ko',
 		date: nextMonthLastDay,
 		input: {
 			element: target2,

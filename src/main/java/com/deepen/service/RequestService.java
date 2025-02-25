@@ -76,7 +76,8 @@ public class RequestService {
             String requestStatus = request.getRequest_status();
 
             // 요청 구분 설정 (발신/수신)
-            if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus))) {
+            //최종권한자는 상태가 2차대기/2차반려/최종승인일때 수신으로 처리한다.
+            if (emp_id.equals(finalApprovalEmpId) && ("RQST003".equals(requestStatus) || "RQST005".equals(requestStatus) || "RQST004".equals(requestStatus))) {
     	        requestDto.setRequest_division("수신");
     	    } 
     	   
@@ -170,11 +171,13 @@ public class RequestService {
 			
 			LocalDateTime deadline = request.getRequest_deadline();
 			if(deadline.toLocalDate().isEqual(now.toLocalDate())){
-				request.setRequest_rejection("기간마감");
+				
 				if(request.getRequest_status().equals("RQST001")){
 					request.setRequest_status("RQST002");
+					request.setRequest_rejection("기간마감");
 				}else if(request.getRequest_status().equals("RQST003")) {
 					request.setRequest_status("RQST004");
+					request.setRequest_rejection("기간마감");
 				}
 				 rqRepository.save(request); // 변경된 데이터 저장
 				 log.info("해당요청번호 업데이트"+request.getRequest_no().toString());
@@ -182,6 +185,25 @@ public class RequestService {
 		}//FOR문 끝
 		
 	}
+	
+	
+	//토스트 알림 -> 최종승인 발령자 조회
+	public List<RequestDTO> selectChecked(String empId){
+		List<RequestDTO> selectCheck =  rqMapper.selectChecked(empId);
+		log.info("해당 로그인한 사번의 요청내역 :"+ selectCheck);  
+		
+		return selectCheck;
+	}
+	
+	//토스트알림 -> is_checked컬럼 업데이트
+	public void updateChecked(Integer request_no) {
+	    rqMapper.updateChecked(request_no);
+	    log.info("is_checked 업데이트 완료, 요청번호: " + request_no);
+	}
+	
+	
+	
+	
 	
 	
 	

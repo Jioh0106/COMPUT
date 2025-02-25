@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPUT.</title>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+	
+	<link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+	
+	<link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
+	<!-- TOAST UI CDN -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<style>
+.tui-grid-cell {
+	/* !important -> 우선순위 높아짐 */
+	background-color: #ffffff !important;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.buttons {
+	/* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
+	margin-left: auto
+}
+
+.buySelect {
+	width: 150px !important;
+}
+
+.row mb-4{
+	display: flex; 
+	align-items: center
+}
+
+.buyDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 230px; 
+	flex-shrink: 0
+}
+
+.nameDiv{
+	display: flex; 
+	align-items: center; 
+	max-width: 400px; 
+	flex-shrink: 0;
+}
+
+.btn-primary {
+    margin-right: 11px; /* 업로드 버튼과 다운로드 버튼 사이 간격 */
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div id="app">
+
+		<!-- 사이드 메뉴바-->
+		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+		<!-- 메인 content -->
+		<div id="main">
+
+
+			<div class="display-flex">
+				<h3>BOM 정보</h3>
+			</div>
+			<!-- display-flex -->
+
+			<div class="card">
+				<div class="card-body" id="default">
+					
+					<!-- 그리드 시작 -->
+					<section class="section">
+						<div class="row" id="basic-table">
+							<form>
+								
+								<!-- 검색 조건 시작 -->
+								<div class="row mb-4 align-items-center">
+								    <!-- 상품등록월-->
+								    <div class="col-md-4">
+								       <label for="searchMonth" class="form-label">등록월</label>
+								       <input type="month" id="searchMonth" class="form-control" onchange="updateProductGrid()">
+								    </div>
+								    <!-- 상품명 -->
+									<div class="col-md-4">
+										<label for="nameSearch" class="form-label">상품명</label>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+											<input type="text" class="form-control" id="productName" placeholder="상품명을 입력해주세요." aria-label="Recipient's username"
+												aria-describedby="button-addon2" onkeyup="updateProductGrid()">
+										</div>
+									</div>
+								</div>
+								<!-- 검색 조건 끝-->
+								
+								<!--단일상품 등록 버튼-->
+								<div class="float-end mb-3 ms-3">
+									<input type="button" class="btn btn-outline-secondary" id="product" value="상품등록" onclick="openProductModal()">
+								</div>
+								
+								<!--엑셀파일 업로드 -> 상품등록 -->
+								<div class=" mb-1 me-3" style="width : 800px;">
+                                    <fieldset>
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="fileInput" accept=".xlsx"
+                                                aria-describedby="inputGroupFileAddon04"
+                                                aria-label="Upload">
+                                            <button class="btn btn-primary" type="button" onclick="fileUpload()"
+                                                id="inputGroupFileAddon04">엑셀 파일 업로드</button>
+                                    	<input type="button" class="btn btn-outline-success" id="excel"  value="상품등록 엑셀 양식 다운로드" onclick=" excelDownload()">
+                                        </div>
+                                    </fieldset>
+                                </div>		
+								
+								<br>
+								
+								<h4>상품</h4>
+								<!--상품그리드-->										   
+								<div id="productGrid" class="mb-3 mt-2"></div>
+								<h4>BOM</h4>
+								<!--BOM그리드-->
+								<div id="bomGrid" class="mb-3 mt-2"></div>
+								
+								<!-- 버튼 시작 -->
+								<!--<div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')">-->
+									<div class="float-end">
+										<input type="button" class="btn btn-outline-secondary" id="bom" value="자재 찾기" onclick="popUp()">
+										<input type="button" class="btn btn-outline-success" id="save"  value="저장" onclick=" updateBom()">
+										<input type="button" class="btn btn-outline-danger" id="del" value="삭제" onclick="deleteSelectedRows()">
+									</div>
+								<!--</div>-->
+								<!-- 버튼 끝 -->
+								
+							</form>
+						</div>
+					</section>
+					<!-- 그리드 끝  -->
+
+				</div> <!-- card-body -->
+			</div> <!-- card -->
+			
+			
+			<!--상품등록 모달 시작 -->
+	          <div class="me-1 mb-1 d-inline-block">
+	              <!--Default size Modal -->
+	              <div class="modal fade text-left" id="productModal" tabindex="-1"
+	                  role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+	                  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+	                      role="document">
+	                      <div class="modal-content">
+	                          <div class="modal-header">
+	                              <h4 class="modal-title" id="myModalLabel18">상품등록</h4>
+	                              <button type="button" class="close" data-bs-dismiss="modal"
+	                                  aria-label="Close">
+	                                  <i data-feather="x"></i>
+	                              </button>
+	                          </div>
+	                          <div class="modal-body">
+								
+								<label for="first-name-column">상품명</label>
+								<input type="text" id="proName" name="product_name" class="form-control">
+								
+								<label for="first-name-column">단위</label>
+								<select id="proUnit" class="form-control" name="product_unit">
+									<option>단위 선택</option>
+								</select>
+								
+								
+								<label for="first-name-column">상품유형</label>
+								<select id="proType" class="form-control" name="product_type">
+									<option>상품유형</option>
+									<option value="완제품">완제품</option>
+									<option value="반제품">반제품</option>
+								</select>
+								
+	                          </div>
+	                          <div class="modal-footer">
+	                              <button type="button" class="btn btn-light-secondary"
+	                                  data-bs-dismiss="modal">
+	                                  <i class="bx bx-x d-block d-sm-none"></i>
+	                                  <span class="d-none d-sm-block">취소</span>
+	                              </button>
+	                              <button type="button" class="btn btn-primary ml-1" id="registBtn">
+	                                  <i class="bx bx-check d-block d-sm-none"></i>
+	                                  <span class="d-none d-sm-block">등록</span>
+	                              </button>
+	                          </div>
+	                      </div>
+	                  </div>
+	              </div>
+	          </div>
+	          <!--상품등록 모달 끝 -->
+	
+		</div> <!-- main -->
+	</div> <!-- app -->
+
+	<!-- 제이쿼리 -->
+	<script th:src="@{/js/jquery-3.7.1.js}"></script>
+	<script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/assets/js/main.js}"></script>
+
+	<!-- TOAST UI CDN -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.js"></script>
+	<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+	
+	<script th:inline="javascript">
+
+		const header = document.querySelector('meta[name="_csrf_header"]').content;
+		const token = document.querySelector('meta[name="_csrf"]').content;
+
+	 	var Grid = tui.Grid;
+		
+		
+			
+		let processOptions = [];
+		let unitOptions = [];
+		let unitMap = {};// 공통코드 → 단위명 매핑 객체
+				
+				
+		//상위그리드(상품)
+		const productGrid = new Grid({
+				el: document.getElementById('productGrid'),
+				rowHeaders: ['checkbox'],
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 280,
+				columns: [
+					{header: '상품번호',	name: 'PRODUCT_NO', editor: 'text', sortable: true},
+					{header: '상품유형',	
+					name: 'PRODUCT_TYPE', 
+					editor: {
+						type: 'select',
+		                options: {
+		                    listItems: [
+		                        { value: '완제품', text: '완제품' },  
+		                        { value: '반제품', text: '반제품' }
+		                    ]
+		                }
+					}, 
+					sortable: true},
+					
+					{header: '상품명',	name: 'PRODUCT_NAME', editor: 'text', sortable: true},
+					
+					{header: '단위',		
+					name: 'PRODUCT_UNIT', 
+					editor: {
+			               type: 'select',
+			               options: {
+			                   listItems: unitOptions // 전역변수
+			               }
+			           },
+			        formatter: ({ value }) => unitMap[value] || value,
+					sortable: true, width: 100},
+					
+					{header: '등록일',	name: 'PRODUCT_DATE', editor: 'text', sortable: true}
+				],
+				data: [],
+				columnOptions: {
+				  resizable: true
+				}
+			});
+		
+	
+		//공정테이블에서 공정유형 조회 함수
+		function loadProcessOptions() {
+		    fetch('/api/product/select/process')
+		        .then(response => response.json())
+		        .then(data => {
+					console.log(" 서버에서 받은 공정유형 데이터:", data);
+		            processOptions = data.map(item => ({
+		                value: String(item.PROCESS_NO),  // 저장할 공정 코드 (ex: 1,2,3..)
+		                text: item.PROCESS_NAME    // 화면에 표시될 공정명 (ex: 가공)
+		            	}));
+						 // 공정 select 박스에 즉시 반영
+			            bomGrid.getColumns().forEach(column => {
+			                if (column.name === 'process_name' && column.editor) {
+			                    column.editor.options.listItems = processOptions;
+			                 }
+			              });
+
+			            bomGrid.refreshLayout(); // UI 업데이트
+		       		 })
+		        .catch(error => {
+		            console.error('공정 목록을 불러오는 중 오류 발생:', error);
+		        });
+			 }
+		
+		
+		//하위그리드(bom)
+		const bomGrid = new Grid({
+						el: document.getElementById('bomGrid'),
+						rowHeaders: ['checkbox'],
+						columns: [
+							{header: 'bom번호',	name: 'bom_no', width: 100},
+							{header: '원자재',	name: 'mtr_name',		editor: 'text', sortable: true, width: 150},
+							{header: '자재상품',	name: 'product_name',	editor: 'text', sortable: true, width: 150},
+							
+							{header: '단위',		name: 'bom_unit',	
+							editor: 'text',
+							sortable: true, width: 100},
+							
+							{header: '소모량',	name: 'bom_quantity',	editor: 'text', sortable: true, width: 100},
+							{header: '등록일',	name: 'bom_date',	editor: 'text', sortable: true, width: 150},
+							
+							{header: '공정',		
+							name: 'process_name',	
+							formatter: ({ value }) => processCodeToName(value), 
+		                    editor: {
+		                        type: 'checkbox',
+		                        options: {
+		                            listItems: processOptions
+		                        }
+		                    }, 
+							sortable: true,
+							width: 200},
+							
+							{header: '상태',		
+							 name: 'bom_status',
+							 formatter: ({ value }) => {
+							         if (value === 'Y') return '사용';
+							         if (value === 'N') return '미사용';
+							         return '사용'; // 값이 없을 경우 기본값을 "사용"으로 설정
+							     },	 	
+							 editor: {
+				                type: 'select',
+				                options: {
+				                    listItems: [
+				                        { value: 'Y', text: '사용' },  
+				                        { value: 'N', text: '미사용' }
+				                    ]
+				                }
+				            },
+							sortable: true, width: 100}
+						],
+						data: [],
+						columnOptions: {
+						  resizable: true
+						}
+					});
+			
+			//상위그리드 단위 공통코드 조회 함수		
+			function selectUnit() {
+			    fetch('/api/product/select/unit')
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("서버에서 받은 단위 데이터:", data);
+
+			            const unitOptions = data.map(unit => ({
+			                text: unit.common_detail_name, // 옵션 표시값
+			                value: unit.common_detail_code
+			            }));
+
+			            console.log("단위 옵션:", unitOptions);
+						
+						// 공통코드 → 단위명 매핑 객체 생성
+			          	unitMap = Object.fromEntries(
+			              data.map(unit => [unit.common_detail_code, unit.common_detail_name])
+			          	);
+						console.log(" unitMap:", unitMap);
+			            
+						// **모달창의 select 박스 업데이트**
+			            const proUnitSelect = document.getElementById('proUnit');
+			            if (proUnitSelect) {
+			                proUnitSelect.innerHTML = '<option value="">단위 선택</option>'; // 기본 옵션 추가
+			                unitOptions.forEach(option => {
+			                    const newOption = document.createElement('option');
+			                    newOption.value = option.value; // 코드값 저장
+			                    newOption.textContent = option.text; // 이름값 표시
+			                    proUnitSelect.appendChild(newOption);
+			                });
+			            }
+						
+						
+			            // productGrid의 단위 컬럼 업데이트
+			            productGrid.getColumns().forEach(column => {
+			                if (column.name === 'PRODUCT_UNIT' && column.editor) {
+			                    column.editor.options.listItems = unitOptions;
+			                }
+			            });
+			            productGrid.refreshLayout();
+			         
+			        })
+			        .catch(error => console.error("단위 데이터 조회 오류:", error));
+				}
+			
+			//단위 공통코드 이름값으로 유지되도록	
+			productGrid.on('afterChange', (ev) => {
+			    ev.changes.forEach(change => {
+			        if (change.columnName === 'PRODUCT_UNIT') {
+			            // 코드값을 unitMap에서 변환 후 저장
+			            const selectedName = unitMap[change.value] || change.value;
+			            productGrid.setValue(change.rowKey, 'PRODUCT_UNIT', selectedName);
+			        }
+			    });
+			});
+
+
+			
+			
+			//공정유형 공통코드 -> 이름값으로 변경 후 /로 구분				
+			function processCodeToName(value) {
+			    if (!value) return '';
+			 	
+				//값이 여러개일때 -> 공정유형이 배열로 담김 -> 공정id를 이름으로 바꾸고 / 넣기
+				if (Array.isArray(value)) {
+				        return value.map(v => {
+				            const process = processOptions.find(p => p.value === v);
+				            return process ? process.text : v;
+				        }).join('/'); //   '/'로 구분된 문자열로 변환
+				    }
+			 
+				// 쉼표(`,`) 포함된 문자열일 경우 → `/`로 변환 후 처리
+			    if (typeof value === 'string' && value.includes(',')) {
+			        value = value.split(',').map(v => v.trim()); // 쉼표로 나눠 배열로 변환
+			        return processCodeToName(value); // 배열 변환 후 다시 실행
+			    }
+				
+				
+			    const process = processOptions.find(p => p.value === value);
+			    return process ? process.text : value;  // 코드 → 이름 변환
+			}		
+					
+		
+			
+		   //상품등록 모달창 열기
+		   function openProductModal() {
+		       const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+		       productModal.show();
+		       selectUnit();
+		   }
+		
+		  
+		  //상품등록 입력값 들고오기
+		  document.getElementById('registBtn').addEventListener('click', function () {
+			 const productName = document.getElementById('proName').value;
+			 const productUnit = document.getElementById('proUnit').value;
+			 const productType = document.getElementById('proType').value;
+			 console.log("^^등록 버튼 클릭 - 단위:", productUnit);
+			 //빈칸검사
+			 if (!productName || !productUnit || !productType) {
+		         alert('모든 필드를 입력하세요.');
+		         return;
+			   }
+			   
+			 // 2. Ajax로 서버에 데이터 전송
+			    $.ajax({
+			        url: '/api/product/save',
+			        type: 'POST',
+			        contentType: 'application/json',
+			        data: JSON.stringify({
+			            product_name: productName,
+			            product_unit: productUnit,
+			            product_type: productType
+			           
+			        }),
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+						},
+			        success: function (response) {
+						updateProductGrid();// 그리드에 데이터 추가
+						alert("저장성공");
+						$('#productModal').modal('hide'); // 모달 창 닫기
+			        },
+			        error: function (error) {
+			            console.error('상품 등록 중 오류 발생:', error);
+			            alert('상품 등록에 실패했습니다.');
+			        }
+			    });
+				
+				
+		  	});
+     
+		  
+			//상품그리드 조회
+			function updateProductGrid() {
+			    const productName = document.getElementById('productName').value || ''; // 검색 상품명 입력값
+			    const searchMonth = document.getElementById('searchMonth').value || ''; // 검색 월 입력값
+				console.log('상품명:', productName); // 디버깅용
+				console.log('등록월:', searchMonth); // 디버깅용
+
+			    // Ajax 요청으로 서버에서 데이터를 가져옴
+			    $.ajax({
+			        url: '/api/product/list',
+			        type: 'POST',
+					contentType: 'application/json',
+			        data: JSON.stringify({ // data를 JSON 문자열로 변환
+			           productName: productName,
+			           searchMonth: searchMonth
+			        }),
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+			        success: function (response) {
+						console.log('응답답답답데이터:', response); // 서버 응답 확인
+			            // 검색 결과를 그리드에 업데이트
+			            productGrid.resetData(response);
+						productGrid.refreshLayout();
+			        },
+			        error: function (error) {
+			            console.error('그리드 데이터 업데이트 중 오류 발생:', error);
+			        }
+			    });
+			}
+			
+			document.addEventListener('DOMContentLoaded', function () {
+			    updateProductGrid(); // 초기 데이터 로드
+			});
+		
+			
+			//bom등록 팝업창
+			function popUp() {
+			 const selectedRows = productGrid.getCheckedRows();
+					  
+			  if (selectedRows.length === 0) {
+			         alert("상품을 선택해주세요.");
+			         return;
+			     }
+				 
+			  if (selectedRows.length > 1) {
+			        alert("하나의 상품만 선택해주세요.");
+			        return;
+			    }		
+				
+			  // 첫 번째 선택된 행의 데이터만 사용
+			  const selectedProduct = selectedRows[0]; 
+			  // 상품번호와 상품명
+		      const productNo = selectedProduct.PRODUCT_NO;
+		      const productName = selectedProduct.PRODUCT_NAME;
+			  	
+	   	      const popupOptions = "width=800,height=600,scrollbars=yes,resizable=yes"; // 팝업창 옵션
+	   	      const popupUrl = `/bom-info?productNo=${productNo}&productName=${encodeURIComponent(productName)}`; // 팝업창으로 열릴 페이지 URL
+	   	      window.open(popupUrl, "assignInsertPopup", popupOptions);
+			}	
+			
+			// **페이지 로드 시 실행**
+			   document.addEventListener('DOMContentLoaded', function () {
+			       loadProcessOptions(); // 공정 옵션 데이터 로드
+			       updateProductGrid();  // 상품 목록 로드
+			       selectUnit(); //단위 목록 로드
+			   });
+			
+			
+			let productNo = null; //상품번호 전역변수
+			
+			//상위그리드 클릭 시 하위그리드 조회 함수 실행
+			productGrid.on('click', (event) => {
+			    const clickedRow = productGrid.getRow(event.rowKey);
+				console.log('클릭한 행 값 :', clickedRow);
+			    
+				productNo = clickedRow.PRODUCT_NO; // 전역변수 : 클릭한 행의 상품번호에 담기
+				console.log('상품번호!!! :', productNo);
+				
+				//하위그리드 업데이트
+				updateBomGrid(productNo);
+			});
+			
+			//하위그리드 조회 함수 실행
+			function updateBomGrid(productNo){
+			 fetch(`/api/product/bom/list?product_no=${productNo}`)
+		        .then(response => response.json())
+		        .then(data => {
+					console.log('데이터값!',data);
+		            bomGrid.resetData(data); // 하위 그리드에 데이터 업데이트
+					bomGrid.refreshLayout();
+		        })
+		        .catch(error => {
+		            console.error('BOM 데이터 조회 오류:', error);
+		        });
+			}
+			
+			
+			// bom체크박스 삭제 함수 - 삭제버튼
+			function deleteSelectedRows() {
+			    let idsToDelete = [];
+			    let url = '';
+			
+			    // 상위 그리드(상품)에서 체크된 행 확인
+			    const selectedProductRows = productGrid.getCheckedRows();
+			    const selectedBomRows = bomGrid.getCheckedRows();
+			
+			    if (selectedProductRows.length > 0 && selectedBomRows.length === 0) {
+			        // 상위 그리드(상품)에서 선택된 경우 (하위 그리드 미선택)
+			        idsToDelete = selectedProductRows.map(row => row.PRODUCT_NO);
+			        url = '/api/product/delete/row/product'; //  상위 그리드 삭제 API
+			        
+			    } else if (selectedBomRows.length > 0 && selectedProductRows.length === 0) {
+			        // 하위 그리드(BOM)에서 선택된 경우 (상위 그리드 미선택)
+			        idsToDelete = selectedBomRows.map(row => row.bom_no);
+			        url = '/api/product/delete/row'; // 하위 그리드 삭제 API
+			        
+			    } else if (selectedProductRows.length > 0 && selectedBomRows.length > 0) {
+			        // 그리드를 둘 다 선택한 경우 → 하나만 선택하라고 알림
+			        alert("상품과 BOM을 동시에 삭제할 수 없습니다. 하나만 선택해주세요.");
+			        return;
+			        
+			    } else {
+			        alert("삭제할 항목을 선택해주세요.");
+			        return;
+			    }
+			
+			    console.log(" 삭제 요청 URL:", url);
+			    console.log(" 삭제할 ID 목록:", idsToDelete);
+			
+			    //서버로 삭제 요청 보내기
+			    fetch(url, {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            [header]: token // CSRF 토큰 추가
+			        },
+			        body: JSON.stringify(idsToDelete)
+			    })
+			    .then(response => {
+			        if (!response.ok) {
+			            throw new Error(`HTTP error! status: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then(data => {
+			        alert("삭제가 완료되었습니다.");
+			        if (url === '/api/product/delete/row/product') {
+			            //  상위 그리드 삭제 후, 하위 그리드 초기화
+			            updateProductGrid();
+			            bomGrid.resetData([]); // 상품 삭제 시 BOM도 초기화
+			        } else {
+			            //  하위 그리드 삭제 후, 다시 하위 그리드 갱신
+			            const selectedRow = productGrid.getRow(productGrid.getFocusedCell()?.rowKey);
+			            if (selectedRow && selectedRow.PRODUCT_NO) {
+			                updateBomGrid(selectedRow.PRODUCT_NO);
+			            }
+			        }
+			    })
+			    .catch(error => {
+			        console.error("삭제 중 오류 발생:", error);
+			    });
+			}
+
+
+			
+			
+			//BOM그리드, 상품그리드 업데이트
+			function updateBom(){
+				//const bomData = bomGrid.getData();
+				//const productData = productGrid.getData();
+				
+				const bomData = bomGrid.getModifiedRows().updatedRows || [];  // 수정된 행만 가져오기
+				const productData = productGrid.getModifiedRows().updatedRows || [];  // 수정된 상품 데이터만 가져오기
+				
+				const product = productData.map(row => ({
+				      product_no: row.PRODUCT_NO,
+				      product_name: row.PRODUCT_NAME,
+				      product_type: row.PRODUCT_TYPE,
+				      product_unit: row.PRODUCT_UNIT
+				  }));
+				
+				console.log('product :', product);
+				
+				bomData.forEach(row => {
+				      
+					  //공정이름을 공정번호로 변환 (서버는 process_no로 저장해야 함)
+					  const process = processOptions.find(p => p.text === row.process_name);
+					  row.process_name = process ? process.value : row.process_name; // process_no로 변환
+					  // 쉼표(`,`)로 구분된 데이터라면 '/'로 변환하여 저장
+					  if (typeof row.process_name === 'string' && row.process_name.includes(',')) {
+					      row.process_name = row.process_name.split(',').map(v => v.trim()).join('/'); // 쉼표 → 슬래시 변환
+					  }
+					  console.log('공정유형ㅗㅗ', row.process_name);	
+					  
+					  row.bom_no = row.bom_no || null;
+				      row.bom_quantity = row.bom_quantity || 0; // 소모량 기본값 0
+				      row.bom_status = row.bom_status || 'Y';  // 상태 기본값 'Y'
+					 
+				  });
+				  
+				  const gridUpdate = {
+					bomList: bomData,
+					product: product //여러개의 상품을 배열로 전송
+				  }
+				  
+				  fetch('/api/product/update/all', { // 새로운 API 엔드포인트 사용
+				         method: 'POST',
+				         headers: {
+				             'Content-Type': 'application/json',
+				             [header]: token
+				         },
+				         body: JSON.stringify(gridUpdate)
+				     })
+				     .then(response => response.text())
+				     .then(data => {
+				         alert('BOM 데이터 업데이트 완료');
+				         updateBomGrid(productNo);
+						 updateProductGrid(); // 저장 후 그리드 새로고침
+				     })
+				     .catch(error => {
+				         console.error('BOM 업데이트 오류:', error);
+				     });
+			}
+			
+			
+			//엑셀파일 업로드 함수
+			function fileUpload(){
+				let fileInput = document.getElementById("fileInput");
+				
+				if (fileInput.files.length === 0) {
+		               alert("파일을 선택해주세요!");
+		               return;
+		           }
+			  
+			    let file = fileInput.files[0];
+		              let formData = new FormData();
+		              formData.append("file", file);
+
+		              fetch('/api/product/upload', { 
+		                  method: "POST",
+						  headers: {
+						         [header]: token 
+						     },
+		                  body: formData
+		              })
+		              .then(response => response.text())
+		              .then(data => {
+		                  alert("업로드 성공: " + data);
+						   location.reload(true); // 페이지 새로고침
+		              })
+		        
+					  .catch(error => {
+	  			         console.error('업로드 오류', error);
+						 alert("파일 업로드 중 오류 발생! " + error.message);
+	  			     }); 
+				
+				 }
+			
+			
+			//상품등록 엑셀 양식 파일 다운로드 함수
+			function excelDownload() {
+			    fetch('api/product/excel/download', {
+			        method: "GET"
+			    })
+			    .then(response => response.blob()) // 서버에서 받은 데이터를 Blob으로 변환(blob 이진데이터 파일업로드에서 주로 사용)
+			    .then(blob => {
+			        const url = window.URL.createObjectURL(blob); // Blob을 가리키는 URL 생성
+			        const a = document.createElement("a");
+			        a.href = url;
+			        a.download = "상품등록_엑셀_양식.xlsx"; // 다운로드될 파일명 설정
+			        document.body.appendChild(a);
+			        a.click(); // 자동으로 다운로드 실행
+			        document.body.removeChild(a);
+			    })
+			    .catch(error => console.error("다운로드 오류:", error));
+			}
+		
+		
+	</script>
+
+
+</body>
+
+</html>

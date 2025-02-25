@@ -1,11 +1,21 @@
-// 휴가신청서 팝업창 가운데 위치(듀얼모니터 포함)
-function openView() {
+// 근무 일정 등록 팝업창 가운데 위치(듀얼모니터 포함)
+function openRegView() {
 	var popupW = 800;
 	var popupH = 550;
 	var left = (document.body.clientWidth / 2) - (popupW / 2);
 	left += window.screenLeft;	 //듀얼 모니터
 	var top = (screen.availHeight / 2) - (popupH / 2);
 	window.open('/work-add', 'work_add', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
+}
+
+// 근무 템플릿 관리 팝업창 가운데 위치(듀얼모니터 포함)
+function openTempView() {
+	var popupW = 800;
+	var popupH = 500;
+	var left = (document.body.clientWidth / 2) - (popupW / 2);
+	left += window.screenLeft;	 //듀얼 모니터
+	var top = (screen.availHeight / 2) - (popupH / 2);
+	window.open('/work-tmp', 'work_tmp', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 }
 // =========================================================================
 
@@ -36,6 +46,7 @@ function datePickerReplace(id) {
 const container1 = document.getElementById('tui-date-picker-container-1');
 const target1 = document.getElementById('tui-date-picker-target-1');
 const instance1 = new tui.DatePicker(container1, {
+	language: 'ko',
 	date: new Date(),
 	input: {
 		element: target1,
@@ -49,6 +60,7 @@ const target2 = document.getElementById('tui-date-picker-target-2');
 const date = new Date();
 date.setDate(date.getDate() + 7);
 const instance2 = new tui.DatePicker(container2, {
+	language: 'ko',
 	date: date,
 	input: {
 		element: target2,
@@ -58,7 +70,7 @@ const instance2 = new tui.DatePicker(container2, {
 
 	
 	
-	// =========================================================================
+// =========================================================================
 $(function() {	
 	
 	// 부서 셀렉트 박스 
@@ -111,6 +123,8 @@ $(function() {
 
 	grid = new tui.Grid({
 		el: document.getElementById('grid'),
+		height: 600,
+		bodyHeight: 550,
 		columns: [
 			{header: 'No', name: 'work_no'},
 			{header: '사원번호', name: 'emp_id'},
@@ -178,7 +192,6 @@ $(function() {
 		    console.error('Error fetching data:', error);
 		});
 			
-		
 		
 	});
 		

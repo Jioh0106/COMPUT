@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+	<link rel="icon" href="images/favicon.png" type="images/png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+    
+    <link rel="stylesheet" href="assets/vendors/iconly/bold.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="shortcut icon" href="assets/images/favicon.svg" type="image/x-icon">
+    
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+        .tui-grid-cell {
+            background-color: #ffffff !important;
+        }
+        .buttons {
+            margin-bottom: 1rem;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .nav-tabs .nav-item .nav-link {
+            color: #607080;
+        }
+        .nav-tabs .nav-item .nav-link.active {
+            color: #435ebe;
+            font-weight: bold;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+        .tui-datepicker {
+            position: absolute;
+            z-index: 1060;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        .bulk-actions {
+            margin-left: 1rem;
+            display: inline-block;
+        }
+        .bulk-actions button {
+            margin-left: 0.5rem;
+        }
+        .gap-2 {
+            gap: 0.5rem !important;
+        }
+        
+        /* 출처 스타일링 */
+        .source-material {
+            border-left: 4px solid #3b82f6 !important;
+        }
+        .source-product {
+            border-left: 4px solid #8b5cf6 !important;
+        }
+
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .material-tag {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .product-tag {
+            background-color: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .source-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .material-tag .source-dot {
+            background-color: #3b82f6;
+        }
+
+        .product-tag .source-dot {
+            background-color: #8b5cf6;
+        }
+
+        /* 출처 필터 태그 스타일 */
+        .source-filter-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .source-filter-label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #444;
+        }
+
+        .source-filter-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 7px;
+            margin-right: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .source-filter-tag:hover {
+            transform: translateY(-2px);
+        }
+
+        .source-filter-tag.active {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tag-all {
+            background-color: #435ebe;
+            color: white;
+        }
+
+        .tag-material {
+            background-color: white;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .tag-material.active {
+            background-color: #dbeafe;
+        }
+
+        .tag-product {
+            background-color: white;
+            color: #5b21b6;
+            border: 1px solid #8b5cf6;
+        }
+        .tag-product.active {
+            background-color: #ede9fe;
+        }
+
+        .source-tag-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .tag-material .source-tag-dot {
+            background-color: #3b82f6;
+        }
+
+        .tag-product .source-tag-dot {
+            background-color: #8b5cf6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 사이드 메뉴바-->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        
+        <!-- 메인 content -->
+        <div id="main">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>출고관리</h3>
+                    </div>
+                    <div class="col-12 col-md-6 order-md-2 order-first">
+                  			 <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                       		 <div class="buttons float-end">
+                            	<button type="button" class="btn btn-primary">출고등록</button>
+                       		 </div>
+                    	 </div>
+                	</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- 검색 영역 -->
+                    <section class="section search-container">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- 첫 번째 데이트 피커 -->
+                                    <div>
+                                        <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+                                            <input type="text" id="startDate" aria-label="Date-Time"/> 
+                                            <span class="tui-ico-date"></span>
+                                        </div>
+                                        <div id="startDatePicker" style="margin-top: -1px;"></div>
+                                    </div>
+
+                                    <span style="font-size: 1.2rem;">~</span>
+
+                                    <!-- 두 번째 데이트 피커 -->
+                                    <div>
+                                        <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+                                            <input type="text" id="endDate" aria-label="Date-Time"/> 
+                                            <span class="tui-ico-date"></span>
+                                        </div>
+                                        <div id="endDatePicker" style="margin-top: -1px;"></div>
+                                    </div>
+
+                                    <!-- 출처 필터 태그 -->
+                                    <div class="source-filter-container">
+                                        <div class="source-filter-tag tag-all active" data-source="">
+                                            전체
+                                        </div>
+                                       	<div class="source-filter-tag tag-material" data-source="MTI">
+										    <span class="source-tag-dot"></span>자재투입
+										</div>
+										<div class="source-filter-tag tag-product" data-source="PSH">
+										    <span class="source-tag-dot"></span>제품출고
+										</div>
+                                    </div>
+
+                                    <!-- 검색어 입력 -->
+                                    <div class="flex-grow-1" style="max-width: 300px">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="검색어를 입력하세요">
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary">검색</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 탭 영역 -->
+                    <ul class="nav nav-tabs" id="mainTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" 
+                               aria-controls="pending" aria-selected="true">대기</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="complete-tab" data-bs-toggle="tab" href="#complete" role="tab" 
+                               aria-controls="complete" aria-selected="false">완료</a>
+                        </li>
+                    </ul>
+
+                    <!-- 탭 컨텐츠 -->
+                    <div class="tab-content" id="mainTabContent">
+                        <!-- 대기 탭 -->
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            <div id="pendingGrid"></div>
+                            <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+	                            <div class="d-flex justify-content-end mt-3">
+	                                <button type="button" class="btn btn-outline-success" id="completeBtn" disabled>출고완료</button>
+	                                <button type="button" class="btn btn-outline-primary ms-2" id="modifyBtn" disabled>수정</button>
+	                                <button type="button" class="btn btn-outline-danger ms-2" id="deleteBtn" disabled>삭제</button>
+	                            </div>
+	                        </div>
+                        </div>
+
+                        <!-- 완료 탭 -->
+                        <div class="tab-pane fade" id="complete" role="tabpanel" aria-labelledby="complete-tab">
+                            <div id="completeGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- 스크립트 -->
+    <script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    
+    <!-- TOAST UI CDN -->
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+    <script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/js/outbound/outbound.js"></script>
+    
+    <script th:inline="javascript">
+	    /*<![CDATA[*/
+	    var hasAdminRole = /*[[${#authorization.expression('hasAnyRole(''ATHR001'',''ATHR002'')')}]]*/ false;
+	    /*]]>*/
+	</script>
+    
+</body>
+</html>

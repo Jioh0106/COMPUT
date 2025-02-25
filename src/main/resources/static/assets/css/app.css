@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+
+* {
+     font-family: "Noto Sans KR", sans-serif; 
+}
+
 .alert {
 	border: none
 }
@@ -931,12 +938,13 @@
 	z-index: 10;
 	overflow-y: auto;
 	background-color: #fff;
+	border-right: 1px solid #e5e5e5;
 	bottom: 0;
 	transition: left .5s ease-out
 }
 
 .sidebar-wrapper .sidebar-header {
-	padding: 2rem 2rem 1rem;
+	padding: 1rem 2rem 1rem;
 	font-size: 2rem;
 	font-weight: 700
 }
@@ -1584,3 +1592,28 @@ a {
 .icon-mid:before {
 	vertical-align: middle
 }
+
+/*=============== topnav ====================*/
+
+
+#topbar {
+	height: 65px;
+	background-color: #fff;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+#logout-btn{ 
+	align-items: center;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+#top-bell {
+	color: #ffc107;
+	
+}
+
+#empty {
+	width: 300px;
+}
+

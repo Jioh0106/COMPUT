@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPUT.</title>
+	<link rel="icon" href="images/favicon.png" type="images/png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.css">
+    <link rel="stylesheet" href="assets/vendors/perfect-scrollbar/perfect-scrollbar.css">
+    <link rel="stylesheet" href="assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    
+    <!-- TOAST UI CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <style>
+    .display-flex {
+        display: flex;
+    }
+    .child-input1 {
+        flex: 1;
+        width: 30%;
+        box-sizing: border-box;
+    }
+    .child-input2 {
+        flex: 1;
+        margin: 0px 5%;
+        width: 30%;
+        box-sizing: border-box;
+    }
+    .child-input3 {
+	    flex: 0.45;  
+	    width: 15%; 
+	    box-sizing: border-box;
+	}
+    .tui-grid-cell {
+        background-color: #ffffff !important;
+    }
+    .highlight-row {
+  	    background-color: #e8f5e9 !important;
+	}
+	
+	.tui-grid-cell.highlight-row {
+   	 	background-color: #e8f5e9 !important;
+	}
+	
+			/* 출처 선택 스타일 */
+	.source-select-container {
+	  display: flex;
+	  border: 1px solid #ddd;
+	  border-radius: 5px;
+	  overflow: hidden;
+	}
+	
+	.source-option {
+	  flex: 1;
+	  text-align: center;
+	  padding: 8px 5px;
+	  cursor: pointer;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  transition: all 0.2s;
+	}
+	
+	.source-option-dot {
+	  display: inline-block;
+	  width: 8px;
+	  height: 8px;
+	  border-radius: 50%;
+	  margin-right: 5px;
+	}
+	
+	.qc-option .source-option-dot {
+	  background-color: #22c55e;
+	}
+	
+	.po-option .source-option-dot {
+	  background-color: #f97316;
+	}
+	
+	.qc-option {
+	  background-color: white;
+	  color: #14532d;
+	}
+	
+	.po-option {
+	  background-color: white;
+	  color: #7c2d12;
+	}
+	
+	.qc-option.active {
+	  background-color: #dcfce7;
+	  font-weight: 600;
+	}
+	
+	.po-option.active {
+	  background-color: #ffedd5;
+	  font-weight: 600;
+	}
+	.manual-option .source-option-dot {
+	    background-color: #3b82f6;
+	}
+	
+	.manual-option {
+	    background-color: white;
+	    color: #1e3a8a;
+	}
+	
+	.manual-option.active {
+	    background-color: #eff6ff;
+	    font-weight: 600;
+	}
+		
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="card-body">
+            <div class="modal-header">
+                <h4 class="modal-title">입고 등록</h4>
+            </div>
+            <div class="modal-body">
+                <form id="inboundForm">
+                    <div class="display-flex">
+                        <div class="child-input1">
+                            <label>입고번호</label>
+                            <div class="form-group">
+                                <input type="text" id="inNo" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="child-input2">
+                            <label>입고일자</label>
+                            <div class="form-group">
+                                <div class="tui-datepicker-input tui-datetime-input tui-has-focus">
+                                    <input type="text" id="inDate" class="form-control" aria-label="Date"/>
+                                    <span class="tui-ico-date"></span>
+                                </div>
+                                <div id="inDatePicker" style="margin-top: -1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="display-flex">
+                        <div class="child-input1">
+                            <label>품목명</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" id="itemName" class="form-control" readonly>
+                                    <input type="hidden" id="itemCode">
+                                    <button type="button" class="btn btn-outline-secondary" id="itemSearchBtn">검색</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="child-input2">
+                            <label>입고수량</label>
+                            <div class="form-group">
+                                <input type="number" id="inQty" class="form-control" min="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="display-flex">
+                        <div class="child-input1">
+                            <label>창고</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" id="warehouseName" class="form-control" readonly>
+                                    <input type="hidden" id="warehouseCode">
+                                    <button type="button" class="btn btn-outline-secondary" id="warehouseSearchBtn">검색</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="child-input2">
+                            <label>구역</label>
+                            <div class="form-group">
+                                <select class="form-select" id="zone" disabled>
+                                    <option value="">구역 선택</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                  <div class="display-flex">
+					    <div class="child-input3">
+					        <label>상태</label>
+					        <div class="form-group">
+					            <input type="text" id="status" class="form-control" value="대기" readonly>
+					        </div>
+					    </div>
+					        <div class="form-group">
+					            <div class="source-select-container">
+					                </div>
+					                <input type="hidden" id="source" value="MANUAL">
+					            </div>
+					    </div>
+					</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" onclick="window.close()">닫기</button>
+                <button type="button" class="btn btn-primary" id="saveInboundBtn">저장</button>
+            </div>
+        </div>
+
+    <!-- 품목 검색 모달 -->
+    <div class="modal fade" id="itemSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">품목 검색</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="itemSearchInput" placeholder="품목명 검색">
+                    </div>
+                    <div id="itemSearchGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 창고 검색 모달 -->
+    <div class="modal fade" id="warehouseSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">창고 검색</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="warehouseSearchInput" placeholder="창고명 검색">
+                    </div>
+                    <div id="warehouseSearchGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- 그 다음 Bootstrap -->
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<!-- <script src="assets/js/main.js"></script> -->
+
+<!-- TOAST UI CDN -->
+<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+<script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+<script src="https://uicdn.toast.com/tui.date-picker/latest/i18n/ko.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- 마지막으로 커스텀 스크립트 -->
+<script src="/js/inbound/inboundPopup.js"></script>
+</body>
+</html>
