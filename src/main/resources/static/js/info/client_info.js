@@ -179,7 +179,7 @@ $(function() {
 	    }
 		Swal.fire({
 		      icon: "warning",
-		      title: "주문 건 삭제",
+		      title: "거래처 정보 삭제",
 			  text: "해당 정보를 모두 삭제하시겠습니까?",
 		      showCancelButton: true,
 		      confirmButtonText: "확인",   
@@ -189,7 +189,9 @@ $(function() {
 				const deleteList = selectedRows.map(row => row.client_no);
 				
 				axios.post('/api/client/delete', deleteList, {
-					headers: { 'X-CSRF-TOKEN': csrfToken }
+					headers: {
+					        'X-CSRF-TOKEN': csrfToken
+					    }
 				})
 			    .then(function (response) {
 					Swal.fire('Success','삭제가 완료되었습니다.','success')
@@ -203,7 +205,7 @@ $(function() {
 			    });
 			} 
 		});
-				
+		
 	}); // 삭제 버튼 이벤트
 	
 	

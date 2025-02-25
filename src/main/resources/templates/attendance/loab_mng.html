@@ -52,6 +52,14 @@
 		.buttons { /* 페이지명과 같은 위치에서 버튼을 오른쪽에 두기 위함 */
 			margin-left:auto
 		}
+		.required {
+			color: #DF0101;
+		}
+		
+		label {
+			color: #676293;
+			font-weight: bold;
+		}	
 	</style>
 </head>
 <body>
@@ -88,13 +96,13 @@
 									
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>사번: </label>
+											<label>사번</label>
 											<div class="form-group">
 												<input type="text" th:value="${emp.emp_id}" name="emp_id" class="form-control" readonly >
 											</div>
 										</div>
 										<div class="child-input2">
-											<label>이름: </label>
+											<label>이름 </label>
 											<div class="form-group">
 												<input type="text" th:value="${emp.emp_name}" class="form-control" readonly>
 											</div>
@@ -103,13 +111,13 @@
 					
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>사용 시작일: </label>
+											<label>사용 시작일<span class="required">*</span> </label>
 											<div class="form-group">
 												<input type="date" class="form-control" id="use-start-date" onchange="calcDate()" name="absence_start">
 											</div>
 										</div>
 										<div class="child-input2">
-											<label>사용 종료일: </label>
+											<label>사용 종료일<span class="required">*</span> </label>
 											<div class="form-group">
 												<input type="date" class="form-control" id="use-end-date" onchange="calcDate()" name="absence_end">
 											</div>
@@ -118,14 +126,14 @@
 									
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>사용일수: </label>
+											<label>사용일수 </label>
 											<div class="form-group">
 												<input type="text" id="use-days" class="form-control" readonly>
 											</div>
 										</div>
 										
 										<div class="child-input2">
-											<label>휴직 구분</label>
+											<label>휴직 구분<span class="required">*</span></label>
 											<fieldset class="form-group">
 												<select class="form-select" id="loabSelect" name="absence_type">
 													<option value="" disabled selected>선택하세요</option>
@@ -136,7 +144,7 @@
 									
 									<div class="display-flex">
 										<div class="child-input1">
-											<label>승인 요청 선택 </label>
+											<label>승인 요청 선택<span class="required">*</span></label>
 											<fieldset class="form-group">
 												<select class="form-select" id="requestSelect" name="request_approval" >
 													<option value="" disabled selected>선택하세요</option>

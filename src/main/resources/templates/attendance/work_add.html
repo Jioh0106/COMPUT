@@ -29,6 +29,10 @@
 			
 		<meta charset="UTF-8">
 		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+			* {
+			     font-family: "Noto Sans KR", sans-serif; 
+			}
 			.tui-grid-cell {
 				/* !important -> 우선순위 높아짐 */
 				background-color: #ffffff !important;
@@ -45,6 +49,10 @@
 				margin: 0px 5%;
 				width: 30%;
 				box-sizing: border-box;
+			}
+			
+			.required {
+				color: #DF0101;
 			}
 			
 		</style>
@@ -65,7 +73,7 @@
 						<div class="row mb-4">
                             <div class="col-md-8">
                                 <fieldset class="form-group">
-									<label for="basicInput">생성기간</label>
+									<label for="basicInput">생성기간<span class="required">*</span></label>
 									<div style="display: flex; align-items: center; gap: 0.5rem;" >
 										<!-- 첫 번째 데이트 피커 -->
 										<div>
@@ -96,7 +104,7 @@
                             
 							<div class="col-md-4">
 								<fieldset class="form-group">
-									<label for="basicInput">근무 템플릿</label>
+									<label for="basicInput">근무 템플릿<span class="required">*</span></label>
                                     <select class="form-select" id="work_tmp">
                                        <option value="" >선택</option>
 									   <option th:each="tmp :${tmpList}" th:value="${tmp.work_tmp_name}" th:text="${tmp.work_tmp_name}"></option>
