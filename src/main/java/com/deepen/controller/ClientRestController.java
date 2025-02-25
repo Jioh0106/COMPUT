@@ -45,14 +45,13 @@ public class ClientRestController {
         	service.updateClient(updatedRows);
         }
         
-        
         // 최신 데이터 반환
         return ResponseEntity.ok(service.clientList());
     }
 	 
 	/** 거래처 그리드 정보 삭제 **/
 	@PostMapping("/delete")
-	public ResponseEntity<String> deleteMaterial(@RequestBody List<Integer> deleteList) {
+	public ResponseEntity<String> deleteClient(@RequestBody List<Integer> deleteList) {
 		
 		log.info(deleteList.toString());
 		

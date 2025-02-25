@@ -21,7 +21,6 @@ import com.deepen.domain.WorkDTO;
 import com.deepen.domain.WorkTmpDTO;
 import com.deepen.service.WorkService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -114,13 +113,10 @@ public class WorkRestController {
 													@RequestParam("end") String end,
 													@RequestParam("dept") String dept,
 													@RequestParam("serch_box") String serch_box,
-													HttpSession session) {
-		Map<String, Object> emp = (Map<String, Object>) session.getAttribute("sEmp");
-		String emp_id = (String) emp.get("emp_id");
-		log.info("dept = " + dept );
-		log.info("start = " + start );
-		log.info("end = " + end );
-		log.info("serch_box = " + serch_box );
+													@AuthenticationPrincipal User user) {
+		
+		
+		String emp_id = user.getUsername();
 		Map<String, String> map = new HashMap<>();
 		map.put("start", start);
 		map.put("end", end);
@@ -135,24 +131,27 @@ public class WorkRestController {
 		return ResponseEntity.ok(list);
         
 	}
-	//    
 	
+	/* 메인 캘린더 월별 일정 조회 */
 	@GetMapping("/schedules")
 	public ResponseEntity<List<ScheduleDTO>> getSchedules( @RequestParam("startDate") String startDate,
 	        											@RequestParam("endDate") String endDate,
+	        											@RequestParam("dept") String dept,
 	        											@AuthenticationPrincipal User user) {
 		String emp_id = user.getUsername();
 		log.info("startDate : " + startDate);
 		log.info("endDate : " + endDate);
+		log.info("dept : " + dept);
 		log.info("emp_id : " + emp_id);
 		
 		Map<String, String> map = new HashMap<>();
 		map.put("start", startDate);
 		map.put("end", endDate);
+		map.put("dept", dept);
 		map.put("emp_id", emp_id);
 		
 		List<ScheduleDTO> schedules = workService.getSchedulesBetween(map);
-		
+		log.info(schedules.toString());
 		
 		return ResponseEntity.ok(schedules);
 	}
@@ -162,7 +161,6 @@ public class WorkRestController {
 	public ResponseEntity<List<WorkTmpDTO>> getWorkTmpList() {
 		
 		List<WorkTmpDTO> list = workService.getWorkTmpList();
-		System.out.println("********************getWorkTmpList = " + list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -189,8 +187,19 @@ public class WorkRestController {
         
     } // insertWork
 	
-	
-	
+	/** 근무일정 그리드 정보 삭제 **/
+	@PostMapping("/delete")
+	public ResponseEntity<String> deleteWork(@RequestBody List<Integer> deleteList) {
+		
+		log.info(deleteList.toString());
+		
+	    try {
+	    	workService.deleteWork(deleteList);
+	        return ResponseEntity.ok("삭제가 완료되었습니다.");
+		} catch (Exception e) {
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
+	    }
+	} // deleteMaterial
 	
 	
 	

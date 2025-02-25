@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.deepen.domain.AbsenceDTO;
 import com.deepen.domain.ScheduleDTO;
 import com.deepen.domain.WorkAddDTO;
 import com.deepen.domain.WorkDTO;
@@ -19,6 +20,7 @@ import com.deepen.entity.WorkTmp;
 import com.deepen.mapper.WorkMapper;
 import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
+import com.deepen.repository.WorkRepository;
 import com.deepen.repository.WorkTmpRepository;
 
 import jakarta.transaction.Transactional;
@@ -33,6 +35,7 @@ public class WorkService {
 	private final PersonnelRepository personnelRepository;
 	private final WorkTmpRepository workTmpRepository;
 	private final WorkMapper workMapper;
+	private final WorkRepository repository;
 	private final CommonDetailRepository cdRepository;
 
 	
@@ -80,7 +83,6 @@ public class WorkService {
 	public void insertWork(WorkAddDTO appendData) {
 		log.info("WorkService/insertWork - appendData " + appendData);
 		
-		
 		WorkDTO work = new WorkDTO();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 입력 문자열 형식
 		LocalDate localDate = null;
@@ -96,7 +98,10 @@ public class WorkService {
 				work.setWork_tmp_name(appendData.getTmp());
 				log.info(work.toString());
 				
-				workMapper.insertWork(work);
+				Map<String, Object> vctn = workMapper.checkVctn(day, (String)row.get("EMP_ID"));
+				if(vctn == null) {
+					workMapper.insertWork(work);
+				}
 				
 			}
 			
@@ -125,17 +130,28 @@ public class WorkService {
 	
 	
 	// 근무일정 캘린더 일정 가져오기
+	@Transactional
 	public List<ScheduleDTO> getSchedulesBetween(Map<String, String> map) {
-		
-		List<WorkDTO> workList = workMapper.getWorkList(map);
 		List<ScheduleDTO> shcdList = new ArrayList<>();
 		
-		for(int i = 0; i < workList.size(); i++) {
-			WorkDTO work = workList.get(i);
-			ScheduleDTO schd = ScheduleDTO.workToSchd(work, String.valueOf(i+1));
-			shcdList.add(schd);
+		List<WorkDTO> workList = workMapper.getWorkList(map);
+		if(workList != null) {
+			for(int i = 0; i < workList.size(); i++) {
+				WorkDTO work = workList.get(i);
+				ScheduleDTO schd = ScheduleDTO.workToSchd(work, String.valueOf(i+1));
+				shcdList.add(schd);
+			}
 		}
 		
+		List<Map<String, Object>> vctnList = workMapper.getVctnList(map);
+		if(vctnList != null) {
+			for(int i = 0; i < vctnList.size(); i++) {
+				ScheduleDTO schd = ScheduleDTO.vctnToSchd(vctnList.get(i), String.valueOf(i+1));
+				shcdList.add(schd);
+			}
+		}
+		
+//		List<Map<String, Object>> loabList = workMapper.getLoabList(map);
 		
 		return shcdList;
 		
@@ -166,6 +182,11 @@ public class WorkService {
 			workTmp.setWork_type(cdRepository.findCommonDetailCodeByName(wtd.getType_name()));
 			workTmpRepository.delete(workTmp);
 		}
+	}
+
+	/** 근무일정 항목 삭제 **/
+	public void deleteWork(List<Integer> deleteList) {
+		repository.deleteAllById(deleteList);
 	} 
 	
 	/** 공휴일 정보  */

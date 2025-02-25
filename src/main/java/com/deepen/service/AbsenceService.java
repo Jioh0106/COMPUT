@@ -18,6 +18,7 @@ import com.deepen.entity.Employees;
 import com.deepen.entity.Request;
 import com.deepen.mapper.AbsenceMapper;
 import com.deepen.repository.AbsenceRepository;
+import com.deepen.repository.CommonDetailRepository;
 import com.deepen.repository.PersonnelRepository;
 import com.deepen.repository.RequestRepository;
 
@@ -33,6 +34,7 @@ public class AbsenceService {
 	private final AbsenceRepository absenceRepository;
 	private final PersonnelRepository personnelRepository;
 	private final RequestRepository requestRepository;
+	private final CommonDetailRepository cdRepository;
 	
 	
 	// 휴직관리 ABSENCE_VIEW 리스트 조회
@@ -77,7 +79,6 @@ public class AbsenceService {
 	// 휴직 테이블 업데이트(여러건)
 	public void updateAbsences(List<Map<String, Object>> updatedRows, String emp_id) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		String absence_type = "";
 		String absence_start ="";
 		String absence_end ="";
 		LocalDate localDate1 = null;
@@ -86,8 +87,7 @@ public class AbsenceService {
 		Date sqlDate2= null;
 		
 		for (Map<String, Object> row : updatedRows) {
-			absence_type = (String) row.get("ABSENCE_TYPE");
-			row.put("ABSENCE_TYPE", absenceMapper.getUpdateCommon(absence_type));
+			row.put("ABSENCE_TYPE", cdRepository.findCommonDetailCodeByName((String) row.get("TYPE_NAME")));
 			
 			absence_start = (String) row.get("ABSENCE_START");
 			absence_end = (String) row.get("ABSENCE_END");
@@ -103,6 +103,7 @@ public class AbsenceService {
 	        row.put("ABSENCE_START", sqlDate1);
 	        row.put("ABSENCE_END", sqlDate2);
 	        row.put("UPDATE_EMP_ID", emp_id);
+	        row.put("HIGH_APPROVAL", (String) row.get("HIGH_APPROVAL"));
 			
             absenceMapper.updateAbsence(row);
         }
@@ -121,7 +122,7 @@ public class AbsenceService {
 		
 		for (Map<String, Object> row : createdRows) {
 			absence.setEmp_id((String)row.get("EMP_ID"));
-			absence_type = (String) row.get("ABSENCE_TYPE");
+			absence_type = (String) row.get("TYPE_NAME");
 			absence.setAbsence_type(absenceMapper.getUpdateCommon(absence_type));
 			
 			absence_start = (String) row.get("ABSENCE_START");

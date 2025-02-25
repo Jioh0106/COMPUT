@@ -64,61 +64,56 @@
 		<!-- 사이드 메뉴바-->
 		<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 		
+		<div id="main">
+			<div class="card" style="width: 1200px;">
+			    <div class="card-body">
+			        <section class="row mb-5">
+			            <div class="col-10 d-flex align-items-center justify-content-start ">
+			                <!-- 제목과 날짜 -->
+			                <div class="d-flex align-items-center">
+			                    <h4>근무 일정</h4>
+			                </div>
+			                <!-- 버튼들 -->
+			                <div class="d-flex align-items-center ms-3">
+			                    <button type="button" id="todayBtn" class="btn btn-outline-secondary rounded-pill mx-3">
+			                        Today
+			                    </button>
+			                    <button type="button" id="prevBtn" class="btn btn-outline-secondary rounded-pill me-2">
+			                        <i class="bi bi-chevron-left"></i>
+			                    </button>
+			                    <h5 id="today" class="mx-4"></h5>
+			                    <button type="button" id="nextBtn" class="btn btn-outline-secondary rounded-pill">
+			                        <i class="bi bi-chevron-right"></i>
+			                    </button>
+			                </div>
+			            </div>
+			            <div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"  class="col-2 d-flex align-items-center justify-content-end">
+			            	<select class="form-select serch-content" aria-label="" id="deptSelect">
+								<option value="" selected>나의 일정</option>
+							</select>
+			            </div>
+			        </section>
 	
-		<!-- 메인 content -->
-<!-- 		<div th:replace="~{main :: main}"></div> -->
-	
-	<div id="main">
-		<div class="card" style="width: 1200px;">
-		    <div class="card-body">
-		        <section class="row mb-5">
-		            <div class="col-10 d-flex align-items-center justify-content-start ">
-		                <!-- 제목과 날짜 -->
-		                <div class="d-flex align-items-center">
-		                    <h4>근무 일정</h4>
-		                </div>
-		                <!-- 버튼들 -->
-		                <div class="d-flex align-items-center ms-3">
-		                    <button type="button" id="todayBtn" class="btn btn-outline-secondary rounded-pill mx-3">
-		                        Today
-		                    </button>
-		                    <button type="button" id="prevBtn" class="btn btn-outline-secondary rounded-pill me-2">
-		                        <i class="bi bi-chevron-left"></i>
-		                    </button>
-		                    <h5 id="today" class="mx-4"></h5>
-		                    <button type="button" id="nextBtn" class="btn btn-outline-secondary rounded-pill">
-		                        <i class="bi bi-chevron-right"></i>
-		                    </button>
-		                </div>
-		            </div>
-		            <div sec:authorize="hasRole('ATHR001') or hasRole('ATHR002')"  class="col-2 d-flex align-items-center justify-content-end">
-		            	<select class="form-select serch-content" aria-label="" id="deptSelect">
-							<option selected>부서 전체</option>
-						</select>
-		            </div>
-		        </section>
-
-		        <section>
-		            <div id="calendar" style="height: 600px; "></div>
-		        </section>
-		    </div>
-		</div>
-		<!--  발령 등록 토스트 알림 -->
-		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-			<div class="toast-header">
-				<img src="/images/siren.png" class="rounded me-2 " id="sirenImg" >
-				<strong class="me-auto">인사발령 알림</strong>
-				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			        <section>
+			            <div id="calendar" style="height: 600px; "></div>
+			        </section>
+			    </div>
 			</div>
-			<div class="toast-body">
-				해당 사번의 인사발령이 승인되었습니다.<br>
-				인사발령현황 메뉴를 확인해주세요. 
+			
+			<!--  발령 승인 토스트 알림 -->
+			<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+				<div class="toast-header">
+					<img src="/images/siren.png" class="rounded me-2 " id="sirenImg" >
+					<strong class="me-auto">인사 발령 알림</strong>
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+				<div class="toast-body">
+					해당 사번의 인사발령이 승인되었습니다.<br>
+					인사발령현황 메뉴를 확인해주세요. 
+				</div>
 			</div>
-		</div>
-     
-	</div>
-	<!-- main.html 끝-->
-
+	     
+		</div><!-- main 끝 -->
     </div> <!--app 끝 -->
 	
     <script src="/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>

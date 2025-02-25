@@ -2,11 +2,6 @@ $(function() {
 	const isEditable = role === 'ATHR001' || role === 'ATHR002';
 	const csrfToken = $('input[name="_csrf"]').val();
 	
-	console.log("role:", role);
-	console.log("CSRF Token:", csrfToken);
-	console.log('isEditable :', isEditable); 
-	
-	
 	let grid;
 
 	grid = new tui.Grid({
