@@ -20,38 +20,45 @@ $(function() {
     };
 	
     // 상태 버튼 렌더러
-    class StatusButtonRenderer {
-        constructor(props) {
-            this.el = document.createElement('button');
-            this.render(props);
-        }
+	class StatusButtonRenderer {
+	    constructor(props) {
+	        this.el = document.createElement('button');
+	        this.render(props);
+	    }
 
-        getElement() {
-            return this.el;
-        }
+	    getElement() {
+	        return this.el;
+	    }
 
-        render(props) {
-            const el = this.el;
-            const grid = props.grid;
-            
-            if (props.value === '대기') {
-                el.className = 'btn btn-sm btn-warning';
-                el.innerHTML = '입고대기';
-                el.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const rowKey = props.rowKey;
-                    const rowData = grid.getRow(rowKey);
-                    changeStatus(rowData.in_no);
-                };
-            } else {
-                el.className = 'btn btn-sm btn-success';
-                el.innerHTML = '입고완료';
-                el.disabled = true;
-            }
-        }
-    }
-
+	    render(props) {
+	        const el = this.el;
+	        const grid = props.grid;
+	        
+	        if (props.value === '대기') {
+	            el.className = 'btn btn-sm btn-warning';
+	            el.innerHTML = '입고대기';
+	            
+	            // 전역 변수로 설정된 권한 정보 확인
+	            if (typeof hasAdminRole !== 'undefined' && hasAdminRole) {
+	                el.onclick = (e) => {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    const rowKey = props.rowKey;
+	                    const rowData = grid.getRow(rowKey);
+	                    changeStatus(rowData.in_no);
+	                };
+	            } else {
+	                // 권한이 없는 경우 버튼 비활성화
+	                el.disabled = true;
+	                el.title = "권한이 없습니다";
+	            }
+	        } else {
+	            el.className = 'btn btn-sm btn-success';
+	            el.innerHTML = '입고완료';
+	            el.disabled = true;
+	        }
+	    }
+	}
     // 입고등록 팝업 열기
     function openInboundRegistration() {
         var popupW = 700;

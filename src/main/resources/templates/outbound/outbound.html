@@ -190,10 +190,12 @@
                         <h3>출고관리</h3>
                     </div>
                     <div class="col-12 col-md-6 order-md-2 order-first">
-                        <div class="buttons float-end">
-                            <button type="button" class="btn btn-primary">출고등록</button>
-                        </div>
-                    </div>
+                  			 <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+                       		 <div class="buttons float-end">
+                            	<button type="button" class="btn btn-primary">출고등록</button>
+                       		 </div>
+                    	 </div>
+                	</div>
                 </div>
             </div>
 
@@ -265,11 +267,13 @@
                         <!-- 대기 탭 -->
                         <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                             <div id="pendingGrid"></div>
-                            <div class="d-flex justify-content-end mt-3">
-                                <button type="button" class="btn btn-outline-success" id="completeBtn" disabled>출고완료</button>
-                                <button type="button" class="btn btn-outline-primary ms-2" id="modifyBtn" disabled>수정</button>
-                                <button type="button" class="btn btn-outline-danger ms-2" id="deleteBtn" disabled>삭제</button>
-                            </div>
+                            <div sec:authorize="hasAnyRole('ATHR001','ATHR002')">
+	                            <div class="d-flex justify-content-end mt-3">
+	                                <button type="button" class="btn btn-outline-success" id="completeBtn" disabled>출고완료</button>
+	                                <button type="button" class="btn btn-outline-primary ms-2" id="modifyBtn" disabled>수정</button>
+	                                <button type="button" class="btn btn-outline-danger ms-2" id="deleteBtn" disabled>삭제</button>
+	                            </div>
+	                        </div>
                         </div>
 
                         <!-- 완료 탭 -->
@@ -297,5 +301,12 @@
     
     <!-- Custom JS -->
     <script src="/js/outbound/outbound.js"></script>
+    
+    <script th:inline="javascript">
+	    /*<![CDATA[*/
+	    var hasAdminRole = /*[[${#authorization.expression('hasAnyRole(''ATHR001'',''ATHR002'')')}]]*/ false;
+	    /*]]>*/
+	</script>
+    
 </body>
 </html>
