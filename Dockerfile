@@ -28,9 +28,9 @@ RUN echo 'root:ssh' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Download and install Tomcat
-RUN wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.34/bin/apache-tomcat-10.1.34.tar.gz -O /tmp/tomcat.tar.gz && \
+RUN wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.36/bin/apache-tomcat-10.1.36.tar.gz -O /tmp/tomcat.tar.gz && \
     tar xvfz /tmp/tomcat.tar.gz -C /usr/local && \
-    mv /usr/local/apache-tomcat-10.1.34 /usr/local/tomcat && \
+    mv /usr/local/apache-tomcat-10.1.36 /usr/local/tomcat && \
     rm /tmp/tomcat.tar.gz
 
 # 기존 ROOT 애플리케이션 제거 (있다면)
