@@ -499,11 +499,7 @@ $(function() {
 	          });
 	      } 
 	  });
-<<<<<<< HEAD
 	} // deleteRow
-=======
-	}
->>>>>>> branch 'develop' of https://github.com/Jioh0106/COMPUT.git
 	
 	
 	// 수정/추가 컬럼 반영

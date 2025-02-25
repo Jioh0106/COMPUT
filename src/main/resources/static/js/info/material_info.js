@@ -207,7 +207,6 @@ $(function() {
 	    }
 		Swal.fire({
 		      icon: "warning",
-<<<<<<< HEAD
 		      title: "주문 건 삭제",
 			  text: "해당 정보를 모두 삭제하시겠습니까?",
 		      showCancelButton: true,
@@ -232,35 +231,7 @@ $(function() {
 			    });
 			} 
 		});
-=======
-		      title: "자제 정보 삭제",
-			  text: "해당 정보를 모두 삭제하시겠습니까?",
-		      showCancelButton: true,
-		      confirmButtonText: "확인",   
-		      cancelButtonText: "취소"     
-		}).then((result) => {
-			if (result.isConfirmed) {  
-				const deleteList = selectedRows.map(row => row.mtr_no);
-				
-				axios.post('/api/material/delete', deleteList, {
-					headers: {
-					        'X-CSRF-TOKEN': csrfToken
-					    }
-				})
-			    .then(function (response) {
-					Swal.fire('Success', '삭제가 완료되었습니다.', 'success' )
-					.then(() => {
-						window.location.reload();  
-					});
-			    })
-			    .catch(function (error) {
-			        console.error('삭제 중 오류 발생:', error);
-					Swal.fire('Error','삭제 중 문제가 발생했습니다.','error' )
-			    });
-			} 
-		});	
->>>>>>> branch 'develop' of https://github.com/Jioh0106/COMPUT.git
-		
+		     
 	}); // 삭제 버튼 이벤트
 	
 	
