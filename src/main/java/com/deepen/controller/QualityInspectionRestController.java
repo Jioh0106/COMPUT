@@ -83,20 +83,20 @@ public class QualityInspectionRestController {
        return ResponseEntity.ok().build();
     }
     
-    @PostMapping("/next-process")
-    public ResponseEntity<Void> createNextProcessLot(
-        @RequestBody Map<String, String> request
-    ) {
-        String lotNo = request.get("lotNo");
-        String judgement = request.get("judgement");
-        
-        if (lotNo == null || judgement == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        qualityInspectionService.createNextProcessLot(lotNo, judgement);
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/next-process")
+//    public ResponseEntity<Void> createNextProcessLot(
+//        @RequestBody Map<String, String> request
+//    ) {
+//        String lotNo = request.get("lotNo");
+//        String judgement = request.get("judgement");
+//        
+//        if (lotNo == null || judgement == null) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//        
+//        qualityInspectionService.createNextProcessLot(lotNo, judgement);
+//        return ResponseEntity.ok().build();
+//    }
     
     /**
      * 공정 목록 조회
@@ -119,7 +119,7 @@ public class QualityInspectionRestController {
         @RequestParam(value = "processNo", required = false) Integer processNo,
         @RequestParam(value = "judgement", required = false) String judgement
     ) {
-        log.info("Fetching inspection history - lotNo: {}, date range: {} ~ {}, processNo: {}, judgement: {}", 
+        log.info("lotNo: {}, date range: {} ~ {}, processNo: {}, judgement: {}", 
                  lotNo, fromDate, toDate, processNo, judgement);
 
         InspectionSearchDTO search = new InspectionSearchDTO();

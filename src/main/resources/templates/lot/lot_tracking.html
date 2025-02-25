@@ -343,26 +343,35 @@
 				</div>
 			</div>
 
+			<!-- 개선된 검색 영역 -->
 			<div class="search-area">
-				<div class="search-row">
-					<div class="search-input-group">
-						<i class="bi bi-search search-icon"></i>
-						<input type="text" id="lotSearchInput" class="search-input" placeholder="LOT 번호 또는 제품명으로 검색">
-					</div>
-					<select id="productSelect" class="form-select" style="width: 200px;">
-						<option value="0">전체 제품</option>
-					</select>
-					<select id="processSelect" class="form-select" style="width: 150px;">
-						<option value="">전체 공정</option>
-						<option value="PRTP001">가공</option>
-						<option value="PRTP002">조립</option>
-						<option value="PRTP003">열처리</option>
-						<option value="QRTP001">품질검사</option>
-					</select>
-					<button id="searchButton" class="btn btn-primary">
-						<i class="bi bi-search me-1"></i>검색
-					</button>
-				</div>
+			    <div class="search-row">
+			        <div class="search-input-group">
+			            <i class="bi bi-search search-icon"></i>
+			            <input type="text" id="lotSearchInput" class="search-input" placeholder="LOT 번호 또는 제품명으로 검색">
+			        </div>
+			        <select id="productSelect" class="form-select" style="width: 200px;">
+			            <option value="0">전체 제품</option>
+			        </select>
+			        <select id="processSelect" class="form-select" style="width: 150px;">
+			            <option value="">전체 공정</option>
+			            <option value="PRTP001">가공</option>
+			            <option value="PRTP002">조립</option>
+			            <option value="PRTP003">열처리</option>
+			            <option value="QRTP001">품질검사</option>
+			            <option value="IRTP001">입고</option>
+			            <option value="ORTP001">출고</option>
+			        </select>
+			        <button id="searchButton" class="btn btn-primary">
+			            <i class="bi bi-search me-1"></i>검색
+			        </button>
+			        <button id="resetSearchButton" class="btn btn-outline-secondary">
+			            <i class="bi bi-arrow-counterclockwise me-1"></i>초기화
+			        </button>
+			    </div>
+			    <div id="searchResultSummary" class="mt-2 small text-muted" style="display: none;">
+			        <!-- 검색 결과 요약이 여기에 표시됩니다 -->
+			    </div>
 			</div>
 
 			<div id="mainContent" class="split">
@@ -418,6 +427,8 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
 
 			<!-- JavaScript 라이브러리 -->
 			<script th:src="@{/js/jquery-3.7.1.js}"></script>

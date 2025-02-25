@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			this.isForward = true;
 			this.treeData = [];
 			this.currentLotData = null;
+			this.lastSearchParams = null;
 		}
 
 		// LOT 노드 텍스트 포맷팅
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				this.lotTreeView = $('#lotTreeView');
 				this.lotDetailsView = $('#lotDetailsContent');
 				this.lotHierarchyView = $('#lotHierarchyView');
+				this.searchResultSummary = $('#searchResultSummary');
 
 				if (!this.lotTreeView.length || !this.lotDetailsView.length || !this.lotHierarchyView.length) {
 					throw new Error('필수 DOM 요소를 찾을 수 없습니다.');
@@ -118,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
 						header: '공정',
 						name: 'processName',
 						width: 120,
-						formatter: ({ value }) => `<div class="d-flex align-items-center">
-                            <i class="bi bi-gear me-2"></i>${value || '-'}
+						formatter: ({ value, row }) => `<div class="d-flex align-items-center">
+                            <i class="bi ${this.getProcessTypeIcon(row.processType)} me-2"></i>${value || '-'}
                         </div>`
 					},
 					{
@@ -228,9 +230,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			try {
 				// 검색 이벤트
 				$('#searchButton').on('click', () => this.searchLots());
-				$('#lotSearchInput').on('keyup', _.debounce(() => this.searchLots(), 300));
+				$('#lotSearchInput').on('keypress', (e) => {
+                    if (e.which === 13) { // 엔터 키
+                        this.searchLots();
+                    }
+                });
 				$('#productSelect').on('change', () => this.searchLots());
 				$('#processSelect').on('change', () => this.searchLots());
+
+                // 검색 초기화 버튼
+                $('#resetSearchButton').on('click', () => this.resetSearch());
 
 				// 트리 뷰 이벤트
 				if (this.lotTreeView && this.lotTreeView.length) {
@@ -339,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					await this.renderLotTree(lots);
 					this.populateProductSelect(lots);
 					this.hideLoading();
+					this.hideSearchResultSummary();
 				} else {
 					this.showMessage('데이터가 없습니다.');
 				}
@@ -349,21 +359,41 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		async fetchLots(params = {}) {
-			try {
-				const defaultParams = {
-					productNo: $('#productSelect').val() || 0,
-					processType: $('#processSelect').val() || ''
-				};
-				const queryParams = { ...defaultParams, ...params };
-
-				const response = await fetch(`/api/lot/product/${queryParams.productNo}`);
-				if (!response.ok) throw new Error('LOT 데이터 조회 실패');
-				return await response.json();
-			} catch (error) {
-				console.error('LOT 데이터 조회 실패:', error);
-				this.handleError(error, 'LOT 데이터 조회 중 오류가 발생했습니다.');
-				return [];
-			}
+		    try {
+		        const defaultParams = {
+		            productNo: $('#productSelect').val() || 0,
+		            processType: $('#processSelect').val() || '',
+		            searchText: $('#lotSearchInput').val() || ''
+		        };
+		        const queryParams = { ...defaultParams, ...params };
+		        
+		        // URL 파라미터 구성
+		        const urlParams = new URLSearchParams();
+		        if (queryParams.productNo && queryParams.productNo !== '0') {
+		            urlParams.append('productNo', queryParams.productNo);
+		        }
+		        if (queryParams.processType) {
+		            urlParams.append('processType', queryParams.processType);
+		        }
+		        if (queryParams.searchText) {
+		            urlParams.append('searchText', queryParams.searchText);
+		        }
+		        
+		        const queryString = urlParams.toString();
+		        const apiUrl = queryString ? 
+		            `/api/lot/search?${queryString}` : 
+		            `/api/lot/product/${queryParams.productNo}`;
+		            
+		        console.log(`API 요청 URL: ${apiUrl}`);
+		        
+		        const response = await fetch(apiUrl);
+		        if (!response.ok) throw new Error(`LOT 데이터 조회 실패 (${response.status})`);
+		        return await response.json();
+		    } catch (error) {
+		        console.error('LOT 데이터 조회 실패:', error);
+		        this.handleError(error, 'LOT 데이터 조회 중 오류가 발생했습니다.');
+		        return [];
+		    }
 		}
 
 		async loadLotDetails(lotNo) {
@@ -422,6 +452,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (this.lotTreeView.jstree(true)) {
 					this.lotTreeView.jstree('destroy');
 				}
+
+				if (!Array.isArray(lots) || lots.length === 0) {
+                    this.lotTreeView.html('<div class="text-center p-4">검색 결과가 없습니다.</div>');
+                    return;
+                }
 
 				const treeData = this.transformLotsToTreeData(lots);
 				await this.initializeJSTree(treeData);
@@ -607,7 +642,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		                    </div>
 		                    ${warningIcon}
 		                </div>
-		                
+		                <div class="card-body py-2">
+		                    <div class="info-item">
+		                        <i class="bi bi-box me-2"></i>
+		                        <small>${lot.productName || '미지정'}</small>
+		                    </div>
+		                </div>
 		            </div>
 		        </div>`;
 
@@ -659,211 +699,316 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 
-		searchLots() {
-			try {
-				const searchText = $('#lotSearchInput').val()?.toLowerCase() || '';
-				const productNo = $('#productSelect').val();
-				const processType = $('#processSelect').val();
-
-				if (this.lotTreeView?.jstree(true)) {
-					this.lotTreeView.jstree('search', searchText, {
-						show_only_matches: true,
-						show_only_matches_children: true
-					});
+		async searchLots() {
+				    try {
+				        const searchText = $('#lotSearchInput').val()?.toLowerCase() || '';
+				        const productNo = $('#productSelect').val();
+				        const processType = $('#processSelect').val();
+				        
+				        console.log(`검색 조건: 텍스트=${searchText}, 제품번호=${productNo}, 공정유형=${processType}`);
+				        
+				        // 검색 조건 저장
+				        this.lastSearchParams = {
+				            searchText,
+				            productNo,
+				            processType
+				        };
+				        
+				        // productNo나 processType 값이 실제로 필터링에 사용될 때만
+				        if (productNo !== '0' || processType !== '' || searchText.length > 0) {
+				            // 필터링된 데이터 다시 로드
+				            this.showLoading();
+				            
+				            // 서버에서 필터링된 데이터 가져오기
+				            const queryParams = {
+				                productNo: productNo || 0,
+				                processType: processType || '',
+				                searchText: searchText
+				            };
+				            
+				            const lots = await this.fetchLots(queryParams);
+				            
+				            if (lots && lots.length > 0) {
+				                await this.renderLotTree(lots);
+				                this.hideLoading();
+				                
+				                // 검색 결과 요약 정보 표시
+				                this.showSearchResultSummary(lots.length, {
+				                    searchText: searchText,
+				                    productName: $('#productSelect option:selected').text() !== '전체 제품' ? 
+				                        $('#productSelect option:selected').text() : '',
+				                    processType: processType
+				                });
+				            } else {
+				                this.showMessage('검색 조건에 맞는 LOT가 없습니다. 검색 조건을 변경해 주세요.', 'warning');
+				                // 트리 비우기
+				                if (this.lotTreeView?.jstree(true)) {
+				                    this.lotTreeView.jstree('destroy');
+				                }
+				                this.lotTreeView.html('<div class="text-center p-4">검색 결과가 없습니다.</div>');
+				                this.hideSearchResultSummary();
+				            }
+				        } else {
+				            // 모든 필터가 기본값일 때 전체 데이터 로드
+				            this.loadInitialData();
+				        }
+				        
+				        // 텍스트 검색은 JSTree의 검색 기능 사용 (이미 로드된 데이터 내에서 필터링)
+				        if (searchText && this.lotTreeView?.jstree(true)) {
+				            this.lotTreeView.jstree('search', searchText, {
+				                show_only_matches: true,
+				                show_only_matches_children: true
+				            });
+				        }
+				    } catch (error) {
+				        console.error('LOT 검색 실패:', error);
+				        this.showErrorMessage(`검색 중 오류가 발생했습니다: ${error.message}`);
+				    }
 				}
-			} catch (error) {
-				console.error('LOT 검색 실패:', error);
-			}
-		}
 
-		formatDateTime(dateStr) {
-			if (!dateStr) return '-';
+		        // 검색 초기화 함수
+		        resetSearch() {
+		            // 입력 필드 초기화
+		            $('#lotSearchInput').val('');
+		            $('#productSelect').val('0');
+		            $('#processSelect').val('');
+		            
+		            // 검색 결과 요약 숨기기
+		            this.hideSearchResultSummary();
+		            
+		            // 초기 데이터 다시 로드
+		            this.loadInitialData();
+		        }
+
+		        // 검색 결과 요약 표시
+		        showSearchResultSummary(count, searchCriteria = {}) {
+		            const $summary = $('#searchResultSummary');
+		            if (!$summary.length) return;
+		            
+		            let summaryText = `검색 결과: ${count}개의 LOT`;
+		            
+		            const criteria = [];
+		            if (searchCriteria.productName) {
+		                criteria.push(`제품: ${searchCriteria.productName}`);
+		            }
+		            if (searchCriteria.processType) {
+		                const processMap = {
+		                    'PRTP001': '가공',
+		                    'PRTP002': '조립',
+		                    'PRTP003': '열처리',
+		                    'QRTP001': '품질검사',
+		                    'IRTP001': '입고',
+		                    'ORTP001': '출고'
+		                };
+		                criteria.push(`공정: ${processMap[searchCriteria.processType] || searchCriteria.processType}`);
+		            }
+		            if (searchCriteria.searchText) {
+		                criteria.push(`검색어: "${searchCriteria.searchText}"`);
+		            }
+		            
+		            if (criteria.length > 0) {
+		                summaryText += ` (${criteria.join(', ')})`;
+		            }
+		            
+		            $summary.text(summaryText).show();
+		        }
+
+		        // 검색 결과 요약 숨기기
+		        hideSearchResultSummary() {
+		            const $summary = $('#searchResultSummary');
+		            if ($summary.length) {
+		                $summary.hide();
+		            }
+		        }
+
+				formatDateTime(dateStr) {
+					if (!dateStr) return '-';
+					try {
+						return new Date(dateStr).toLocaleString('ko-KR', {
+							year: 'numeric',
+							month: '2-digit',
+							day: '2-digit',
+							hour: '2-digit',
+							minute: '2-digit'
+						});
+					} catch (error) {
+						console.error('날짜 포맷 변환 실패:', error);
+						return '-';
+					}
+				}
+
+				getStatusBadge(status) {
+					if (!status) return this.getDefaultStatusBadge();
+
+					try {
+						const statusMap = {
+							'LTST001': ['status-created', '생성', 'bi-plus-circle'],
+							'LTST002': ['status-progress', '공정 진행중', 'bi-arrow-repeat'],
+							'LTST003': ['status-complete', '검사 대기', 'bi-hourglass'],
+							'LTST004': ['status-hold', '검사 진행중', 'bi-clipboard-check'],
+							'LTST005': ['status-cancel', '입고 대기', 'bi-box-arrow-in-down'],
+							'LTST006': ['status-cancel', '입고 완료', 'bi-box-seam'],
+							'LTST007': ['status-cancel', '공정 완료', 'bi-check-circle'],
+							'LTST008': ['status-cancel', '검사 완료', 'bi-check-square'],
+							'LTST009': ['status-complete', '출고 대기', 'bi-box-arrow-up'],
+							'LTST010': ['status-complete', '출고 완료', 'bi-truck']
+						};
+
+						const [className, label, icon] = statusMap[status] || ['status-created', '미지정', 'bi-question-circle'];
+						return `<span class="status-badge ${className}"><i class="bi ${icon}"></i> ${label}</span>`;
+					} catch (error) {
+						console.error('상태 배지 생성 실패:', error);
+						return this.getDefaultStatusBadge();
+					}
+				}
+
+				getDefaultStatusBadge() {
+					return '<span class="status-badge status-created"><i class="bi bi-question-circle"></i> 미지정</span>';
+				}
+
+				getActionTypeBadge(actionType) {
+					if (!actionType) return '-';
+
+					try {
+						const badges = {
+							'START': '<span class="badge bg-primary">시작</span>',
+							'END': '<span class="badge bg-success">완료</span>',
+							'HOLD': '<span class="badge bg-warning">보류</span>',
+							'CANCEL': '<span class="badge bg-danger">취소</span>'
+						};
+						return badges[actionType] || actionType;
+					} catch (error) {
+						console.error('작업 타입 배지 생성 실패:', error);
+						return actionType || '-';
+					}
+				}
+
+				getJudgementBadge(row) {
+					if (!row?.judgement) return '-';
+
+					try {
+						const badges = {
+							'Y': '<span class="badge bg-success">합격</span>',
+							'N': `<span class="badge bg-danger d-flex align-items-center gap-1">
+				                            불합격
+				                            <i class="bi bi-exclamation-triangle-fill"></i>
+				                        </span>`
+						};
+						return badges[row.judgement] || row.judgement;
+					} catch (error) {
+						console.error('판정 배지 생성 실패:', error);
+						return row.judgement || '-';
+					}
+				}
+
+				getProcessTypeIcon(processType) {
+					if (!processType) return 'bi bi-question-circle';
+
+					try {
+						const iconMap = {
+							'PRTP001': 'bi bi-gear',         // 공정
+							'PRTP002': 'bi bi-tools',        // 조립
+							'PRTP003': 'bi bi-fire',         // 열처리
+							'QRTP001': 'bi bi-search',       // 품질검사
+							'IRTP001': 'bi bi-box-arrow-in-down',  // 입고
+							'ORTP001': 'bi bi-box-arrow-up'  // 출고
+						};
+						return iconMap[processType] || 'bi bi-question-circle';
+					} catch (error) {
+						console.error('프로세스 타입 아이콘 생성 실패:', error);
+						return 'bi bi-question-circle';
+					}
+				}
+
+				getProcessTypeClass(processType) {
+					if (!processType) return 'process-default';
+
+					try {
+						const classMap = {
+							'PRTP001': 'process-machining',   // 공정
+							'PRTP002': 'process-assembly',    // 조립
+							'PRTP003': 'process-heat',        // 열처리
+							'QRTP001': 'process-qc',          // 품질검사
+							'IRTP001': 'process-in',          // 입고
+							'ORTP001': 'process-out'          // 출고
+						};
+						return classMap[processType] || 'process-default';
+					} catch (error) {
+						console.error('프로세스 타입 클래스 생성 실패:', error);
+						return 'process-default';
+					}
+				}
+
+				showMessage(message, type = 'info') {
+					if (!this.lotDetailsView?.length) return;
+
+					try {
+						const alertClass = `alert alert-${type}`;
+						const iconClass = type === 'danger' ? 'bi-exclamation-triangle' : 'bi-info-circle';
+
+						this.lotDetailsView.html(`
+				                    <div class="${alertClass} d-flex align-items-center">
+				                        <i class="bi ${iconClass} me-2"></i>
+				                        ${message}
+				                    </div>
+				                `);
+					} catch (error) {
+						console.error('메시지 표시 실패:', error);
+					}
+				}
+
+				showErrorMessage(message) {
+					this.showMessage(message, 'danger');
+				}
+
+				showLoading() {
+					if (!this.lotDetailsView?.length) return;
+
+					try {
+						const loadingHtml = `
+				                    <div class="text-center p-4">
+				                        <div class="spinner-border text-primary" role="status">
+				                            <span class="visually-hidden">Loading...</span>
+				                        </div>
+				                        <p class="mt-2 text-muted">데이터를 불러오는 중입니다...</p>
+				                    </div>
+				                `;
+						this.lotDetailsView.html(loadingHtml);
+					} catch (error) {
+						console.error('로딩 표시 실패:', error);
+					}
+				}
+
+				hideLoading() {
+					// 필요한 경우 로딩 표시 제거
+				}
+
+				handleError(error, message) {
+					console.error(error);
+					this.showErrorMessage(message);
+				}
+			}
+
+			// 페이지 로드 시 앱 인스턴스 생성
 			try {
-				return new Date(dateStr).toLocaleString('ko-KR', {
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit'
-				});
+				window.lotTrackingApp = new LotTrackingApp();
 			} catch (error) {
-				console.error('날짜 포맷 변환 실패:', error);
-				return '-';
+				console.error('Application initialization failed:', error);
+
+				const errorHtml = `
+				            <div class="alert alert-danger" role="alert">
+				                <h4 class="alert-heading">
+				                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+				                    초기화 오류
+				                </h4>
+				                <p>애플리케이션을 초기화하는 중 오류가 발생했습니다.</p>
+				                <hr>
+				                <p class="mb-0">페이지를 새로고침하거나 잠시 후 다시 시도해주세요.</p>
+				            </div>
+				        `;
+				const lotTreeView = document.getElementById('lotTreeView');
+				if (lotTreeView) {
+					lotTreeView.innerHTML = errorHtml;
+				}
 			}
-		}
-
-		getStatusBadge(status) {
-			if (!status) return this.getDefaultStatusBadge();
-
-			try {
-				const statusMap = {
-					'LTST001': ['status-created', '생성', 'bi-plus-circle'],
-					'LTST002': ['status-progress', '공정 진행중', 'bi-arrow-repeat'],
-					'LTST003': ['status-complete', '검사 대기', 'bi-hourglass'],
-					'LTST004': ['status-hold', '검사 진행중', 'bi-clipboard-check'],
-					'LTST005': ['status-cancel', '입고 대기', 'bi-box-arrow-in-down'],
-					'LTST006': ['status-cancel', '입고 완료', 'bi-box-arrow-in-down-fill'],
-					'LTST007': ['status-cancel', '공정 완료', 'bi-check-circle'],
-					'LTST008': ['status-cancel', '검사 완료', 'bi-check-square'],
-					'LTST009': ['status-complete', '출고 대기', 'bi-box-arrow-up'],
-					'LTST010': ['status-complete', '출고 완료', 'bi-box-arrow-up-fill']
-				};
-
-				const [className, label, icon] = statusMap[status] || ['status-created', '미지정', 'bi-question-circle'];
-				return `<span class="status-badge ${className}"><i class="bi ${icon}"></i> ${label}</span>`;
-			} catch (error) {
-				console.error('상태 배지 생성 실패:', error);
-				return this.getDefaultStatusBadge();
-			}
-		}
-
-		getDefaultStatusBadge() {
-			return '<span class="status-badge status-created"><i class="bi bi-question-circle"></i> 미지정</span>';
-		}
-
-		getActionTypeBadge(actionType) {
-			if (!actionType) return '-';
-
-			try {
-				const badges = {
-					'START': '<span class="badge bg-primary">시작</span>',
-					'END': '<span class="badge bg-success">완료</span>',
-					'HOLD': '<span class="badge bg-warning">보류</span>',
-					'CANCEL': '<span class="badge bg-danger">취소</span>'
-				};
-				return badges[actionType] || actionType;
-			} catch (error) {
-				console.error('작업 타입 배지 생성 실패:', error);
-				return actionType || '-';
-			}
-		}
-
-		getJudgementBadge(row) {
-			if (!row?.judgement) return '-';
-
-			try {
-				const badges = {
-					'Y': '<span class="badge bg-success">합격</span>',
-					'N': `<span class="badge bg-danger d-flex align-items-center gap-1">
-		                            불합격
-		                            <i class="bi bi-exclamation-triangle-fill"></i>
-		                        </span>`
-				};
-				return badges[row.judgement] || row.judgement;
-			} catch (error) {
-				console.error('판정 배지 생성 실패:', error);
-				return row.judgement || '-';
-			}
-		}
-
-		getProcessTypeIcon(processType) {
-			if (!processType) return 'bi bi-question-circle';
-
-			try {
-				const iconMap = {
-					'PRTP001': 'bi bi-gear',         // 공정
-					'PRTP002': 'bi bi-tools',        // 조립
-					'PRTP003': 'bi bi-fire',         // 열처리
-					'QRTP001': 'bi bi-search',       // 품질검사
-					'IRTP001': 'bi bi-box-arrow-in-down',  // 입고
-					'ORTP001': 'bi bi-box-arrow-up'  // 출고
-				};
-				return iconMap[processType] || 'bi bi-question-circle';
-			} catch (error) {
-				console.error('프로세스 타입 아이콘 생성 실패:', error);
-				return 'bi bi-question-circle';
-			}
-		}
-
-		getProcessTypeClass(processType) {
-			if (!processType) return 'process-default';
-
-			try {
-				const classMap = {
-					'PRTP001': 'process-machining',   // 공정
-					'PRTP002': 'process-assembly',    // 조립
-					'PRTP003': 'process-heat',        // 열처리
-					'QRTP001': 'process-qc',          // 품질검사
-					'IRTP001': 'process-in',          // 입고
-					'ORTP001': 'process-out'          // 출고
-				};
-				return classMap[processType] || 'process-default';
-			} catch (error) {
-				console.error('프로세스 타입 클래스 생성 실패:', error);
-				return 'process-default';
-			}
-		}
-
-		showMessage(message, type = 'info') {
-			if (!this.lotDetailsView?.length) return;
-
-			try {
-				const alertClass = `alert alert-${type}`;
-				const iconClass = type === 'danger' ? 'bi-exclamation-triangle' : 'bi-info-circle';
-
-				this.lotDetailsView.html(`
-		                    <div class="${alertClass} d-flex align-items-center">
-		                        <i class="bi ${iconClass} me-2"></i>
-		                        ${message}
-		                    </div>
-		                `);
-			} catch (error) {
-				console.error('메시지 표시 실패:', error);
-			}
-		}
-
-		showErrorMessage(message) {
-			this.showMessage(message, 'danger');
-		}
-
-		showLoading() {
-			if (!this.lotDetailsView?.length) return;
-
-			try {
-				const loadingHtml = `
-		                    <div class="text-center p-4">
-		                        <div class="spinner-border text-primary" role="status">
-		                            <span class="visually-hidden">Loading...</span>
-		                        </div>
-		                        <p class="mt-2 text-muted">데이터를 불러오는 중입니다...</p>
-		                    </div>
-		                `;
-				this.lotDetailsView.html(loadingHtml);
-			} catch (error) {
-				console.error('로딩 표시 실패:', error);
-			}
-		}
-
-		hideLoading() {
-			// 필요한 경우 로딩 표시 제거
-		}
-
-		handleError(error, message) {
-			console.error(error);
-			this.showErrorMessage(message);
-		}
-	}
-
-	// 페이지 로드 시 앱 인스턴스 생성
-	try {
-		window.lotTrackingApp = new LotTrackingApp();
-	} catch (error) {
-		console.error('Application initialization failed:', error);
-
-		const errorHtml = `
-		            <div class="alert alert-danger" role="alert">
-		                <h4 class="alert-heading">
-		                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-		                    초기화 오류
-		                </h4>
-		                <p>애플리케이션을 초기화하는 중 오류가 발생했습니다.</p>
-		                <hr>
-		                <p class="mb-0">페이지를 새로고침하거나 잠시 후 다시 시도해주세요.</p>
-		            </div>
-		        `;
-		const lotTreeView = document.getElementById('lotTreeView');
-		if (lotTreeView) {
-			lotTreeView.innerHTML = errorHtml;
-		}
-	}
-});
+		});
