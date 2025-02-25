@@ -23,10 +23,11 @@ ORDER BY end_time DESC
 
 <!-- 생산계획번호 조회 -->
 <select id="selectPlanId" resultType="java.util.Map">
-select pl.plan_id AS planId, c.common_detail_name AS palnStatus, p.product_name AS productName, TO_CHAR(pl.plan_date, 'YYYY-MM-DD') AS planDate
-from plans pl
-join product p on REGEXP_SUBSTR(pl.plan_id, '[^-]+', 1, 3) = p.product_no
-join common_detail c on pl.plan_status = c.common_detail_code
+SELECT pl.plan_id AS planId, c.common_detail_name AS palnStatus, p.product_name AS productName, TO_CHAR(pl.plan_date, 'YYYY-MM-DD') AS planDate
+FROM plans pl
+JOIN product p ON REGEXP_SUBSTR(pl.plan_id, '[^-]+', 1, 3) = p.product_no
+JOIN common_detail c ON pl.plan_status = c.common_detail_code
+ORDER BY planDate desc
 </select>
 
 
