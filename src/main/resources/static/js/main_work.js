@@ -113,4 +113,75 @@ $(document).ready(function () {
     updateCurrentMonth();
 	// 페이지 로드 시 일정 가져오기
 	fetchSchedules();
+	
+	
+	
+	// 부서 셀렉트 박스 
+	$('#deptSelect').on('click', function () {
+	    // 이미 데이터가 로드된 경우 추가 요청 방지
+	    if (this.options.length > 1) {
+	        return;
+	    }
+	
+	    const type = 'DEPT'; 
+	
+	    getCommonList(type).then(function (data) {
+	        $('#deptSelect')
+	            .empty()
+				.append('<option value="" disabled selected>전체 부서</option>');
+	        data.forEach(item => {
+	            if (item.common_detail_code && item.common_detail_name) {
+	                $('#deptSelect').append(
+	                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+	                );
+	            }
+	        });
+	    });
+	    
+	}); // 부서 셀렉트 박스
+	
+	
+
+	// type으로 공통 코드 가져오는 함수
+	function getCommonList(type) {
+	    return axios.get(`/api/absence/common/list/${type}`)
+	        .then(function (response) {
+	            return response.data; // 데이터 반환
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
+	            return []; // 에러 발생 시 빈 배열 반환
+	        });
+	}
+	
+	$('#deptSelect').on('change', function () {
+	    // 이미 데이터가 로드된 경우 추가 요청 방지
+	    if (this.options.length > 1) {
+	        return;
+	    }
+	
+	    const type = 'DEPT'; 
+	
+	    getCommonList(type).then(function (data) {
+	        $('#deptSelect')
+	            .empty()
+				.append('<option value="" disabled selected>전체 부서</option>');
+	        data.forEach(item => {
+	            if (item.common_detail_code && item.common_detail_name) {
+	                $('#deptSelect').append(
+	                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
+	                );
+	            }
+	        });
+	    });
+	    
+	}); // 부서 셀렉트 박스
+	
+
+
 });
