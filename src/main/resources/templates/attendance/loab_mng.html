@@ -25,6 +25,9 @@
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+	
 	<style>
 		.child-input1 {
 			flex: 1;
@@ -399,6 +402,7 @@
 			
 			// "저장" 버튼 클릭 이벤트
 			$('#save').on('click', async function () {
+				grid.blur();
 				const modifiedRows = grid.getModifiedRows();
 				console.log(modifiedRows); 
 				
@@ -413,9 +417,9 @@
 				    return (
 				        !row.EMP_ID ||
 				        !row.EMP_NAME ||
-				        !row.EMP_DEPT ||
-				        !row.EMP_POSITION ||
-				        !row.ABSENCE_TYPE ||
+				        !row.DEPT_NAME ||
+				        !row.POSITION_NAME ||
+				        !row.TYPE_NAME ||
 				        !row.ABSENCE_START ||
 				        !row.ABSENCE_END ||
 				        !row.HIGH_APPROVAL
@@ -549,45 +553,48 @@
 							name: 'ABSENCE_NO', 
 							width: 60,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-							editor: isEditable ? 'text' : null
+							editor: isEditable ? 'text' : null,
+							align: 'center' 
 						},
 						{ 
 							header: '사원번호', 
 							name: 'EMP_ID', 
 							width: 120,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-							editor: isEditable ? 'text' : null
+							align: 'center' 
 						},  
 						{ 
 							header: '사원명', 
 							name: 'EMP_NAME', 
 							width: 100,
 							filter: { type: 'text', showApplyBtn: true, showClearBtn: true },
-							editor: isEditable ? 'text' : null
+							align: 'center' 
 						},
 						{ 
 							header: '부서', 
-							name: 'EMP_DEPT',
+							name: 'DEPT_NAME',
 							width: 100,
-							editor: isEditable ? 'text' : null,
-							filter: 'select'
+							filter: 'select',
+							align: 'center' 
 						},
 						{ 
 							header: '직급', 
-							name: 'EMP_POSITION', 
+							name: 'POSITION_NAME', 
 							width: 100,
 							editor: isEditable ? 'text' : null,
-							filter: 'select'
+							filter: 'select',
+							align: 'center' 
 						},
 						{ 
 							header: '종류', 
-							name: 'ABSENCE_TYPE',
+							name: 'TYPE_NAME',
 							width: 100,
 							editor: isEditable ? {
 								type: 'select',
 								options: {listItems: data.loabCommon}
 						    } : null,
-							filter: 'select'
+							filter: 'select',
+							align: 'center' 
 						},
 						
 						{ 
@@ -604,7 +611,8 @@
 				            filter: {
 				                type: 'date',
 				                options: {format: 'yyyy-MM-dd', language: 'ko'}
-				            }
+				            },
+				            align: 'center' 
 				        },
 				        { 
 							header: '휴직 종료일', 
@@ -621,7 +629,8 @@
 				                    format: 'yyyy-MM-dd',
 				                    language: 'ko'
 				                }
-				            }
+				            },
+				            align: 'center' 
 				        },
 				        {
 				            header: '신청일', 
@@ -634,7 +643,8 @@
 				            filter: {
 				                type: 'date',
 				                options: {format: 'yyyy-MM-dd hh:mm', language: 'ko'}
-				            }
+				            },
+				            align: 'center' 
 				        },
 				        { 
 							header: '최종 승인자', 
@@ -645,13 +655,15 @@
 								type: 'select',
 								options: {listItems: data.highList}
 						    } : null,
-							filter: 'select'
+							filter: 'select',
+							align: 'center' 
 						},
 						{ 
 							header: '비고', 
 							name: 'ABSENCE_REMARK',
 							width: 200,
-							editor: isEditable ? 'text' : null
+							editor: isEditable ? 'text' : null,
+							align: 'center' 
 						}
 					],
 					editing: isEditable  // 편집 기능 활성화
@@ -660,19 +672,20 @@
 			    
 			    
 			 	// 사원번호/사원명 수정 시 모달창에서 사원 조회 후 등록
-			    grid.on('editingStart', function (ev) {
-			    	const { rowKey, columnName } = ev;
-
-			        // 사원번호 또는 사원명 수정 시 모달 띄우기
-			        if (columnName === 'EMP_ID' || columnName === 'EMP_NAME' || columnName === 'EMP_DEPT' || columnName === 'EMP_POSITION') {
-			            ev.stop(); // 기본 편집 동작 중단
-			            
-			        	// 해당 행의 데이터 가져오기
-			            const rowData = grid.getRow(rowKey);
-						
-						// 행정보 전달
-			            showEmpModal(rowKey);
-			        }
+			    grid.on('click', function (ev) {
+			    	if(isEditable) {
+				    	const { rowKey, columnName } = ev;
+	
+				        // 사원번호 또는 사원명 수정 시 모달 띄우기
+				        if (columnName === 'EMP_ID' || columnName === 'EMP_NAME' || columnName === 'DEPT_NAME' || columnName === 'POSITION_NAME') {
+				            
+				        	// 해당 행의 데이터 가져오기
+				            const rowData = grid.getRow(rowKey);
+							
+							// 행정보 전달
+				            showEmpModal(rowKey);
+				        }
+			    	}
 			        
 			    });
 			 	
@@ -692,10 +705,10 @@
 			            data: [], // 초기 데이터
 			            rowHeaders: ['checkbox'], // 행 헤더: 체크박스 추가
 			            columns: [
-			                { header: '사번', name: 'EMP_ID', width: 120 },
-			                { header: '이름', name: 'EMP_NAME', width: 100 },
-			                { header: '부서', name: 'EMP_DEPT', width: 100 },
-			                { header: '직급', name: 'EMP_POSITION', width: 100 }
+			                { header: '사번', name: 'EMP_ID', width: 120, align: 'center'  },
+			                { header: '이름', name: 'EMP_NAME', width: 100, align: 'center'  },
+			                { header: '부서', name: 'EMP_DEPT', width: 100, align: 'center'  },
+			                { header: '직급', name: 'EMP_POSITION', width: 100, align: 'center'  }
 			            ]
 			        });
 			    }
@@ -732,8 +745,8 @@
 				        // 메인 Grid 데이터 업데이트
 				        grid.setValue(rowKey, 'EMP_ID', selectedRow.EMP_ID); // EMP_ID 업데이트
 				        grid.setValue(rowKey, 'EMP_NAME', selectedRow.EMP_NAME); // EMP_NAME 업데이트
-				        grid.setValue(rowKey, 'EMP_DEPT', selectedRow.EMP_DEPT); // EMP_DEPT 업데이트
-				        grid.setValue(rowKey, 'EMP_POSITION', selectedRow.EMP_POSITION); // EMP_POSITION 업데이트
+				        grid.setValue(rowKey, 'DEPT_NAME', selectedRow.EMP_DEPT); // DEPT_NAME 업데이트
+				        grid.setValue(rowKey, 'POSITION_NAME', selectedRow.EMP_POSITION); // POSITION_NAME 업데이트
 
 				        modal.modal('hide'); // 모달창 닫기
 				    } else if (selectedRows.length > 1) {

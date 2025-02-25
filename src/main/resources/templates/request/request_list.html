@@ -18,7 +18,10 @@
 	<link rel="icon" href="images/favicon.png" type="images/png">
 	<!-- TOAST UI CDN -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
+	
 	<style>
 		.tui-grid-cell {
 			/* !important -> 우선순위 높아짐 */

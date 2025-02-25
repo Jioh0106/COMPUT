@@ -27,6 +27,12 @@ public interface WorkMapper {
 
 	List<WorkTmpDTO> getWorkTmpList();
 
+	List<Map<String, Object>> getLoabList(Map<String, String> map);
+
+	List<Map<String, Object>> getVctnList(Map<String, String> map);
+
+	Map<String, Object> checkVctn(@Param("day") String day, @Param("emp_id") String emp_id);
+
 
 
 	

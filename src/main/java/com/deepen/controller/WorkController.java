@@ -27,7 +27,6 @@ public class WorkController {
 	
 	private final WorkService workService;
 	
-	
 	// 근무 관리
 	@GetMapping("/work-mng")
 	public String workMng(@AuthenticationPrincipal User user, HttpServletRequest request, Model model) {
@@ -76,11 +75,10 @@ public class WorkController {
 	@GetMapping("/work-tmp")
 	public String workTmp() {
 		//http://localhost:8082/work-tmp
-		
-		
 		return "attendance/work_tmp";
 	}
 
+	
 	
 	
 
