@@ -55,8 +55,16 @@ public class ExcelService {
 				productDTO.setProduct_unit(getCellValue(row.getCell(1))); //상품단위
 				productDTO.setProduct_type(getCellValue(row.getCell(2))); //상품유형(완제품,반제품)
 				
-				productList.add(productDTO);
-				  log.info("엑셀 데이터 읽음: " + productDTO.toString()); // 추가
+				 // 유효한 데이터인지 확인 후 추가
+			    if (productDTO.getProduct_name() != null && productDTO.getProduct_type() != null) {
+			        productList.add(productDTO);
+			        log.info("엑셀 데이터 읽음: " + productDTO.toString());
+			    } else {
+			        log.info("빈 데이터가 포함된 행이므로 제외됨.");
+			    }
+				
+//				productList.add(productDTO);
+//				  log.info("엑셀 데이터 읽음: " + productDTO.toString()); // 추가
 			}
 			
 			
@@ -70,9 +78,12 @@ public class ExcelService {
 	
 	
 	private String getCellValue(Cell cell) {
-	    if (cell == null) {
-	        return "";
-	    }
+		  if (cell == null || cell.getCellType() == CellType.BLANK) {
+		        return null;  // 빈 값은 null로 설정
+		    }
+//	    if (cell == null) {
+//	        return null;
+//	    }
 	    switch (cell.getCellType()) {
 	        case STRING:
 	            return cell.getStringCellValue();
@@ -83,9 +94,9 @@ public class ExcelService {
 	        case FORMULA:
 	            return cell.getCellFormula();
 	        case BLANK:
-	            return "";
+	            return null;
 	        default:
-	            return "";
+	            return null;
 	    }
 	}
 	
