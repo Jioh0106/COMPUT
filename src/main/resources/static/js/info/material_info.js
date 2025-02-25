@@ -7,42 +7,42 @@ $(function() {
 	console.log('isEditable :', isEditable); 
 	
 	// 그리드 수정 시 공통코드 셀렉트값 가져오기
-		function mainFetchData() {
-		    
-		    return Promise.all([
-		         getCommonList('UNIT'), 
-		    ])
-		    .then(function ([unitCommon]) {
-		        return {
-		            unitCommon: unitCommon.map(item => ({
-		                text: item.common_detail_name,
-		                value: item.common_detail_name
-		            }))
-		        };
-		    })
-		    .catch(function (error) {
-		        console.error('Error fetching data:', error);
-		        return { unitCommon: [] };
-		    });
-		}
-		
-		// type으로 공통 코드 가져오는 함수
-		function getCommonList(type) {
-		    return axios.get(`/api/absence/common/list/${type}`)
-		        .then(function (response) {
-		            return response.data; // 데이터 반환
-		        })
-		        .catch(function (error) {
-		            console.error('Error fetching data:', error);
-					Swal.fire(
-					        'Error',
-					        '데이터를 가져오는 중 문제가 발생했습니다.',
-					        'error'
-					      )
-		            return []; // 에러 발생 시 빈 배열 반환
-		        });
-		}
+	function mainFetchData() {
+	    
+	    return Promise.all([
+	         getCommonList('UNIT'), 
+	    ])
+	    .then(function ([unitCommon]) {
+	        return {
+	            unitCommon: unitCommon.map(item => ({
+	                text: item.common_detail_name,
+	                value: item.common_detail_name
+	            }))
+	        };
+	    })
+	    .catch(function (error) {
+	        console.error('Error fetching data:', error);
+	        return { unitCommon: [] };
+	    });
+	}
 	
+	// type으로 공통 코드 가져오는 함수
+	function getCommonList(type) {
+	    return axios.get(`/api/absence/common/list/${type}`)
+	        .then(function (response) {
+	            return response.data; // 데이터 반환
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
+	            return []; // 에러 발생 시 빈 배열 반환
+	        });
+	}
+
 	
 	let grid;
 	mainFetchData().then(function (data) {  

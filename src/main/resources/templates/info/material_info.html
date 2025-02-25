@@ -92,7 +92,7 @@
 	
 	<script th:inline="javascript">
 		const role = /*[[${#authentication.authorities[0].authority.replace('ROLE_', '')}]]*/ '';
-		const data = (/*[[${materialList }]]*/ [] || []).reverse();
+// 		const data = (/*[[${materialList }]]*/ [] || []).reverse();
 	</script>
 	<!--자재 관리 JS -->
 	<script th:inline="javascript" th:src="@{/js/info/material_info.js}" ></script>
