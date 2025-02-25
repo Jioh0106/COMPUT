@@ -21,6 +21,7 @@ import com.deepen.domain.WorkDTO;
 import com.deepen.domain.WorkTmpDTO;
 import com.deepen.service.WorkService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -30,10 +31,10 @@ import lombok.extern.java.Log;
 @RequestMapping("/api/work")
 public class WorkRestController {
 	
-	/** 근무관리 서비스 */
+	/* 근무관리 서비스 */
 	private final WorkService workService;
 	
-	/** 직원 검색 조회 */
+	/* 직원 검색 조회 */
 	@GetMapping("/serchEmp")
 	public ResponseEntity<List<Map<String, String>>> getSerchEmpList(@RequestParam Map<String, String> serchEmpInfo) {
 		
@@ -49,7 +50,7 @@ public class WorkRestController {
 	} // getSerchEmpList
 
 	
-	// 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인
+	/* 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인 */
 	@PostMapping("/check")
 	public ResponseEntity<?> checkWork(@RequestBody WorkAddDTO appendData) {
 		
@@ -72,7 +73,7 @@ public class WorkRestController {
 		
 	} // ckeckWork
 	
-	// 근무 테이블에 추가
+	/* 근무 테이블에 추가 */
 	@PostMapping("/insert")
     public ResponseEntity<String> insertWork(@RequestBody WorkAddDTO appendData) {
 		
@@ -89,7 +90,7 @@ public class WorkRestController {
 	    
     } // insertWork
 	
-	/** 근무일정 정보 조회 */
+	/* 근무일정 정보 조회 */
 	@GetMapping("/list")
 	public ResponseEntity<List<WorkDTO>> getWorkList(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
@@ -112,18 +113,20 @@ public class WorkRestController {
 	public ResponseEntity<List<WorkDTO>> getWorkListSerch(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
 													@RequestParam("dept") String dept,
-													@RequestParam("emp_info") String emp_info) {
-		
+													@RequestParam("serch_box") String serch_box,
+													HttpSession session) {
+		Map<String, Object> emp = (Map<String, Object>) session.getAttribute("sEmp");
+		String emp_id = (String) emp.get("emp_id");
 		log.info("dept = " + dept );
-		log.info("emp_info = " + emp_info );
 		log.info("start = " + start );
 		log.info("end = " + end );
-		
+		log.info("serch_box = " + serch_box );
 		Map<String, String> map = new HashMap<>();
 		map.put("start", start);
 		map.put("end", end);
 		map.put("dept", dept);
-		map.put("emp_info", emp_info);
+		map.put("serch_box", serch_box);
+		map.put("emp_id", emp_id);
 		
 		List<WorkDTO> list = workService.getWorkListSerch(map);
 		

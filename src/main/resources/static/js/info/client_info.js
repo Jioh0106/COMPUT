@@ -177,22 +177,34 @@ $(function() {
 			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
 	    }
-		
-		const deleteList = selectedRows.map(row => row.client_no);
-		
-		axios.post('/api/client/delete', deleteList, {
-			headers: {
-			        'X-CSRF-TOKEN': csrfToken
-			    }
-		})
-	    .then(function (response) {
-			Swal.fire('Success','삭제가 완료되었습니다.','success')
-	        window.location.reload();
-	    })
-	    .catch(function (error) {
-	        console.error('삭제 중 오류 발생:', error);
-			Swal.fire('Error', '삭제 중 문제가 발생했습니다.','error')
-	    });
+		Swal.fire({
+		      icon: "warning",
+		      title: "거래처 정보 삭제",
+			  text: "해당 정보를 모두 삭제하시겠습니까?",
+		      showCancelButton: true,
+		      confirmButtonText: "확인",   
+		      cancelButtonText: "취소"     
+		}).then((result) => {
+			if (result.isConfirmed) {  
+				const deleteList = selectedRows.map(row => row.client_no);
+				
+				axios.post('/api/client/delete', deleteList, {
+					headers: {
+					        'X-CSRF-TOKEN': csrfToken
+					    }
+				})
+			    .then(function (response) {
+					Swal.fire('Success','삭제가 완료되었습니다.','success')
+					.then(() => {
+						window.location.reload();  
+					});
+			    })
+			    .catch(function (error) {
+			        console.error('삭제 중 오류 발생:', error);
+					Swal.fire('Error', '삭제 중 문제가 발생했습니다.','error')
+			    });
+			} 
+		});
 		
 	}); // 삭제 버튼 이벤트
 	

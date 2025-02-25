@@ -126,17 +126,17 @@ $(function() {
 		height: 600,
 		bodyHeight: 550,
 		columns: [
-			{header: 'No', name: 'work_no'},
-			{header: '사원번호', name: 'emp_id'},
-			{header: '사원명', name: 'emp_name'},
-			{header: '부서', name: 'emp_dept'},
-			{header: '근무일자', name: 'work_date'},
-			{header: '시작시간', name: 'work_start'},
-			{header: '종료시간', name: 'work_end'},
-			{header: '휴게시간', name: 'rest_time'},
-			{header: '근무시간', name: 'work_time'},
-			{header: '근무 템플릿', name: 'work_tmp_name'},
-			{header: '근무유형', name: 'work_shift'}
+			{header: 'No', name: 'work_no', align: 'center'},
+			{header: '사원번호', name: 'emp_id', align: 'center'},
+			{header: '사원명', name: 'emp_name', align: 'center'},
+			{header: '부서', name: 'emp_dept', align: 'center'},
+			{header: '근무일자', name: 'work_date', align: 'center'},
+			{header: '시작시간', name: 'work_start', align: 'center'},
+			{header: '종료시간', name: 'work_end', align: 'center'},
+			{header: '휴게시간', name: 'rest_time', align: 'center'},
+			{header: '근무시간', name: 'work_time', align: 'center'},
+			{header: '근무 템플릿', name: 'work_tmp_name', align: 'center'},
+			{header: '근무유형', name: 'work_shift', align: 'center'}
 		],
 		data: [] // 서버에서 전달받은 데이터
 	});
@@ -166,21 +166,31 @@ $(function() {
 	
 	// ============================================
 	// 검색 버튼 클릭 시 그리드 데이터 초기화
-	$('#serch').on('click', function() {
+	$('.serch').on('input', function() {
+	    updateGrid();
+	});
+	instance1.on('change', function() {
+	    updateGrid();  // 날짜가 변경되면 그리드 데이터 갱신
+	});
+
+	instance2.on('change', function() {
+	    updateGrid();
+	});
+	function updateGrid() {
 		grid.resetData([]);
 		
 		let start = instance1.getDate().toLocaleDateString('en-CA');  
 		let end = instance2.getDate().toLocaleDateString('en-CA');
 		let dept = $('#deptSelect').val() ||'';
-		let emp_info = $('#searchEmp').val() || '';
+		let serch_box = $('#searchEmp').val() || '';
 		console.log("start : "  + start);
 		console.log("end : "  + end);
 		console.log("dept : "  + dept);
-		console.log("emp_info : "  + emp_info);
+		console.log("serch_box : "  + serch_box);
 		
 		
 		axios.get('/api/work/list/serch', {
-			params: { start, end, dept, emp_info }
+			params: { start, end, dept, serch_box }
 		})
 		.then(function (response) {
 			const data = response.data; // 데이터 로드
@@ -191,11 +201,11 @@ $(function() {
 		.catch(function (error) {
 		    console.error('Error fetching data:', error);
 		});
-			
 		
-	});
-		
-		
+	}
+
+
+	
 		
 	
 

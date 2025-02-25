@@ -493,12 +493,12 @@ $(function() {
 						window.location.reload();  
 					});
 				})
-		          .catch(function (error) {
-		              console.error('삭제 중 오류 발생:', error);
-		              Swal.fire('Error', '삭제 중 문제가 발생했습니다.', 'error' );
-		          });
-		      } 
-		  });
+	          .catch(function (error) {
+	              console.error('삭제 중 오류 발생:', error);
+	              Swal.fire('Error', '삭제 중 문제가 발생했습니다.', 'error' );
+	          });
+	      } 
+	  });
 	}
 	
 	
