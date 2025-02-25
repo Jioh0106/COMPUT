@@ -35,6 +35,7 @@ public class MaterialService {
 		for(MaterialDTO row : createdRows) {
 			Material material = Material.setMaterialToEntity(row);
 			material.setMtr_no(null);
+			material.setMtr_unit(cdRepository.findCommonDetailCodeByName(row.getUnit_name()));
 			repository.save(material);
 		}
 	}
