@@ -121,11 +121,12 @@ public class VacationService {
 		
 		// 요청내역 테이블 데이터
 		map.put("rqstType", String.valueOf(rqstMap.get("type")));
+		map.put("aprvId", String.valueOf(rqstMap.get("aprvId")));
+		map.put("role", String.valueOf(rqstMap.get("role")));
 		map.put("status", "RQST001");
 		
-		// 요청자 및 중간승인권자
+		// 요청자
 		map.put("leaveId", String.valueOf(vctnMap.get("leaveId")));
-		map.put("aprvId", String.valueOf(vctnMap.get("aprvId")));
 		
 		int rqstNo = mapper.insertRequest(map); // 요청내역
 		int result = mapper.insertVctn(map);	// 휴가
