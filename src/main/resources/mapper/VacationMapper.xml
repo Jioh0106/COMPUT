@@ -220,12 +220,26 @@
 		  , request_status
 		  , request_date
 		  , request_deadline
-		  , middle_approval
+		  <choose>
+	        <when test="role == 'ATHR001'">
+	            , high_approval
+	        </when>
+	        <otherwise>
+	            , middle_approval
+	        </otherwise>
+	     </choose>
 		  , emp_id
 		
 		) VALUES ( 
 		    #{rqstType}
-		  , #{status}
+		  	<choose>
+		        <when test="role == 'ATHR001'">
+		            , 'RQST005'
+		        </when>
+		        <otherwise>
+		            , 'RQST001'
+		        </otherwise>
+	     	</choose>
 		  , CURRENT_DATE
 		  , CURRENT_DATE + 5
 		  , #{aprvId}
