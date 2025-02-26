@@ -212,7 +212,8 @@ const gridConfig = {
 // ================== 전역 변수 ==================
 
 let grid = null;
-let missingPaymentGrid = null; 
+let missingPaymentGrid = null;
+let selectedRowKey = null;
 
 // ================== 데이터 로드 및 검색 함수 ==================
 
@@ -464,7 +465,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 그리드 초기화 시 클래스 추가
 // 메인 그리드 초기화
 function initializeMainGrid(isRegularEmployee) {
     grid = new tui.Grid({
@@ -520,7 +520,7 @@ function initializeMissingPaymentGrid() {
             },
             {
                 header: '부서',
-                name: 'departmentName',
+                name: 'departmentName', 
                 width: 200,
                 align: 'center',
                 formatter: function(cell) {
@@ -609,7 +609,7 @@ async function addMissingEmployees() {
 	    }
 	
     showLoadingSpinner();
-
+	
     try {
         // 선택된 각 직원에 대해 급여 계산
         for (const employee of checkedRows) {
@@ -666,6 +666,7 @@ async function addMissingEmployees() {
         alert(`${checkedRows.length}명의 직원이 추가되었습니다.`);
         const modal = bootstrap.Modal.getInstance(document.getElementById('missingPaymentModal'));
         modal?.hide();
+		$('.modal-backdrop').remove();
 
     } catch (error) {
         hideLoadingSpinner();
@@ -1235,21 +1236,3 @@ function savePaymentData() {
 					    document.getElementById('simulationResult').style.display = 'none';
 					});
 					
-					// 각 항목 업데이트
-					const fields = {
-				        'sim-baseSalary': 'baseSalary',
-				        'sim-nationalPension': 'nationalPension',
-				        'sim-healthInsurance': 'healthInsurance',
-				        'sim-longTermCare': 'longTermCare',
-				        'sim-employmentInsurance': 'employmentInsurance',
-				        'sim-incomeTax': 'incomeTax',
-				        'sim-residentTax': 'residentTax',
-				        'sim-totalDeductions': 'totalDeductions',
-				        'sim-netSalary': 'netSalary'
-				    };
-
-				    Object.entries(fields).forEach(([elementId, dataKey]) => {
-				        const value = data[dataKey];
-				        console.log(`Updating ${elementId} with value:`, value); // 각 필드 업데이트 확인
-				        document.getElementById(elementId).textContent = formatCurrency(value);
-				    });

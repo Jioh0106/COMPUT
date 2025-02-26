@@ -204,6 +204,18 @@
 						            <div class="card-body">
 						                <h5 class="card-title">검사 통계</h5>
 						                <div class="row">
+						                    <div class="col-md-6">
+						                        <div class="chart-container" style="position: relative; height: 250px;">
+						                            <canvas id="inspectionPieChart"></canvas>
+						                        </div>
+						                    </div>
+						                    <div class="col-md-6">
+						                        <div class="chart-container" style="position: relative; height: 250px;">
+						                            <canvas id="processBarChart"></canvas>
+						                        </div>
+						                    </div>
+						                </div>
+						                <div class="row mt-3">
 						                    <div class="col-md-4">
 						                        <div class="summary-card cursor-pointer" onclick="filterByJudgement('')" id="totalStats">
 						                            <h6>전체 검사</h6>
@@ -243,6 +255,7 @@
 
     <!-- JavaScript -->
     <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
     <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
     <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>

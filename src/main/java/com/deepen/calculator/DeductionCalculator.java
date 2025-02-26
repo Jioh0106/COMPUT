@@ -86,25 +86,21 @@ public class DeductionCalculator {
 
     // 비율 기반 공제 계산 (국민연금, 건강보험, 고용보험)
     private BigDecimal calculatePercentageDeduction(JsonNode formula, PayInfo payInfo) {
-        log.info("비율 기반 공제 계산 시작 - formula: {}", formula);
         
         BigDecimal base = BigDecimal.ZERO;
         JsonNode baseFields = formula.get("baseFields");
         
         for (JsonNode field : baseFields) {
             String fieldName = field.asText();
-            log.info("기준금액 필드 처리: {}", fieldName);
             
             switch (fieldName) {
                 case "emp_salary" -> {
                     BigDecimal salary = new BigDecimal(payInfo.getEmpSalary());
                     base = base.add(salary);
-                    log.info("기본급 추가: {}", salary);
                 }
                 case "allow_amt" -> {
                     if (payInfo.getAllowAmt() != null) {
                         base = base.add(payInfo.getAllowAmt());
-                        log.info("수당 추가: {}", payInfo.getAllowAmt());
                     }
                 }
             }
@@ -112,8 +108,6 @@ public class DeductionCalculator {
         
         BigDecimal rate = new BigDecimal(formula.get("rate").asText());
         BigDecimal result = base.multiply(rate).setScale(0, RoundingMode.DOWN);
-        log.info("계산 결과 - 기준금액: {}, 요율: {}, 결과: {}", base, rate, result);
-        
         return result;
     }
 
