@@ -87,7 +87,6 @@
 	    animation: pulse 2s infinite !important;
 	}
 	
-	/* 레이아웃 구조 */
 	.split {
 	    display: flex;
 	    height: calc(100vh - 240px) !important;
@@ -102,7 +101,6 @@
 	    padding: 1rem;
 	}
 	
-	/* 검색 영역 */
 	.search-area {
 	    background: white;
 	    padding: 1.5rem;
@@ -252,7 +250,6 @@
 	    100% { opacity: 1; }
 	}
 	
-	/* Split.js 스타일 */
 	.gutter {
 	    background-color: var(--bg-header);
 	    border: 1px solid var(--border-color);
@@ -263,7 +260,6 @@
 	    width: 8px !important;
 	}
 	
-	/* 탭 컨텐츠 */
 	.tab-content {
 	    height: calc(100% - 42px);
 	    overflow: hidden;
@@ -299,12 +295,10 @@
 	    background: #a8a8a8;
 	}
 	
-	/* Grid 스타일 */
 	.tui-grid-cell.qc-failed {
 	    color: var(--error-color);
 	}
 	
-	/* 반응형 스타일 */
 	@media (max-width: 768px) {
 	    .search-row {
 	        flex-direction: column;
@@ -333,13 +327,6 @@
 			<div class="page-heading">
 				<div class="d-flex justify-content-between align-items-center">
 					<h3>LOT 추적</h3>
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb mb-0">
-							<li class="breadcrumb-item"><a href="/"><i class="bi bi-house"></i></a></li>
-							<li class="breadcrumb-item">생산관리</li>
-							<li class="breadcrumb-item active">LOT 추적</li>
-						</ol>
-					</nav>
 				</div>
 			</div>
 
@@ -355,12 +342,10 @@
 			        </select>
 			        <select id="processSelect" class="form-select" style="width: 150px;">
 			            <option value="">전체 공정</option>
-			            <option value="PRTP001">가공</option>
-			            <option value="PRTP002">조립</option>
-			            <option value="PRTP003">열처리</option>
-			            <option value="QRTP001">품질검사</option>
-			            <option value="IRTP001">입고</option>
-			            <option value="ORTP001">출고</option>
+			            <option value="PRTP001">공정</option>
+			            <option value="PRTP002">품질검사</option>
+			            <option value="PRTP003">입고</option>
+			            <option value="PRTP004">출고</option>
 			        </select>
 			        <button id="searchButton" class="btn btn-primary">
 			            <i class="bi bi-search me-1"></i>검색
