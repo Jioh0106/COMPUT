@@ -41,7 +41,7 @@ public class ExcelService {
 				rowIterator.next();
 			}
 			
-			//두번째 행
+			//두번째 행 -> pruduct_name, product_unit, product_type이 적힌 행.
 			if(rowIterator.hasNext()){
 				rowIterator.next();
 			}

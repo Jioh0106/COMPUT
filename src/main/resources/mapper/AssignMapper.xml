@@ -161,7 +161,7 @@
  	 	<if test="startDate != null and startDate !='' and endDate != null and endDate !='' and search != null and search != ''">
         	AND (e.emp_id LIKE '%' || #{search} || '%' OR e.emp_name LIKE '%' || #{search} || '%')
     	</if>
-	    ORDER BY a.assignment_no	   
+	    ORDER BY a.assignment_no desc	   
 				
 	</select>
 	
