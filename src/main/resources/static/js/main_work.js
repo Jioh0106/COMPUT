@@ -1,7 +1,5 @@
 $(document).ready(function () {
 	
-
-	
 	// 오늘 날짜를 "yyyy-MM-dd" 형식으로 포맷
 	function formatDate(date) {
         const year = date.getFullYear();
