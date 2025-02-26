@@ -6,10 +6,22 @@ let lineGrid = "";
 
 // 페이지 로드 시 설비 정보 조회하는 함수 호출
 
-window.onload = function () { //페이지 로드 시 사용내역 그리드 현시 처리
-	selectProcessInfo();
-	document.getElementById('tab-line-tab').addEventListener('click',selectLineInfo);
-};
+//window.onload = async function () { //페이지 로드 시 사용내역 그리드 현시 처리
+//	selectProcessInfo();
+//	document.getElementById('tab-line-tab').addEventListener('click',selectLineInfo);
+//};
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("문서 로드 완료");
+
+    // 공정 정보 로드
+    selectProcessInfo();
+
+    // 탭 클릭 시 라인 정보 조회
+    document.getElementById('tab-line-tab').addEventListener('click', function() {
+        selectLineInfo();
+    });
+});
 
 // 공정정보
 // 초기 화면 함수
