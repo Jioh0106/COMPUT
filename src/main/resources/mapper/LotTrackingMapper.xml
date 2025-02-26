@@ -124,72 +124,153 @@
 		ORDER BY lql.qc_log_no DESC
 	</select>
 
-	<!-- LOT 계층 구조 조회 수정 -->
-	<!-- <select id="selectLotDetail" -->
-	<!-- resultType="com.deepen.domain.LotMasterDTO"> -->
-	<!-- SELECT -->
-	<!-- lm.lot_no as lotNo, -->
-	<!-- lm.parent_lot_no as parentLotNo, -->
-	<!-- lm.process_type as processType, -->
-	<!-- lm.wi_no as wiNo, -->
-	<!-- p.product_no as productNo, -->
-	<!-- p.product_name as productName, -->
-	<!-- lm.process_no as processNo, -->
-	<!-- pi.process_name as processName, -->
-	<!-- lm.line_no as lineNo, -->
-	<!-- li.line_name as lineName, -->
-	<!-- lm.lot_status as lotStatus, -->
-	<!-- cd.common_detail_name as statusName, -->
-	<!-- lm.start_time as startTime, -->
-	<!-- lm.end_time as endTime, -->
-	<!-- lm.create_user as createUser, -->
-	<!-- LEVEL as hierarchyLevel, -->
-	<!-- CONNECT_BY_ROOT lot_no as rootLotNo, -->
-	<!-- SYS_CONNECT_BY_PATH(lot_no, '/') as lotPath -->
-	<!-- FROM lot_master lm -->
-	<!-- LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no -->
-	<!-- LEFT JOIN product p ON wi.product_no = p.product_no -->
-	<!-- LEFT JOIN process_info pi ON lm.process_no = pi.process_no -->
-	<!-- LEFT JOIN line_info li ON lm.line_no = li.line_no -->
-	<!-- LEFT JOIN common_detail cd ON lm.lot_status = cd.common_detail_code -->
-	<!-- START WITH lot_no = #{lotNo} -->
-	<!-- CONNECT BY NOCYCLE PRIOR lot_no = parent_lot_no -->
-	<!-- ORDER SIBLINGS BY start_time DESC -->
-	<!-- </select> -->
-	
-	<!-- LOT 계층 구조 조회 수정 -->
-	<select id="selectLotDetail" resultType="com.deepen.domain.LotMasterDTO">
-	    SELECT DISTINCT
-	        lm.lot_no as lotNo,
-	        lm.parent_lot_no as parentLotNo,
-	        lm.process_type as processType,
-	        lm.wi_no as wiNo,
-	        p.product_no as productNo,
-	        p.product_name as productName,
-	        lm.process_no as processNo,
-	        pi.process_name as processName,
-	        lm.line_no as lineNo,
-	        li.line_name as lineName,
-	        lm.lot_status as lotStatus,
-	        cd.common_detail_name as statusName,
-	        lm.start_time as startTime,
-	        lm.end_time as endTime,
-	        lm.create_user as createUser
-	    FROM lot_master lm
-	    LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no
-	    LEFT JOIN product p ON wi.product_no = p.product_no
-	    LEFT JOIN process_info pi ON lm.process_no = pi.process_no
-	    LEFT JOIN line_info li ON lm.line_no = li.line_no
-	    LEFT JOIN common_detail cd ON lm.lot_status = cd.common_detail_code 
-	    WHERE lm.lot_no = #{lotNo}
-	        OR lm.lot_no IN (
-	            SELECT child.lot_no
-	            FROM lot_master child
-	            START WITH child.lot_no = #{lotNo}
-	            CONNECT BY NOCYCLE PRIOR child.lot_no = child.parent_lot_no
-	        )
-	    ORDER BY 
-	        CASE WHEN lm.lot_no = #{lotNo} THEN 0 ELSE 1 END,
-	        lm.start_time DESC
+	<!-- LOT 계층 구조 조회 -->
+	<select id="selectLotDetail"
+		resultType="com.deepen.domain.LotMasterDTO">
+		SELECT DISTINCT
+		lm.lot_no as lotNo,
+		lm.parent_lot_no as
+		parentLotNo,
+		lm.process_type as processType,
+		lm.wi_no as wiNo,
+		p.product_no as productNo,
+		p.product_name as productName,
+		lm.process_no
+		as processNo,
+		pi.process_name as processName,
+		lm.line_no as lineNo,
+		li.line_name as lineName,
+		lm.lot_status as lotStatus,
+		cd.common_detail_name as statusName,
+		lm.start_time as startTime,
+		lm.end_time as endTime,
+		lm.create_user as createUser
+		FROM lot_master lm
+		LEFT JOIN work_instruction wi ON lm.wi_no = wi.wi_no
+		LEFT JOIN product
+		p ON wi.product_no = p.product_no
+		LEFT JOIN process_info pi ON
+		lm.process_no = pi.process_no
+		LEFT JOIN line_info li ON lm.line_no =
+		li.line_no
+		LEFT JOIN common_detail cd ON lm.lot_status =
+		cd.common_detail_code
+		WHERE lm.lot_no = #{lotNo}
+		OR lm.lot_no IN (
+		SELECT child.lot_no
+		FROM lot_master child
+		START WITH child.lot_no =
+		#{lotNo}
+		CONNECT BY NOCYCLE PRIOR child.lot_no = child.parent_lot_no
+		)
+		ORDER BY
+		CASE WHEN lm.lot_no = #{lotNo} THEN 0 ELSE 1 END,
+		lm.start_time DESC
+	</select>
+
+	<!-- 작업지시 정보 조회 쿼리 추가 -->
+	<select id="selectWorkOrderInfo" resultType="java.util.HashMap">
+		SELECT
+		wi.wi_no as
+		wiNo,
+		p.product_no as productNo,
+		p.product_name as productName,
+		wi.wi_status as wiStatus,
+		cd.common_detail_name as statusName
+		FROM work_instruction wi
+		LEFT JOIN product p ON wi.product_no
+		= p.product_no
+		LEFT JOIN common_detail cd ON wi.wi_status =
+		cd.common_detail_code
+		WHERE wi.wi_no = #{wiNo}
+	</select>
+
+	<select id="searchLots"
+		resultType="com.deepen.domain.LotMasterDTO"
+		parameterType="java.util.Map">
+		SELECT
+		l.lot_no AS lotNo,
+		l.parent_lot_no AS parentLotNo,
+		FROM lot_master
+		l
+		LEFT JOIN work_instruction wi ON l.wi_no = wi.wi_no
+		LEFT JOIN product
+		p ON wi.product_no = p.product_no
+		LEFT JOIN process_info pi ON
+		l.process_no = pi.process_no
+		WHERE 1=1
+		<if test="lotNo != null and lotNo != ''">
+			AND l.lot_no LIKE '%' || #{lotNo} || '%'
+		</if>
+		<if test="productNo != null and productNo != 0">
+			AND p.product_no = #{productNo}
+		</if>
+		<if test="processType != null and processType != ''">
+			AND l.process_type = #{processType}
+		</if>
+		<if test="searchText != null and searchText != ''">
+			AND (
+			l.lot_no LIKE '%' || #{searchText} || '%' OR
+			p.product_name LIKE '%' || #{searchText} || '%'
+			)
+		</if>
+		ORDER BY l.start_time DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+
+	<select id="countSearchLots" resultType="int"
+		parameterType="java.util.Map">
+		SELECT COUNT(*)
+		FROM lot_master l
+		LEFT JOIN
+		work_instruction wi ON l.wi_no = wi.wi_no
+		LEFT JOIN product p ON
+		wi.product_no = p.product_no
+		WHERE 1=1
+	</select>
+
+	<select id="searchLotsByFilter"
+		resultType="com.deepen.domain.LotMasterDTO">
+		SELECT
+		l.lot_no AS lotNo,
+		l.parent_lot_no AS parentLotNo,
+		l.process_type AS processType,
+		l.wi_no AS wiNo,
+		p.product_no AS productNo,
+		p.product_name AS productName,
+		pi.process_no AS processNo,
+		pi.process_name AS processName,
+		l.lot_status AS lotStatus,
+		l.start_time AS startTime,
+		l.end_time AS endTime,
+		l.create_user AS createUser
+		FROM lot_master l
+		LEFT JOIN work_instruction wi ON l.wi_no = wi.wi_no
+		LEFT JOIN product p ON wi.product_no = p.product_no
+		LEFT JOIN process_info pi ON l.process_no = pi.process_no
+		LEFT JOIN line_info li ON l.line_no = li.line_no
+		WHERE 1=1
+		<if test="lotNo != null and lotNo != ''">
+			AND l.lot_no LIKE '%' || #{lotNo} || '%'
+		</if>
+		<if test="wiNo != null and wiNo != 0">
+			AND l.wi_no = #{wiNo}
+		</if>
+		<if test="productNo != null and productNo != 0">
+			AND p.product_no = #{productNo}
+		</if>
+		<if test="processType != null and processType != ''">
+			AND l.process_type = #{processType}
+		</if>
+		<if test="searchText != null and searchText != ''">
+			AND (
+			l.lot_no LIKE '%' || #{searchText} || '%' OR
+			p.product_name LIKE '%' || #{searchText} || '%'
+			)
+		</if>
+		ORDER BY l.start_time DESC
+		<if test="limit != null">
+			LIMIT #{limit} OFFSET #{offset}
+		</if>
 	</select>
 </mapper>

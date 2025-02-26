@@ -385,44 +385,44 @@ public class QualityInspectionService {
     /**
      * 다음 공정 LOT 생성
      */
-    @Transactional
-    public void createNextProcessLot(String currentLotNo, String judgement) {
-        // 합격인 경우에만 다음 공정 LOT 생성
-        if (!"Y".equals(judgement)) {
-            log.info("Skip creating next process LOT - judgement is not passed: {}", judgement);
-            return;
-        }
-
-        LotMasterDTO currentLot = qualityInspectionMapper.selectLotMasterByNo(currentLotNo);
-        ProcessInfoDTO nextProcess = qualityInspectionMapper.selectNextProcess(currentLot.getProcessNo());
-        
-        if (nextProcess != null) {
-            // 현재 날짜 기준 순차 번호 조회
-            String currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            int sequence = qualityInspectionMapper.getNextLotSequence(currentDate);
-            
-            // 새로운 LOT 번호 생성
-            String newLotNo = String.format("%s-NP%d-%03d", 
-                                          currentDate, 
-                                          nextProcess.getProcessNo(), 
-                                          sequence);
-            
-            LotMasterDTO newLot = new LotMasterDTO();
-            newLot.setLotNo(newLotNo);
-            newLot.setParentLotNo(currentLotNo);
-            newLot.setProcessType(currentLot.getProcessType());
-            newLot.setWiNo(currentLot.getWiNo());
-            newLot.setProductNo(currentLot.getProductNo());
-            newLot.setProcessNo(nextProcess.getProcessNo());
-            newLot.setLotStatus("LTST003"); // 검사 대기 상태
-            newLot.setStartTime(LocalDateTime.now());
-            newLot.setCreateUser("SYSTEM");
-            
-            qualityInspectionMapper.insertLotMaster(newLot);
-            
-            log.info("Created next process LOT: {} for parent LOT: {}", newLotNo, currentLotNo);
-        } else {
-            log.info("No next process found for LOT: {}", currentLotNo);
-        }
-    }
+//    @Transactional
+//    public void createNextProcessLot(String currentLotNo, String judgement) {
+//        // 합격인 경우에만 다음 공정 LOT 생성
+//        if (!"Y".equals(judgement)) {
+//            log.info("Skip creating next process LOT - judgement is not passed: {}", judgement);
+//            return;
+//        }
+//
+//        LotMasterDTO currentLot = qualityInspectionMapper.selectLotMasterByNo(currentLotNo);
+//        ProcessInfoDTO nextProcess = qualityInspectionMapper.selectNextProcess(currentLot.getProcessNo());
+//        
+//        if (nextProcess != null) {
+//            // 현재 날짜 기준 순차 번호 조회
+//            String currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//            int sequence = qualityInspectionMapper.getNextLotSequence(currentDate);
+//            
+//            // 새로운 LOT 번호 생성
+//            String newLotNo = String.format("%s-Q%d-%03d", 
+//                                          currentDate, 
+//                                          nextProcess.getProcessNo(), 
+//                                          sequence);
+//            
+//            LotMasterDTO newLot = new LotMasterDTO();
+//            newLot.setLotNo(newLotNo);
+//            newLot.setParentLotNo(currentLotNo);
+//            newLot.setProcessType(currentLot.getProcessType());
+//            newLot.setWiNo(currentLot.getWiNo());
+//            newLot.setProductNo(currentLot.getProductNo());
+//            newLot.setProcessNo(nextProcess.getProcessNo());
+//            newLot.setLotStatus("LTST003"); // 검사 대기 상태
+//            newLot.setStartTime(LocalDateTime.now());
+//            newLot.setCreateUser("SYSTEM");
+//            
+//            qualityInspectionMapper.insertLotMaster(newLot);
+//            
+//            log.info("Created next process LOT: {} for parent LOT: {}", newLotNo, currentLotNo);
+//        } else {
+//            log.info("No next process found for LOT: {}", currentLotNo);
+//        }
+//    }
 }
