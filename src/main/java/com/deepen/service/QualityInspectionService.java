@@ -128,10 +128,10 @@ public class QualityInspectionService {
             // 원본 LOT 상태를 검사완료로 업데이트
             qualityInspectionMapper.updateLotStatusAndResult(originalLotNo, "LTST007");
 
-            // 다음 공정 LOT 생성 (합격인 경우에만)
-            if (allPassed) {
-                createNextProcessLot(originalLotNo, "Y");
-            }
+//            // 다음 공정 LOT 생성 (합격인 경우에만)
+//            if (allPassed) {
+//                createNextProcessLot(originalLotNo, "Y");
+//            }
 
             log.info("Successfully saved inspection results for LOT: {}, Status: LTST008, All Passed: {}", 
                      originalLotNo, allPassed);

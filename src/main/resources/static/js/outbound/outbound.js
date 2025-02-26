@@ -56,7 +56,7 @@ $(function() {
 	                    e.stopPropagation();
 	                    const rowKey = props.rowKey;
 	                    const rowData = grid.getRow(rowKey);
-	                    changeStatus(rowData.in_no);
+	                    changeStatus(rowData.out_no);
 	                };
 	            } else {
 	                // 권한이 없는 경우 버튼 비활성화
