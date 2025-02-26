@@ -624,9 +624,9 @@ document.getElementById('workStartBtn').addEventListener('click', async () => {
        	const empId = workInstructionGrid.getValue(row.rowKey, 'emp_id');
         console.log("empId : ",empId);
        	if (!empId) {
-           	console.warn("담당자을 선택해주세요");
+           	console.warn("담당자를 선택해주세요");
 			Swal.fire({
-				title:"담당자을 선택해주세요",
+				title:"담당자를 선택해주세요",
 				icon:"info",
 				confirmButtonColor: "#435ebe",
 				confirmButtonText: "확인"
