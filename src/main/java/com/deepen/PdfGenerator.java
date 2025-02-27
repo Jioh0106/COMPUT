@@ -16,11 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PdfGenerator {
     
-    private static final String[] FONT_PATHS = {
-        "C:/Windows/Fonts/malgun.ttf",  // Windows
-        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",  // Linux
-        "/Library/Fonts/AppleGothic.ttf"  // Mac
-    };
+	private static final String[] FONT_PATHS = {
+	    "C:/Windows/Fonts/malgun.ttf",  // Windows
+	    "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",  // Ubuntu/Linux
+	    "/usr/share/fonts/NanumGothic.ttf",  // Amazon Linux 2
+	    "/Library/Fonts/AppleGothic.ttf"  // Mac
+		};
     
     public byte[] generatePdf(String html) throws Exception {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -34,7 +35,7 @@ public class PdfGenerator {
                     renderer.getFontResolver().addFont(
                         fontPath,
                         BaseFont.IDENTITY_H, 
-                        BaseFont.NOT_EMBEDDED
+                        BaseFont.EMBEDDED
                     );
                     fontLoaded = true;
                     log.info("사용한 폰트: {}", fontPath);
