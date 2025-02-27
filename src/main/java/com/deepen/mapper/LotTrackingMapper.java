@@ -1,6 +1,7 @@
 package com.deepen.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,7 +21,14 @@ public interface LotTrackingMapper {
     
     // LOT 품질검사 이력 조회
     List<LotQcDTO> selectLotQcHistory(String lotNo);
+
+    Map<String, Object> selectWorkOrderInfo(Integer wiNo);
     
-    // BOM 기반 LOT 계층 구조 조회
-//    List<LotHierarchyDTO> selectLotHierarchy(String lotNo);
+	List<LotMasterDTO> searchLots(Map<String, Object> params);
+	
+	int countSearchLots(Map<String, Object> params);
+	
+	List<LotMasterDTO> searchLotsByFilter(Map<String, Object> params);
+	
+	int countLotsByFilter(Map<String, Object> params);
 }

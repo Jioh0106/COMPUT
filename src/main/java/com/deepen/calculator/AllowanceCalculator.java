@@ -21,7 +21,6 @@ public class AllowanceCalculator {
 	
 	private final VacationMapper vacationMapper;
 	
-	@Autowired
     public AllowanceCalculator(VacationMapper vacationMapper) {
         this.vacationMapper = vacationMapper;
     }
@@ -31,11 +30,9 @@ public class AllowanceCalculator {
      */
 	public BigDecimal calculateTechAllowance(JsonNode formula, Employees emp) {
 	    if (!"OCPT003".equals(emp.getEmp_job_type())) {
-	        log.info("기술직이 아닌 직원: empId={}, jobType={}", emp.getEmp_id(), emp.getEmp_job_type());
 	        return BigDecimal.ZERO;
 	    }
 	    
-	    log.info("기술수당 계산: empId={}, amount={}", emp.getEmp_id(), formula.get("amount").asText());
 	    return new BigDecimal(formula.get("amount").asText());
 	}
 
@@ -62,7 +59,6 @@ public class AllowanceCalculator {
 	    String mappedRank = rankMapping.get(empRank);
 	    
 	    if (mappedRank == null) {
-	        log.warn("알 수 없는 성과 등급: empId={}, rank={}", emp.getEmp_id(), empRank);
 	        return BigDecimal.ZERO;
 	    }
 
@@ -70,8 +66,6 @@ public class AllowanceCalculator {
 	    if (rates.has(mappedRank)) {
 	        BigDecimal result = new BigDecimal(emp.getEmp_salary())
 	            .multiply(new BigDecimal(rates.get(mappedRank).asText()));
-	        log.info("성과수당 계산: empId={}, rank={}, amount={}", 
-	            emp.getEmp_id(), mappedRank, result);
 	        return result;
 	    }
 	    
@@ -125,13 +119,10 @@ public class AllowanceCalculator {
                     }
                 }
                 if (!isPaymentMonth) {
-                    log.info("휴가수당 지급월이 아님: empId={}, month={}", emp.getEmp_id(), currentMonth);
                     return BigDecimal.ZERO;
                 }
             } else {
-                // months가 없는 경우 12월에만 지급
                 if (currentMonth != 12) {
-                    log.info("휴가수당 지급월이 아님(12월 한정): empId={}, month={}", emp.getEmp_id(), currentMonth);
                     return BigDecimal.ZERO;
                 }
             }
@@ -152,7 +143,6 @@ public class AllowanceCalculator {
             // 5. 미사용 휴가 일수 조회
             Map<String, Object> vacationInfo = vacationMapper.vctnDays(emp.getEmp_id());
             if (vacationInfo == null || !vacationInfo.containsKey("total")) {
-                log.info("휴가 정보 없음: empId={}", emp.getEmp_id());
                 return BigDecimal.ZERO;
             }
             
@@ -168,15 +158,9 @@ public class AllowanceCalculator {
             BigDecimal allowanceAmount = dailyRate
                 .multiply(new BigDecimal(unusedDays))
                 .setScale(0, RoundingMode.DOWN);
-
-            log.info("휴가수당 계산 완료: empId={}, month={}, dailyRate={}, unusedDays={}, allowance={}", 
-                emp.getEmp_id(), currentMonth, dailyRate, unusedDays, allowanceAmount);
-                
             return allowanceAmount;
 
         } catch (Exception e) {
-            log.error("휴가수당 계산 중 오류 발생: empId={}, error={}, formula={}", 
-                emp.getEmp_id(), e.getMessage(), formula.toString(), e);
             return BigDecimal.ZERO;
         }
     }
@@ -185,7 +169,6 @@ public class AllowanceCalculator {
      * 지급월 여부 확인
      */
     private boolean isPaymentMonth(JsonNode months, int currentMonth) {
-        // months가 null이거나 배열이 아닌 경우 true 반환 (매월 지급)
         if (months == null || !months.isArray()) {
             return true;
         }

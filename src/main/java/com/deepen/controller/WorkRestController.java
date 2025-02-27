@@ -30,10 +30,10 @@ import lombok.extern.java.Log;
 @RequestMapping("/api/work")
 public class WorkRestController {
 	
-	/** 근무관리 서비스 */
+	/* 근무관리 서비스 */
 	private final WorkService workService;
 	
-	/** 직원 검색 조회 */
+	/* 직원 검색 조회 */
 	@GetMapping("/serchEmp")
 	public ResponseEntity<List<Map<String, String>>> getSerchEmpList(@RequestParam Map<String, String> serchEmpInfo) {
 		
@@ -49,7 +49,7 @@ public class WorkRestController {
 	} // getSerchEmpList
 
 	
-	// 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인
+	/* 선택된 직원이 선택된 날짜에 기등록된 근무 일정이 있는지 확인 */
 	@PostMapping("/check")
 	public ResponseEntity<?> checkWork(@RequestBody WorkAddDTO appendData) {
 		
@@ -72,7 +72,7 @@ public class WorkRestController {
 		
 	} // ckeckWork
 	
-	// 근무 테이블에 추가
+	/* 근무 테이블에 추가 */
 	@PostMapping("/insert")
     public ResponseEntity<String> insertWork(@RequestBody WorkAddDTO appendData) {
 		
@@ -89,7 +89,7 @@ public class WorkRestController {
 	    
     } // insertWork
 	
-	/** 근무일정 정보 조회 */
+	/* 근무일정 정보 조회 */
 	@GetMapping("/list")
 	public ResponseEntity<List<WorkDTO>> getWorkList(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
@@ -112,18 +112,17 @@ public class WorkRestController {
 	public ResponseEntity<List<WorkDTO>> getWorkListSerch(@RequestParam("start") String start, 
 													@RequestParam("end") String end,
 													@RequestParam("dept") String dept,
-													@RequestParam("emp_info") String emp_info) {
+													@RequestParam("serch_box") String serch_box,
+													@AuthenticationPrincipal User user) {
 		
-		log.info("dept = " + dept );
-		log.info("emp_info = " + emp_info );
-		log.info("start = " + start );
-		log.info("end = " + end );
 		
+		String emp_id = user.getUsername();
 		Map<String, String> map = new HashMap<>();
 		map.put("start", start);
 		map.put("end", end);
 		map.put("dept", dept);
-		map.put("emp_info", emp_info);
+		map.put("serch_box", serch_box);
+		map.put("emp_id", emp_id);
 		
 		List<WorkDTO> list = workService.getWorkListSerch(map);
 		
@@ -132,24 +131,27 @@ public class WorkRestController {
 		return ResponseEntity.ok(list);
         
 	}
-	//    
 	
+	/* 메인 캘린더 월별 일정 조회 */
 	@GetMapping("/schedules")
 	public ResponseEntity<List<ScheduleDTO>> getSchedules( @RequestParam("startDate") String startDate,
 	        											@RequestParam("endDate") String endDate,
+	        											@RequestParam("dept") String dept,
 	        											@AuthenticationPrincipal User user) {
 		String emp_id = user.getUsername();
 		log.info("startDate : " + startDate);
 		log.info("endDate : " + endDate);
+		log.info("dept : " + dept);
 		log.info("emp_id : " + emp_id);
 		
 		Map<String, String> map = new HashMap<>();
 		map.put("start", startDate);
 		map.put("end", endDate);
+		map.put("dept", dept);
 		map.put("emp_id", emp_id);
 		
 		List<ScheduleDTO> schedules = workService.getSchedulesBetween(map);
-		
+		log.info(schedules.toString());
 		
 		return ResponseEntity.ok(schedules);
 	}
@@ -159,7 +161,6 @@ public class WorkRestController {
 	public ResponseEntity<List<WorkTmpDTO>> getWorkTmpList() {
 		
 		List<WorkTmpDTO> list = workService.getWorkTmpList();
-		System.out.println("********************getWorkTmpList = " + list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -186,8 +187,19 @@ public class WorkRestController {
         
     } // insertWork
 	
-	
-	
+	/** 근무일정 그리드 정보 삭제 **/
+	@PostMapping("/delete")
+	public ResponseEntity<String> deleteWork(@RequestBody List<Integer> deleteList) {
+		
+		log.info(deleteList.toString());
+		
+	    try {
+	    	workService.deleteWork(deleteList);
+	        return ResponseEntity.ok("삭제가 완료되었습니다.");
+		} catch (Exception e) {
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생");
+	    }
+	} // deleteMaterial
 	
 	
 	

@@ -128,7 +128,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-light-secondary" onClick='window.close()'>닫기</button>
-				<button type="button" class="btn btn-primary" data-bs-target="#defaultSize" data-bs-toggle="modal"
+				<button type="button" class="btn btn-primary" data-bs-target="#defaultSize"
 					onclick="middleAprvr()">신청</button>
 			</div>
 		</div>
@@ -162,6 +162,7 @@
 					<button type="button" class="btn btn-primary ml-1" onclick="requestApproval()">
 						<i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">승인요청</span>
 					</button>
+					<input type="hidden" class="form-control serch-content" id="emp_role" th:value="${session.sEmp.EMP_ROLE}">
 				</div>
 			</div>
 		</div>
@@ -188,6 +189,12 @@
 		const name = $("#userName").val()
 
 		let selectApprover = {};
+		
+		var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
+		var vctnCnt = 0; // 잔여 일수
+		
+		const empRole = document.getElementById('emp_role').value;  // 현재 로그인된 사용자 권한
+		const empId = document.getElementById('emp_id').value;  // 현재 로그인된 사용자 ID
 
 		// Toast Grid 초기화
 		let grid;
@@ -214,16 +221,20 @@
 				data: gridData
 			});
 
-			// 그리드에 값 미현시로 모달창 열린 후 레이아웃 새로 고침 처리
-			$('#defaultSize').on('shown.bs.modal', function () {
-				grid.refreshLayout();
-			});
+			if(empRole == 'ATHR001'){
+				requestApproval();
+			} else {
+				$("#defaultSize").modal("show"); // 모달 강제 실행
+				// 그리드에 값 미현시로 모달창 열린 후 레이아웃 새로 고침 처리
+				$('#defaultSize').on('shown.bs.modal', function () {
+					grid.refreshLayout();
+				});
+			}
 
 			// 중간승인권자 선택 - 그리드 행 클릭 이벤트 처리 (이벤트 위임 방식)
 			grid.on('click', (ev) => {
 				if (ev.rowKey !== null) {
 					const row = grid.getRow(ev.rowKey); // 클릭한 행의 데이터 가져오기
-					console.info(row);
 					Approver(row); // Approver(row) 호출
 				}
 			});
@@ -260,8 +271,11 @@
 					type: type
 				}),
 				success: function (res) {
-					console.info(res);
-					document.getElementById('vctnDays').value = res;
+					vctnCnt = res;
+					// 유효성
+					if(validity()){
+						document.getElementById('vctnDays').value = res;
+					}
 				},
 				error: function () {
 					Swal.fire({
@@ -276,8 +290,8 @@
 		// 승인 요청 클릭 시 실행되는 함수
 		function requestApproval() {
 			const vctnSeList = document.getElementById("vctnSe"); // 휴가 구분 리스트
-
-			if (!selectApprover.approverEmp_id) {
+			
+			if (empRole != 'ATHR001' && !selectApprover.approverEmp_id) {
 				swal("중간승인권자를 선택하세요.");
 				return;
 			}
@@ -288,7 +302,6 @@
 				, endDate: document.getElementById('use-end-date').value
 				, total: document.getElementById('use-days').value
 				, leaveId: document.getElementById('empId').value
-				, aprvId: selectApprover.approverEmp_id
 				, rmrk: document.getElementById('rmrk').value
 			}
 			
@@ -296,7 +309,8 @@
 
 			const rqstDTO = {
 				type: '휴가'
-				, aprvId: selectApprover.approverEmp_id
+				, aprvId: empRole != 'ATHR001' ? selectApprover.approverEmp_id : empId
+				, role: empRole
 				, empId: document.getElementById('empId').value
 			}
 
@@ -348,8 +362,7 @@
 
 			const startDate = new Date(startDateValue);
 			const endDate = new Date(endDateValue);
-
-			var count = 0; //일수(const는 재할당 안 돼서 var로 변경)
+			count = 0; // 초기화
 
 			if (startDateValue && endDateValue) {
 
@@ -369,6 +382,21 @@
 				}
 				document.getElementById('use-days').value = count;
 			}
+			
+			// 휴가 구분 선택 후 날짜 변경 시 유효성 실행
+			if(document.getElementById('vctnDays').value != ""){
+				if(validity());
+			}
+		}
+		
+		// 사용일수 및 잔여일수 유효성
+		function validity() {
+			if(count > vctnCnt){
+				swal("사용할 수 있는 잔여일수가 부족합니다.");
+				document.getElementById("vctnSe").value = '';
+				return false;
+			}
+			return true;
 		}
 	</script>
 

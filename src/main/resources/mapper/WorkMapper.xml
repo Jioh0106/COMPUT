@@ -40,6 +40,13 @@
 		   AND work_date = #{day}
     </select>
     
+    <select id="checkVctn">
+    	SELECT *
+    	  FROM VACATION
+    	 WHERE VACATION_LEAVE = #{emp_id}
+    	   AND (#{day} BETWEEN VACATION_START AND VACATION_END)  
+    </select>
+    
     <insert id="insertWork" parameterType="com.deepen.domain.WorkDTO">
     	INSERT INTO work(emp_id, work_date, work_tmp_name)
     	VALUES (
@@ -52,23 +59,37 @@
 	<select id="getWorkList" resultType="com.deepen.domain.WorkDTO" parameterType="map">
 	    SELECT *
 	      FROM work_view
-	     WHERE emp_id = #{emp_id}
-	       AND work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+		<where>
+			work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+			<if test="dept == null or dept == ''">
+				AND emp_id = #{emp_id}
+			</if>
+			<if test="dept != null and dept != '' and dept != 'deptAll'">
+				AND emp_dept = #{dept}
+			</if>
+		</where>
+		ORDER BY work_date DESC
 	</select>
 	
 	<select id="getWorkListSerch" resultType="com.deepen.domain.WorkDTO" parameterType="map">
 	    SELECT *
 	      FROM work_view
-	     WHERE work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
-		 <if test="dept != null and dept != ''">
-		   AND emp_dept = #{dept}
-		 </if>
-		 <if test="emp_info != null and emp_info != ''">
-		   AND (
-	           emp_name LIKE '%' || #{emp_info} || '%'
-	           OR emp_id LIKE '%' || #{emp_info} || '%'
-	       )
-		 </if>
+		<where>
+			work_date BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD')
+			<if test="(serch_box == null or serch_box == '') and (dept == null or dept == '')">
+		    	AND emp_id = #{emp_id}
+			</if>
+			<if test="dept != null and dept != '' and dept != 'deptAll'">
+		    	AND emp_dept = #{dept}
+			</if>
+		    <if test="serch_box != null and serch_box != ''">
+		        AND (
+		            emp_name LIKE '%' || #{serch_box} || '%'
+		            OR emp_id LIKE '%' || #{serch_box} || '%'
+		        )
+		    </if>
+		</where>
+		ORDER BY work_date DESC
 	</select>
 	
 	<select id="getWorkTmpList" resultType="com.deepen.domain.WorkTmpDTO" >
@@ -84,6 +105,37 @@
 		  FROM WORK_TMP w
 		  	   JOIN COMMON_DETAIL cd1 ON w.work_shift = cd1.common_detail_code
 		  	   JOIN COMMON_DETAIL cd2 ON w.work_type = cd2.common_detail_code
+	</select>
+	
+	<select id="getVctnList" resultType="Map" >
+		SELECT VACATION_NO
+		 	 , VACATION_TYPE 
+		 	 , cd.COMMON_DETAIL_NAME AS TYPE_NAME
+		 	 , VACATION_START
+		 	 , VACATION_END
+		 	 , VACATION_TOTAL
+		 	 , VACATION_LEAVE
+		 	 , e.EMP_NAME 
+		 	 , e.EMP_DEPT 
+		  FROM VACATION v 
+			   JOIN EMPLOYEES e ON v.VACATION_LEAVE = e.EMP_ID 
+		  	   JOIN COMMON_DETAIL cd ON v.VACATION_TYPE = cd.COMMON_DETAIL_CODE 
+		<where>
+			(
+		        (VACATION_START BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD'))
+		        OR
+		        (VACATION_END BETWEEN TO_DATE(#{start}, 'YYYY-MM-DD') AND TO_DATE(#{end}, 'YYYY-MM-DD'))
+		        OR
+		        (VACATION_START &lt;= TO_DATE(#{start}, 'YYYY-MM-DD') AND VACATION_END >= TO_DATE(#{end}, 'YYYY-MM-DD'))
+		    )
+			<if test="dept == null or dept == ''">
+				AND VACATION_LEAVE = #{emp_id}
+			</if>
+			<if test="dept != null and dept != '' and dept != 'deptAll'">
+				AND EMP_DEPT = #{dept}
+			</if>
+		</where>
+	
 	</select>
 	
 </mapper>

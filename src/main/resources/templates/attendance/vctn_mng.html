@@ -313,6 +313,7 @@
 			popup = window.open('/vctn-appform', '', 'width=' + popupW + ',height=' + popupH + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=no,toolbar=no,titlebar=no,menubar=no,location=no')
 			
 			popup.addEventListener('beforeunload', function() { // 팝업창 콜백 처리
+				console.info("ㅍ바업 닫힘");
 			    window.location.href = '/request-list'; // 요청내역 페이지로 이동
 			});
 		

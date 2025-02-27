@@ -7,42 +7,42 @@ $(function() {
 	console.log('isEditable :', isEditable); 
 	
 	// 그리드 수정 시 공통코드 셀렉트값 가져오기
-		function mainFetchData() {
-		    
-		    return Promise.all([
-		         getCommonList('UNIT'), 
-		    ])
-		    .then(function ([unitCommon]) {
-		        return {
-		            unitCommon: unitCommon.map(item => ({
-		                text: item.common_detail_name,
-		                value: item.common_detail_name
-		            }))
-		        };
-		    })
-		    .catch(function (error) {
-		        console.error('Error fetching data:', error);
-		        return { unitCommon: [] };
-		    });
-		}
-		
-		// type으로 공통 코드 가져오는 함수
-		function getCommonList(type) {
-		    return axios.get(`/api/absence/common/list/${type}`)
-		        .then(function (response) {
-		            return response.data; // 데이터 반환
-		        })
-		        .catch(function (error) {
-		            console.error('Error fetching data:', error);
-					Swal.fire(
-					        'Error',
-					        '데이터를 가져오는 중 문제가 발생했습니다.',
-					        'error'
-					      )
-		            return []; // 에러 발생 시 빈 배열 반환
-		        });
-		}
+	function mainFetchData() {
+	    
+	    return Promise.all([
+	         getCommonList('UNIT'), 
+	    ])
+	    .then(function ([unitCommon]) {
+	        return {
+	            unitCommon: unitCommon.map(item => ({
+	                text: item.common_detail_name,
+	                value: item.common_detail_name
+	            }))
+	        };
+	    })
+	    .catch(function (error) {
+	        console.error('Error fetching data:', error);
+	        return { unitCommon: [] };
+	    });
+	}
 	
+	// type으로 공통 코드 가져오는 함수
+	function getCommonList(type) {
+	    return axios.get(`/api/absence/common/list/${type}`)
+	        .then(function (response) {
+	            return response.data; // 데이터 반환
+	        })
+	        .catch(function (error) {
+	            console.error('Error fetching data:', error);
+				Swal.fire(
+				        'Error',
+				        '데이터를 가져오는 중 문제가 발생했습니다.',
+				        'error'
+				      )
+	            return []; // 에러 발생 시 빈 배열 반환
+	        });
+	}
+
 	
 	let grid;
 	mainFetchData().then(function (data) {  
@@ -53,15 +53,15 @@ $(function() {
 			bodyHeight: 550,
 			rowHeaders: ['checkbox'],
 			columns: [
-				{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true},
-				{header: '자재 이름', name: 'mtr_name', width: 200, editor: isEditable ? 'text' : null},
-				{header: '자재 종류', name: 'mtr_type', width: 150, editor: isEditable ? 'text' : null, filter: 'select' },
-				{header: '자재 성분', name: 'composition', width: 150, editor: isEditable ? 'text' : null},
-				{header: '경도/강도', name: 'hardness', width: 100, editor: isEditable ? 'text' : null},
-				{header: '밀도 (g/cm³)', name: 'density', width: 100, editor: isEditable ? 'text' : null},
-				{header: '융점 (°C)', name: 'melting_point', width: 100, editor: isEditable ? 'text' : null},
-				{header: '인장 강도 (MPa)', name: 'tensile_strength', width: 100, editor: isEditable ? 'text' : null},
-				{header: '주요 용도', name: 'mtr_use', width: 150, editor: isEditable ? 'text' : null},
+				{header: '번호', name: 'mtr_no', width: 60, editor: isEditable ? 'text' : null, sortingType: 'asc', sortable: true, align: 'center'},
+				{header: '자재 이름', name: 'mtr_name', width: 200, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '자재 종류', name: 'mtr_type', width: 150, editor: isEditable ? 'text' : null, filter: 'select' , align: 'center'},
+				{header: '자재 성분', name: 'composition', width: 150, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '경도/강도', name: 'hardness', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '밀도 (g/cm³)', name: 'density', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '융점 (°C)', name: 'melting_point', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '인장 강도 (MPa)', name: 'tensile_strength', width: 100, editor: isEditable ? 'text' : null, align: 'center'},
+				{header: '주요 용도', name: 'mtr_use', width: 150, editor: isEditable ? 'text' : null, align: 'center'},
 				{
 					header: '자재 단위', 
 					name: 'unit_name', 
@@ -70,6 +70,7 @@ $(function() {
 						type: 'select',
 						options: {listItems: data.unitCommon}
 					},
+					align: 'center'
 				},
 				{
 					header: '등록일', 
@@ -78,19 +79,14 @@ $(function() {
 					editor: isEditable
 						? {
 		                type: 'datePicker',
-		                options: {
-		                    format: 'yyyy-MM-dd',
-							language: 'ko' 
-		                }
+		                options: { format: 'yyyy-MM-dd', language: 'ko' }
 		            }
 					: null,
 		            filter: {
 		                type: 'date',
-		                options: {
-		                    format: 'yyyy-MM-dd',
-							language: 'ko' 
-		                }
-		            }
+		                options: { format: 'yyyy-MM-dd', language: 'ko' }
+		            },
+					align: 'center'
 				},
 				{
 					header: '수정일', 
@@ -99,21 +95,16 @@ $(function() {
 					editor: isEditable
 						? {
 		                type: 'datePicker',
-		                options: {
-		                    format: 'yyyy-MM-dd',
-							language: 'ko' 
-		                }
+		                options: { format: 'yyyy-MM-dd',language: 'ko' }
 		            }
 					: null,
 		            filter: {
 		                type: 'date',
-		                options: {
-		                    format: 'yyyy-MM-dd',
-							language: 'ko' 
-		                }
-		            }
+		                options: { format: 'yyyy-MM-dd', language: 'ko' }
+		            },
+					align: 'center'
 				},
-				{header: '사용여부', name: 'mtr_status', width: 80, editor: isEditable ? 'text' : null, filter: 'select' },
+				{ header: '사용여부', name: 'mtr_status', width: 80, editor: isEditable ? 'text' : null, filter: 'select', align: 'center' },
 			],
 			editing: isEditable  // 편집 기능 활성화
 		});
@@ -209,29 +200,38 @@ $(function() {
 	// "삭제" 버튼 클릭 이벤트
 	$('#delete').on('click', function () {
 		const selectedRows = grid.getCheckedRows();
-		console.log('선택된 데이터:', selectedRows);
 		
 		if (selectedRows.length === 0) {
-			Swal.fire({ icon: "warning",title: "삭제할 항목을 선택하세요."})
+			Swal.fire({ icon: "warning", title: "삭제할 항목을 선택하세요."})
 	        return;
 	    }
-		
-		const deleteList = selectedRows.map(row => row.mtr_no);
-		
-		axios.post('/api/material/delete', deleteList, {
-			headers: {
-			        'X-CSRF-TOKEN': csrfToken
-			    }
-		})
-	    .then(function (response) {
-			Swal.fire('Success', '삭제가 완료되었습니다.', 'success' )
-	        window.location.reload();
-	    })
-	    .catch(function (error) {
-	        console.error('삭제 중 오류 발생:', error);
-			Swal.fire('Error','삭제 중 문제가 발생했습니다.','error' )
-	    });
-		
+		Swal.fire({
+		      icon: "warning",
+		      title: "주문 건 삭제",
+			  text: "해당 정보를 모두 삭제하시겠습니까?",
+		      showCancelButton: true,
+		      confirmButtonText: "확인",   
+		      cancelButtonText: "취소"     
+		}).then((result) => {
+			if (result.isConfirmed) {  
+				const deleteList = selectedRows.map(row => row.mtr_no);
+				
+				axios.post('/api/material/delete', deleteList, {
+					headers: { 'X-CSRF-TOKEN': csrfToken }
+				})
+			    .then(function (response) {
+					Swal.fire('Success', '삭제가 완료되었습니다.', 'success' )
+					.then(() => {
+						window.location.reload();  
+					});
+			    })
+			    .catch(function (error) {
+			        console.error('삭제 중 오류 발생:', error);
+					Swal.fire('Error','삭제 중 문제가 발생했습니다.','error' )
+			    });
+			} 
+		});
+		     
 	}); // 삭제 버튼 이벤트
 	
 	

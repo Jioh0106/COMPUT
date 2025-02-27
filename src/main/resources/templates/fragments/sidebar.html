@@ -13,7 +13,7 @@
 		        <!-- 날짜 -->
 	        	<div class="d-flex align-items-center">
 	        		<h5 id="todayDate" class="me-3 " >날짜</h5>
-	        		<button type="button" class="btn btn-primary btn" id="atndBtn" onclick="cmtBtn()">출근하기</button>
+	        		<button type="button" class="btn btn-primary" id="atndBtn" onclick="cmtBtn()">출근하기</button>
 	        		
 	        		<!-- data로 담아 갈 input -->
 	        		<input type="hidden" id="cmtCd">
@@ -28,16 +28,18 @@
 	        
 			<div class="col-md-4 d-flex justify-content-end"> 
 				<!-- 알림 아이콘  -->
-				<a href="#" class="d-flex align-items-center">
-		        	<i class="fs-3 bi bi-bell-fill mx-3 d-flex align-items-center" id="top-bell"></i>
-		        </a>
+<!-- 				<a href="#" class="d-flex align-items-center"> -->
+<!-- 		        	<i class="fs-3 bi bi-bell-fill mx-3 d-flex align-items-center" id="top-bell"></i> -->
+<!-- 		        </a> -->
 		        
-				<!-- 마이페이지  -->
-				<a href="#" class="d-flex align-items-center">
-		        	<i class=" fs-3 bi bi-person-circle mx-3 d-flex align-items-center"></i>
-		        </a>
+<!-- 				마이페이지  -->
+<!-- 				<a href="#" class="d-flex align-items-center"> -->
+<!-- 		        	<i class=" fs-3 bi bi-person-circle mx-3 d-flex align-items-center"></i> -->
+<!-- 		        </a> -->
 		        <!-- 로그아웃 버튼 -->
-				<button type="button" class="btn btn-outline-secondary btn-sm rounded-pill ms-3 me-4 d-flex align-items-center" onclick="location.href='logout'">로그아웃</button>
+				<button type="button" id="logoutBtn" class="btn btn-outline-secondary rounded-pill ms-3 me-4 d-flex align-items-center" onclick="location.href='logout'">
+					로그아웃 &nbsp; <i class="bi bi-box-arrow-right "></i>
+				</button>
 	        </div> <!-- right -->
 		</div> <!-- topbar -->
 	

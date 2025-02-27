@@ -374,8 +374,10 @@
 	
 	<update id="updateEquipmentInfoByLineNoToOperation" parameterType="Map">
 		UPDATE equipment_info SET
-			info_type = 'USST001'
-		WHERE line_no = #{line_no}
+			info_type = 'USST001',
+			info_use_date = sysdate,
+			info_mdfn_date = sysdate
+		WHERE line_no = #{line_name}
 			AND (info_type = 'USST002' OR info_type = 'USST004') 
 	</update>
 	
@@ -474,7 +476,8 @@
 	
 	<update id="updateEquipmentInfoByLineNoToStanBy">
 		UPDATE equipment_info SET
-			info_type = 'USST002'
+			info_type = 'USST002',
+			info_mdfn_date = sysdate
 		WHERE line_no = #{lineNo}
 			AND info_type = 'USST001'
 	</update>

@@ -686,7 +686,7 @@
 					  if (typeof row.process_name === 'string' && row.process_name.includes(',')) {
 					      row.process_name = row.process_name.split(',').map(v => v.trim()).join('/'); // 쉼표 → 슬래시 변환
 					  }
-					  console.log('공정유형ㅗㅗ', row.process_name);	
+					  console.log('공정유형', row.process_name);	
 					  
 					  row.bom_no = row.bom_no || null;
 				      row.bom_quantity = row.bom_quantity || 0; // 소모량 기본값 0

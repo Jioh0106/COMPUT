@@ -24,12 +24,17 @@ public class WorkDTO {
 	
 	private String emp_name;
 	private String emp_dept;
+	private String dept_name;
 	private String work_start;
 	private String work_end;
 	private String work_shift;
+	private String shift_name;
 	private String work_type;
+	private String type_name;
 	private Integer work_time;
 	private Integer rest_time;
+	
+	
 	
 	@Override
     public boolean equals(Object o) {

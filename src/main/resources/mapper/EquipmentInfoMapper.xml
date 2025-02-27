@@ -21,10 +21,10 @@
 		 				, info_sn as "sn"
 						, info_nm as "name"
 						, info_kind as "kind"
-						, info_mnfct as "mnfct"
+						, TO_CHAR(info_mnfct) as "mnfct"
 						, TO_CHAR(info_buy_date, 'YYYY-MM-DD') as "buy"
 						, TO_CHAR(info_set_date, 'YYYY-MM-DD') as "set"
-						, line_no as "line"
+						, TO_CHAR(line_no) as "line"
 						, info_useyn as "useYn"
 						, 'select' AS  "rowType"
 		 FROM

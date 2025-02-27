@@ -26,17 +26,12 @@ public class SalaryFormulaCalculator {
             String formulaCode) {  
             
         try {
-            log.info("급여 계산 시작 - 직원ID: {}, 계산식 코드: {}", emp.getEmp_id(), formulaCode);
-            log.info("계산식 내용: {}", formula.toString());
-            
             String type = formula.get("type").asText();
-            log.info("계산 유형: {}", type);
             
             BigDecimal result;
             
             // 수당 계산
             if (formulaCode.startsWith("RWRD")) {
-                log.info("수당 계산 시작 - 유형: {}", type);
                 result = switch (type) {
                     case "fixed" -> {
                         BigDecimal amount = allowanceCalculator.calculateTechAllowance(formula, emp);
@@ -59,7 +54,6 @@ public class SalaryFormulaCalculator {
                         yield amount;
                     }
                     default -> {
-                        log.warn("알 수 없는 수당 유형: {}", type);
                         yield BigDecimal.ZERO;
                     }
                 };
@@ -67,7 +61,6 @@ public class SalaryFormulaCalculator {
             
             // 공제 계산
             else if (formulaCode.startsWith("DDCT")) {
-                log.info("공제 계산 시작 - 코드: {}", formulaCode);
                 result = switch (formulaCode) {
                     case "DDCT001" -> {
                         BigDecimal amount = deductionCalculator.calculateNationalPension(formula, payInfo);
@@ -94,21 +87,17 @@ public class SalaryFormulaCalculator {
                         yield amount;
                     }
                     default -> {
-                        log.warn("알 수 없는 공제 코드: {}", formulaCode);
                         yield BigDecimal.ZERO;
                     }
                 };
             }
             else {
-                log.warn("알 수 없는 계산식 코드: {}", formulaCode);
                 result = BigDecimal.ZERO;
             }
             
-            log.info("최종 계산 결과 - 코드: {}, 금액: {}", formulaCode, result);
             return result;
             
         } catch (Exception e) {
-            log.error("급여 계산 중 오류 발생 - 코드: {}, 에러: {}", formulaCode, e.getMessage(), e);
             return BigDecimal.ZERO;
         }
     }

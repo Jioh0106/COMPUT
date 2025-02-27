@@ -29,8 +29,29 @@ $(document).ready(function () {
 	        end: formatDate(lastDay),
 	    };
 	}
-	
-
+	const calendarList = [
+	    {
+	        id: 'work',
+	        name: '근무일정',
+	        backgroundColor: '#ff9f89',
+	        borderColor: '#ff6f61',
+	        dragBackgroundColor: '#ff9f89',
+	    },
+	    {
+	        id: 'vctn', 
+	        name: '휴가일정',
+	        backgroundColor: '#b9def0',
+	        borderColor: '#3a9bdc',
+	        dragBackgroundColor: '#86c5da',
+	    },
+	    {
+	        id: 'loab', 
+	        name: '휴직일정',
+	        backgroundColor: '#b6b3b3',
+	        borderColor: '#686868',
+	        dragBackgroundColor: '#686868',
+	    }
+	];
 
 	// Toast UI Calendar 초기화
 	const calendar = new tui.Calendar('#calendar', {
@@ -38,6 +59,7 @@ $(document).ready(function () {
 	    taskView: false, // Task 보이지 않게 설정
 	    scheduleView: true, // 일정 보이게 설정
 	    useDetailPopup: true, // 상세 팝업 활성화
+		calendars: calendarList, 
 		timezone: {
 	       zones: [
 	           { timezoneName: 'Asia/Seoul', displayLabel: 'Seoul'},
@@ -46,14 +68,20 @@ $(document).ready(function () {
 	    template: {
 	        monthDayname: (dayname) =>
 	            `<span class="calendar-week-dayname">${dayname.label}</span>`, // 주 이름 템플릿
+			monthGridTitle: function(schedule) {
+		        // ✅ `Boolean(schedule.isAllDay)`을 사용하여 `true`인지 정확하게 확인
+		        return Boolean(schedule.isAllDay) ? schedule.title : `${schedule.start.split('T')[1]} - ${schedule.title}`;
+		    }
 	    },
 	});
 
 	// AJAX 요청 함수: 일정 가져오기
 	function fetchSchedules() {
 	    const { start, end } = getMonthStartAndEndDates();
-	    console.log("start = " + start);
-	    console.log("end = " + end);
+		const dept = $('#deptSelect').val();
+		const deptParam = dept !== undefined && dept !== null && dept !== '' ? dept : '';
+		
+	    console.log("Fetching schedules for:", { start, end, dept });
 
 	    $.ajax({
 	        url: '/api/work/schedules', 
@@ -61,6 +89,7 @@ $(document).ready(function () {
 	        data: {
 	            startDate: start,
 	            endDate: end,
+				dept: deptParam
 	        },
 	        success: function (response) {
 	            console.log('Schedules fetched successfully:', response);
@@ -73,11 +102,12 @@ $(document).ready(function () {
 	                title: schedule.title, 
 	                start: schedule.start, 
 	                end: schedule.end, 
-	                isAllDay: schedule.isAllDay || false,
-	                category: schedule.category || 'time', 
+	                isAllDay: Boolean(schedule.isAllDay), 
+	                category: schedule.isAllDay ? 'allday' : 'time',
 	                location: schedule.location || '', 
 	            }));
 	            calendar.createEvents(events); // 새 일정 추가
+				calendar.render();
 	        },
 	        error: function (xhr, status, error) {
 	            console.error('Failed to fetch schedules:', error);
@@ -127,8 +157,7 @@ $(document).ready(function () {
 	
 	    getCommonList(type).then(function (data) {
 	        $('#deptSelect')
-	            .empty()
-				.append('<option value="" disabled selected>전체 부서</option>');
+			.append('<option value="deptAll" >전체 부서</option>');
 	        data.forEach(item => {
 	            if (item.common_detail_code && item.common_detail_name) {
 	                $('#deptSelect').append(
@@ -159,29 +188,9 @@ $(document).ready(function () {
 	        });
 	}
 	
-	$('#deptSelect').on('change', function () {
-	    // 이미 데이터가 로드된 경우 추가 요청 방지
-	    if (this.options.length > 1) {
-	        return;
-	    }
 	
-	    const type = 'DEPT'; 
-	
-	    getCommonList(type).then(function (data) {
-	        $('#deptSelect')
-	            .empty()
-				.append('<option value="" disabled selected>전체 부서</option>');
-	        data.forEach(item => {
-	            if (item.common_detail_code && item.common_detail_name) {
-	                $('#deptSelect').append(
-	                    $('<option></option>').val(item.common_detail_code).text(item.common_detail_name)
-	                );
-	            }
-	        });
-	    });
-	    
-	}); // 부서 셀렉트 박스
-	
-
+	$('#deptSelect').on('change', function() {
+		fetchSchedules();
+	});
 
 });
