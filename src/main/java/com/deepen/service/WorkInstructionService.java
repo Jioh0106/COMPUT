@@ -185,10 +185,10 @@ public class WorkInstructionService {
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
 		
 		// 공정 lot insert
-		//createAndInsertProcessLot(updateDataList,sessionEmpId);
+		createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
 		// lot_master insert
-		//createAndInsertLotMaster(updateDataList,sessionEmpId);
+		createAndInsertLotMaster(updateDataList,sessionEmpId);
 		
 		log.info("작업 시작 완료");
 		
