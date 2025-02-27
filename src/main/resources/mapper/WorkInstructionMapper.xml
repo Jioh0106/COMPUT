@@ -377,7 +377,7 @@
 			info_type = 'USST001',
 			info_use_date = sysdate,
 			info_mdfn_date = sysdate
-		WHERE line_no = #{line_no}
+		WHERE line_no = #{line_name}
 			AND (info_type = 'USST002' OR info_type = 'USST004') 
 	</update>
 	
