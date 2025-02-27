@@ -177,6 +177,7 @@ public class WorkInstructionService {
 			
 			// 설비 상태 업데이트 => 가동(USST001)
 			// 조건 : 라인번호에 해당하는 설비, 상태가 대기(USST002),정지(USST004)인 것만
+			log.info("라인 번호 : "+updateData.get("line_no").toString());
 			wiMapper.updateEquipmentInfoByLineNoToOperation(updateData);
 			log.info("설비 상태 업데이트 완료!");
 		}
@@ -184,10 +185,10 @@ public class WorkInstructionService {
 		log.info("작업 지시 정보 및 상태 업데이트 완료");
 		
 		// 공정 lot insert
-		createAndInsertProcessLot(updateDataList,sessionEmpId);
+		//createAndInsertProcessLot(updateDataList,sessionEmpId);
 		
 		// lot_master insert
-		createAndInsertLotMaster(updateDataList,sessionEmpId);
+		//createAndInsertLotMaster(updateDataList,sessionEmpId);
 		
 		log.info("작업 시작 완료");
 		
