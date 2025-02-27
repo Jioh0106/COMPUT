@@ -27,7 +27,7 @@
 					WHERE REGEXP_REPLACE(COMMON_DETAIL_CODE, '[0-9]') = 'USST'
 					AND common_detail_status = 'Y' 
 					AND common_detail_code = info_type), '정지') AS "type"
-			, info_use_date AS "useDate"
+			, TO_CHAR(info_use_date, 'YYYY-MM-DD') AS "useDate"
 		FROM
 			equipment_info ei
 		<where>
