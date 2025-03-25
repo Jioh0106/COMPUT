@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.deepen.calculator.SalaryFormulaCalculator;
 import com.deepen.domain.PayInfoDTO;
@@ -25,10 +28,7 @@ import com.deepen.repository.PersonnelRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.transaction.Transactional;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -76,7 +76,7 @@ public class PayrollCalculatorService {
     /**
      * 급여 계산 수행
      */
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public PayInfoDTO calculateSalary(String empId, String paymentDate) {
         log.info("급여 계산 시작 - 사원번호: {}, 지급월: {}", empId, paymentDate);
 
@@ -93,9 +93,6 @@ public class PayrollCalculatorService {
             // 4. 급여 정보 생성 및 계산
             PayInfo payInfo = calculatePayInfo(emp, paymentDate, formulas);
 
-            // 5. 저장
-//            PayInfo savedPayInfo = payInfoRepository.save(payInfo);
-            
             log.info("급여 계산 완료 - 사원번호: {}, 지급월: {}", empId, paymentDate);
             
             // 6. DTO 변환 후 반환
@@ -110,7 +107,7 @@ public class PayrollCalculatorService {
     /**
      * 급여 저장 수행
      */
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public PayInfoDTO saveSalary(PayInfoDTO payInfoDTO) {
         try {
             // 1. 지급월 중복 체크
@@ -146,9 +143,15 @@ public class PayrollCalculatorService {
             setCreationInfo(payInfo);
             
             // 저장
-            PayInfo savedPayInfo = payInfoRepository.save(payInfo);
-            return convertToDTO(savedPayInfo);
-
+            try {
+                payInfo = payInfoRepository.save(payInfo);
+            } catch (DataIntegrityViolationException ex) {
+                log.error("동시성으로 인한 중복 저장 시도 (saveSalary): empId={}, paymentDate={}", 
+                    payInfoDTO.getEmpId(), payInfoDTO.getPaymentDate(), ex);
+                throw new RuntimeException("해당 지급월에 급여가 이미 지급되었습니다.");
+            }
+            
+            return convertToDTO(payInfo);
         } catch (Exception e) {
             log.error("급여 저장 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("급여 저장 중 오류가 발생했습니다: " + e.getMessage());
