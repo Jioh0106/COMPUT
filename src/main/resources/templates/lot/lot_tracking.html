@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>LOT 추적</title>
+	<title>COMPUT.</title>
 
 	<!-- CSS 라이브러리 -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css">
@@ -16,7 +16,8 @@
 	<link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
 	<link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
 	<link rel="stylesheet" th:href="@{/assets/css/app.css}">
-
+	<link rel="icon" href="images/favicon.png" type="images/png">
+	
 	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}" />
 	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}" />
 
@@ -85,6 +86,20 @@
 	    transform: translateY(10%) !important;
 	    color: var(--error-color) !important;
 	    animation: pulse 2s infinite !important;
+	}
+	
+	.lot-node-fail {
+	  background-color: rgba(255, 0, 0, 0.08) !important; 
+	  border-left: 4px solid red !important;
+	  display: inline-block !important;
+	  min-height: 24px;
+	  border-radius: 4px;
+	  padding: 2px 4px;
+	  transition: background-color 0.3s ease;
+	}
+	
+	.lot-node-fail:hover {
+	  background-color: rgba(255, 0, 0, 0.15) !important;
 	}
 	
 	.split {

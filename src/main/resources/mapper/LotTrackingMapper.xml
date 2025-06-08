@@ -6,32 +6,47 @@
 	<select id="selectLotByWorkOrder"
 		resultType="com.deepen.domain.LotMasterDTO">
 		SELECT
-		lm.lot_no,
-		lm.process_type,
-		lm.wi_no,
-		p.product_no,
-		p.product_name,
-		pi.process_no,
-		pi.process_name,
-		li.line_no,
-		li.line_name,
-		lm.lot_status,
-		lm.start_time,
-		lm.end_time,
-		lm.create_user,
-		lm.create_time
-		FROM lot_master lm
-		INNER JOIN work_instruction wi ON lm.wi_no =
-		wi.wi_no
-		INNER JOIN product p ON wi.product_no = p.product_no
-		INNER JOIN
-		process_info pi ON lm.process_no = pi.process_no
-		LEFT JOIN line_info li
-		ON lm.line_no = li.line_no
-		WHERE lm.wi_no = #{wiNo}
-		ORDER BY
-		lm.start_time DESC
+		l.lot_no,
+		l.wi_no,
+		l.process_type,
+		l.lot_status,
+		l.start_time,
+		l.end_time,
+		l.create_user,
+		l.create_time
+		FROM lot_master l
+		WHERE l.wi_no = #{wiNo}
+		ORDER BY l.start_time DESC
 	</select>
+
+	<select id="selectLotProcessHistoryBatch"
+		parameterType="java.util.List"
+		resultType="com.deepen.domain.LotProcessDTO"> SELECT lpl.process_log_no,
+		lpl.lot_no, lpl.process_no, ... FROM lot_process_log lpl WHERE
+		lpl.lot_no IN <foreach collection="list" item="lotNo" open="("
+			separator="," close=")">
+			#{lotNo}
+		</foreach> ORDER BY lpl.process_log_no DESC </select>
+
+	<select id="selectLotQcHistoryBatch"
+        parameterType="java.util.List"
+        resultType="com.deepen.domain.LotQcDTO">
+    SELECT 
+        lql.qc_log_no,
+        lql.lot_no,
+        lql.process_no,
+        lql.judgement,
+        lql.inspector,
+        lql.check_time,
+        lql.create_time
+    FROM lot_qc_log lql
+    WHERE lql.lot_no IN
+        <foreach collection="list" item="lotNo" open="(" separator="," close=")">
+            #{lotNo}
+        </foreach>
+    ORDER BY lql.qc_log_no DESC
+</select>
+
 
 	<!-- LOT 마스터 정보 조회 (제품별) -->
 	<select id="selectLotByProduct"
@@ -187,36 +202,29 @@
 
 	<select id="searchLots"
 		resultType="com.deepen.domain.LotMasterDTO"
-		parameterType="java.util.Map">
-		SELECT
-		l.lot_no AS lotNo,
-		l.parent_lot_no AS parentLotNo,
-		FROM lot_master
-		l
-		LEFT JOIN work_instruction wi ON l.wi_no = wi.wi_no
-		LEFT JOIN product
-		p ON wi.product_no = p.product_no
-		LEFT JOIN process_info pi ON
-		l.process_no = pi.process_no
-		WHERE 1=1
-		<if test="lotNo != null and lotNo != ''">
+		parameterType="java.util.Map"> SELECT l.lot_no AS lotNo, l.parent_lot_no
+		AS parentLotNo, FROM lot_master l LEFT JOIN work_instruction wi ON
+		l.wi_no = wi.wi_no LEFT JOIN product p ON wi.product_no = p.product_no
+		LEFT JOIN process_info pi ON l.process_no = pi.process_no WHERE 1=1 <if
+			test="lotNo != null and lotNo != ''">
 			AND l.lot_no LIKE '%' || #{lotNo} || '%'
 		</if>
-		<if test="productNo != null and productNo != 0">
+		<if
+			test="productNo != null and productNo != 0">
 			AND p.product_no = #{productNo}
 		</if>
-		<if test="processType != null and processType != ''">
+		<if
+			test="processType != null and processType != ''">
 			AND l.process_type = #{processType}
 		</if>
-		<if test="searchText != null and searchText != ''">
+		<if
+			test="searchText != null and searchText != ''">
 			AND (
 			l.lot_no LIKE '%' || #{searchText} || '%' OR
 			p.product_name LIKE '%' || #{searchText} || '%'
 			)
 		</if>
-		ORDER BY l.start_time DESC
-		LIMIT #{limit} OFFSET #{offset}
-	</select>
+		ORDER BY l.start_time DESC LIMIT #{limit} OFFSET #{offset} </select>
 
 	<select id="countSearchLots" resultType="int"
 		parameterType="java.util.Map">
@@ -230,46 +238,38 @@
 	</select>
 
 	<select id="searchLotsByFilter"
-		resultType="com.deepen.domain.LotMasterDTO">
-		SELECT
-		l.lot_no AS lotNo,
-		l.parent_lot_no AS parentLotNo,
-		l.process_type AS processType,
-		l.wi_no AS wiNo,
-		p.product_no AS productNo,
-		p.product_name AS productName,
-		pi.process_no AS processNo,
-		pi.process_name AS processName,
-		l.lot_status AS lotStatus,
-		l.start_time AS startTime,
-		l.end_time AS endTime,
-		l.create_user AS createUser
-		FROM lot_master l
-		LEFT JOIN work_instruction wi ON l.wi_no = wi.wi_no
-		LEFT JOIN product p ON wi.product_no = p.product_no
-		LEFT JOIN process_info pi ON l.process_no = pi.process_no
-		LEFT JOIN line_info li ON l.line_no = li.line_no
-		WHERE 1=1
-		<if test="lotNo != null and lotNo != ''">
+		resultType="com.deepen.domain.LotMasterDTO"> SELECT l.lot_no AS lotNo,
+		l.parent_lot_no AS parentLotNo, l.process_type AS processType, l.wi_no
+		AS wiNo, p.product_no AS productNo, p.product_name AS productName,
+		pi.process_no AS processNo, pi.process_name AS processName, l.lot_status
+		AS lotStatus, l.start_time AS startTime, l.end_time AS endTime,
+		l.create_user AS createUser FROM lot_master l LEFT JOIN work_instruction
+		wi ON l.wi_no = wi.wi_no LEFT JOIN product p ON wi.product_no =
+		p.product_no LEFT JOIN process_info pi ON l.process_no = pi.process_no
+		LEFT JOIN line_info li ON l.line_no = li.line_no WHERE 1=1 <if
+			test="lotNo != null and lotNo != ''">
 			AND l.lot_no LIKE '%' || #{lotNo} || '%'
 		</if>
-		<if test="wiNo != null and wiNo != 0">
+		<if
+			test="wiNo != null and wiNo != 0">
 			AND l.wi_no = #{wiNo}
 		</if>
-		<if test="productNo != null and productNo != 0">
+		<if
+			test="productNo != null and productNo != 0">
 			AND p.product_no = #{productNo}
 		</if>
-		<if test="processType != null and processType != ''">
+		<if
+			test="processType != null and processType != ''">
 			AND l.process_type = #{processType}
 		</if>
-		<if test="searchText != null and searchText != ''">
+		<if
+			test="searchText != null and searchText != ''">
 			AND (
 			l.lot_no LIKE '%' || #{searchText} || '%' OR
 			p.product_name LIKE '%' || #{searchText} || '%'
 			)
 		</if>
-		ORDER BY l.start_time DESC
-		<if test="limit != null">
+		ORDER BY l.start_time DESC <if test="limit != null">
 			LIMIT #{limit} OFFSET #{offset}
 		</if>
 	</select>

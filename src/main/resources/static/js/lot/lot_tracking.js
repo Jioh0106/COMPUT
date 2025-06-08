@@ -100,20 +100,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// LOT 노드 텍스트 포맷팅
 		formatLotNodeText(lot) {
-			if (!lot) return '데이터 없음';
+		    if (!lot) return '데이터 없음';
 
-			const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
-			const statusBadge = this.getStatusBadge(lot.lotStatus);
-			const warningIcon = hasQcFailed ?
-				'<i class="bi bi-exclamation-triangle-fill qc-warning-icon"></i>' : '';
+		    // 불합격 QC 항목이 있는지 검사
+		    const hasQcFailed = lot.qcHistory?.some(qc => qc.judgement === 'N');
+		    
+		    // 불합격이 있으면 lot-node-fail 클래스를 추가
+		    const failClass = hasQcFailed ? ' lot-node-fail' : '';
 
-			return `
-		        <div class="lot-node">
+		    const statusBadge = this.getStatusBadge(lot.lotStatus);
+
+		    return `
+		        <div class="lot-node${failClass}">
 		            <div class="lot-node-text">
 		                ${lot.lotNo} - ${lot.productName || '미지정'}
 		                <span class="lot-node-status">${statusBadge}</span>
 		            </div>
-		            ${warningIcon}
 		        </div>
 		    `;
 		}
@@ -672,7 +674,6 @@ document.addEventListener('DOMContentLoaded', function() {
 					try {
 						if (this.lotTreeView.jstree(true)) {
 							console.log('[renderLotTree] 모든 노드 확장');
-							this.lotTreeView.jstree('open_all');
 						}
 					} catch (error) {
 						console.error('[renderLotTree] 노드 확장 실패:', error);
@@ -738,7 +739,6 @@ document.addEventListener('DOMContentLoaded', function() {
 							setTimeout(() => {
 								try {
 									console.log('[initializeJSTree] 모든 노드 확장 시도');
-									this.lotTreeView.jstree('open_all');
 									
 									// 노드 수 확인
 									const allNodes = this.lotTreeView.jstree(true).get_json('#', {flat: true});
@@ -863,7 +863,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						parentLotNo: lot.parentLotNo,
 						data: lot,
 						children: lot.children.map(child => convertToTreeNode(child)),
-						state: { opened: true }
+						state: { opened: false }
 					};
 				};
 				
@@ -1227,7 +1227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     id: `wo-${workOrder.wiNo}`,
                     text: this.formatWorkOrderNodeText(workOrder),
                     icon: 'bi bi-clipboard-data',
-                    state: { opened: true },
+                    state: { opened: false },
                     workOrderNo: workOrder.wiNo,
                     children: []
                 };

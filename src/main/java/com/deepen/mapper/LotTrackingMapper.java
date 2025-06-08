@@ -31,4 +31,6 @@ public interface LotTrackingMapper {
 	List<LotMasterDTO> searchLotsByFilter(Map<String, Object> params);
 	
 	int countLotsByFilter(Map<String, Object> params);
+	List<LotProcessDTO> selectLotProcessHistoryBatch(List<String> lotNoList);
+	List<LotQcDTO> selectLotQcHistoryBatch(List<String> lotNoList);
 }

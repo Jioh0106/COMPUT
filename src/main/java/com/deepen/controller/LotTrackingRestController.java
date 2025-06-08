@@ -51,11 +51,19 @@ public class LotTrackingRestController {
     @GetMapping(value = "/work-order/{wiNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LotMasterDTO>> getLotTrackingByWorkOrder(
             @PathVariable(name = "wiNo") Integer wiNo) {
+
+        long start = System.currentTimeMillis();
+
+        // (1) LOT 목록 1회, (2) 공정 이력 일괄 조회, (3) QC 이력 일괄 조회 → 3번 쿼리
         List<LotMasterDTO> result = lotTrackingService.getLotTrackingByWorkOrder(wiNo);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(result);
+
+        long end = System.currentTimeMillis();
+        System.out.println("[LOG] getLotTrackingByWorkOrder took " 
+                           + (end - start) + " ms");
+
+        return ResponseEntity.ok(result);
     }
+
     
     @GetMapping(value = "/product/{productNo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LotMasterDTO>> getLotTrackingByProduct(
@@ -94,7 +102,7 @@ public class LotTrackingRestController {
             @RequestParam(name = "lotNo", required = false) String lotNo,
             @RequestParam(name = "productNo", required = false) Integer productNo,
             @RequestParam(name = "processType", required = false) String processType,
-            @RequestParam(name = "seacrhText", required = false) String searchText,
+            @RequestParam(name = "searchText", required = false) String searchText,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
         
